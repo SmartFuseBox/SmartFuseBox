@@ -30,7 +30,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
     if (cmd == ConfigSoundRelayId)
     {
         // Expect "MAP <value>=<relay>" where relay 0..7 (or 255 to unmap)
-        if (paramCount >= 1)
+        if (paramCount == 1 && params[1].value.length() > 0)
         {
             uint8_t relay = params[0].value.toInt(); // if value empty, toInt() -> 0
 
@@ -45,7 +45,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         }
         else
         {
-            sendAckErr(sender, cmd, F("Missing params"));
+            sendAckErr(sender, cmd, F("Invalid params"));
         }
     }
     else if (cmd == ConfigSaveSettings)
