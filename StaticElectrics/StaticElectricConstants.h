@@ -19,10 +19,18 @@ constexpr uint8_t TotalRelays = 8;
 
 constexpr uint8_t Relays[TotalRelays] = { Relay1, Relay2, Relay3, Relay4, Relay5, Relay6, Relay7, Relay8 };
 
+
+constexpr char SystemHeartbeatCommand[] = "F0";
+
 constexpr char SystemInitialized[] = "F1";
 constexpr char SensorWaterLevel[] = "S6";
 constexpr char SensorTemperature[] = "S0";
 constexpr char SensorHumidity[] = "S1";
+
+
+constexpr char AckSuccess[] = "ok";
+constexpr char ValueParamName[] = "v";
+
 
 constexpr unsigned long SerialInitTimeoutMs = 300;
 

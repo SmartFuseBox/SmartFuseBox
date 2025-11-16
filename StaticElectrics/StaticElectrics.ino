@@ -1,3 +1,4 @@
+#include "SystemCommandHandler.h"
 #include <Arduino.h>
 #include <stdint.h>
 #include <UnoWiFiDevEd.h>
@@ -11,6 +12,9 @@
 #include "ConfigCommandHandler.h"
 #include "Queue.h"
 #include "SoundManager.h"
+
+#include "SystemCommandHandler.h"
+#include "AckCommandHandler.h"
 #include "SoundCommandHandler.h"
 #include "RelayCommandHandler.h"
 #include "BaseCommandHandler.h"
@@ -41,6 +45,8 @@ SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', '
 
 SoundManager soundManager;
 
+SystemCommandHandler systemHandler(&commandMgrComputer);
+AckCommandHandler ackHandler(&commandMgrComputer);
 RelayCommandHandler relayHandler(&commandMgrComputer, &commandMgrLink, Relays, TotalRelays);
 SoundCommandHandler soundHandler(&commandMgrComputer, &commandMgrLink, &soundManager);
 ConfigCommandHandler configHandler(&soundManager);
@@ -56,11 +62,11 @@ unsigned long lastSerialConnectAttempt = 0;
 
 void setup()
 {
-	ISerialCommandHandler* linkHandlers[] = { &relayHandler, &soundHandler, &configHandler } ;
+	ISerialCommandHandler* linkHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemHandler } ;
 	size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
 	commandMgrLink.registerHandlers(linkHandlers, linkHandlerCount);
 
-	ISerialCommandHandler* computerHandlers[] = { &relayHandler, &soundHandler, &configHandler };
+	ISerialCommandHandler* computerHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemHandler };
 	size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 

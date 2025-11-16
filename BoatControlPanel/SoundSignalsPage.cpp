@@ -73,6 +73,7 @@ void SoundSignalsPage::handleTouch(uint8_t compId, uint8_t eventType)
 
     case BtnCancelAll:
 		getCommandMgrLink()->sendCommand(SoundSignalCancel, "");
+		getCommandMgrLink()->sendCommand(SoundSignalActive, "");
         break;
 
     case ButtonNext:

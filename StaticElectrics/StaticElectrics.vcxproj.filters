@@ -40,6 +40,12 @@
     <ClCompile Include="ConfigCommandHandler.cpp">
       <Filter>Source Files\CommandHandlers</Filter>
     </ClCompile>
+    <ClCompile Include="AckCommandHandler.cpp">
+      <Filter>Source Files\CommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCommandHandler.cpp">
+      <Filter>Source Files\CommandHandlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.StaticElectrics.vsarduino.h">
@@ -62,6 +68,12 @@
     </ClInclude>
     <ClInclude Include="ConfigCommandHandler.h">
       <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="AckCommandHandler.h">
+      <Filter>Header Files\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCommandHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

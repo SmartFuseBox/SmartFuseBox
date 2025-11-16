@@ -245,10 +245,10 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         }
 
 		// C7 Boat type
-		sender->sendCommand(ConfigBoatType, String(static_cast<uint8_t>(cfg->vesselType)));
+		sender->sendCommand(ConfigBoatType, "v=" + String(static_cast<uint8_t>(cfg->vesselType)));
 
 		// C8 Sound relay ID
-		sender->sendCommand(ConfigSoundRelayId, String(cfg->hornRelayIndex));
+		sender->sendCommand(ConfigSoundRelayId, "v=" + String(cfg->hornRelayIndex));
 
         sendAckOk(sender, cmd);
     }
