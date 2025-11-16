@@ -39,6 +39,7 @@ public:
      *
      * @param command The command string to send
      * @param params Optional parameters string (default: empty string)
+     * @param linkOnly If true, only send to link serial (skip computer serial)
      */
     void sendCommand(const char* command, const char* params = "", bool linkOnly = false);
 
@@ -47,6 +48,7 @@ public:
      *
      * @param command The command string to send
      * @param params Optional parameters string
+     * @param linkOnly If true, only send to link serial (skip computer serial)
      */
     void sendCommand(const String& command, const String& params = "", bool linkOnly = false);
 
