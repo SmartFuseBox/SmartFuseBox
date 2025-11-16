@@ -182,6 +182,5 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Broadcast" />
   </ItemGroup>
 </Project>
