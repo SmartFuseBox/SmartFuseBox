@@ -9,7 +9,7 @@ BroadcastManager::BroadcastManager(SerialCommandManager* computerSerial, SerialC
 
 void BroadcastManager::update(unsigned long now)
 {
-    // Currently no periodic updates needed
+    // Perform periodic updates every 5 seconds: send configuration values to serial interfaces
 	if (now > _nextUpdateTime)
     {
         _nextUpdateTime = now + UpdateIntervalMs;
