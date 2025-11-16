@@ -6,7 +6,6 @@
 class AckCommandHandler : public BaseCommandHandler
 {
 public:
-    // Constructor: pass the NextionControl pointer so we can notify the current page
     explicit AckCommandHandler(SerialCommandManager* commandMgrComputer);
 
     bool handleCommand(SerialCommandManager* sender, const String command, const StringKeyValue params[], int paramCount) override;

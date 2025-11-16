@@ -21,11 +21,13 @@ constexpr uint8_t Relays[TotalRelays] = { Relay1, Relay2, Relay3, Relay4, Relay5
 
 
 constexpr char SystemHeartbeatCommand[] = "F0";
+constexpr char SystemInitializedCommand[] = "F1";
+constexpr char SystemFreeMemoryCommand[] = "F2";
 
-constexpr char SystemInitialized[] = "F1";
 constexpr char SensorWaterLevel[] = "S6";
 constexpr char SensorTemperature[] = "S0";
 constexpr char SensorHumidity[] = "S1";
+
 
 
 constexpr char AckSuccess[] = "ok";

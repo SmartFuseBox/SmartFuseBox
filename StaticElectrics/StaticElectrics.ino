@@ -1,4 +1,3 @@
-#include "SystemCommandHandler.h"
 #include <Arduino.h>
 #include <stdint.h>
 #include <UnoWiFiDevEd.h>
@@ -80,7 +79,7 @@ void setup()
 	digitalWrite(WaterSensorActivePin, LOW);
 	relayHandler.setup();
 
-	commandMgrComputer.sendCommand(SystemInitialized, "");
+	commandMgrComputer.sendCommand(SystemInitializedCommand, "");
 }
 
 void loop() 

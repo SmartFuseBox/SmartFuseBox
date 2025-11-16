@@ -73,7 +73,7 @@
       <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
     <ClInclude Include="SystemCommandHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

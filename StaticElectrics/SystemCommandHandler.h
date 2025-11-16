@@ -5,6 +5,7 @@
 #include "Config.h"
 #include "ConfigManager.h"
 #include "BaseCommandHandler.h"
+#include "StaticElectricConstants.h"
 
 class SystemCommandHandler : public BaseCommandHandler
 {

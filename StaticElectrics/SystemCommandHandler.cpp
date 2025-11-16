@@ -1,12 +1,5 @@
-// 
-// 
-// 
 
 #include "SystemCommandHandler.h"
-
-constexpr char SystemHeartbeat[] = "F0";
-constexpr char SystemInitialized[] = "F1";
-constexpr char FreeMemory[] = "F2";
 
 SystemCommandHandler::SystemCommandHandler(SerialCommandManager* commandMgrComputer)
     : _commandMgrComputer(commandMgrComputer)
@@ -28,21 +21,21 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
     String cmd = command;
     cmd.trim();
 
-    if (cmd == SystemHeartbeat)
+    if (cmd == SystemHeartbeatCommand)
     {
-        sendAckOk(sender, cmd, &params[0]);
+        sendAckOk(sender, cmd);
     }
-    else if (cmd == SystemInitialized)
+    else if (cmd == SystemInitializedCommand)
     {
-        sendAckOk(sender, cmd, &params[0]);
+        sendAckOk(sender, cmd);
     }
-    else if (cmd == FreeMemory)
+    else if (cmd == SystemFreeMemoryCommand)
     {
-        sendAckOk(sender, cmd, &params[0]);
+        sendAckOk(sender, cmd);
     }
     else
     {
-        sendAckErr(sender, cmd, F("Unknown config command"));
+        sendAckErr(sender, cmd, F("Unknown system command"));
     }
 
     return true;
@@ -50,7 +43,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
 
 const String* SystemCommandHandler::supportedCommands(size_t& count) const
 {
-    static const String cmds[] = { SystemHeartbeat, SystemInitialized, FreeMemory };
+    static const String cmds[] = { SystemHeartbeatCommand, SystemInitializedCommand, SystemFreeMemoryCommand };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
