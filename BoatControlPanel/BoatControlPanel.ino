@@ -124,7 +124,7 @@ void setup()
     }
 
     // Simplified broadcasting
-    broadcastManager.sendCommand(ConfigSoundRelayId, String(config->hornRelayIndex));
+    broadcastManager.sendCommand(ConfigSoundRelayId, "v=" + String(config->hornRelayIndex));
     broadcastManager.sendCommand(ConfigBoatType, "v=" + String(static_cast<int>(config->vesselType)));
     broadcastManager.sendCommand(SystemInitialized, "");
 
