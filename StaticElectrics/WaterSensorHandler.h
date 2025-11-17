@@ -75,6 +75,6 @@ public:
 			_waterPumpQueue(15), _waitingForStabilization(false)
 	{
 		pinMode(sensorPin, OUTPUT);
-		digitalWrite(activePin, LOW);
+		digitalWrite(_activePin, LOW);
 	};
 };
