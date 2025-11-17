@@ -60,9 +60,9 @@ protected:
 		return TempHumidityCheckMs;
 	};
 public:
-	Dht11SensorHandler(SerialCommandManager* commandMangerLink, SerialCommandManager* commandManagerComputer,
+	Dht11SensorHandler(SerialCommandManager* commandManagerLink, SerialCommandManager* commandManagerComputer,
 		uint8_t sensorPin)
-		: _commandMgrLink(commandMangerLink), _commandMgrComputer(commandManagerComputer), _dht11Sensor(), _sensorPin(sensorPin)
+		: _commandMgrLink(commandManagerLink), _commandMgrComputer(commandManagerComputer), _dht11Sensor(), _sensorPin(sensorPin)
 	{
 	};
 };
