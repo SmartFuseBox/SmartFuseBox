@@ -90,7 +90,7 @@ public:
 		for (uint8_t i = 0; i < _handlerCount; i++)
 		{
 			BaseSensorHandler* handler = _handlers[i];
-			if (currentTime > handler->_nextUpdateTime)
+			if (currentTime >= handler->_nextUpdateTime)
 			{
 				handler->_nextUpdateTime = currentTime + handler->update();
 			}
