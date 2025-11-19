@@ -55,7 +55,7 @@ void WarningManager::clearWarning(WarningType type)
     // Auto-clear SensorFailure only if no sensor warnings remain (check bits 20+)
     if (warningBit & SENSOR_WARNING_MASK) {
         // Check if any other sensor warnings are still active (excluding SensorFailure itself)
-        uint32_t otherSensorWarnings = _activeWarnings & SENSOR_WARNING_MASK & ~static_cast<uint32_t>(WarningType::SensorFailure);
+        uint64_t otherSensorWarnings = _activeWarnings & SENSOR_WARNING_MASK & ~static_cast<uint64_t>(WarningType::SensorFailure);
         if (otherSensorWarnings == 0) {
             _activeWarnings &= ~static_cast<uint32_t>(WarningType::SensorFailure);
         }
