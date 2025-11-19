@@ -37,7 +37,10 @@ protected:
 		{
 			if (_commandMgrComputer)
 			{
-				_commandMgrLink->sendCommand(WarningAdd, "0x07=1", "");
+				if (_commandMgrLink)
+				{
+					_commandMgrLink->sendCommand(WarningAdd, "0x07=1", "");
+				}
 
 				_commandMgrComputer->sendDebug(String(result), F("DHT11 Error"));
 			}
