@@ -1,5 +1,8 @@
 #include "WarningManager.h"
 
+// Define sensor warning mask (bits 20-63)
+constexpr uint64_t SENSOR_WARNING_MASK = 0xFFFFFFFFFFF00000ULL; // Bits 20-63 set
+
 WarningManager::WarningManager(SerialCommandManager* commandMgr, unsigned long heartbeatInterval, unsigned long heartbeatTimeout)
     : _commandMgr(commandMgr),
       _activeWarnings(0),
@@ -32,10 +35,12 @@ void WarningManager::raiseWarning(WarningType type)
     if (type == WarningType::None)
         return;
     
-    uint8_t bit = static_cast<uint8_t>(type);
-    if (bit < 32)  // Ensure we don't overflow the bitmap
-    {
-        _activeWarnings |= (1UL << bit);
+    uint32_t warningBit = static_cast<uint32_t>(type);
+    _activeWarnings |= warningBit;
+    
+    // Auto-raise SensorFailure for any sensor-related warning (bit 20+)
+    if (warningBit & SENSOR_WARNING_MASK) {
+        _activeWarnings |= static_cast<uint32_t>(WarningType::SensorFailure);
     }
 }
 
@@ -44,10 +49,16 @@ void WarningManager::clearWarning(WarningType type)
     if (type == WarningType::None)
         return;
     
-    uint8_t bit = static_cast<uint8_t>(type);
-    if (bit < 32)
-    {
-        _activeWarnings &= ~(1UL << bit);
+    uint32_t warningBit = static_cast<uint32_t>(type);
+    _activeWarnings &= ~warningBit;
+    
+    // Auto-clear SensorFailure only if no sensor warnings remain (check bits 20+)
+    if (warningBit & SENSOR_WARNING_MASK) {
+        // Check if any other sensor warnings are still active (excluding SensorFailure itself)
+        uint32_t otherSensorWarnings = _activeWarnings & SENSOR_WARNING_MASK & ~static_cast<uint32_t>(WarningType::SensorFailure);
+        if (otherSensorWarnings == 0) {
+            _activeWarnings &= ~static_cast<uint32_t>(WarningType::SensorFailure);
+        }
     }
 }
 
@@ -66,13 +77,8 @@ bool WarningManager::isWarningActive(WarningType type) const
     if (type == WarningType::None)
         return false;
     
-    uint8_t bit = static_cast<uint8_t>(type);
-    if (bit < 32)
-    {
-        return (_activeWarnings & (1UL << bit)) != 0;
-    }
-    
-    return false;
+    uint32_t warningBit = static_cast<uint32_t>(type);
+    return (_activeWarnings & warningBit) != 0;
 }
 
 void WarningManager::sendHeartbeat()
@@ -108,4 +114,9 @@ void WarningManager::updateConnection(unsigned long now)
             raiseWarning(WarningType::ConnectionLost);
         }
     }
+}
+
+uint32_t WarningManager::getActiveWarningsMask() const
+{
+    return static_cast<uint32_t>(_activeWarnings);
 }

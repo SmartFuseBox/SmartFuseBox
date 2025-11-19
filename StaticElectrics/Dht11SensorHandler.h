@@ -9,6 +9,7 @@
 constexpr unsigned long TempHumidityCheckMs = 2500;
 
 
+
 /**
  * @brief Sensor handler for DHT11 monitoring.
  *
@@ -39,7 +40,7 @@ protected:
 			{
 				if (_commandMgrLink)
 				{
-					_commandMgrLink->sendCommand(WarningAdd, F("0x07=1"), "");
+					_commandMgrLink->sendCommand(WarningAdd, warningTypeToString(WarningType::TemperatureSensorFailure) + F("=1"), "");
 				}
 
 				_commandMgrComputer->sendDebug(String(result), F("DHT11 Error"));
@@ -56,7 +57,7 @@ protected:
 
 		if (_commandMgrLink)
 		{
-			_commandMgrLink->sendCommand(WarningAdd, F("0x07=0"), "");
+			_commandMgrLink->sendCommand(WarningAdd, warningTypeToString(WarningType::TemperatureSensorFailure) + F("=0"), "");
 		}
 
 		float humidity = _dht11Sensor.humidity;
