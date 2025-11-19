@@ -1,7 +1,5 @@
 #include "WarningCommandHandler.h"
 
-
-
 WarningCommandHandler::WarningCommandHandler(BroadcastManager* broadcastManager, NextionControl* nextionControl, WarningManager* warningManager)
     : BaseBoatCommandHandler(broadcastManager, nextionControl, warningManager)
 {
@@ -15,41 +13,27 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const St
     // Ensure warning manager is available
     if (!_warningManager)
     {
-		sendAckErr(sender, cmd, F("Warning manager not configured"));
+        sendAckErr(sender, cmd, F("Warning manager not configured"));
         sendDebugMessage(F("Warning manager not available"), F("WarningCommandHandler"));
         return false;
     }
 
     if (cmd == WarningsActive && paramCount == 0)
     {
-        uint8_t count = 0;
-        for (uint8_t i = 1; i < WarningCount; i++)
-        {
-            WarningType type = static_cast<WarningType>(i);
-
-            if (_warningManager->isWarningActive(type))
-            {
-                count++;
-            }
-        }
-
-        StringKeyValue param = { ValueParamName, String(count) };
+        // Return the active warnings as a bitmask value
+        uint32_t activeWarnings = _warningManager->getActiveWarningsMask();
+        
+        StringKeyValue param = { ValueParamName, String(activeWarnings, HEX) };
         sendAckOk(sender, cmd, &param);
         return true;
     }
     else if (cmd == WarningsList && paramCount == 0)
     {
-        // Send list of all defined warning types with their active status
-
-        for (uint8_t i = 1; i < WarningCount; i++)  // Start at 1 to skip WarningType::None
-        {
-            WarningType type = static_cast<WarningType>(i);
-            bool isActive = _warningManager->isWarningActive(type);
-
-            StringKeyValue param = { String(i), isActive ? "1" : "0" };
-            sendAckOk(sender, cmd, &param);
-        }
-
+        // Return the complete bitmask of active warnings as a single value
+        uint32_t activeWarnings = _warningManager->getActiveWarningsMask();
+        
+        StringKeyValue param = { ValueParamName, String(activeWarnings, HEX) };
+        sendAckOk(sender, cmd, &param);
         return true;
     }
     else if (cmd == WarningStatus && paramCount == 1)
@@ -65,7 +49,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const St
         // Parse and validate warning type
         if (!convertWarningTypeFromString(key, warningType))
         {
-			sendAckErr(sender, cmd, F("Invalid warning type"));
+            sendAckErr(sender, cmd, F("Invalid warning type"));
             return true;
         }
 
@@ -95,7 +79,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const St
         // Parse and validate warning type
         if (!convertWarningTypeFromString(key, warningType))
         {
-			sendAckErr(sender, cmd, F("Invalid warning type"));
+            sendAckErr(sender, cmd, F("Invalid warning type"));
             return true;
         }
 
@@ -106,7 +90,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const St
         else
             _warningManager->clearWarning(warningType);
 
-		sendAckOk(sender, cmd, &params[0]);
+        sendAckOk(sender, cmd, &params[0]);
         return true;
     }
     else
@@ -118,7 +102,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const St
 
 bool WarningCommandHandler::convertWarningTypeFromString(const String& str, WarningType& outType)
 {
-    uint8_t warningTypeInt = 0;
+    uint32_t warningTypeInt = 0;
 
     // Parse the string based on format
     if (str.startsWith(F("0x")) || str.startsWith(F("0X")))
@@ -137,10 +121,18 @@ bool WarningCommandHandler::convertWarningTypeFromString(const String& str, Warn
         return false;
     }
 
-    // Validate range: must be between 1 and WarningCount-1 (exclude None)
-    if (warningTypeInt == 0 || warningTypeInt >= WarningCount)
+    // Validate: must be a valid power of 2 (single bit flag) and non-zero
+    if (warningTypeInt == 0)
     {
-        sendDebugMessage(F("Warning type out of range"), F("WarningCommandHandler"));
+        sendDebugMessage(F("Warning type cannot be None"), F("WarningCommandHandler"));
+        return false;
+    }
+
+    // Check if it's a valid single-bit flag (power of 2)
+    // A number is a power of 2 if (n & (n-1)) == 0
+    if ((warningTypeInt & (warningTypeInt - 1)) != 0)
+    {
+        sendDebugMessage(F("Warning type must be a single bit flag"), F("WarningCommandHandler"));
         return false;
     }
 
