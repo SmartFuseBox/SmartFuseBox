@@ -1,7 +1,7 @@
 #include "WarningManager.h"
 
-// Define sensor warning mask (bits 20-63)
-constexpr uint64_t SENSOR_WARNING_MASK = 0xFFFFFFFFFFF00000ULL; // Bits 20-63 set
+// Define sensor warning mask (bits 20-31)
+constexpr uint32_t SENSOR_WARNING_MASK = 0xFFF00000U; // Bits 20-31 set
 
 WarningManager::WarningManager(SerialCommandManager* commandMgr, unsigned long heartbeatInterval, unsigned long heartbeatTimeout)
     : _commandMgr(commandMgr),
