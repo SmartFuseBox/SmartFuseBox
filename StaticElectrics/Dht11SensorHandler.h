@@ -97,7 +97,7 @@ protected:
 
 		if (_commandMgrLink)
 		{
-			StringKeyValue params[] = { "v", String(tempCelsius, 1) };
+			StringKeyValue params[] = { { "v", String(tempCelsius, 1) } };
 			_commandMgrLink->sendCommand(SensorTemperature, "", "", params, 1);
 			params->value = String(humidity, 0);
 			_commandMgrLink->sendCommand(SensorHumidity, "", "", params, 1);
