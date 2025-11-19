@@ -116,7 +116,7 @@ inline WarningType& operator|=(WarningType& a, WarningType b) {
  * is built-in and automatically manages the ConnectionLost warning.
  * 
  * Features:
- * - Bitmap-based warning tracking using bit flags (supports up to 64 warnings)
+ * - Bitmap-based warning tracking using bit flags (supports up to 32 warnings)
  * - Built-in heartbeat monitoring with automatic F0 command transmission
  * - Extensible WarningType enum for adding new warnings
  * - Query methods to check active warnings
