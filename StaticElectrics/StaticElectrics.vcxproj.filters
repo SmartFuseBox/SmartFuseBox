@@ -52,12 +52,6 @@
     <ClCompile Include="ConfigCommandHandler.cpp">
       <Filter>Source Files\CommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="AckCommandHandler.cpp">
-      <Filter>Source Files\CommandHandlers</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files\CommandHandlers</Filter>
-    </ClCompile>
     <ClCompile Include="BroadcastManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +60,12 @@
     </ClCompile>
     <ClCompile Include="SystemCommandHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AckCommandHandler.cpp">
+      <Filter>Source Files\SharedCode\CommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCommandHandler.cpp">
+      <Filter>Source Files\SharedCode\CommandHandlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,12 +84,6 @@
     <ClInclude Include="ConfigCommandHandler.h">
       <Filter>Header Files\CommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="AckCommandHandler.h">
-      <Filter>Header Files\CommandHandlers</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemCommandHandler.h">
-      <Filter>Header Files\CommandHandlers</Filter>
-    </ClInclude>
     <ClInclude Include="WaterSensorHandler.h">
       <Filter>Header Files\Sensors</Filter>
     </ClInclude>
@@ -102,22 +96,28 @@
     <ClInclude Include="Config.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="BroadcastManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SharedConstants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WarningType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SystemCommandHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\CommandHandlers\SharedBaseCommandHandler.h">
+    <ClInclude Include="AckCommandHandler.h">
+      <Filter>Header Files\SharedCode\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="BroadcastManager.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigManager.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedBaseCommandHandler.h">
+      <Filter>Header Files\SharedCode\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedConstants.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCommandHandler.h">
+      <Filter>Header Files\SharedCode\CommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="WarningType.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
   </ItemGroup>
