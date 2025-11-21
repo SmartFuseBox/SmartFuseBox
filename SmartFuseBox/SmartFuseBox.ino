@@ -7,12 +7,16 @@
 #include "ConfigManager.h"
 #include "ConfigCommandHandler.h"
 #include "SoundManager.h"
+#include "WarningManager.h"
 
 #include "SystemCommandHandler.h"
 #include "AckCommandHandler.h"
 #include "SoundCommandHandler.h"
 #include "RelayCommandHandler.h"
 #include "BaseCommandHandler.h"
+#include "SensorCommandHandler.h"
+#include "WarningCommandHandler.h"
+#include "InterceptDebugCommandHandler.h"
 
 #include "WaterSensorHandler.h"
 #include "Dht11SensorHandler.h"
@@ -33,14 +37,24 @@ SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', '
 // Broadcast manager for coordinated messaging
 BroadcastManager broadcastManager(&commandMgrComputer, &commandMgrLink);
 
+// Warning manager with heartbeat monitoring
+WarningManager warningManager(&commandMgrLink, HeartbeatIntervalMs, HeartbeatTimeoutMs);
+
 SoundManager soundManager;
 
-SystemCommandHandler systemHandler(&broadcastManager);
-AckCommandHandler ackHandler(&broadcastManager);
+// link command handlers
 RelayCommandHandler relayHandler(&commandMgrComputer, &commandMgrLink, Relays, TotalRelays);
 SoundCommandHandler soundHandler(&commandMgrComputer, &commandMgrLink, &soundManager);
+InterceptDebugHandler interceptDebugHandler(&broadcastManager);
+SensorCommandHandler sensorCommandHandler(&broadcastManager, &warningManager);
+WarningCommandHandler warningCommandHandler(&broadcastManager, &warningManager);
+
+// computer command handlers
 ConfigCommandHandler configHandler(&soundManager);
 
+// shared command handlers
+AckCommandHandler ackHandler(&broadcastManager, &warningManager);
+SystemCommandHandler systemCommandHandler(&broadcastManager);
 
 // Sensors
 WaterSensorHandler waterSensorHandler(&commandMgrLink, &commandMgrComputer, WaterSensorPin, WaterSensorActivePin);
@@ -54,11 +68,11 @@ SensorManager sensorManager(sensorHandlers, sizeof(sensorHandlers) / sizeof(sens
 
 void setup()
 {
-	ISerialCommandHandler* linkHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemHandler } ;
+	ISerialCommandHandler* linkHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemCommandHandler } ;
 	size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
 	commandMgrLink.registerHandlers(linkHandlers, linkHandlerCount);
 
-	ISerialCommandHandler* computerHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemHandler };
+	ISerialCommandHandler* computerHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemCommandHandler };
 	size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 

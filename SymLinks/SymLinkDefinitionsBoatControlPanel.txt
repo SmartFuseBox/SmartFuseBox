@@ -5,8 +5,15 @@ ConfigManager.h|..\Shared\ConfigManager.h
 ConfigManager.cpp|..\Shared\ConfigManager.cpp
 BroadcastManager.h|..\Shared\BroadcastManager.h
 BroadcastManager.cpp|..\Shared\BroadcastManager.cpp
+WarningManager.h|..\Shared\WarningManager.h
+WarningManager.cpp|..\Shared\WarningManager.cpp
 SharedBaseCommandHandler.h|..\Shared\CommandHandlers\SharedBaseCommandHandler.h
 AckCommandHandler.h|..\Shared\CommandHandlers\AckCommandHandler.h
 AckCommandHandler.cpp|..\Shared\CommandHandlers\AckCommandHandler.cpp
 SystemCommandHandler.h|..\Shared\CommandHandlers\SystemCommandHandler.h
 SystemCommandHandler.cpp|..\Shared\CommandHandlers\SystemCommandHandler.cpp
+WarningCommandHandler.h|..\Shared\CommandHandlers\WarningCommandHandler.h
+WarningCommandHandler.cpp|..\Shared\CommandHandlers\WarningCommandHandler.cpp
+SensorCommandHandler.h|..\Shared\CommandHandlers\SensorCommandHandler.h
+SensorCommandHandler.cpp|..\Shared\CommandHandlers\SensorCommandHandler.cpp
+InterceptDebugCommandHandler.h|..\Shared\CommandHandlers\InterceptDebugCommandHandler.h

@@ -2,14 +2,13 @@
 
 const char AckCommand[] = "ACK";
 
-AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager
-#ifdef BOAT_CONTROL_PANEL
-    , NextionControl* nextionControl, WarningManager* warningManager)
+#if defined(BOAT_CONTROL_PANEL)
+AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, NextionControl* nextionControl, WarningManager* warningManager)
     : BaseBoatCommandHandler(broadcastManager, nextionControl, warningManager)
-#else
-    )
-	: SharedBaseCommandHandler(broadcastManager)
-#endif // BOAT_CONTROL_PANEL
+#elif defined(FUSE_BOX_CONTROLLER)
+AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, WarningManager* warningManager)
+    : SharedBaseCommandHandler(broadcastManager, warningManager)
+#endif
 {
 }
 
@@ -20,10 +19,10 @@ bool AckCommandHandler::processHeartbeatAck(SerialCommandManager* sender, const 
     if (key != SystemHeartbeatCommand || !value.equalsIgnoreCase(AckSuccess))
         return false;
 
-    if (_warningManager)
+    if (getWarningManager())
     {
         // Notify the warning manager to update heartbeat timestamp
-        _warningManager->notifyHeartbeatAck();
+        getWarningManager()->notifyHeartbeatAck();
 	}
 
     // Notify the current page about the heartbeat acknowledgement

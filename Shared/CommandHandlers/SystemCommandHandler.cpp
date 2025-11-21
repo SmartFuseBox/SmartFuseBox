@@ -1,5 +1,12 @@
 #include "SystemCommandHandler.h"
 
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char* __brkval;
+#endif  // __arm__
+
 SystemCommandHandler::SystemCommandHandler(BroadcastManager* broadcaster)
     : _broadcaster(broadcaster)
 {
@@ -46,11 +53,18 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
 }
 
 uint16_t SystemCommandHandler::freeRam() {
-#ifdef ARDUINO_MEGA2560
+#if defined(ARDUINO_MEGA2560)
     extern int __heap_start, * __brkval;
     int v;
     return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
-#else
-	return 0; // Not implemented for other platforms
+#elif defined(ARDUINO_UNO_R4)
+    char top;
+#ifdef __arm__
+    return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+    return &top - __brkval;
+#else  // __arm__
+    return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
 #endif
 }

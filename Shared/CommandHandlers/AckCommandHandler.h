@@ -1,8 +1,10 @@
 #pragma once
+
 #include <Arduino.h>
 
 #include "Local.h"
 #include "ConfigManager.h"
+
 #ifdef BOAT_CONTROL_PANEL
 #include "BoatControlPanelConstants.h"
 #include "HomePage.h"
@@ -11,20 +13,27 @@
 #include "SharedBaseCommandHandler.h"
 #endif
 
-class AckCommandHandler : public
-#ifdef BOAT_CONTROL_PANEL
-    BaseBoatCommandHandler
+
+// Define the base class type based on the build configuration
+#if defined(BOAT_CONTROL_PANEL)
+#define SENSOR_BASE_CLASS BaseBoatCommandHandler
+#elif defined(FUSE_BOX_CONTROLLER)
+#define SENSOR_BASE_CLASS SharedBaseCommandHandler
 #else
-    SharedBaseCommandHandler
+#error "Either BOAT_CONTROL_PANEL or FUSE_BOX_CONTROLLER must be defined"
 #endif
+
+class AckCommandHandler : public SENSOR_BASE_CLASS
 {
 public:
-    // Constructor: pass the NextionControl pointer so we can notify the current page
+#if defined(BOAT_CONTROL_PANEL)
     explicit AckCommandHandler(BroadcastManager* computerCommandManager
-#ifdef BOAT_CONTROL_PANEL
-        , NextionControl* nextionControl, WarningManager* warningManager
+        , NextionControl* nextionControl
+        , WarningManager* warningManager);
+#elif defined(FUSE_BOX_CONTROLLER)
+    explicit AckCommandHandler(BroadcastManager* broadcastManager, WarningManager* warningManager);
 #endif
-    );
+    
 
     bool handleCommand(SerialCommandManager* sender, const String command, const StringKeyValue params[], int paramCount) override;
     const String* supportedCommands(size_t& count) const override;
@@ -34,3 +43,5 @@ private:
     bool processHeartbeatAck(SerialCommandManager* sender, const String& key, const String& value);
 #endif
 };
+
+#undef SENSOR_BASE_CLASS

@@ -70,6 +70,21 @@
     <ClCompile Include="BroadcastManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WarningCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WarningManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
@@ -105,9 +120,6 @@
     <ClInclude Include="BroadcastManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigManager.h">
-      <Filter>Header Files\SharedCode</Filter>
-    </ClInclude>
     <ClInclude Include="SharedBaseCommandHandler.h">
       <Filter>Header Files\SharedCode\CommandHandlers</Filter>
     </ClInclude>
@@ -121,6 +133,21 @@
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
     <ClInclude Include="SystemCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InterceptDebugCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WarningCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WarningManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SystemCommandHandler.h">

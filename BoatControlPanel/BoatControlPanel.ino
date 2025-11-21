@@ -35,8 +35,6 @@
 
 constexpr unsigned long UpdateIntervalMs = 600;
 constexpr unsigned long SerialInitTimeoutMs = 300;
-constexpr unsigned long HeartbeatIntervalMs = 1000;
-constexpr unsigned long HeartbeatTimeoutMs = 3000;
 
 // forward declares
 void InitializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection = false);

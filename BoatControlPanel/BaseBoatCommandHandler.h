@@ -50,29 +50,7 @@ protected:
      */
     void notifyCurrentPage(uint8_t updateType, const void* data);
 
-    /**
-     * @brief Parse a string value as a boolean.
-     * 
-     * Accepts multiple formats:
-     * - "1" or "0"
-     * - "on" or "off" (case-insensitive)
-     * - "true" or "false" (case-insensitive)
-     * 
-     * @param value String to parse
-     * @return true if the value represents a truthy value, false otherwise
-     */
-    bool parseBooleanValue(const String& value) const;
-
-    /**
-     * @brief Check if a string contains only digits.
-     * 
-     * @param s String to check
-     * @return true if the string is non-empty and contains only digits (0-9)
-     */
-    bool isAllDigits(const String& s) const;
-
     // Protected member variables for derived classes to access
     // Note: _broadcaster is inherited from SharedBaseCommandHandler
     NextionControl* _nextionControl;
-    WarningManager* _warningManager;
 };

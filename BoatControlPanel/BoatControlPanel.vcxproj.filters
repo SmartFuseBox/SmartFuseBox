@@ -58,9 +58,6 @@
     <ClCompile Include="ConfigCommandHandler.cpp">
       <Filter>Source Files\CommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files\CommandHandlers</Filter>
-    </ClCompile>
     <ClCompile Include="BaseBoatPage.cpp">
       <Filter>Source Files\Pages</Filter>
     </ClCompile>
@@ -120,6 +117,9 @@
     </ClCompile>
     <ClCompile Include="WarningManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files\SharedCode\CommandHandlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,13 +204,8 @@
     <ClInclude Include="SharedConstants.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CleanSymLinks.bat">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="CleanAllSymLinks.bat">
-      <Filter>Source Files</Filter>
-    </None>
+    <ClInclude Include="SharedBaseCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -113,6 +113,7 @@
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
     <ClInclude Include="SharedBaseCommandHandler.h" />
+    <ClInclude Include="SharedBaseCommandHandler.h" />
     <ClInclude Include="BroadcastManager.h" />
     <ClInclude Include="SharedConstants.h" />
     <ClInclude Include="WarningType.h" />
@@ -139,10 +140,6 @@
     <ClInclude Include="WarningManager.h" />
     <ClInclude Include="WarningPage.h" />
     <ClInclude Include="__vm\.BoatControlPanel.vsarduino.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CleanAllSymLinks.bat" />
-    <None Include="CleanSymLinks.bat" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

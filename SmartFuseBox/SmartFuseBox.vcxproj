@@ -74,6 +74,10 @@
     <ProjectCapability Include="VisualMicroLinux" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SensorCommandHandler.cpp" />
+    <ClCompile Include="WarningCommandHandler.cpp" />
+    <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="WarningManager.cpp" />
     <ClCompile Include="BroadcastManager.cpp" />
     <ClCompile Include="SystemCommandHandler.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
@@ -95,10 +99,13 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClInclude Include="InterceptDebugCommandHandler.h" />
+    <ClInclude Include="SensorCommandHandler.h" />
+    <ClInclude Include="WarningCommandHandler.h" />
+    <ClInclude Include="WarningManager.h" />
     <ClInclude Include="SharedBaseCommandHandler.h" />
     <ClInclude Include="BroadcastManager.h" />
     <ClInclude Include="SystemCommandHandler.h" />
-    <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="SharedConstants.h" />
     <ClInclude Include="WarningType.h" />
     <ClInclude Include="AckCommandHandler.h" />

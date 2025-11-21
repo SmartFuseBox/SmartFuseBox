@@ -61,3 +61,5 @@ constexpr char AckSuccess[] = "ok";
 constexpr char ValueParamName[] = "v";
 
 
+constexpr unsigned long HeartbeatIntervalMs = 1000;
+constexpr unsigned long HeartbeatTimeoutMs = 3000;

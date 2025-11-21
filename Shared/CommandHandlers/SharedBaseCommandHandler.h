@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "BaseCommandHandler.h"
 #include "BroadcastManager.h"
+#include "WarningManager.h"
 
 /**
  * @brief Base class for command handlers that need broadcasting capabilities.
@@ -17,6 +18,9 @@
  */
 class SharedBaseCommandHandler : public BaseCommandHandler
 {
+private:
+    WarningManager* _warningManager;
+
 protected:
 	BroadcastManager* _broadcaster;
 
@@ -25,10 +29,20 @@ protected:
      * 
      * @param broadcaster Manager for broadcasting commands/debug/errors
      */
-    SharedBaseCommandHandler(BroadcastManager* broadcaster)
-		: _broadcaster(broadcaster)
+    SharedBaseCommandHandler(BroadcastManager* broadcaster, WarningManager* warningManager)
+		: _warningManager(warningManager), _broadcaster(broadcaster)
     {
     };
+
+    /**
+     * @brief Get pointer to the WarningManager.
+     * 
+     * @return WarningManager* Pointer to the warning manager (can be nullptr)
+	 */
+    WarningManager* getWarningManager() const
+    {
+        return _warningManager;
+	}
 
     /**
      * @brief Send a debug message to the computer serial (via BroadcastManager).
@@ -78,5 +92,42 @@ protected:
         {
             _broadcaster->sendError(message, identifier);
         }
+    }
+    /**
+     * @brief Parse a string value as a boolean.
+     *
+     * Accepts multiple formats:
+     * - "1" or "0"
+     * - "on" or "off" (case-insensitive)
+     * - "true" or "false" (case-insensitive)
+     *
+     * @param value String to parse
+     * @return true if the value represents a truthy value, false otherwise
+     */
+    bool parseBooleanValue(const String& value) const
+    {
+        return (value == F("1") ||
+            value.equalsIgnoreCase(F("on")) ||
+            value.equalsIgnoreCase(F("true")));
+    }
+
+    /**
+     * @brief Check if a string contains only digits.
+     *
+     * @param s String to check
+     * @return true if the string is non-empty and contains only digits (0-9)
+     */
+    bool isAllDigits(const String& s) const
+    {
+        if (s.length() == 0)
+            return false;
+
+        for (size_t i = 0; i < s.length(); ++i)
+        {
+            if (!isDigit(s[i]))
+                return false;
+        }
+
+        return true;
     }
 };
