@@ -121,6 +121,9 @@
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files\SharedCode\CommandHandlers</Filter>
     </ClCompile>
+    <ClCompile Include="SharedFunctions.cpp">
+      <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.BoatControlPanel.vsarduino.h">
@@ -204,8 +207,8 @@
     <ClInclude Include="SharedConstants.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="SharedBaseCommandHandler.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SharedFunctions.h">
+      <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
