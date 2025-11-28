@@ -2,9 +2,11 @@
 #include "BluetoothController.h"
 
 
-ConfigCommandHandler::ConfigCommandHandler(SoundManager* soundManager, BluetoothController* bluetoothController)
+ConfigCommandHandler::ConfigCommandHandler(SoundManager* soundManager, BluetoothController* bluetoothController,
+    RelayCommandHandler* relayCommandHandler)
     : _soundManager(soundManager),
-      _bluetoothController(bluetoothController)
+      _bluetoothController(bluetoothController),
+      _relayCommandHandler(relayCommandHandler)
 {
 }
 
@@ -98,6 +100,12 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
             }
 
             config->hornRelayIndex = relay;
+
+            if (_relayCommandHandler)
+            {
+				_relayCommandHandler->configUpdated(config);
+            }
+
             sendAckOk(sender, cmd, &params[0]);
         }
         else

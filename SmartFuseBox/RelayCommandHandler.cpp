@@ -164,13 +164,47 @@ void RelayCommandHandler::setup()
         pinMode(_relays[i], OUTPUT);
         digitalWrite(_relays[i], HIGH);
     }
+}
 
-	Config* config = ConfigManager::getConfigPtr();
-
-	if (config != nullptr)
+void RelayCommandHandler::configUpdated(Config* config)
+{
+    if (config == nullptr)
     {
-        _reservedSoundRelay = config->hornRelayIndex;
+        _reservedSoundRelay = DefaultValue;
+        return;
     }
+
+    _reservedSoundRelay = config->hornRelayIndex;
+
+    // Defensive check: ensure it's either a valid relay or 0xFF (none)
+    if (_reservedSoundRelay >= _relayCount && _reservedSoundRelay != DefaultValue)
+    {
+        _reservedSoundRelay = DefaultValue;
+
+        if (_commandMgrComputer != nullptr)
+        {
+            _commandMgrComputer->sendDebug(
+                F("Invalid hornRelayIndex corrected to 0xFF"),
+                F("RELAY")
+            );
+        }
+    }
+
+#ifdef DEBUG
+    if (_commandMgrComputer != nullptr)
+    {
+        String msg = F("Reserved sound relay: ");
+        if (_reservedSoundRelay == DefaultValue)
+        {
+            msg += F("None (0xFF)");
+        }
+        else
+        {
+            msg += String(_reservedSoundRelay);
+        }
+        _commandMgrComputer->sendDebug(msg, F("RELAY"));
+    }
+#endif
 }
 
 RelayResult RelayCommandHandler::setRelayStatus(uint8_t relayIndex, bool isOn)

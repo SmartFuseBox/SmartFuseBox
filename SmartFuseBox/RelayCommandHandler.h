@@ -30,7 +30,7 @@ public:
     void setup();
     RelayResult setRelayStatus(uint8_t relayIndex, bool isOn);
 	uint8_t getRelayStatus(uint8_t relayIndex) const;
-
+    void configUpdated(Config* config);
 	uint8_t getRelayCount() const { return _relayCount; }
 private:
     void broadcastRelayStatus(const String& cmd, const StringKeyValue* param = nullptr);

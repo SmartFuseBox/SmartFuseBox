@@ -74,10 +74,18 @@ SensorManager sensorManager(sensorHandlers, sizeof(sensorHandlers) / sizeof(sens
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayHandler, &warningManager, &commandMgrComputer);
 
 // computer command handlers
-ConfigCommandHandler configHandler(&soundManager, &bluetoothController);
+ConfigCommandHandler configHandler(&soundManager, &bluetoothController, &relayHandler);
 
 void setup()
 {
+	// retrieve config settings
+	ConfigManager::begin();
+
+	if (!ConfigManager::load())
+	{
+		warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
+	}
+
 	ISerialCommandHandler* linkHandlers[] = { &relayHandler, &soundHandler, &configHandler, &ackHandler, &systemCommandHandler, &warningCommandHandler, &sensorCommandHandler } ;
 	size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
 	commandMgrLink.registerHandlers(linkHandlers, linkHandlerCount);
@@ -89,21 +97,14 @@ void setup()
 	InitializeSerial(COMPUTER_SERIAL, 115200, true);
 	InitializeSerial(LINK_SERIAL, 9600, true);
 
-	sensorManager.setup();
-	relayHandler.setup();
-
-	// retrieve config settings
-	ConfigManager::begin();
-
-	if (!ConfigManager::load())
-	{
-		warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
-	}
-
 	Config* config = ConfigManager::getConfigPtr();
 	bluetoothController.applyConfig(config);
 
+	sensorManager.setup();
+	relayHandler.setup();
+
 	soundManager.configUpdated(config);
+	relayHandler.configUpdated(config);
 
 	commandMgrComputer.sendCommand(SystemInitialized, "");
 }
