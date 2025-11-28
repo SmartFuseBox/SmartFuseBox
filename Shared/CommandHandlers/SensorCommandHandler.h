@@ -54,7 +54,7 @@ public:
 	void setWaterPumpActive(bool value) { _lastWaterPumpActive = value; }
 private:
 	float _lastTemperature = NAN;
-	uint8_t _lastHumidity = NAN;
+	uint8_t _lastHumidity = 0;
 	float _lastBearing = NAN;
 	float _lastCompassTemp = 0;
 	uint8_t _lastSpeed = 0;

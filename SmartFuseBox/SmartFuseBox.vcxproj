@@ -103,6 +103,7 @@
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
     <ClInclude Include="..\Shared\CommandHandlers\SystemCommandHandler.h" />
+    <ClInclude Include="BluetoothController.h" />
     <ClInclude Include="BluetoothManager.h" />
     <ClInclude Include="BluetoothSensorService.h" />
     <ClInclude Include="BluetoothServiceBase.h" />

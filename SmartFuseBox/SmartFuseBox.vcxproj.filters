@@ -180,5 +180,8 @@
     <ClInclude Include="ConfigManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
+    <ClInclude Include="BluetoothController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

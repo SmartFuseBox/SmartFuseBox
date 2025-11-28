@@ -28,6 +28,7 @@
 #include "BluetoothManager.h"
 #include "BluetoothSystemService.h"
 #include "BluetoothSensorService.h"
+#include "BluetoothController.h"
 
 
 #define COMPUTER_SERIAL Serial
@@ -56,9 +57,6 @@ InterceptDebugHandler interceptDebugHandler(&broadcastManager);
 SensorCommandHandler sensorCommandHandler(&broadcastManager, &warningManager);
 WarningCommandHandler warningCommandHandler(&broadcastManager, &warningManager);
 
-// computer command handlers
-ConfigCommandHandler configHandler(&soundManager);
-
 // shared command handlers
 AckCommandHandler ackHandler(&broadcastManager, &warningManager);
 SystemCommandHandler systemCommandHandler(&broadcastManager);
@@ -73,13 +71,10 @@ BaseSensorHandler* sensorHandlers[] = {
 SensorManager sensorManager(sensorHandlers, sizeof(sensorHandlers) / sizeof(sensorHandlers[0]));
 
 // configure bluetooth support
-BluetoothSystemService bluetoothSystemService(&systemCommandHandler);
-BluetoothSensorService bluetoothSensorService(&sensorCommandHandler);
+BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &warningManager);
 
-BluetoothServiceBase* bluetoothServices[] = {
-	&bluetoothSystemService, &bluetoothSensorService
-};
-BluetoothManager bluetoothManager(bluetoothServices, sizeof(bluetoothServices) / sizeof(bluetoothServices[0]));
+// computer command handlers
+ConfigCommandHandler configHandler(&soundManager, &bluetoothController);
 
 void setup()
 {
@@ -106,18 +101,9 @@ void setup()
 	}
 
 	Config* config = ConfigManager::getConfigPtr();
+	bluetoothController.applyConfig(config);
 
 	soundManager.configUpdated(config);
-
-	// initialize bluetooth
-	if (!bluetoothManager.begin("Smart Fuse Box"))
-	{
-		warningManager.raiseWarning(WarningType::BluetoothInitFailed);
-	}
-	else
-	{
-		bluetoothSystemService.notifyInitialized();
-	}
 
 	commandMgrComputer.sendCommand(SystemInitialized, "");
 }
@@ -140,7 +126,7 @@ void loop()
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();
-	bluetoothManager.loop();
+	bluetoothController.loop();
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::update();
