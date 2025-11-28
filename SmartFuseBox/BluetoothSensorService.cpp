@@ -15,7 +15,8 @@ BluetoothSensorService::BluetoothSensorService(SensorCommandHandler* commandHand
     _charCompassTemperatureUsage(nullptr),
     _charSpeedUsage(nullptr),
     _charWaterLevelUsage(nullptr),
-    _charWaterPumpActive(nullptr)
+    _charWaterPumpActive(nullptr),
+	_lastUpdate(0)
 {
 }
 
@@ -118,7 +119,11 @@ void BluetoothSensorService::updateTemperature()
     if (_charTemperatureUsage)
     {
         float temperature = _commandHandler->getTemperature();
-        _charTemperatureUsage->writeValue(temperature);
+
+        if (!isnan(temperature))
+        {
+            _charTemperatureUsage->writeValue(temperature);
+        }
 	}
 }
 
@@ -127,7 +132,11 @@ void BluetoothSensorService::updateHumidity()
     if (_charHumidityUsage)
     {
         float humidity = _commandHandler->getHumidity();
-        _charHumidityUsage->writeValue(humidity);
+
+        if (!isnan(humidity))
+        {
+            _charHumidityUsage->writeValue(humidity);
+        }
 	}
 }
 
@@ -136,7 +145,11 @@ void BluetoothSensorService::updateBearing()
     if (_charBearingUsage)
     {
         float bearing = _commandHandler->getBearing();
-        _charBearingUsage->writeValue(bearing);
+
+        if (!isnan(bearing))
+        {
+            _charBearingUsage->writeValue(bearing);
+        }
     }
 }
 
@@ -145,7 +158,11 @@ void BluetoothSensorService::updateCompassTemperature()
     if (_charCompassTemperatureUsage)
     {
         float compassTemp = _commandHandler->getCompassTemperature();
-        _charCompassTemperatureUsage->writeValue(compassTemp);
+
+        if (!isnan(compassTemp))
+        {
+            _charCompassTemperatureUsage->writeValue(compassTemp);
+        }
     }
 }
 
@@ -162,7 +179,7 @@ void BluetoothSensorService::updateWaterLevel()
 {
     if (_charWaterLevelUsage)
     {
-        int waterLevel = _commandHandler->getWaterLevel();
+        uint16_t waterLevel = static_cast<uint16_t>(_commandHandler->getWaterLevel());
         _charWaterLevelUsage->writeValue(waterLevel);
 	}
 }

@@ -144,9 +144,6 @@
     <ClInclude Include="WarningType.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WarningManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -179,6 +176,9 @@
     </ClInclude>
     <ClInclude Include="BluetoothSensorService.h">
       <Filter>Header Files\Bluetooth</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigManager.h">
+      <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

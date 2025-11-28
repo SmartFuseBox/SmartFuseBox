@@ -1,3 +1,4 @@
+#include <ArduinoBLE.h>
 #include <Arduino.h>
 #include <stdint.h>
 #include <SerialCommandManager.h>

@@ -4,6 +4,7 @@
 #include <ArduinoBLE.h>
 #include "BluetoothServiceBase.h"
 #include "SystemCommandHandler.h"
+#include "SensorCommandHandler.h"
 
 class BluetoothSensorService : public BluetoothServiceBase
 {
