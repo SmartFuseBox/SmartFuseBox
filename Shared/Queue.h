@@ -17,7 +17,7 @@ private:
 	uint8_t _capacity;
 	uint8_t _size;
 	QItem<T>* _front;
-	QItem<T>*_rear;
+	QItem<T>* _rear;
     T _defaultValue;
     
 public:
