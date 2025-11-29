@@ -1,6 +1,6 @@
 #include "Queue.h"
 
-Queue::Queue(int capacity)
+Queue::Queue(uint8_t capacity)
 {
 	_front = NULL;
 	_rear = NULL;
@@ -21,7 +21,7 @@ bool Queue::isEmpty()
     return (_size == 0);
 }
 
-void Queue::enqueue(int item)
+void Queue::enqueue(QueueDataType item)
 {
     if (isFull())
         return;
@@ -39,10 +39,10 @@ void Queue::enqueue(int item)
 	_rear = temp;
 }
  
-int Queue::dequeue()
+QueueDataType Queue::dequeue()
 {
     if (isEmpty())
-        return INT_MIN;
+        return QUEUE_DEFAULT_VALUE;
         
     QItem* temp = _front;
 	_front = _front->next;
@@ -51,20 +51,20 @@ int Queue::dequeue()
 	if (_front == NULL)
 		_rear = NULL;
 	
-	int value = temp->data;
+	QueueDataType value = temp->data;
 	delete(temp);
 	
     return value;
 }
  
-int Queue::average()
+QueueDataType Queue::average()
 {
     if (isEmpty() || _front == NULL)
 	{
-        return INT_MIN;
+        return QUEUE_DEFAULT_VALUE;
 	}
         
-    int sum = 0;
+    QueueDataType sum = 0;
 	QItem* temp = _front;
 	
 	while (temp != NULL)

@@ -109,9 +109,6 @@
     <ClCompile Include="BluetoothRelayService.cpp">
       <Filter>Source Files\Bluetooth</Filter>
     </ClCompile>
-    <ClCompile Include="Queue.cpp">
-      <Filter>Source Files\SharedCode</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
