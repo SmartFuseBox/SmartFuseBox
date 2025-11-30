@@ -73,11 +73,11 @@ SensorManager sensorManager(sensorHandlers, sizeof(sensorHandlers) / sizeof(sens
 // configure bluetooth support
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayHandler, &warningManager, &commandMgrComputer);
 
-// computer command handlers
-ConfigCommandHandler configHandler(&soundManager, &bluetoothController, &relayHandler);
-
 // configure wifi support
 WifiController wifiController(&commandMgrComputer, &warningManager);
+
+// computer command handlers
+ConfigCommandHandler configHandler(&soundManager, &bluetoothController, &wifiController, &relayHandler);
 
 void setup()
 {

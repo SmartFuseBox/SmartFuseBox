@@ -119,7 +119,7 @@ private:
         // You can add additional validation here if needed
 
         // Validate port number (optional)
-        if (cfg->port == 0)
+        if (cfg->wifiPort == 0)
         {
             return false;
         }

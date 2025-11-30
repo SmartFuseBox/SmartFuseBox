@@ -61,12 +61,6 @@
     <ClCompile Include="AckCommandHandler.cpp">
       <Filter>Source Files\SharedCode\CommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files\SharedCode</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigManager.cpp">
-      <Filter>Source Files\SharedCode</Filter>
-    </ClCompile>
     <ClCompile Include="BroadcastManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
@@ -110,6 +104,12 @@
       <Filter>Source Files\Bluetooth</Filter>
     </ClCompile>
     <ClCompile Include="WifiServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCommandHandler.cpp">
+      <Filter>Source Files\CommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

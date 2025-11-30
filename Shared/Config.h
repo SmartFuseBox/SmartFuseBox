@@ -50,7 +50,7 @@ struct Config {
 	uint8_t accessMode; // 0 = AP, 1 = Client
     char _apSSID[MaxSSIDLength];
     char _apPassword[MaxWiFiPasswordLength];
-    uint16_t port;
+    uint16_t wifiPort;
 #endif
 
     uint16_t checksum;

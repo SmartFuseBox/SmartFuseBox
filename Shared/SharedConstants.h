@@ -41,7 +41,15 @@ constexpr char ConfigSetButtonColor[] = "C6";
 constexpr char ConfigBoatType[] = "C7";
 constexpr char ConfigSoundRelayId[] = "C8";
 constexpr char ConfigSoundStartDelay[] = "C9";
+
+#if defined(ARDUINO_UNO_R4)
 constexpr char ConfigBluetoothEnable[] = "C10";
+constexpr char ConfigWifiEnable[] = "C11";
+constexpr char ConfigWifiMode[] = "C12";
+constexpr char ConfigWifiSSID[] = "C13";
+constexpr char ConfigWifiPassword[] = "C14";
+constexpr char ConfigWifiPort[] = "C15";
+#endif
 
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";

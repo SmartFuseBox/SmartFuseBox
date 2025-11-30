@@ -117,7 +117,7 @@ void ConfigManager::resetToDefaults()
     _cfg.accessMode = 0; // 0 = AP, 1 = Client
     _cfg._apSSID[0] = '\0';
     _cfg._apPassword[0] = '\0';
-	_cfg.port = 80;
+	_cfg.wifiPort = 80;
 #endif
 
     // compute checksum
