@@ -114,7 +114,7 @@ void setup()
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 
 	// network command handlers
-	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler };
+	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler };
 	size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
 	wifiController.registerHandlers(networkHandlers, networkHandlerCount);
 

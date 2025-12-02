@@ -144,7 +144,7 @@ These commands are used to activate, query or deactivate signal sounds (Fog Horn
 | `H7` — Maneuver Danger | `H7` | Activates maneuver danger sound. Param format: No Parameters. |
 | `H8` — Overtake Starboard | `H8` | Activates overtake starboard sound. Param format: No Parameters. |
 | `H9` — Overtake Port | `H9` | Activates overtake port sound. Param format: No Parameters. |
-| `H10` — Overtake Consent | `H10` | Activates overtake astern sound. Param format: No Parameters. |
+| `H10` — Overtake Consent | `H10` | Activates overtake consent sound. Param format: No Parameters. |
 | `H11` — Overtake Danger | `H11` | Activates overtake danger sound. Param format: No Parameters. |
 | `H12` — Test | `H12` | Tests the signal sound. Param format: No Parameters. |
 
