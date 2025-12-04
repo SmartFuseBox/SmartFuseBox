@@ -17,8 +17,7 @@ private:
     RelayController* _relayController;
     
     // Helper to format JSON response
-    void formatJsonResponse(char* buffer, size_t size, bool success, const char* message = nullptr);
-    void formatRelayStatesJson(char* buffer, size_t size);
+    void formatStatusJson(char* buffer, size_t size);
     
 public:
     explicit RelayNetworkHandler(RelayController* relayController);

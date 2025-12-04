@@ -60,3 +60,13 @@ bool SharedFunctions::isAllDigits(const String& s)
 
     return true;
 }
+
+unsigned long SharedFunctions::elapsedMillis(unsigned long now, unsigned long previous)
+{
+    return now - previous;
+}
+
+bool SharedFunctions::hasElapsed(unsigned long now, unsigned long previous, unsigned long interval)
+{
+    return (now - previous) >= interval;
+}

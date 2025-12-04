@@ -11,8 +11,7 @@ private:
 	SoundController* _soundController;
 
 	// Helper to format JSON response
-	void formatJsonResponse(char* buffer, size_t size, bool success, const char* message = nullptr);
-	void formatSoundStatusJson(char* buffer, size_t size);
+	void formatStatusJson(char* buffer, size_t size) override;
 
 public:
 	explicit SoundNetworkHandler(SoundController* soundController);

@@ -4,6 +4,7 @@
 #include <SerialCommandManager.h>
 
 #include "SystemCpuMonitor.h"
+#include "DateTimeManager.h"
 
 #include "SmartFuseBoxConstants.h"
 #include "Config.h"
@@ -34,6 +35,7 @@
 #include "RelayNetworkHandler.h"
 #include "SoundNetworkHandler.h"
 #include "WarningNetworkHandler.h"
+#include "SystemNetworkHandler.h"
 
 #include "RelayController.h"
 
@@ -81,18 +83,20 @@ SensorManager sensorManager(sensorHandlers, sizeof(sensorHandlers) / sizeof(sens
 // configure bluetooth support
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayController, &warningManager, &commandMgrComputer);
 
-// configure wifi support
-RelayNetworkHandler relayNetworkHandler(&relayController);
-SoundNetworkHandler soundNetworkHandler(&soundController);
-WarningNetworkHandler warningNetworkHandler(&warningManager);
-
 WifiController wifiController(&commandMgrComputer, &warningManager);
 
 // computer command handlers
 ConfigCommandHandler configHandler(&soundController, &bluetoothController, &wifiController, &relayHandler);
 
+// configure wifi support
+RelayNetworkHandler relayNetworkHandler(&relayController);
+SoundNetworkHandler soundNetworkHandler(&soundController);
+WarningNetworkHandler warningNetworkHandler(&warningManager);
+SystemNetworkHandler systemNetworkHandler(&wifiController);
+
 void setup()
 {
+	DateTimeManager::setDateTime();
 	// retrieve config settings
 	ConfigManager::begin();
 
@@ -116,7 +120,7 @@ void setup()
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 
 	// network command handlers
-	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler, &warningNetworkHandler };
+	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler, &warningNetworkHandler, &systemNetworkHandler };
 	size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
 	wifiController.registerHandlers(networkHandlers, networkHandlerCount);
 

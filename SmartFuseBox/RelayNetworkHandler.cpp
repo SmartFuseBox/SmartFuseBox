@@ -23,18 +23,18 @@ CommandResult RelayNetworkHandler::handleRequest(const String& method,
 	if (cmd == RelayTurnAllOff)
 	{
 		_relayController->turnAllRelaysOff();
-		formatRelayStatesJson(responseBuffer, bufferSize);
+		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
 	else if (cmd == RelayTurnAllOn)
 	{
 		_relayController->turnAllRelaysOn();
-		formatRelayStatesJson(responseBuffer, bufferSize);
+		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
 	else if (cmd == RelayRetrieveStates)
 	{
-		formatRelayStatesJson(responseBuffer, bufferSize);
+		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
 	else if (cmd == RelaySetState)
@@ -61,7 +61,7 @@ CommandResult RelayNetworkHandler::handleRequest(const String& method,
 				return CommandResult::error(InvalidCommandParameters);
 			}
 
-			formatRelayStatesJson(responseBuffer, bufferSize);
+			formatStatusJson(responseBuffer, bufferSize);
 			return CommandResult::ok();
 		}
 		else
@@ -80,7 +80,7 @@ CommandResult RelayNetworkHandler::handleRequest(const String& method,
 				return CommandResult::error(InvalidCommandParameters);
 			}
 
-			formatRelayStatesJson(responseBuffer, bufferSize);
+			formatStatusJson(responseBuffer, bufferSize);
 			return CommandResult::ok();
 		}
 		else
@@ -93,7 +93,7 @@ CommandResult RelayNetworkHandler::handleRequest(const String& method,
 	return CommandResult{ false, 0 };
 }
 
-void RelayNetworkHandler::formatRelayStatesJson(char* buffer, size_t size)
+void RelayNetworkHandler::formatStatusJson(char* buffer, size_t size)
 {
 	// Simple JSON formatting without library (to save memory)
 	int written = snprintf(buffer, size, "{\"relays\":[");
@@ -107,17 +107,4 @@ void RelayNetworkHandler::formatRelayStatesJson(char* buffer, size_t size)
 	}
 	
 	snprintf(buffer + written, size - written, "]}");
-}
-
-void RelayNetworkHandler::formatJsonResponse(char* buffer, size_t size, bool success, const char* message)
-{
-	if (message)
-	{
-		snprintf(buffer, size, "{\"success\":%s,\"message\":\"%s\"}", 
-				success ? "true" : "false", message);
-	}
-	else
-	{
-		snprintf(buffer, size, "{\"success\":%s}", success ? "true" : "false");
-	}
 }

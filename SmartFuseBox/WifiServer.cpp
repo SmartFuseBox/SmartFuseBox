@@ -1,4 +1,5 @@
 #include "WifiServer.h"
+#include "SharedFunctions.h"
 
 constexpr uint16_t MaximumResponseBufferSize = 512;
 
@@ -184,7 +185,7 @@ void WifiServer::updateClientHandling()
 		case ClientHandlingState::ReadingRequest:
 		{
 			// Check for timeout
-			if (now - _activeClient.startTime >= ClientReadTimeoutMs)
+			if (SharedFunctions::hasElapsed(now, _activeClient.startTime, ClientReadTimeoutMs))
 			{
 				sendDebug(F("Client read timeout"), F("WifiServer"));
 				_activeClient.client.stop();
@@ -486,7 +487,7 @@ void WifiServer::updateClientConnection()
 	{
 		case WifiConnectionState::Connecting:
 			// Check connection status periodically
-			if (now - _lastConnectionAttempt >= ConnectionCheckIntervalMs)
+			if (SharedFunctions::hasElapsed(now, _lastConnectionAttempt, ConnectionCheckIntervalMs))
 			{
 				_lastConnectionAttempt = now;
 				
@@ -502,7 +503,7 @@ void WifiServer::updateClientConnection()
 					// Start the HTTP server now that we're connected
 					startServer();
 				}
-				else if (now - _connectionStartTime >= ConnectionTimeoutMs)
+				else if (SharedFunctions::hasElapsed(now, _connectionStartTime, ConnectionTimeoutMs))
 				{
 					// Connection timeout
 					_connectionState = WifiConnectionState::Failed;
@@ -525,7 +526,7 @@ void WifiServer::updateClientConnection()
 			}
 			
 			// Check RSSI periodically to detect weak signal before disconnection
-			if (now - _lastRSSICheck >= RSSICheckIntervalMs)
+			if (SharedFunctions::hasElapsed(now, _lastRSSICheck, RSSICheckIntervalMs))
 			{
 				_lastRSSICheck = now;
 				_lastRSSI = WiFi.RSSI();
@@ -557,7 +558,7 @@ void WifiServer::updateClientConnection()
 			}
 			
 			// Attempt reconnection after retry interval
-			if (now - _lastConnectionAttempt >= retryInterval)
+			if (SharedFunctions::hasElapsed(now, _lastConnectionAttempt, retryInterval))
 			{
 				if (_consecutiveFailures >= MaxConsecutiveFailures)
 				{
