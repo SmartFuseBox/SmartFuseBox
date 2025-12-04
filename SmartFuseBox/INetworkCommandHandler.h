@@ -35,4 +35,20 @@ public:
         size_t bufferSize) = 0;
     
     virtual ~INetworkCommandHandler() = default;
+
+    virtual void formatStatusJson(char* buffer, size_t size) = 0;
+
+    void formatJsonResponse(char* buffer, size_t size, bool success, const char* message = nullptr)
+    {
+        if (message)
+        {
+            snprintf(buffer, size, "{\"success\":%s,\"message\":\"%s\"}",
+                success ? "true" : "false", message);
+        }
+        else
+        {
+            snprintf(buffer, size, "{\"success\":%s}", success ? "true" : "false");
+        }
+    }
+
 };

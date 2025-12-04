@@ -76,9 +76,6 @@
     <ClCompile Include="ConfigManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files\SharedCode\SerialCommandHandlers</Filter>
     </ClCompile>
@@ -131,7 +128,16 @@
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
     <ClCompile Include="WarningNetworkHandler.cpp">
+      <Filter>Source Files\NetworkCommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTimeManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemNetworkHandler.cpp">
+      <Filter>Source Files\NetworkCommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemCommandHandler.cpp">
+      <Filter>Source Files\SerialCommandHandlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +244,12 @@
       <Filter>Header Files\NetworkCommandHandlers</Filter>
     </ClInclude>
     <ClInclude Include="WarningNetworkHandler.h">
+      <Filter>Header Files\NetworkCommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTimeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemNetworkHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

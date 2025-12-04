@@ -1,6 +1,7 @@
 #include "SystemCommandHandler.h"
 #include "SystemCpuMonitor.h"
 #include "ConfigManager.h"
+#include "DateTimeManager.h"
 
 #if defined(ARDUINO_UNO_R4)
 #include "WifiController.h"
@@ -18,7 +19,7 @@ SystemCommandHandler::~SystemCommandHandler()
 const String* SystemCommandHandler::supportedCommands(size_t& count) const
 {
     static const String cmds[] = { SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
-        SystemBluetoothStatus, SystemWifiStatus };
+        SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
@@ -73,6 +74,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         bool enabled = false;
         String ipAddress = F("0.0.0.0");
 		String ssid = "";
+        int rssi = 0;
 
         if (config)
             enabled = config->wifiEnabled;
@@ -82,20 +84,70 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         {
             ipAddress = _wifiController->getServer()->getIpAddress();
 			ssid = _wifiController->getServer()->getSSID();
+			rssi = _wifiController->getServer()->getSignalStrength();
         }
 
         if (_broadcaster)
         {
-            constexpr uint8_t argCount = 3;
+            constexpr uint8_t argCount = 4;
             StringKeyValue params[argCount] = {
                 { ValueParamName, enabled ? F("1") : F("0") },
                 { "ip", ipAddress },
-				{ "ssid", ssid }
+				{ "ssid", ssid },
+                { "rssi", String(rssi)}
             };
             sendAckOk(sender, cmd, params, argCount);
         }
     }
 #endif
+    else if (cmd == SystemSetDateTime && paramCount == 1)
+    {
+        String value = params[0].value;
+        value.trim();
+        
+        bool success = false;
+        
+        // Try ISO 8601 format first (contains 'T' or '-')
+        if (value.indexOf('T') >= 0 || value.indexOf('-') >= 0)
+        {
+            success = DateTimeManager::setDateTimeISO(value);
+        }
+        else
+        {
+            // Try Unix timestamp (all digits)
+            unsigned long timestamp = value.toInt();
+            if (timestamp > 0) {
+                DateTimeManager::setDateTime(timestamp);
+                success = true;
+            }
+        }
+        
+        if (success)
+        {
+            StringKeyValue param = { ValueParamName, DateTimeManager::formatDateTime() };
+            sendAckOk(sender, cmd, &param);
+        }
+        else
+        {
+            sendAckErr(sender, cmd, F("Invalid datetime format"));
+        }
+        
+        return true;
+    }
+	else if (cmd == SystemGetDateTime)
+    {
+        if (DateTimeManager::isTimeSet())
+        {
+            StringKeyValue param = { ValueParamName, DateTimeManager::formatDateTime() };
+            sendAckOk(sender, cmd, &param);
+        }
+        else
+        {
+            sendAckErr(sender, cmd, F("Date/time not set"));
+        }
+        
+        return true;
+    }
     else
     {
         sendAckErr(sender, cmd, F("Unknown system command"));

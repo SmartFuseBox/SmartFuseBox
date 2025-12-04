@@ -89,26 +89,12 @@ CommandResult SoundNetworkHandler::handleRequest(const String& method,
 		return CommandResult::error(InvalidCommandParameters);
 	}
 
-	formatSoundStatusJson(responseBuffer, bufferSize);
+	formatStatusJson(responseBuffer, bufferSize);
 	return CommandResult::ok();
 }
 
-void SoundNetworkHandler::formatSoundStatusJson(char* buffer, size_t size)
+void SoundNetworkHandler::formatStatusJson(char* buffer, size_t size)
 {
-	// Simple JSON formatting without library (to save memory)
-	int written = snprintf(buffer, size, "{\"sound\":{\"active\": %d,\"type\": %d}}", 
-		_soundController->isPlaying(), _soundController->getCurrentSoundType());
-}
-
-void SoundNetworkHandler::formatJsonResponse(char* buffer, size_t size, bool success, const char* message)
-{
-	if (message)
-	{
-		snprintf(buffer, size, "{\"success\":%s,\"message\":\"%s\"}",
-			success ? "true" : "false", message);
-	}
-	else
-	{
-		snprintf(buffer, size, "{\"success\":%s}", success ? "true" : "false");
-	}
+	snprintf(buffer, size, "{\"sound\":{\"active\": %d,\"type\": %d}}", 
+		_soundController->isPlaying(), static_cast<int>(_soundController->getCurrentSoundType()));
 }

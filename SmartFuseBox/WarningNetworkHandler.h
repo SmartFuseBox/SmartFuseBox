@@ -12,8 +12,7 @@ private:
 	WarningManager* _warningManager;
 
 	// Helper to format JSON response
-	void formatJsonResponse(char* buffer, size_t size, bool success, const char* message = nullptr);
-	void formatWarningStatusJson(char* buffer, size_t size);
+	void formatStatusJson(char* buffer, size_t size) override;
 
 public:
 	explicit WarningNetworkHandler(WarningManager* warningManager);

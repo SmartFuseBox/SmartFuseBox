@@ -18,7 +18,6 @@ CommandResult WarningNetworkHandler::handleRequest(const String& method,
 	size_t bufferSize)
 {
 	(void)method;
-	(void)params;
 
 	if (_warningManager == nullptr)
 	{
@@ -38,7 +37,7 @@ CommandResult WarningNetworkHandler::handleRequest(const String& method,
 
 	if (cmd == WarningsList)
 	{
-		formatWarningStatusJson(responseBuffer, bufferSize);
+		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
 
@@ -46,21 +45,8 @@ CommandResult WarningNetworkHandler::handleRequest(const String& method,
 	return CommandResult::error(InvalidCommandParameters);
 }
 
-void WarningNetworkHandler::formatWarningStatusJson(char* buffer, size_t size)
+void WarningNetworkHandler::formatStatusJson(char* buffer, size_t size)
 {
 	snprintf(buffer, size, "{\"warning\":{\"active\": \"0x%X\"}}",
-		_warningManager->getActiveWarningsMask());
-}
-
-void WarningNetworkHandler::formatJsonResponse(char* buffer, size_t size, bool success, const char* message)
-{
-	if (message)
-	{
-		snprintf(buffer, size, "{\"success\":%s,\"message\":\"%s\"}",
-			success ? "true" : "false", message);
-	}
-	else
-	{
-		snprintf(buffer, size, "{\"success\":%s}", success ? "true" : "false");
-	}
+		static_cast<int32_t>(_warningManager->getActiveWarningsMask()));
 }
