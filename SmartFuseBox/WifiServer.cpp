@@ -2,6 +2,7 @@
 #include "SharedFunctions.h"
 
 constexpr uint16_t MaximumResponseBufferSize = 512;
+constexpr uint16_t MaximumRequestSize = 1024;
 
 WifiServer::WifiServer(SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
 	INetworkCommandHandler** handlers, uint8_t handlerCount, JsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
@@ -113,6 +114,13 @@ bool WifiServer::begin()
 
 void WifiServer::startServer()
 {
+	if (WiFi.status() == WL_NO_MODULE)
+	{
+		sendError(F("WiFi module not detected"), F("WifiServer"));
+		_connectionState = WifiConnectionState::Failed;
+		return;
+	}
+
 	if (!_serverActive)
 	{
 		_server.begin();
@@ -219,6 +227,16 @@ void WifiServer::updateClientHandling()
 					break;
 				}
 			}
+			
+			// Add safety check in ReadingRequest state
+			if (_activeClient.request.length() > MaximumRequestSize)
+			{
+				sendDebug(F("Request too large"), F("WifiServer"));
+				send400(_activeClient.client);
+				_activeClient.client.stop();
+				_activeClient.state = ClientHandlingState::Idle;
+				break;
+			}
 			break;
 		}
 		
@@ -277,6 +295,7 @@ void WifiServer::processClientRequest()
 	if (path.startsWith(F("/api/index")))
 	{
 		handleIndex(_activeClient.client, path);
+		handled = true;
 	}
 
 	if (!handled && _handlers && _handlerCount > 0)
@@ -320,6 +339,9 @@ void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* co
 	{
 		case 200:
 			client.println(F("OK"));
+			break;
+		case 400:
+			client.println(F("Bad Request"));
 			break;
 		case 404:
 			client.println(F("Not Found"));
@@ -372,7 +394,7 @@ bool WifiServer::isConnected() const
 	{
 		return true; // AP is always "connected" once initialized
 	}
-	
+
 	return _connectionState == WifiConnectionState::Connected;
 }
 
@@ -404,6 +426,8 @@ int WifiServer::getSignalStrength() const
 
 bool WifiServer::handleIndex(WiFiClient& client, const String& path)
 {
+	sendDebug(String(F("HandleIndex: ")) + path, F("WifiServer"));
+
 	// Send HTTP headers first
 	_activeClient.client.print(F("HTTP/1.1 200 OK\r\n"));
 	_activeClient.client.print(F("Content-Type: application/json\r\n"));
@@ -450,6 +474,8 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 		return false;
 	}
 
+	sendDebug(String(F("dispatchToHandler: ")) + path, F("WifiServer"));
+	
 	// Extract command from path: /api/{handler}/{command}
 	// For example: /api/sound/H10 -> command = H10
 	//              /api/config/C8 -> command = C8

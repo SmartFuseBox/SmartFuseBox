@@ -83,7 +83,7 @@ private:
 	void stopServer();
 	bool handleIndex(WiFiClient& client, const String& path);
 	bool dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const String& path, const String& method, const String& query);
-	void WifiServer::registerJsonVisitors(JsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
+	void registerJsonVisitors(JsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 	
 public:
 	WifiServer(SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
