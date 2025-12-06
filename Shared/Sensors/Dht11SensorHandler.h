@@ -75,7 +75,7 @@ public:
 	Dht11SensorHandler(BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
 		WarningManager* warningManager, uint8_t sensorPin)
 		: BroadcastLoggerSupport(broadcastManager), _sensorCommandHandler(sensorCommandHandler),
-			_warningManager(warningManager), _dht11Sensor(), _sensorPin(sensorPin)
+			_warningManager(warningManager), _dht11Sensor(), _sensorPin(sensorPin), _humidity(0.0f), _celsius(0.0f)
 	{
 	}
 
