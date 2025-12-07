@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B2F18220-A
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
 		..\SETUP.md = ..\SETUP.md
+		..\Wifi.md = ..\Wifi.md
 	EndProjectSection
 EndProject
 Global

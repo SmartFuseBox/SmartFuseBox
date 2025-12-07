@@ -24,7 +24,8 @@ enum class ClientHandlingState : uint8_t
 {
 	Idle,
 	ReadingRequest,
-	ProcessingRequest
+	ProcessingRequest,
+	KeepAlive
 };
 
 class WifiServer : public SingleLoggerSupport
@@ -63,13 +64,16 @@ private:
 	static constexpr unsigned long BackoffIntervalMs = 60000;
 	static constexpr uint8_t MaxConsecutiveFailures = 3;
 	unsigned long _lastRSSICheck;
+	static constexpr unsigned long PersistentTimeoutMs = 30000;
 
 	struct ActiveClient
 	{
 		WiFiClient client;
 		String request;
 		unsigned long startTime;
+		unsigned long lastActivity;
 		ClientHandlingState state;
+		bool isPersistent;
 	} _activeClient;
 	
 	void sendResponse(WiFiClient& client, int statusCode, const char* contentType, const String& body);
