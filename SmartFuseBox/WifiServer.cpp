@@ -27,6 +27,8 @@ WifiServer::WifiServer(SerialCommandManager* commandMgrComputer, WarningManager*
 	_ssid[0] = '\0';
 	_password[0] = '\0';
 	_activeClient.state = ClientHandlingState::Idle;
+	_activeClient.lastActivity = 0;
+	_activeClient.isPersistent = false;
 	registerJsonVisitors(jsonVisitors, jsonVisitorCount);
 }
 
@@ -189,6 +191,8 @@ void WifiServer::updateClientHandling()
 				_activeClient.client = client;
 				_activeClient.request = "";
 				_activeClient.startTime = now;
+				_activeClient.lastActivity = now;
+				_activeClient.isPersistent = false;
 				_activeClient.state = ClientHandlingState::ReadingRequest;
 			}
 			break;
@@ -196,7 +200,7 @@ void WifiServer::updateClientHandling()
 		
 		case ClientHandlingState::ReadingRequest:
 		{
-			// Check for timeout
+			// Check for timeout first (before checking for new clients)
 			if (SharedFunctions::hasElapsed(now, _activeClient.startTime, ClientReadTimeoutMs))
 			{
 				sendDebug(F("Client read timeout"), F("WifiServer"));
@@ -215,37 +219,115 @@ void WifiServer::updateClientHandling()
 			}
 			
 			// Read available data (non-blocking)
+			bool requestComplete = false;
 			while (_activeClient.client.available())
 			{
 				char c = _activeClient.client.read();
 				_activeClient.request += c;
+				_activeClient.lastActivity = now;  // Update activity timestamp
 				
 				// Check for end of HTTP headers
 				if (_activeClient.request.endsWith("\r\n\r\n"))
 				{
-					_activeClient.state = ClientHandlingState::ProcessingRequest;
+					requestComplete = true;
 					break;
+				}
+				
+				// Safety check for request size
+				if (_activeClient.request.length() > MaximumRequestSize)
+				{
+					sendDebug(F("Request too large"), F("WifiServer"));
+					send400(_activeClient.client);
+					_activeClient.client.stop();
+					_activeClient.state = ClientHandlingState::Idle;
+					return;  // Exit early
 				}
 			}
 			
-			// Add safety check in ReadingRequest state
-			if (_activeClient.request.length() > MaximumRequestSize)
+			// Only check for concurrent connections AFTER attempting to read
+			// This prevents interfering with the active connection
+			WiFiClient newClient = _server.available();
+			if (newClient)
 			{
-				sendDebug(F("Request too large"), F("WifiServer"));
-				send400(_activeClient.client);
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
-				break;
+				sendDebug(F("Rejecting concurrent connection (reading)"), F("WifiServer"));
+				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
+				newClient.println(F("Content-Type: text/plain"));
+				newClient.println(F("Connection: close"));
+				newClient.println(F("Retry-After: 2"));
+				newClient.println();
+				newClient.println(F("Server busy"));
+				newClient.stop();
 			}
+			
+			// Transition to processing if request is complete
+			if (requestComplete)
+			{
+				_activeClient.state = ClientHandlingState::ProcessingRequest;
+			}
+			
 			break;
 		}
 		
 		case ClientHandlingState::ProcessingRequest:
 		{
+			WiFiClient newClient = _server.available();
+			if (newClient)
+			{
+				sendDebug(F("Rejecting concurrent connection (processing)"), F("WifiServer"));
+				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
+				newClient.println(F("Content-Type: text/plain"));
+				newClient.println(F("Connection: close"));
+				newClient.println(F("Retry-After: 2"));
+				newClient.println();
+				newClient.println(F("Server busy"));
+				newClient.stop();
+			}
+			
 			processClientRequest();
-			_activeClient.client.stop();
-			sendDebug(F("Client disconnected"), F("WifiServer"));
-			_activeClient.state = ClientHandlingState::Idle;
+			break;
+		}
+		
+		case ClientHandlingState::KeepAlive:
+		{
+			WiFiClient newClient = _server.available();
+			if (newClient)
+			{
+				sendDebug(F("Rejecting concurrent connection (keepalive)"), F("WifiServer"));
+				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
+				newClient.println(F("Content-Type: text/plain"));
+				newClient.println(F("Connection: close"));
+				newClient.println(F("Retry-After: 2"));
+				newClient.println();
+				newClient.println(F("Server busy"));
+				newClient.stop();
+			}
+			
+			// Check for timeout (30 seconds of inactivity)
+			if (SharedFunctions::hasElapsed(now, _activeClient.lastActivity, PersistentTimeoutMs))
+			{
+				sendDebug(F("Persistent connection timeout"), F("WifiServer"));
+				_activeClient.client.stop();
+				_activeClient.state = ClientHandlingState::Idle;
+				break;
+			}
+			
+			// Check if client is still connected
+			if (!_activeClient.client.connected())
+			{
+				sendDebug(F("Persistent client disconnected"), F("WifiServer"));
+				_activeClient.client.stop();
+				_activeClient.state = ClientHandlingState::Idle;
+				break;
+			}
+			
+			// Check for new data on the persistent connection
+			if (_activeClient.client.available())
+			{
+				sendDebug(F("New request on persistent connection"), F("WifiServer"));
+				_activeClient.request = "";
+				_activeClient.startTime = now;
+				_activeClient.state = ClientHandlingState::ReadingRequest;
+			}
 			break;
 		}
 	}
@@ -258,6 +340,10 @@ void WifiServer::processClientRequest()
 		return;
 	}
 	
+	// Check for persistent connection header
+	bool isPersistent = _activeClient.request.indexOf(F("X-Connection-Type: persistent")) != -1;
+	_activeClient.isPersistent = isPersistent;
+	
 	// Parse the request line (GET /path?query HTTP/1.1)
 	int firstSpace = _activeClient.request.indexOf(' ');
 	int secondSpace = _activeClient.request.indexOf(' ', firstSpace + 1);
@@ -265,6 +351,16 @@ void WifiServer::processClientRequest()
 	if (firstSpace == -1 || secondSpace == -1)
 	{
 		send404(_activeClient.client);
+		if (!isPersistent)
+		{
+			_activeClient.client.stop();
+			_activeClient.state = ClientHandlingState::Idle;
+		}
+		else
+		{
+			_activeClient.state = ClientHandlingState::KeepAlive;
+			_activeClient.lastActivity = millis();
+		}
 		return;
 	}
 	
@@ -274,6 +370,16 @@ void WifiServer::processClientRequest()
 	if (method != "GET")
 	{
 		send404(_activeClient.client);
+		if (!isPersistent)
+		{
+			_activeClient.client.stop();
+			_activeClient.state = ClientHandlingState::Idle;
+		}
+		else
+		{
+			_activeClient.state = ClientHandlingState::KeepAlive;
+			_activeClient.lastActivity = millis();
+		}
 		return;
 	}
 
@@ -315,6 +421,21 @@ void WifiServer::processClientRequest()
 	{
 		send404(_activeClient.client);
 	}
+	
+	// Decide next state based on connection type
+	if (!isPersistent)
+	{
+		_activeClient.client.stop();
+		sendDebug(F("Client disconnected (transient)"), F("WifiServer"));
+		_activeClient.state = ClientHandlingState::Idle;
+	}
+	else
+	{
+		_activeClient.request = "";  // Clear request buffer for next request
+		_activeClient.lastActivity = millis();
+		_activeClient.state = ClientHandlingState::KeepAlive;
+		sendDebug(F("Client kept alive (persistent)"), F("WifiServer"));
+	}
 }
 
 void WifiServer::send400(WiFiClient& client)
@@ -353,7 +474,19 @@ void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* co
 	
 	client.print(F("Content-Type: "));
 	client.println(contentType);
-	client.println(F("Connection: close"));
+	
+	// Conditionally set Connection header based on persistent flag
+	if (_activeClient.isPersistent)
+	{
+		client.println(F("Connection: keep-alive"));
+		client.print(F("Keep-Alive: timeout="));
+		client.println(PersistentTimeoutMs / 1000);  // Send timeout in seconds
+	}
+	else
+	{
+		client.println(F("Connection: close"));
+	}
+	
 	client.print(F("Content-Length: "));
 	client.println(body.length());
 	client.println();
@@ -431,7 +564,19 @@ bool WifiServer::handleIndex(WiFiClient& client, const String& path)
 	// Send HTTP headers first
 	_activeClient.client.print(F("HTTP/1.1 200 OK\r\n"));
 	_activeClient.client.print(F("Content-Type: application/json\r\n"));
-	_activeClient.client.print(F("Connection: close\r\n"));
+
+	if (_activeClient.isPersistent)
+	{
+		_activeClient.client.print(F("Connection: keep-alive\r\n"));
+		_activeClient.client.print(F("Keep-Alive: timeout="));
+		_activeClient.client.print(PersistentTimeoutMs / 1000);  // Send timeout in seconds
+		_activeClient.client.print(F("\r\n"));
+	}
+	else
+	{
+		_activeClient.client.print(F("Connection: close\r\n"));
+	}
+
 	_activeClient.client.print(F("\r\n"));
 
 	// Stream JSON response
