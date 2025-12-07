@@ -5,11 +5,6 @@
 #include "SharedConstants.h"
 #include "Local.h"
 
-enum class FuseBoxType : uint8_t
-{
-    General = 0x00,
-    Boat = 0x01,
-};
 
 enum class VesselType : uint8_t
 {
