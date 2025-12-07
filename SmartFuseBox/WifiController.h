@@ -71,11 +71,11 @@ public:
             // Configure based on config settings
             if (cfg->accessMode == 0) // Access Point
             {
-                _wifiServer->setAccessPointMode(cfg->_apSSID, cfg->_apPassword);
+                _wifiServer->setAccessPointMode(cfg->apSSID, cfg->apPassword, cfg->apIpAddress);
             }
             else // Client
             {
-                _wifiServer->setClientMode(cfg->_apSSID, cfg->_apPassword);
+                _wifiServer->setClientMode(cfg->apSSID, cfg->apPassword);
             }
 
             if (!_wifiServer->begin())
@@ -146,7 +146,7 @@ private:
         }
 
         // Check if SSID is provided and not empty
-        if (cfg->_apSSID[0] == '\0')
+        if (cfg->apSSID[0] == '\0')
         {
             return false;
         }
@@ -159,6 +159,15 @@ private:
         if (cfg->wifiPort == 0)
         {
             return false;
+        }
+
+        if (cfg->accessMode == 0) // Access Point
+        {
+            IPAddress testIp;
+            if (!testIp.fromString(cfg->apIpAddress))
+            {
+                return false;
+            }
         }
 
         return true;

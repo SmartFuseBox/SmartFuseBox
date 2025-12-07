@@ -42,6 +42,8 @@ private:
 	// AP mode settings
 	char _ssid[MaxSSIDLength];
 	char _password[MaxWiFiPasswordLength];
+	char _ipAddress[MaxIpAddressLength];
+
 
 	// Network command handlers
 	INetworkCommandHandler** _handlers;
@@ -96,7 +98,7 @@ public:
 	~WifiServer();
 	
 	// Configuration methods
-	void setAccessPointMode(const char* ssid, const char* password = nullptr);
+	void setAccessPointMode(const char* ssid, const char* password = nullptr, const char* ipAddress = nullptr);
 	void setClientMode(const char* ssid, const char* password);
 	
 	// Initialization and lifecycle

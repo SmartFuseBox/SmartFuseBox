@@ -33,7 +33,7 @@ enum class VesselType : uint8_t
 //
 // Keep struct packed and stable. Increase 'VERSION' when you change layout.
 // Packed POD for persistent configuration.
-constexpr uint8_t ConfigVersion = 2;
+constexpr uint8_t ConfigVersion = 3;
 constexpr uint8_t ConfigRelayCount = 8;
 constexpr uint8_t ConfigHomeButtons = 4;
 constexpr uint8_t ConfigMaxBoatNameLength = 31; // max characters (inc null)
@@ -55,9 +55,10 @@ struct Config {
     bool bluetoothEnabled;
 	bool wifiEnabled;
 	uint8_t accessMode; // 0 = AP, 1 = Client
-    char _apSSID[MaxSSIDLength];
-    char _apPassword[MaxWiFiPasswordLength];
+    char apSSID[MaxSSIDLength];
+    char apPassword[MaxWiFiPasswordLength];
     uint16_t wifiPort;
+	char apIpAddress[MaxIpAddressLength]; // xxx.xxx.xxx.xxx + null
 #endif
 
     uint16_t checksum;

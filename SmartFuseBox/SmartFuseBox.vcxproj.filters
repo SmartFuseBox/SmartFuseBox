@@ -73,9 +73,6 @@
     <ClCompile Include="BroadcastManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files\SharedCode\SerialCommandHandlers</Filter>
     </ClCompile>
@@ -138,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="SystemCommandHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.cpp">
+      <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
