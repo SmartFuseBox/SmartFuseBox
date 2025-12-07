@@ -5,7 +5,14 @@
 #include "SharedConstants.h"
 #include "Local.h"
 
-enum class VesselType : uint8_t {
+enum class FuseBoxType : uint8_t
+{
+    General = 0x00,
+    Boat = 0x01,
+};
+
+enum class VesselType : uint8_t
+{
     Motor = 0x00,                   // Power boat
     Sail = 0x01,                    // Sailing boat
     Fishing = 0x02,                 // Fishing boat
