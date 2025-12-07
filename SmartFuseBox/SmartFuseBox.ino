@@ -46,6 +46,8 @@
 // forward declares
 void onComputerCommandReceived(SerialCommandManager* mgr);
 void onLinkCommandReceived(SerialCommandManager* mgr);
+void configureWifiSupport(Config* config);
+void configureBluetoothSupport(Config* config);
 
 // controllers
 RelayController relayController(Relays, TotalRelays);
@@ -102,6 +104,7 @@ void setup()
 	SharedFunctions::initializeSerial(LINK_SERIAL, 9600, true);
 
 	DateTimeManager::setDateTime();
+
 	// retrieve config settings
 	ConfigManager::begin();
 
@@ -124,34 +127,15 @@ void setup()
 	size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 
-	// network command handlers
-	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler, &warningNetworkHandler, &systemNetworkHandler };
-	size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
-	wifiController.registerHandlers(networkHandlers, networkHandlerCount);
-
 	Config* config = ConfigManager::getConfigPtr();
-	// json status visitors for wifi
-	JsonVisitor* jsonVisitors[] = {
-		&relayNetworkHandler,
-		&soundNetworkHandler,
-		&warningNetworkHandler,
-		&systemNetworkHandler,
-		&waterSensorHandler,
-		&dht11SensorHandler
-	};
-	uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);
-	wifiController.registerJsonVisitors(jsonVisitors, jsonVisitorCount);
 
-	// bluetooth
-	bluetoothController.applyConfig(config);
-
-	//wifi 
-	wifiController.applyConfig(config);
-	systemCommandHandler.setWifiController(&wifiController);
-
+	configureWifiSupport(config);
+	configureBluetoothSupport(config);
 	soundController.configUpdated(config);
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
+
+	// indicate system initialized
 	commandMgrComputer.sendCommand(SystemInitialized, "");
 }
 
@@ -192,4 +176,34 @@ void onComputerCommandReceived(SerialCommandManager* mgr)
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
 	commandMgrComputer.sendError(mgr->getRawMessage(), F("STATLNK"));
+}
+
+void configureWifiSupport(Config* config)
+{
+	// network command handlers
+	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler, &warningNetworkHandler, &systemNetworkHandler };
+	size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
+	wifiController.registerHandlers(networkHandlers, networkHandlerCount);
+
+
+	// json status visitors for wifi
+	JsonVisitor* jsonVisitors[] = {
+		&relayNetworkHandler,
+		&soundNetworkHandler,
+		&warningNetworkHandler,
+		&systemNetworkHandler,
+		&waterSensorHandler,
+		&dht11SensorHandler
+	};
+	uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);
+	wifiController.registerJsonVisitors(jsonVisitors, jsonVisitorCount);
+
+	wifiController.applyConfig(config);
+	systemCommandHandler.setWifiController(&wifiController);
+}
+
+void configureBluetoothSupport(Config* config)
+{
+	// bluetooth
+	bluetoothController.applyConfig(config);
 }

@@ -53,6 +53,7 @@ constexpr char ConfigWifiSSID[] = "C13";
 constexpr char ConfigWifiPassword[] = "C14";
 constexpr char ConfigWifiPort[] = "C15";
 constexpr char ConfigWifiState[] = "C16";
+constexpr char ConfigWifiApIpAddress[] = "C17";
 #endif
 
 constexpr char WarningsActive[] = "W0";
@@ -100,6 +101,9 @@ constexpr uint8_t InvalidCommandParameters = 100;
 #if defined(ARDUINO_UNO_R4)
 constexpr uint8_t MaxSSIDLength = 33; // 32 chars + null
 constexpr uint8_t MaxWiFiPasswordLength = 65; // 64 chars + null
+constexpr uint8_t MaxIpAddressLength = 16; // xxx.xxx.xxx.xxx + null
+constexpr char DefaultApIpAddress[MaxIpAddressLength] = "192.168.4.1";
+
 
 // WiFi Connection Quality Thresholds
 constexpr int8_t WeakSignalWarningRSSI = -80;  // dBm - warn user

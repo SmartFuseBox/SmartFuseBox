@@ -37,11 +37,20 @@ WifiServer::~WifiServer()
 	end();
 }
 
-void WifiServer::setAccessPointMode(const char* ssid, const char* password)
+void WifiServer::setAccessPointMode(const char* ssid, const char* password, const char* ipAddress)
 {
 	_mode = WifiMode::AccessPoint;
 	strncpy(_ssid, ssid, sizeof(_ssid) - 1);
 	_ssid[sizeof(_ssid) - 1] = '\0';
+	if (ipAddress != nullptr)
+	{
+		strncpy(_ipAddress, ipAddress, sizeof(_ipAddress) - 1);
+		_ipAddress[sizeof(_ipAddress) - 1] = '\0';
+	}
+	else
+	{
+		_ipAddress[0] = '\0';
+	}
 	
 	if (password != nullptr)
 	{
@@ -76,6 +85,21 @@ bool WifiServer::begin()
 	{
 		sendDebug(String(F("Initializing in Access Point mode: ")) + String(_ssid), F("WifiServer"));
 		
+		IPAddress apIp;
+
+		if (apIp.fromString(_ipAddress))
+		{
+			sendDebug(String(F("Access Point IP set to: ")) + apIp.toString(), F("WifiServer"));
+		}
+		else
+		{
+			sendDebug(F("Using default Access Point IP"), F("WifiServer"));
+			apIp = IPAddress(192, 168, 4, 1);
+		}
+
+		IPAddress subnet(255, 255, 255, 0);
+		WiFi.config(apIp, apIp, subnet);
+
 		if (strlen(_password) > 0)
 		{
 			success = WiFi.beginAP(_ssid, _password);

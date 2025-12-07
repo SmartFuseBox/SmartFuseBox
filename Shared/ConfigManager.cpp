@@ -115,11 +115,13 @@ void ConfigManager::resetToDefaults()
     _cfg.bluetoothEnabled = false;
     _cfg.wifiEnabled = false;
     _cfg.accessMode = 0; // 0 = AP, 1 = Client
-    strncpy(_cfg._apSSID, "SmartFuseBox", sizeof(_cfg._apSSID) - 1);
-    _cfg._apSSID[sizeof(_cfg._apSSID) - 1] = '\0';
-    strncpy(_cfg._apPassword, "12345678", sizeof(_cfg._apPassword) - 1);
-    _cfg._apPassword[sizeof(_cfg._apPassword) - 1] = '\0';
+    strncpy(_cfg.apSSID, "SmartFuseBox", sizeof(_cfg.apSSID) - 1);
+    _cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';
+    strncpy(_cfg.apPassword, "12345678", sizeof(_cfg.apPassword) - 1);
+    _cfg.apPassword[sizeof(_cfg.apPassword) - 1] = '\0';
     _cfg.wifiPort = 80; 
+	strncpy(_cfg.apIpAddress, DefaultApIpAddress, sizeof(_cfg.apIpAddress) - 1);
+	_cfg.apIpAddress[sizeof(_cfg.apIpAddress) - 1] = '\0';
 #endif
 
     // compute checksum

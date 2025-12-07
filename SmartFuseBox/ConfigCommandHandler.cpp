@@ -1,6 +1,10 @@
 #include "ConfigCommandHandler.h"
 #include "BluetoothController.h"
 
+#if defined(ARDUINO_UNO_R4)
+#include <Arduino.h>
+#endif
+
 
 ConfigCommandHandler::ConfigCommandHandler(SoundController* soundController, BluetoothController* bluetoothController,
     WifiController* wifiController, RelayCommandHandler* relayCommandHandler)
@@ -63,10 +67,10 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
 		sender->sendCommand(ConfigWifiMode, "v=" + String(config->accessMode));
 
 		// C13 WiFi SSID
-		sender->sendCommand(ConfigWifiSSID, "v=" + String(config->_apSSID));
+		sender->sendCommand(ConfigWifiSSID, "v=" + String(config->apSSID));
 
 		// C14 WiFi Password
-		sender->sendCommand(ConfigWifiPassword, "v=" + String(config->_apPassword));
+		sender->sendCommand(ConfigWifiPassword, "v=" + String(config->apPassword));
 
 		// C15 WiFi Port
 		sender->sendCommand(ConfigWifiPort, "v=" + String(config->wifiPort));
@@ -76,6 +80,12 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         {
             sender->sendCommand(ConfigWifiState, "v=" + String(static_cast<int32_t>(_wifiController->getServer()->getConnectionState())));
         }
+
+		// C17 WiFi AP IP Address
+        if (_wifiController && _wifiController->getServer())
+        {
+            sender->sendCommand(ConfigWifiApIpAddress, "v=" + _wifiController->getServer()->getIpAddress());
+		}
 #endif
 
         sendAckOk(sender, cmd);
@@ -235,7 +245,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         {
             String ssid = params[0].value;
             ssid.trim();
-            ssid.toCharArray(config->_apSSID, sizeof(config->_apSSID));
+            ssid.toCharArray(config->apSSID, sizeof(config->apSSID));
             sendAckOk(sender, cmd, &params[0]);
         }
         else
@@ -251,7 +261,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         {
             String password = params[0].value;
             password.trim();
-            password.toCharArray(config->_apPassword, sizeof(config->_apPassword));
+            password.toCharArray(config->apPassword, sizeof(config->apPassword));
             sendAckOk(sender, cmd, &params[0]);
         }
         else
@@ -291,6 +301,30 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         sender->sendCommand(ConfigWifiState, "v=" + String(state));
         sendAckOk(sender, cmd);
 	}
+    else if (cmd == ConfigWifiApIpAddress)
+    {
+        // Expect "C17:v=<value>"
+        if (paramCount >= 1)
+        {
+            String ipAddress = params[0].value;
+            ipAddress.trim();
+
+            IPAddress ip;
+            if (!ip.fromString(ipAddress))
+            {
+                sendAckErr(sender, cmd, F("Invalid IP address"), &params[0]);
+                return true;
+			}
+
+            ipAddress.toCharArray(config->apIpAddress, sizeof(config->apIpAddress));
+            sendAckOk(sender, cmd, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, cmd, F("Missing param"));
+            return true;
+        }
+	}
 #endif
 
     else
@@ -306,7 +340,7 @@ const String* ConfigCommandHandler::supportedCommands(size_t& count) const
     static const String cmds[] = { ConfigSaveSettings, ConfigGetSettings, 
         ConfigResetSettings, ConfigBoatType, ConfigSoundRelayId, ConfigSoundStartDelay,
         ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID, 
-        ConfigWifiPassword, ConfigWifiPort, ConfigWifiState };
+        ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
