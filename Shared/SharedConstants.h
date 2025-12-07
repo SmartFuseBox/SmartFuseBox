@@ -102,7 +102,7 @@ constexpr uint8_t InvalidCommandParameters = 100;
 constexpr uint8_t MaxSSIDLength = 33; // 32 chars + null
 constexpr uint8_t MaxWiFiPasswordLength = 65; // 64 chars + null
 constexpr uint8_t MaxIpAddressLength = 16; // xxx.xxx.xxx.xxx + null
-constexpr char DefaultApIpAddress[MaxIpAddressLength] = "192.168.4.4";
+constexpr char DefaultApIpAddress[MaxIpAddressLength] = "192.168.4.1";
 
 
 // WiFi Connection Quality Thresholds
