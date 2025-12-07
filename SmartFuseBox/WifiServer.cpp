@@ -577,7 +577,6 @@ bool WifiServer::handleIndex(WiFiClient& client, const String& path)
 		_activeClient.client.print(F("Connection: close\r\n"));
 	}
 
-	_activeClient.client.print(F("Connection: close\r\n"));
 	_activeClient.client.print(F("\r\n"));
 
 	// Stream JSON response
