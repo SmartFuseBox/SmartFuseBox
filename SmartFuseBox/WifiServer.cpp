@@ -200,7 +200,7 @@ void WifiServer::updateClientHandling()
 		
 		case ClientHandlingState::ReadingRequest:
 		{
-			// Check for timeout FIRST (before checking for new clients)
+			// Check for timeout first (before checking for new clients)
 			if (SharedFunctions::hasElapsed(now, _activeClient.startTime, ClientReadTimeoutMs))
 			{
 				sendDebug(F("Client read timeout"), F("WifiServer"));
