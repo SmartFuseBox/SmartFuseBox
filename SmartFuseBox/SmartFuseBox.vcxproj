@@ -84,7 +84,7 @@
     <ClCompile Include="SensorNetworkHandler.cpp" />
     <ClCompile Include="SoundNetworkHandler.cpp" />
     <ClCompile Include="SystemCpuMonitor.cpp" />
-    <ClCompile Include="SharedFunctions.cpp" />
+    <ClCompile Include="SystemFunctions.cpp" />
     <ClCompile Include="SystemCommandHandler.cpp" />
     <ClCompile Include="SystemNetworkHandler.cpp" />
     <ClCompile Include="WarningCommandHandler.cpp" />
@@ -131,7 +131,7 @@
     <ClInclude Include="BluetoothServiceBase.h" />
     <ClInclude Include="BluetoothSystemService.h" />
     <ClInclude Include="SystemCpuMonitor.h" />
-    <ClInclude Include="SharedFunctions.h" />
+    <ClInclude Include="SystemFunctions.h" />
     <ClInclude Include="SystemNetworkHandler.h" />
     <ClInclude Include="WarningCommandHandler.h" />
     <ClInclude Include="SensorCommandHandler.h" />

@@ -7,8 +7,8 @@ BroadcastManager.h|..\Shared\BroadcastManager.h
 BroadcastManager.cpp|..\Shared\BroadcastManager.cpp
 WarningManager.h|..\Shared\WarningManager.h
 WarningManager.cpp|..\Shared\WarningManager.cpp
-SharedFunctions.h|..\Shared\SharedFunctions.h
-SharedFunctions.cpp|..\Shared\SharedFunctions.cpp
+SystemFunctions.h|..\Shared\SystemFunctions.h
+SystemFunctions.cpp|..\Shared\SystemFunctions.cpp
 SystemCpuMonitor.h|..\Shared\SystemCpuMonitor.h
 SystemCpuMonitor.cpp|..\Shared\SystemCpuMonitor.cpp
 SharedBaseCommandHandler.h|..\Shared\CommandHandlers\SharedBaseCommandHandler.h

@@ -42,7 +42,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
     }
     else if (cmd == SystemFreeMemory)
     {
-        StringKeyValue param = { ValueParamName, String(SharedFunctions::freeMemory()) };
+        StringKeyValue param = { ValueParamName, String(SystemFunctions::freeMemory()) };
         sendAckOk(sender, cmd, &param);
     }
 	else if (cmd == SystemCpuUsage)

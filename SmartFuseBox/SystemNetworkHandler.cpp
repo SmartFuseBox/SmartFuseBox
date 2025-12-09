@@ -2,7 +2,7 @@
 #include "SystemCpuMonitor.h"
 #include "ConfigManager.h"
 #include "DateTimeManager.h"
-#include "SharedFunctions.h"
+#include "SystemFunctions.h"
 
 SystemNetworkHandler::SystemNetworkHandler(WifiController* wifiController)
 	: _wifiController(wifiController)
@@ -61,7 +61,7 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 	// Enhanced JSON formatting with WiFi runtime details
 	snprintf(buffer, size,
 		"\"system\":{\"mem\":%d,\"cpu\":%d,\"bluetooth\":%d,\"wifi\":%d,\"ip\":\"%s\",\"ssid\":\"%s\",\"rssi\":%d,\"time\":\"%s\"}",
-		SharedFunctions::freeMemory(),
+		SystemFunctions::freeMemory(),
 		SystemCpuMonitor::getCpuUsage(),
 		bluetoothEnabled,
 		wifiEnabled,

@@ -121,7 +121,7 @@
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files\SharedCode\CommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="SharedFunctions.cpp">
+    <ClCompile Include="SystemFunctions.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
     <ClCompile Include="SystemCpuMonitor.cpp">
@@ -132,6 +132,9 @@
     </ClCompile>
     <ClCompile Include="AboutPage.cpp">
       <Filter>Source Files\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTimeManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -210,10 +213,7 @@
     <ClInclude Include="AckCommandHandler.h">
       <Filter>Header Files\SharedCode\CommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="SharedConstants.h">
-      <Filter>Header Files\SharedCode</Filter>
-    </ClInclude>
-    <ClInclude Include="SharedFunctions.h">
+    <ClInclude Include="SystemFunctions.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
     <ClInclude Include="SystemCpuMonitor.h">
@@ -230,6 +230,15 @@
     </ClInclude>
     <ClInclude Include="LoggingSupport.h">
       <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTimeManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sensors\BaseSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemDefinitions.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

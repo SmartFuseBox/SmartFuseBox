@@ -1,5 +1,5 @@
 #include "BluetoothSystemService.h"
-#include "SharedFunctions.h"
+#include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
 
 BluetoothSystemService::BluetoothSystemService(SystemCommandHandler* commandHandler)
@@ -120,7 +120,7 @@ void BluetoothSystemService::updateFreeMemory()
 {
     if (_charFreeMemory)
     {
-        uint32_t freeMemory = SharedFunctions::freeMemory();
+        uint32_t freeMemory = SystemFunctions::freeMemory();
         _charFreeMemory->writeValue(freeMemory);
     }
 }

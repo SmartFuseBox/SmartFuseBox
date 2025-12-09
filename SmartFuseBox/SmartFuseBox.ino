@@ -112,8 +112,8 @@ void setup()
 {
 	// Serial initialization is performed first to ensure that any logging or error messages
 	// from DateTimeManager or ConfigManager during initialization are properly output.
-	SharedFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
-	SharedFunctions::initializeSerial(LINK_SERIAL, 9600, true);
+	SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
+	SystemFunctions::initializeSerial(LINK_SERIAL, 9600, true);
 
 	DateTimeManager::setDateTime();
 
