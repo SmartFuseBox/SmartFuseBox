@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-class SharedFunctions {
+class SystemFunctions {
 public:
     // Call once at startup (handles any board-specific init)
     static uint16_t freeMemory();

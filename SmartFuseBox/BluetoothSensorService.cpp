@@ -3,7 +3,7 @@
 // 
 
 #include "BluetoothSensorService.h"
-#include "SharedFunctions.h"
+#include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
 
 BluetoothSensorService::BluetoothSensorService(SensorCommandHandler* commandHandler)

@@ -103,9 +103,9 @@ void setup()
     size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
     commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 
-    SharedFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
-    SharedFunctions::initializeSerial(NEXTION_SERIAL, 19200, false);
-    SharedFunctions::initializeSerial(LINK_SERIAL, 9600, false);
+    SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
+    SystemFunctions::initializeSerial(NEXTION_SERIAL, 19200, false);
+    SystemFunctions::initializeSerial(LINK_SERIAL, 9600, false);
 
 #ifdef NEXTION_DEBUG
     nextion.setDebugCallback([](const String& msg) {

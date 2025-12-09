@@ -75,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DateTimeManager.cpp" />
-    <ClCompile Include="SharedFunctions.cpp" />
+    <ClCompile Include="SystemFunctions.cpp" />
     <ClCompile Include="AboutPage.cpp" />
     <ClCompile Include="SystemCpuMonitor.cpp" />
     <ClCompile Include="SystemCommandHandler.cpp" />
@@ -124,7 +124,7 @@
     <ClInclude Include="AboutPage.h" />
     <ClInclude Include="SplashPage.h" />
     <ClInclude Include="SystemCpuMonitor.h" />
-    <ClInclude Include="SharedFunctions.h" />
+    <ClInclude Include="SystemFunctions.h" />
     <ClInclude Include="BroadcastManager.h" />
     <ClInclude Include="SystemPage.h" />
     <ClInclude Include="WarningType.h" />

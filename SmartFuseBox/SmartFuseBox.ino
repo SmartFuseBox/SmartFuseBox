@@ -31,6 +31,7 @@
 #include "BluetoothController.h"
 
 #include "WifiController.h"
+#include "ConfigNetworkHandler.h"
 #include "RelayNetworkHandler.h"
 #include "SoundNetworkHandler.h"
 #include "WarningNetworkHandler.h"
@@ -102,6 +103,7 @@ SensorController sensorController(baseSensors, sensorHandlerCount);
 
 
 // configure wifi support
+ConfigNetworkHandler configNetworkHandler;
 RelayNetworkHandler relayNetworkHandler(&relayController);
 SoundNetworkHandler soundNetworkHandler(&soundController);
 WarningNetworkHandler warningNetworkHandler(&warningManager);
@@ -112,8 +114,8 @@ void setup()
 {
 	// Serial initialization is performed first to ensure that any logging or error messages
 	// from DateTimeManager or ConfigManager during initialization are properly output.
-	SharedFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
-	SharedFunctions::initializeSerial(LINK_SERIAL, 9600, true);
+	SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
+	SystemFunctions::initializeSerial(LINK_SERIAL, 9600, true);
 
 	DateTimeManager::setDateTime();
 
@@ -201,6 +203,7 @@ void configureWifiSupport(Config* config)
 
 	// json status visitors for wifi
 	NetworkJsonVisitor* jsonVisitors[] = {
+		&configNetworkHandler,
 		&relayNetworkHandler,
 		&soundNetworkHandler,
 		&warningNetworkHandler,

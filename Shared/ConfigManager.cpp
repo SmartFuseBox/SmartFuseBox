@@ -1,6 +1,7 @@
 #include <EEPROM.h>
 
 #include "ConfigManager.h"
+#include "SystemFunctions.h"
 
 constexpr char DefaultBoatName[] = "My Boat";
 constexpr char RelayNameShort[] = "R %u";
@@ -117,9 +118,9 @@ void ConfigManager::resetToDefaults()
     _cfg.accessMode = 0; // 0 = AP, 1 = Client
     strncpy(_cfg.apSSID, "SmartFuseBox", sizeof(_cfg.apSSID) - 1);
     _cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';
-    strncpy(_cfg.apPassword, "12345678", sizeof(_cfg.apPassword) - 1);
+	SystemFunctions::GenerateDefaultPassword(_cfg.apPassword, sizeof(_cfg.apPassword));
     _cfg.apPassword[sizeof(_cfg.apPassword) - 1] = '\0';
-    _cfg.wifiPort = 80; 
+    _cfg.wifiPort = DefaultWifiPort;
 	strncpy(_cfg.apIpAddress, DefaultApIpAddress, sizeof(_cfg.apIpAddress) - 1);
 	_cfg.apIpAddress[sizeof(_cfg.apIpAddress) - 1] = '\0';
 #endif

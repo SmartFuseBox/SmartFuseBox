@@ -78,13 +78,14 @@
     <ClCompile Include="BluetoothRelayService.cpp" />
     <ClCompile Include="BluetoothSensorService.cpp" />
     <ClCompile Include="BluetoothSystemService.cpp" />
+    <ClCompile Include="ConfigNetworkHandler.cpp" />
     <ClCompile Include="DateTimeManager.cpp" />
     <ClCompile Include="RelayNetworkHandler.cpp" />
     <ClCompile Include="SensorController.h" />
     <ClCompile Include="SensorNetworkHandler.cpp" />
     <ClCompile Include="SoundNetworkHandler.cpp" />
     <ClCompile Include="SystemCpuMonitor.cpp" />
-    <ClCompile Include="SharedFunctions.cpp" />
+    <ClCompile Include="SystemFunctions.cpp" />
     <ClCompile Include="SystemCommandHandler.cpp" />
     <ClCompile Include="SystemNetworkHandler.cpp" />
     <ClCompile Include="WarningCommandHandler.cpp" />
@@ -112,6 +113,7 @@
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
     <ClInclude Include="BaseSensor.h" />
+    <ClInclude Include="ConfigNetworkHandler.h" />
     <ClInclude Include="NetworkJsonVisitor.h" />
     <ClInclude Include="SystemDefinitions.h" />
     <ClInclude Include="DateTimeManager.h" />
@@ -131,7 +133,7 @@
     <ClInclude Include="BluetoothServiceBase.h" />
     <ClInclude Include="BluetoothSystemService.h" />
     <ClInclude Include="SystemCpuMonitor.h" />
-    <ClInclude Include="SharedFunctions.h" />
+    <ClInclude Include="SystemFunctions.h" />
     <ClInclude Include="SystemNetworkHandler.h" />
     <ClInclude Include="WarningCommandHandler.h" />
     <ClInclude Include="SensorCommandHandler.h" />

@@ -1,6 +1,6 @@
 
 #include "SystemPage.h"
-#include "SharedFunctions.h"
+#include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
 
 constexpr char ControlFuseBoxCpu[] = "t5";
@@ -152,7 +152,7 @@ void SystemPage::updateControlPanelCpu()
 
 void SystemPage::updateControlPanelMemory()
 {
-	uint16_t memory = SharedFunctions::freeMemory();
+	uint16_t memory = SystemFunctions::freeMemory();
 
 	if (memory != _lastControlPanelMemory)
     {

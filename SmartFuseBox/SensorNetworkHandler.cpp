@@ -23,8 +23,7 @@ CommandResult SensorNetworkHandler::handleRequest(const String& method,
 		// nothing to do in this context
 	}
 
-	formatJsonResponse(responseBuffer, bufferSize, false, "Invalid request");
-	return CommandResult{ false, 0 };
+    return CommandResult::error(InvalidCommandParameters);
 }
 
 void SensorNetworkHandler::formatStatusJson(char* buffer, size_t size)

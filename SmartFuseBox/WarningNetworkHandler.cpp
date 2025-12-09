@@ -42,7 +42,6 @@ CommandResult WarningNetworkHandler::handleRequest(const String& method,
 		return CommandResult::ok();
 	}
 
-	formatJsonResponse(responseBuffer, bufferSize, false, "Invalid command");
 	return CommandResult::error(InvalidCommandParameters);
 }
 
