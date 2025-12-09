@@ -120,7 +120,7 @@ void ConfigManager::resetToDefaults()
     _cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';
 	SystemFunctions::GenerateDefaultPassword(_cfg.apPassword, sizeof(_cfg.apPassword));
     _cfg.apPassword[sizeof(_cfg.apPassword) - 1] = '\0';
-    _cfg.wifiPort = 80; 
+    _cfg.wifiPort = DefaultWifiPort;
 	strncpy(_cfg.apIpAddress, DefaultApIpAddress, sizeof(_cfg.apIpAddress) - 1);
 	_cfg.apIpAddress[sizeof(_cfg.apIpAddress) - 1] = '\0';
 #endif

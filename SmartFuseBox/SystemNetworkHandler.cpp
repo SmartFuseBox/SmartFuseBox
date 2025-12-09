@@ -40,8 +40,6 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 
 	bool bluetoothEnabled = false;
 	bool wifiEnabled = false;
-	String ipAddress = F("0.0.0.0");
-	String ssid = "";
 	int rssi = 0;
 
 	if (config)
@@ -53,20 +51,16 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 	// Get runtime WiFi status if available
 	if (_wifiController && wifiEnabled && _wifiController->isEnabled())
 	{
-		ipAddress = _wifiController->getServer()->getIpAddress();
-		ssid = _wifiController->getServer()->getSSID();
 		rssi = _wifiController->getServer()->getSignalStrength();
 	}
 
 	// Enhanced JSON formatting with WiFi runtime details
 	snprintf(buffer, size,
-		"\"system\":{\"mem\":%d,\"cpu\":%d,\"bluetooth\":%d,\"wifi\":%d,\"ip\":\"%s\",\"ssid\":\"%s\",\"rssi\":%d,\"time\":\"%s\"}",
+		"\"system\":{\"mem\":%d,\"cpu\":%d,\"bluetooth\":%d,\"wifi\":%d,\"rssi\":%d,\"time\":\"%s\"}",
 		SystemFunctions::freeMemory(),
 		SystemCpuMonitor::getCpuUsage(),
 		bluetoothEnabled,
 		wifiEnabled,
-		ipAddress.c_str(),
-		ssid.c_str(),
 		rssi,
 		DateTimeManager::formatDateTime().c_str());
 }

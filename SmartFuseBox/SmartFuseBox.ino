@@ -31,6 +31,7 @@
 #include "BluetoothController.h"
 
 #include "WifiController.h"
+#include "ConfigNetworkHandler.h"
 #include "RelayNetworkHandler.h"
 #include "SoundNetworkHandler.h"
 #include "WarningNetworkHandler.h"
@@ -102,6 +103,7 @@ SensorController sensorController(baseSensors, sensorHandlerCount);
 
 
 // configure wifi support
+ConfigNetworkHandler configNetworkHandler;
 RelayNetworkHandler relayNetworkHandler(&relayController);
 SoundNetworkHandler soundNetworkHandler(&soundController);
 WarningNetworkHandler warningNetworkHandler(&warningManager);
@@ -201,6 +203,7 @@ void configureWifiSupport(Config* config)
 
 	// json status visitors for wifi
 	NetworkJsonVisitor* jsonVisitors[] = {
+		&configNetworkHandler,
 		&relayNetworkHandler,
 		&soundNetworkHandler,
 		&warningNetworkHandler,

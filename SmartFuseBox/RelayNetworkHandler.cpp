@@ -89,8 +89,7 @@ CommandResult RelayNetworkHandler::handleRequest(const String& method,
 		}
 	}
 	
-	formatJsonResponse(responseBuffer, bufferSize, false, "Invalid request");
-	return CommandResult{ false, 0 };
+	return CommandResult::error(InvalidCommandParameters);
 }
 
 void RelayNetworkHandler::formatStatusJson(char* buffer, size_t size)
