@@ -3,6 +3,8 @@
 #include "Local.h"
 
 #if defined(ARDUINO_UNO_R4)
+#include <WiFi.h>
+
 extern "C" char* sbrk(int incr);
 #endif
 
@@ -43,29 +45,27 @@ void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long
 	}
 }
 
-static uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize)
+uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize)
 {
-    if (bufferSize < 17)
+    if (bufferSize < 15)
         return BufferInvalid;
 
 #if defined(ARDUINO_UNO_R4)
     uint8_t mac[6];
     WiFi.macAddress(mac);
 
-    char password[16];
-    // Create password like: SFB-A1B2C3
-    sprintf(buffer, "sfb-%02X%02X%02X", mac[3], mac[4], mac[5]);
+    snprintf(buffer, bufferSize, "sfb-%02X%02X%02X", mac[3], mac[4], mac[5]);
 #else
-    uint32_t storedID = 0;
-
     // Use analog noise as seed
     randomSeed(analogRead(A0) + analogRead(A1) + millis());
-    storedID = random(0x10000000, 0xFFFFFFFF);
+    uint32_t storedID = random(0x10000000, 0xFFFFFFFF);
 
     // Format: SFB12A1B2C3
-    snprintf(buffer, bufferSize, "sfb%08X", storedID);
+    snprintf(buffer, bufferSize, "sfb-%08X", storedID);
 
 #endif
+
+	buffer[bufferSize - 1] = '\0';
 
     return BufferSuccess;
 }
