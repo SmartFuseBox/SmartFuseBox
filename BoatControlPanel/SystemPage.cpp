@@ -86,7 +86,7 @@ void SystemPage::handleTouch(uint8_t compId, uint8_t eventType)
     switch (compId)
     {
     case ButtonPrevious:
-        setPage(PageSoundSignals);
+        setPage(PageFlags);
         break;
 
     case ButtonNext:
@@ -146,7 +146,9 @@ void SystemPage::updateControlPanelCpu()
     if (cpu != _lastControlPanelCpu)
     {
         _lastControlPanelCpu = cpu;
-        sendText(ControlPanelCpu, String(cpu) + PercentSuffix);
+        char value[10];
+		snprintf(value, sizeof(value), CpuFormat, cpu);
+        sendText(ControlPanelCpu, value);
     }
 }
 
@@ -157,7 +159,9 @@ void SystemPage::updateControlPanelMemory()
 	if (memory != _lastControlPanelMemory)
     {
         _lastControlPanelMemory = memory;
-        sendText(ControlPanelMemory, String(memory) + BytesSuffix);
+        char value[15];
+		snprintf(value, sizeof(value), MemoryFormat, memory);
+        sendText(ControlPanelMemory, value);
     }
 }
 

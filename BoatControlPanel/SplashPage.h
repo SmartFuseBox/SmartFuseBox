@@ -28,21 +28,21 @@ public:
         }
 
         // initialize global variables
-        sendCommand(String(F("pageSplash.vaBoatName.txt=\"")) + String(config->boatName) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaHomeB1.txt=\"")) + String(config->relayShortNames[0]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaHomeB2.txt=\"")) + String(config->relayShortNames[1]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaHomeB3.txt=\"")) + String(config->relayShortNames[2]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaHomeB4.txt=\"")) + String(config->relayShortNames[3]) + String(F("\"")));
+        sendText("pageSplash.vaBoatName", config->boatName);
+        sendText("pageSplash.vaHomeB1", config->relayShortNames[0]);
+        sendText("pageSplash.vaHomeB2", config->relayShortNames[1]);
+        sendText("pageSplash.vaHomeB3", config->relayShortNames[2]);
+        sendText("pageSplash.vaHomeB4", config->relayShortNames[3]);
 
         // Relay page global variables
-        sendCommand(String(F("pageSplash.vaRelayName1.txt=\"")) + String(config->relayLongNames[0]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName2.txt=\"")) + String(config->relayLongNames[1]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName3.txt=\"")) + String(config->relayLongNames[2]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName4.txt=\"")) + String(config->relayLongNames[3]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName5.txt=\"")) + String(config->relayLongNames[4]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName6.txt=\"")) + String(config->relayLongNames[5]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName7.txt=\"")) + String(config->relayLongNames[6]) + String(F("\"")));
-        sendCommand(String(F("pageSplash.vaRelayName8.txt=\"")) + String(config->relayLongNames[7]) + String(F("\"")));
+        sendText("pageSplash.vaRelayName1", config->relayLongNames[0]);
+        sendText("pageSplash.vaRelayName2", config->relayLongNames[1]);
+        sendText("pageSplash.vaRelayName3", config->relayLongNames[2]);
+        sendText("pageSplash.vaRelayName4", config->relayLongNames[3]);
+        sendText("pageSplash.vaRelayName5", config->relayLongNames[4]);
+        sendText("pageSplash.vaRelayName6", config->relayLongNames[5]);
+        sendText("pageSplash.vaRelayName7", config->relayLongNames[6]);
+        sendText("pageSplash.vaRelayName8", config->relayLongNames[7]);
     }
 
     void refresh(unsigned long now) override

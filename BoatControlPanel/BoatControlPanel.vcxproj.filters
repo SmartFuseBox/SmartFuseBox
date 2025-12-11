@@ -127,14 +127,17 @@
     <ClCompile Include="SystemCpuMonitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SystemPage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AboutPage.cpp">
       <Filter>Source Files\Pages</Filter>
     </ClCompile>
     <ClCompile Include="DateTimeManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlagsPage.cpp">
+      <Filter>Source Files\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemPage.cpp">
+      <Filter>Source Files\Pages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,9 +222,6 @@
     <ClInclude Include="SystemCpuMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SystemPage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SplashPage.h">
       <Filter>Header Files\Pages</Filter>
     </ClInclude>
@@ -239,6 +239,12 @@
     </ClInclude>
     <ClInclude Include="SystemDefinitions.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlagsPage.h">
+      <Filter>Header Files\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemPage.h">
+      <Filter>Header Files\Pages</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

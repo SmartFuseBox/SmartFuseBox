@@ -2,7 +2,7 @@
 #include "AboutPage.h"
 
 // Nextion Names/Ids on current Page
-constexpr uint8_t BtnNext = 3; // b3
+constexpr uint8_t BtnNextFlag = 3; // b3
 constexpr uint8_t BtnBack = 2; // b4
 
 constexpr unsigned long RefreshIntervalMs = 10000;
@@ -29,7 +29,7 @@ void AboutPage::handleTouch(uint8_t compId, uint8_t eventType)
 
     switch (compId)
     {
-    case BtnNext:
+    case BtnNextFlag:
 		setPage(PageHome);
         break;
 

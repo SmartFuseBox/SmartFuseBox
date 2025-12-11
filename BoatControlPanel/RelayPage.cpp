@@ -45,8 +45,10 @@ void RelayPage::begin()
 
     for (uint8_t i = 0; i < ConfigRelayCount; ++i)
     {
-        setPicture(RelayButtonPrefix + String(i + 1), ImageButtonColorGrey + ImageButtonColorOffset);
-        setPicture2(RelayButtonPrefix + String(i + 1), ImageButtonColorGrey + ImageButtonColorOffset);
+        char variable[10];
+        snprintf(variable, sizeof(variable), "%s%d", RelayButtonPrefix, i + 1);
+        setPicture(variable, ImageButtonColorGrey + ImageButtonColorOffset);
+        setPicture2(variable, ImageButtonColorGrey + ImageButtonColorOffset);
 	}
 }
 
@@ -192,7 +194,8 @@ void RelayPage::handleExternalUpdate(uint8_t updateType, const void* data)
                 _buttonImage[buttonIndex] = newColor;
 
                 // Update the button appearance on display
-                String buttonName = RelayButtonPrefix + String(buttonIndex + 1);
+                char buttonName[15];
+                snprintf(buttonName, sizeof(buttonName), "%s%d", RelayButtonPrefix, buttonIndex);
                 setPicture(buttonName, newColor);
                 setPicture2(buttonName, newColor);
 
@@ -231,10 +234,12 @@ void RelayPage::configUpdated()
         _buttonOn[button] = false;
         _buttonImage[button] = ImageButtonColorGrey + ImageButtonColorOffset;
 
-        setPicture(RelayButtonPrefix + String(button), ImageButtonColorGrey + ImageButtonColorOffset);
-        setPicture2(RelayButtonPrefix + String(button), ImageButtonColorGrey + ImageButtonColorOffset);
+        char relayPrefix[15];
+        snprintf(relayPrefix, sizeof(relayPrefix), "%s%d", RelayButtonPrefix, button);
 
-        String longName = String(config->relayLongNames[button]);
-        sendText(RelayButtonPrefix + String(button), longName);
+        setPicture(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);
+        setPicture2(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);
+
+        sendText(relayPrefix, config->relayLongNames[button]);
     }
 }

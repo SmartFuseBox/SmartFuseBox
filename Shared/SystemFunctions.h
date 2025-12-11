@@ -19,7 +19,7 @@ public:
      * @param value String to parse
      * @return true if the value represents a truthy value, false otherwise
      */
-    static bool parseBooleanValue(const String& value);
+    static bool parseBooleanValue(const char* value);
 
     /**
      * @brief Check if a string contains only digits.
@@ -27,7 +27,7 @@ public:
      * @param s String to check
      * @return true if the string is non-empty and contains only digits (0-9)
      */
-    static bool isAllDigits(const String& s);
+    static bool isAllDigits(const char* s);
 
     /**
      * @brief Calculate elapsed time between two millis() timestamps safely handling wrap-around.
@@ -52,4 +52,22 @@ public:
      * @return true if interval has elapsed
      */
     static bool hasElapsed(unsigned long now, unsigned long previous, unsigned long interval);
+
+    /**
+     * @brief Check if a pointer is in PROGMEM (flash) or RAM.
+     * 
+     * @param ptr Pointer to check
+     * @return true if pointer is in PROGMEM, false if in RAM
+     */
+    static bool isProgmem(const char* ptr);
+
+    /**
+     * @brief Safely copy a string from PROGMEM or RAM to a buffer.
+     * 
+     * @param dest Destination buffer
+     * @param src Source string (can be PROGMEM or RAM)
+     * @param maxLen Maximum bytes to copy (including null terminator)
+     * @return Number of characters copied (excluding null terminator)
+     */
+    static size_t copyString(char* dest, const char* src, size_t maxLen);
 };

@@ -108,7 +108,7 @@ bool WarningPage::buildWarningText(char* buffer, size_t bufferSize)
 
 void WarningPage::updateWarningDisplay()
 {
-    sendText(WarningHeader, F("System Warnings"));
+    sendText(WarningHeader, "System Warnings");
 
     // Build warning text into a temporary buffer
     char newWarningText[MaxWarningTextLength];

@@ -43,20 +43,23 @@ void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long
 	}
 }
 
-bool SystemFunctions::parseBooleanValue(const String& value)
+bool SystemFunctions::parseBooleanValue(const char* value)
 {
-    return (value == F("1") ||
-        value.equalsIgnoreCase(F("on")) ||
-        value.equalsIgnoreCase(F("true")));
+    return (strcmp(value, "1") == 0 ||
+        strcmp(value, "on") == 0 ||
+        strcmp(value, "true") == 0);
 }
 
-bool SystemFunctions::isAllDigits(const String& s)
+bool SystemFunctions::isAllDigits(const char* s)
 {
-    if (s.length() == 0)
+    if (s[0] == '\0')
         return false;
 
-    for (size_t i = 0; i < s.length(); ++i)
+    for (size_t i = 0; i < sizeof(s); ++i)
     {
+		if (s[i] == '\0')
+            return false;
+
         if (!isDigit(s[i]))
             return false;
     }
@@ -72,4 +75,28 @@ unsigned long SystemFunctions::elapsedMillis(unsigned long now, unsigned long pr
 bool SystemFunctions::hasElapsed(unsigned long now, unsigned long previous, unsigned long interval)
 {
     return (now - previous) >= interval;
+}
+
+bool SystemFunctions::isProgmem(const char* ptr)
+{
+    // On AVR (Arduino Mega 2560), PROGMEM starts after RAM
+    // RAMEND is defined by Arduino (typically 0x21FF for Mega 2560)
+    return (uintptr_t)ptr >= RAMEND;
+}
+
+size_t SystemFunctions::copyString(char* dest, const char* src, size_t maxLen)
+{
+    if (!dest || !src || maxLen == 0)
+        return 0;
+
+    if (isProgmem(src))
+    {
+        // Copy from PROGMEM
+        return strlcpy_P(dest, src, maxLen);
+    }
+    else
+    {
+        // Copy from RAM
+        return strlcpy(dest, src, maxLen);
+    }
 }
