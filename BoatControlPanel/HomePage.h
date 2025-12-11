@@ -58,6 +58,6 @@ public:
     void setHumidity(float humPerc);
     void setBearing(float dir);
     void setSpeed(float speedKn);
-    void setDirection(String dir);
+    void setDirection(const char* dir);
     void setCompassTemperature(float tempC);
 };

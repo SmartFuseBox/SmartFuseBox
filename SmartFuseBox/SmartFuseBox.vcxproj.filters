@@ -79,9 +79,6 @@
     <ClCompile Include="WarningManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
-    <ClCompile Include="SharedFunctions.cpp">
-      <Filter>Source Files\SharedCode</Filter>
-    </ClCompile>
     <ClCompile Include="WarningCommandHandler.cpp">
       <Filter>Source Files\SharedCode\SerialCommandHandlers</Filter>
     </ClCompile>
@@ -144,6 +141,12 @@
     </ClCompile>
     <ClCompile Include="SensorNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigNetworkHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemFunctions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,9 +240,6 @@
     <ClInclude Include="INetworkCommandHandler.h">
       <Filter>Header Files\NetworkCommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="SharedFunctions.h">
-      <Filter>Header Files\SharedCode</Filter>
-    </ClInclude>
     <ClInclude Include="SoundController.h">
       <Filter>Header Files\BusinessLogic</Filter>
     </ClInclude>
@@ -269,6 +269,12 @@
     </ClInclude>
     <ClInclude Include="SystemNetworkHandler.h">
       <Filter>Header Files\NetworkCommandHandlers</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigNetworkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemFunctions.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

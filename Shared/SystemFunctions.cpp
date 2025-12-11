@@ -52,14 +52,11 @@ bool SystemFunctions::parseBooleanValue(const char* value)
 
 bool SystemFunctions::isAllDigits(const char* s)
 {
-    if (s[0] == '\0')
+    if (!s || s[0] == '\0')
         return false;
 
-    for (size_t i = 0; i < sizeof(s); ++i)
+    for (size_t i = 0; s[i] != '\0'; ++i) 
     {
-		if (s[i] == '\0')
-            return false;
-
         if (!isDigit(s[i]))
             return false;
     }

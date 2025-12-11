@@ -314,9 +314,14 @@ void HomePage::setSpeed(float speedKn)
     }
 }
 
-void HomePage::setDirection(String dir)
+void HomePage::setDirection(const char* dir)
 {
-    configUpdated();
+    if (dir && strcmp(_lastDirection, dir) != 0)
+    {
+        strncpy(_lastDirection, dir, sizeof(_lastDirection) - 1);
+        _lastDirection[sizeof(_lastDirection) - 1] = '\0';
+        updateDirection();
+    }
 }
 
 void HomePage::setCompassTemperature(float tempC)
