@@ -69,7 +69,7 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
                 // Parse hexadecimal (skip the "0x" prefix)
                 remoteWarningMask = strtoul(warningValue.c_str() + 2, nullptr, 16);
             }
-            else if (SystemFunctions::isAllDigits(warningValue))
+            else if (SystemFunctions::isAllDigits(warningValue.c_str()))
             {
                 // Parse decimal
                 remoteWarningMask = warningValue.toInt();
@@ -173,13 +173,13 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const String
         if (paramCount >= 2)
         {
             // Format: ACK:R2=ok:0=0 (with relay index and state)
-            if (!SystemFunctions::isAllDigits(params[1].key) || !SystemFunctions::isAllDigits(params[1].value))
+            if (!SystemFunctions::isAllDigits(params[1].key.c_str()) || !SystemFunctions::isAllDigits(params[1].value.c_str()))
             {
                 return true;
             }
 
             uint8_t relayIndex = params[1].key.toInt();
-            bool isOn = SystemFunctions::parseBooleanValue(params[1].value);
+            bool isOn = SystemFunctions::parseBooleanValue(params[1].value.c_str());
             
             RelayStateUpdate update = { relayIndex, isOn };
             notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::RelayState), &update);
@@ -190,7 +190,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const String
         if (paramCount >= 2)
         {
             uint8_t relayIndex = params[1].key.toInt();
-            bool isOn = SystemFunctions::parseBooleanValue(params[1].value);
+            bool isOn = SystemFunctions::parseBooleanValue(params[1].value.c_str());
 
             RelayStateUpdate update = { relayIndex, isOn };
             notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::RelayState), &update);
@@ -204,7 +204,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const String
     {
         if (paramCount >= 2)
         {
-            bool isOn = SystemFunctions::parseBooleanValue(params[1].value);
+            bool isOn = SystemFunctions::parseBooleanValue(params[1].value.c_str());
 
             BoolStateUpdate update = { isOn };
             notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::SoundSignal), &update);

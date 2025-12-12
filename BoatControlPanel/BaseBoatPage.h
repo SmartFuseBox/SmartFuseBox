@@ -65,7 +65,8 @@ struct CharStateUpdate {
  * control panel application, including warning state management, configuration
  * access, and other shared behaviors.
  */
-class BaseBoatPage : public BaseDisplayPage {
+class BaseBoatPage : public BaseDisplayPage
+{
 private:
     // Shared configuration pointer
     Config* _config;

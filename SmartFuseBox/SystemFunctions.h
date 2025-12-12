@@ -19,7 +19,8 @@ public:
      *         BufferInvalid (nonzero) if the buffer is invalid or too small.
      */
     static uint8_t GenerateDefaultPassword(char* buffer, size_t bufferSize);
-     * @brief Parse a string value as a boolean.
+
+     /** @brief Parse a string value as a boolean.
      *
      * Accepts multiple formats:
      * - "1" or "0"

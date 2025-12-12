@@ -48,7 +48,9 @@ void HomePage::begin()
 
     for (uint8_t i = 1; i <= ConfigHomeButtons; ++i)
     {
-        setPicture(HomeButtonPrefix + String(i), ImageButtonColorGrey);
+        char cmd[10];
+		snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, i);
+        setPicture(cmd, ImageButtonColorGrey);
 	}
     _compassTempAboveNorm = 0;
 }
@@ -190,14 +192,16 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
         _buttonImage[buttonIndex] = newColor;
 
         // Update the button appearance
-        setPicture(HomeButtonPrefix + String(buttonIndex + 1), newColor);
-        setPicture2(HomeButtonPrefix + String(buttonIndex + 1), newColor);
+        char cmd[10];
+        snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, buttonIndex + 1);
+        setPicture(cmd, newColor);
+        setPicture2(cmd, newColor);
 
-        // Send relay command
-        String cmd = String(relayIndex) + (_buttonOn[buttonIndex] ? ButtonOn : ButtonOff);
         SerialCommandManager* commandMgrLink = getCommandMgrLink();
         if (commandMgrLink)
         {
+            // Send relay command
+            snprintf(cmd, sizeof(cmd), "%d%s", relayIndex, _buttonOn[buttonIndex] ? ButtonOn : ButtonOff);
             commandMgrLink->sendCommand(RelaySetState, cmd);
         }
     }
@@ -228,9 +232,10 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
                 _buttonImage[buttonIndex] = newColor;
 
                 // Update the button appearance on display
-                String buttonName = HomeButtonPrefix + String(buttonIndex + 1);
-                setPicture(buttonName, newColor);
-                setPicture2(buttonName, newColor);
+                char cmd[10];
+                snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, buttonIndex + 1);
+                setPicture(cmd, newColor);
+                setPicture2(cmd, newColor);
 
                 // Log the update for debugging (using short name)
                 Config* config = getConfig();
@@ -258,7 +263,7 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
     else if (updateType == static_cast<uint8_t>(PageUpdateType::Direction) && data != nullptr)
     {
         const CharStateUpdate* update = static_cast<const CharStateUpdate*>(data);
-        setDirection(String(update->value));
+        setDirection(update->value);
     }
     else if (updateType == static_cast<uint8_t>(PageUpdateType::Speed) && data != nullptr)
     {
@@ -309,11 +314,12 @@ void HomePage::setSpeed(float speedKn)
     }
 }
 
-void HomePage::setDirection(String dir)
+void HomePage::setDirection(const char* dir)
 {
-    if (_lastDirection == "" || _lastDirection != dir)
+    if (dir && strcmp(_lastDirection, dir) != 0)
     {
-        _lastDirection = dir;
+        strncpy(_lastDirection, dir, sizeof(_lastDirection) - 1);
+        _lastDirection[sizeof(_lastDirection) - 1] = '\0';
         updateDirection();
     }
 }
@@ -349,7 +355,20 @@ void HomePage::updateTemperature()
         return;
     }
 
-    sendText(ControlTemperature, String(_lastTemp, 1) + String((char)176) + CelsiusSuffix); // one decimal place 
+    char cmd[10];
+    dtostrf(_lastTemp, 4, 1, cmd);
+
+    size_t len = strlen(cmd);
+
+    // Append degree symbol (character 176) and "C"
+    if (len + 2 < sizeof(cmd))  // +2 for degree symbol and 'C'
+    {
+        cmd[len] = (char)176;      // Degree symbol
+        cmd[len + 1] = '\0';       // Null terminate
+        strcat(cmd, CelsiusSuffix); // Append "C"
+    }
+
+    sendText(ControlTemperature, cmd);
 }
 
 void HomePage::updateHumidity()
@@ -360,7 +379,17 @@ void HomePage::updateHumidity()
         return;
     }
 
-    sendText(ControlHumidity, String(_lastHumidity, 1) + PercentSuffix);
+    char cmd[10];
+    dtostrf(_lastHumidity, 4, 1, cmd);
+
+    size_t len = strlen(cmd);
+
+    if (len + strlen(PercentSuffix) < sizeof(cmd))
+    {
+        strcpy(cmd + len, PercentSuffix);
+    }
+
+    sendText(ControlHumidity, cmd);
 }
 
 void HomePage::updateBearing()
@@ -407,29 +436,30 @@ void HomePage::configUpdated()
     // Example: apply home page mapping and enabled mask to UI slots
     for (uint8_t button = 0; button < ConfigHomeButtons; ++button)
     {
+        char buffer[15];
+        snprintf(buffer, sizeof(buffer), "%s%d", HomeButtonPrefix, button + 1);
+
         uint8_t relayIndex = config->homePageMapping[button];
         if (relayIndex <= 7)
         {
             _slotToRelay[button] = relayIndex;
 
             // set picture control (button image) - control names in your Nextion might differ
-            setPicture(HomeButtonPrefix + String(button + 1), _buttonImage[button]);
+            setPicture(buffer, _buttonImage[button]);
 
             // Use short name for home page display
-            String shortName = String(config->relayShortNames[relayIndex]);
-            sendText(String(HomeButtonPrefix) + String(button + 1), shortName);
+            sendText(buffer, config->relayShortNames[relayIndex]);
         }
         else
         {
             _slotToRelay[button] = 0xFF;
             _buttonOn[button] = false;
             _buttonImage[button] = ImageButtonColorGrey;
-            setPicture(HomeButtonPrefix + String(button + 1), _buttonImage[button]);
-            sendText(String(HomeButtonPrefix) + String(button + 1), "");
+            setPicture(buffer, _buttonImage[button]);
+            sendText(buffer, "");
         }
     }
 
     // Update the boat name
-    String boatName = String(config->boatName);
-    sendText(ControlBoatName, boatName);
+    sendText(ControlBoatName, config->boatName);
 }

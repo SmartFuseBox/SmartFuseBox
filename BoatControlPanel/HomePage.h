@@ -16,7 +16,7 @@ private:
     float _lastHumidity = NAN;
     float _lastBearing = NAN;
     float _lastSpeed = NAN;
-    String _lastDirection = "";
+    char _lastDirection[5] = "";
     float _lastCompassTemp = NAN;
     byte _compassTempAboveNorm = 0;
 	bool _buttonOn[ConfigHomeButtons] = { false, false, false, false };
@@ -58,6 +58,6 @@ public:
     void setHumidity(float humPerc);
     void setBearing(float dir);
     void setSpeed(float speedKn);
-    void setDirection(String dir);
+    void setDirection(const char* dir);
     void setCompassTemperature(float tempC);
 };
