@@ -15,10 +15,7 @@ CommandResult SensorNetworkHandler::handleRequest(const String& method,
 	(void)params;
 	(void)paramCount;
 
-	String cmd = command;
-	cmd.trim();
-
-	if (cmd == SensorBearing)
+	if (strcmp(command, SensorBearing) == 0)
 	{
 		// nothing to do in this context
 	}
