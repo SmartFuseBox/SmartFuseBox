@@ -86,7 +86,7 @@ public:
      * @param bufferLength Size of the buffer (minimum 20 bytes recommended)
      * @return true if time is set and formatted successfully, false if time not synchronized or buffer is null
      */
-    static bool formatDateTime(char* buffer, uint8_t bufferLength);
+    static bool formatDateTime(char* buffer, const uint8_t bufferLength);
 
     /**
      * @brief Format current date/time as human-readable string.
@@ -95,7 +95,7 @@ public:
      * @param bufferLength Size of the buffer (minimum 20 bytes recommended)
      * @return true if time is set and formatted successfully, false if time not synchronized or buffer is null
      */
-    static bool formatDateTimeReadable(char* buffer, uint8_t bufferLength);
+    static bool formatDateTimeReadable(char* buffer, const uint8_t bufferLength);
 
     /**
      * @brief Reset/clear the stored time.

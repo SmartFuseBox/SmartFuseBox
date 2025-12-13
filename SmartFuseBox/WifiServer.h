@@ -111,7 +111,7 @@ public:
 	bool isInitialized() const { return _initialized; }
 	WifiConnectionState getConnectionState() const { return _connectionState; }
 	WifiMode getMode() const { return _mode; }
-	bool getIpAddress(char* buffer, uint8_t bufferLength) const;
-	bool getSSID(char* buffer, uint8_t bufferLength) const;
+	bool getIpAddress(char* buffer, const uint8_t bufferLength) const;
+	bool getSSID(char* buffer, const uint8_t bufferLength) const;
 	int getSignalStrength() const;
 };

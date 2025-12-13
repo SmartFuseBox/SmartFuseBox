@@ -95,7 +95,7 @@ unsigned long DateTimeManager::getSecondsSinceSync()
     return elapsedMillis / 1000;
 }
 
-bool DateTimeManager::formatDateTime(char* buffer, uint8_t bufferLength)
+bool DateTimeManager::formatDateTime(char* buffer, const uint8_t bufferLength)
 {
     if (!_isSet) {
         return false;
@@ -111,7 +111,7 @@ bool DateTimeManager::formatDateTime(char* buffer, uint8_t bufferLength)
     return true;
 }
 
-bool DateTimeManager::formatDateTimeReadable(char* buffer, uint8_t bufferLength)
+bool DateTimeManager::formatDateTimeReadable(char* buffer, const uint8_t bufferLength)
 {
     if (!_isSet)
     {

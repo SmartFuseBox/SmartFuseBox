@@ -554,7 +554,7 @@ bool WifiServer::isConnected() const
 	return _connectionState == WifiConnectionState::Connected;
 }
 
-bool WifiServer::getIpAddress(char* buffer, uint8_t bufferLength) const
+bool WifiServer::getIpAddress(char* buffer, const uint8_t bufferLength) const
 {
 	if (!buffer || bufferLength == 0) {
 		return false;
@@ -570,7 +570,7 @@ bool WifiServer::getIpAddress(char* buffer, uint8_t bufferLength) const
 	return true;
 }
 
-bool WifiServer::getSSID(char* buffer, uint8_t bufferLength) const
+bool WifiServer::getSSID(char* buffer, const uint8_t bufferLength) const
 {
 	if (!buffer || bufferLength == 0) {
 		return false;
