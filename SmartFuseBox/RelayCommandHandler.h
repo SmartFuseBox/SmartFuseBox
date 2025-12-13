@@ -11,7 +11,7 @@ private:
     SerialCommandManager* _commandMgrComputer;
     SerialCommandManager* _commandMgrLink;
     RelayController* _relayController;
-    void broadcastRelayStatus(const String& cmd, const StringKeyValue* param = nullptr);
+    void broadcastRelayStatus(const char* cmd, const StringKeyValue* param = nullptr);
 
 public:
     RelayCommandHandler(SerialCommandManager* commandMgrComputer, SerialCommandManager* commandMgrLink, RelayController* relayController);
@@ -24,6 +24,5 @@ public:
     void configUpdated(Config* config);
 
     uint8_t getRelayCount() const { return _relayController ? _relayController->getRelayCount() : 0; }
-
 };
 
