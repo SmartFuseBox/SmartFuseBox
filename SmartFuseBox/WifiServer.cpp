@@ -554,20 +554,35 @@ bool WifiServer::isConnected() const
 	return _connectionState == WifiConnectionState::Connected;
 }
 
-String WifiServer::getIpAddress() const
+bool WifiServer::getIpAddress(char* buffer, uint8_t bufferLength) const
 {
-	if (!_initialized)
-	{
-		return "0.0.0.0";
+	if (!buffer || bufferLength == 0) {
+		return false;
 	}
-	
-	IPAddress ip = WiFi.localIP();
-	return String(ip[0]) + "." + String(ip[1]) + "." + String(ip[2]) + "." + String(ip[3]);
+
+	if (!isConnected()) {
+		return false;
+	}
+
+	// Copy the stored IP address or get from WiFi
+	strncpy(buffer, _ipAddress, bufferLength - 1);
+	buffer[bufferLength - 1] = '\0';
+	return true;
 }
 
-String WifiServer::getSSID() const
+bool WifiServer::getSSID(char* buffer, uint8_t bufferLength) const
 {
-	return String(_ssid);
+	if (!buffer || bufferLength == 0) {
+		return false;
+	}
+
+	if (!isConnected()) {
+		return false;
+	}
+
+	strncpy(buffer, _ssid, bufferLength - 1);
+	buffer[bufferLength - 1] = '\0';
+	return true;
 }
 
 int WifiServer::getSignalStrength() const
