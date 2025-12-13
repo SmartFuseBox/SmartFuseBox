@@ -29,96 +29,93 @@ bool SoundCommandHandler::handleCommand(SerialCommandManager* sender, const char
 
     if (_soundController == nullptr)
     {
-        sendAckErr(sender, command, "Sound manager not initialized");
+        sendAckErr(sender, command, F("Sound manager not initialized"));
 		return true;
     }
-
-    String cmd = command;
-    cmd.trim();
 
     // none of the sound commands should receive any parameters
     if (paramCount > 0)
     {
-        sendAckErr(sender, cmd, "Invalid Parameters");
+        sendAckErr(sender, command, F("Invalid Parameters"));
         return true;
     }
 
-    if (cmd == SoundSignalCancel)
+    if (strcmp(command, SoundSignalCancel) == 0)
     {
         _soundController->playSound(SoundType::None);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalActive)
+    else if (strcmp(command, SoundSignalActive) == 0)
     {
-        StringKeyValue param = { String(static_cast<uint8_t>(_soundController->getCurrentSoundType())), String(static_cast<uint8_t>(_soundController->getCurrentSoundState())) };
-        sendAckOk(sender, cmd, &param);
+        StringKeyValue param = makeParam(static_cast<uint8_t>(_soundController->getCurrentSoundType()), static_cast<uint8_t>(_soundController->getCurrentSoundState()));
+        sendAckOk(sender, command, &param);
     }
-    else if (cmd == SoundSignalSoS)
+    else if (strcmp(command, SoundSignalSoS) == 0)
     {
         _soundController->playSound(SoundType::Sos);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalFog)
+    else if (strcmp(command, SoundSignalFog) == 0)
     {
         _soundController->playSound(SoundType::Fog);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalMoveAstern)
+    else if (strcmp(command, SoundSignalMoveAstern) == 0)
     {
         _soundController->playSound(SoundType::MoveAstern);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalMovePort)
+    else if (strcmp(command, SoundSignalMovePort) == 0)
     {
         _soundController->playSound(SoundType::MovePort);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalMoveStarboard)
+    else if (strcmp(command, SoundSignalMoveStarboard) == 0)
     {
         _soundController->playSound(SoundType::MoveStarboard);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalMoveDanger)
+    else if (strcmp(command, SoundSignalMoveDanger) == 0)
     {
         _soundController->playSound(SoundType::MoveDanger);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalOvertakeConsent)
+    else if (strcmp(command, SoundSignalOvertakeConsent) == 0)
     {
         _soundController->playSound(SoundType::OvertakeConsent);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalOvertakeDanger)
+    else if (strcmp(command, SoundSignalOvertakeDanger) == 0)
     {
         _soundController->playSound(SoundType::OvertakeDanger);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalOvertakePort)
+    else if (strcmp(command, SoundSignalOvertakePort) == 0)
     {
         _soundController->playSound(SoundType::OvertakePort);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalOvertakeStarboard)
+    else if (strcmp(command, SoundSignalOvertakeStarboard) == 0)
     {
         _soundController->playSound(SoundType::OvertakeStarboard);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SoundSignalTest)
+    else if (strcmp(command, SoundSignalTest) == 0)
     {
         _soundController->playSound(SoundType::Test);
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
     else
     {
-        sendAckErr(sender, cmd, F("Unknown system command"));
+        sendAckErr(sender, command, F("Unknown system command"));
     }
 
-    broadcast(cmd);
+    broadcast(command);
 
     return true;
 }
 
-void SoundCommandHandler::broadcast(const String& cmd, const StringKeyValue* param)
+void SoundCommandHandler::broadcast(const char* cmd, const StringKeyValue* param)
 {
     if (_commandMgrLink != nullptr)
     {

@@ -19,5 +19,5 @@ public:
 
     const char* const* supportedCommands(size_t& count) const override;
 private:
-    void broadcast(const String& cmd, const StringKeyValue* param = nullptr);
+    void broadcast(const char* cmd, const StringKeyValue* param = nullptr);
 };
