@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+constexpr uint8_t MaxDateTimeStringLength = 20; // "YYYY-MM-DDTHH:MM:SS" + null terminator
+
 /**
  * @class DateTimeManager
  * @brief Static date/time manager for tracking system time.

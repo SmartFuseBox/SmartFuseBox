@@ -67,20 +67,10 @@ void BroadcastManager::sendDebug(const char* message, const char* source)
     }
 }
 
-void BroadcastManager::sendDebug(const String& message, const String& source)
-{
-    sendDebug(message.c_str(), source.c_str());
-}
-
 void BroadcastManager::sendError(const char* message, const char* source)
 {
     if (_computerSerial)
     {
         _computerSerial->sendError(message, source);
     }
-}
-
-void BroadcastManager::sendError(const String& message, const String& source)
-{
-    sendError(message.c_str(), source.c_str());
 }

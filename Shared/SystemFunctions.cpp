@@ -3,6 +3,7 @@
 #include "Local.h"
 
 #if defined(ARDUINO_UNO_R4)
+#include <WiFiS3.h>
 extern "C" char* sbrk(int incr);
 #endif
 
@@ -101,9 +102,17 @@ bool SystemFunctions::hasElapsed(unsigned long now, unsigned long previous, unsi
 
 bool SystemFunctions::isProgmem(const char* ptr)
 {
+#if defined(ARDUINO_MEGA2560)
     // On AVR (Arduino Mega 2560), PROGMEM starts after RAM
     // RAMEND is defined by Arduino (typically 0x21FF for Mega 2560)
     return (uintptr_t)ptr >= RAMEND;
+#elif defined(ARDUINO_UNO_R4)
+    // On Arduino UNO R4 (Renesas RA4M1), PROGMEM is not used the same way
+    // Flash memory starts at 0x00000000, SRAM starts at 0x20000000
+    return (uintptr_t)ptr < 0x20000000;
+#else
+#error "You must define 'ARDUINO_MEGA2560' or 'ARDUINO_UNO_R4'"
+#endif
 }
 
 size_t SystemFunctions::copyString(char* dest, const char* src, size_t maxLen)
@@ -111,16 +120,32 @@ size_t SystemFunctions::copyString(char* dest, const char* src, size_t maxLen)
     if (!dest || !src || maxLen == 0)
         return 0;
 
+    size_t copied = 0;
+
     if (isProgmem(src))
     {
         // Copy from PROGMEM
-        return strlcpy_P(dest, src, maxLen);
+        while (copied < maxLen - 1)
+        {
+            char c = pgm_read_byte(src++);
+            if (c == '\0')
+                break;
+            dest[copied++] = c;
+        }
+        dest[copied] = '\0';
     }
     else
     {
         // Copy from RAM
-        return strlcpy(dest, src, maxLen);
+        while (copied < maxLen - 1 && src[copied] != '\0')
+        {
+            dest[copied] = src[copied];
+            copied++;
+        }
+        dest[copied] = '\0';
     }
+
+    return copied;
 }
 
 // Implementation

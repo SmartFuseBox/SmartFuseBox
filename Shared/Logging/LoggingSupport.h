@@ -17,7 +17,10 @@ protected:
      */
     static void sendDebug(SerialCommandManager* mgr, const char* message, const char* source = "")
     {
-        mgr->sendDebug(message, source);
+        if (mgr)
+        {
+            mgr->sendDebug(message, source);
+        }
     }
     
     /**
@@ -61,7 +64,10 @@ protected:
     
     void sendDebug(const char* message, const char* source = "")
     {
-        LoggingSupport::sendDebug(_logger, message, source);
+        if (_logger)
+        {
+            LoggingSupport::sendDebug(_logger, message, source);
+        }
     }
 
 	void sendDebug(const __FlashStringHelper* message, const __FlashStringHelper* source = nullptr)
@@ -82,7 +88,10 @@ protected:
 
     void sendError(const char* message, const char* source = "")
     {
-        LoggingSupport::sendError(_logger, message, source);
+        if (_logger)
+        {
+            LoggingSupport::sendError(_logger, message, source);
+        }
     }
 
     void sendError(const __FlashStringHelper* message, const __FlashStringHelper* source = nullptr)
