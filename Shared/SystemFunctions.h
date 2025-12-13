@@ -3,9 +3,42 @@
 
 class SystemFunctions {
 public:
-    // Call once at startup (handles any board-specific init)
+	/**
+	* @brief Estimate free memory (RAM) available.
+    * 
+	* @return Estimated free memory in bytes
+    */
     static uint16_t freeMemory();
+
+    /**
+	* @brief Estimate available stack space.
+    * 
+	* @return Estimated available stack space in bytes
+    */
     static uint16_t stackAvailable();
+
+    /**
+     * @brief Generate a default password and write it to the provided buffer.
+     *
+     * Generates a default password string and stores it in the given buffer.
+     * The buffer must be large enough to hold the password and the null terminator.
+     *
+     * @param buffer Pointer to the character buffer where the password will be written.
+     * @param bufferSize Size of the buffer in bytes.
+     * @return BufferSuccess (0) if the password was generated and written successfully,
+     *         BufferInvalid (nonzero) if the buffer is invalid or too small.
+     */
+    static uint8_t GenerateDefaultPassword(char* buffer, size_t bufferSize);
+
+    /**
+     * @brief Initialize a HardwareSerial port with specified baud rate.
+     *
+     * Optionally waits for the serial connection to be established (useful for USB serial).
+     *
+     * @param serialPort Reference to HardwareSerial port (e.g., Serial, Serial1)
+     * @param baudRate Baud rate for serial communication
+     * @param waitForConnection If true, waits for serial connection to be established
+	 */
     static void initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection);
 
     /**

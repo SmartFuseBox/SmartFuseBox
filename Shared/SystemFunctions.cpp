@@ -27,6 +27,31 @@ uint16_t SystemFunctions::freeMemory()
 #endif
 }
 
+uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize)
+{
+    if (bufferSize < 15)
+        return BufferInvalid;
+
+#if defined(ARDUINO_UNO_R4)
+    uint8_t mac[6];
+    WiFi.macAddress(mac);
+
+    snprintf(buffer, bufferSize, "sfb-%02X%02X%02X", mac[3], mac[4], mac[5]);
+#else
+    // Use analog noise as seed
+    randomSeed(analogRead(A0) + analogRead(A1) + millis());
+    uint32_t storedID = random(0x10000000, 0xFFFFFFFF);
+
+    // Format: SFB12A1B2C3
+    snprintf(buffer, bufferSize, "sfb-%08X", storedID);
+
+#endif
+
+    buffer[bufferSize - 1] = '\0';
+
+    return BufferSuccess;
+}
+
 void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection)
 {
 	serialPort.begin(baudRate);
