@@ -12,15 +12,15 @@ RelayCommandHandler::~RelayCommandHandler()
 
 }
 
-const String* RelayCommandHandler::supportedCommands(size_t& count) const
+const char* const* RelayCommandHandler::supportedCommands(size_t& count) const
 {
-    static const String cmds[] = { RelayTurnAllOff, RelayTurnAllOn, RelayRetrieveStates, 
+    static const char* cmds[] = { RelayTurnAllOff, RelayTurnAllOn, RelayRetrieveStates, 
         RelaySetState, RelayStatusGet };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
 
-bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const String command, const StringKeyValue params[], uint8_t paramCount)
+bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
     if (!_relayController)
     {
@@ -28,36 +28,33 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const Stri
         return true;
 	}
 
-    String cmd = command;
-    cmd.trim();
-
-    if (cmd == RelayTurnAllOff)
+    if (command == RelayTurnAllOff)
     {
         if (paramCount == 0)
         {
 			_relayController->turnAllRelaysOff();
-			broadcastRelayStatus(cmd);
+			broadcastRelayStatus(command);
         }
         else
         {
-			sendAckErr(sender, cmd, F("Invalid parameters"));
+			sendAckErr(sender, command, F("Invalid parameters"));
             return true;
         }
     }
-    else if (cmd == RelayTurnAllOn)
+    else if (command == RelayTurnAllOn)
     {
         if (paramCount == 0)
         {
 			_relayController->turnAllRelaysOn();
-            broadcastRelayStatus(cmd);
+            broadcastRelayStatus(command);
         }
         else
 		{
-            sendAckErr(sender, cmd, F("Invalid parameters"));
+            sendAckErr(sender, command, F("Invalid parameters"));
 			return true;
         }
     }
-    else if (cmd == RelayRetrieveStates)
+    else if (command == RelayRetrieveStates)
     {
         if (paramCount == 0)
         {
@@ -67,28 +64,28 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const Stri
                 CommandResult result = _relayController->getRelayStatus(i);
 
 				uint8_t status = result.status;
-                StringKeyValue param = { String(i), String(status) };
-                broadcastRelayStatus(cmd, &param);
+                StringKeyValue param = makeParam(i, status);
+                broadcastRelayStatus(command, &param);
             }
 
-			broadcastRelayStatus(cmd);
+			broadcastRelayStatus(command);
         }
         else
         {
-            sendAckErr(sender, cmd, F("Invalid parameters"));
+            sendAckErr(sender, command, F("Invalid parameters"));
 			return true;
         }
     }
-    else if (cmd == RelaySetState)
+    else if (command == RelaySetState)
     {
         if (paramCount == 1)
         {
-            uint8_t relayIndex = params[0].key.toInt();
-            uint8_t state = params[0].value.toInt();
+            uint8_t relayIndex = atoi(params[0].key);
+            uint8_t state = atoi(params[0].value);
 
             if (relayIndex >= _relayController->getRelayCount())
             {
-                sendAckErr(sender, cmd, F("Invalid relay index"));
+                sendAckErr(sender, command, F("Invalid relay index"));
                 return true;
 			}
 
@@ -97,49 +94,49 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const Stri
 
             if (status == RelayResult::InvalidIndex)
             {
-                sendAckErr(sender, cmd, F("Invalid relay index"), &params[0]);
+                sendAckErr(sender, command, F("Invalid relay index"), &params[0]);
                 return true;
 			}
             else if (status == RelayResult::Reserved)
             {
-                sendAckErr(sender, cmd, F("Relay is reserved for sound system"), &params[0]);
+                sendAckErr(sender, command, F("Relay is reserved for sound system"), &params[0]);
                 return true;
 			}
 
-			broadcastRelayStatus(cmd, &params[0]);
+			broadcastRelayStatus(command, &params[0]);
         }
         else
         {
-            sendAckErr(sender, cmd, F("Invalid parameters"));
+            sendAckErr(sender, command, "Invalid parameters");
 			return true;
         }
 	}
-    else if (cmd == RelayStatusGet)
+    else if (command == RelayStatusGet)
     {
         if (paramCount == 1)
         {
-            uint8_t relayIndex = params[0].key.toInt();
+            uint8_t relayIndex = atoi(params[0].key);
 
             if (relayIndex >= _relayController->getRelayCount())
             {
-                sendAckErr(sender, cmd, F("Invalid relay index"));
+                sendAckErr(sender, command, "Invalid relay index");
                 return true;
             }
 
             CommandResult result = _relayController->getRelayStatus(relayIndex);
 			uint8_t status = result.status;
-            StringKeyValue param = { String(relayIndex), String(status) };
-            broadcastRelayStatus(cmd, &param);
+            StringKeyValue param = makeParam(relayIndex, status);
+            broadcastRelayStatus(command, &param);
         }
         else
         {
-            sendAckErr(sender, cmd, F("Invalid parameters"));
+            sendAckErr(sender, command, F("Invalid parameters"));
 			return true;
         }
 	}
     else
     {
-        sendAckErr(sender, cmd, F("Unknown relay command"));
+        sendAckErr(sender, command, F("Unknown relay command"));
         return true;
     }
 
@@ -173,30 +170,24 @@ void RelayCommandHandler::configUpdated(Config* config)
 
         if (_commandMgrComputer != nullptr)
         {
-            _commandMgrComputer->sendDebug(
-                F("Invalid hornRelayIndex corrected to 0xFF"),
-                F("RELAY")
-            );
+            _commandMgrComputer->sendDebug(F("Invalid hornRelayIndex corrected to 0xFF"), F("RELAY"));
         }
     }
 
     if (_commandMgrComputer != nullptr)
     {
-        String msg = F("Reserved sound relay: ");
         if (_relayController->getReservedSoundRelay() == DefaultValue)
         {
-            msg += F("None (0xFF)");
+            _commandMgrComputer->sendDebug(F("Reserved sound relay: None (0xFF)"), F("RELAY"));
         }
         else
         {
-            msg += String(_relayController->getReservedSoundRelay());
+            _commandMgrComputer->sendDebug(F("Reserved sound relay has been set"), F("RELAY"));
         }
-
-        _commandMgrComputer->sendDebug(msg, F("RELAY"));
     }
 }
 
-void RelayCommandHandler::broadcastRelayStatus(const String& cmd, const StringKeyValue* param)
+void RelayCommandHandler::broadcastRelayStatus(const char* cmd, const StringKeyValue* param)
 {
     if (_commandMgrLink != nullptr)
     {

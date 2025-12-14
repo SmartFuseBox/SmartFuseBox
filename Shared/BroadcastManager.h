@@ -43,14 +43,6 @@ public:
     void sendCommand(const char* command, const char* params = "", bool linkOnly = false);
 
     /**
-     * @brief Send a command to all registered serial managers (String overload for convenience).
-     *
-     * @param command The command string to send
-     * @param params Optional parameters string
-     */
-    void sendCommand(const String& command, const String& params = "", bool linkOnly = false);
-
-    /**
      * @brief Send a command to all registered serial managers.
      *
 	 * @param command The command
@@ -79,28 +71,12 @@ public:
     void sendDebug(const char* message, const char* source = "");
 
     /**
-     * @brief Send a debug message to all registered serial managers (String overload).
-     *
-     * @param message The debug message
-     * @param source Optional source identifier
-     */
-    void sendDebug(const String& message, const String& source = "");
-
-    /**
      * @brief Send an error message to all registered serial managers.
      *
      * @param message The error message
      * @param source Optional source identifier (default: empty string)
      */
     void sendError(const char* message, const char* source = "");
-
-    /**
-     * @brief Send an error message to all registered serial managers (String overload).
-     *
-     * @param message The error message
-     * @param source Optional source identifier
-     */
-    void sendError(const String& message, const String& source = "");
 
     /**
      * @brief Get pointer to computer serial manager (for selective operations).

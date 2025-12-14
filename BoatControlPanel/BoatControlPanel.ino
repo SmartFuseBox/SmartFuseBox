@@ -25,7 +25,7 @@
 #include "SoundManeuveringPage.h"
 #include "SoundEmergencyPage.h"
 #include "SoundOtherPage.h"
-#include "FlagsPage.h"
+//#include "FlagsPage.h"
 #include "AboutPage.h"
 
 #include "Config.h"
@@ -46,8 +46,8 @@ void onLinkCommandReceived(SerialCommandManager* mgr);
 void onComputerCommandReceived(SerialCommandManager* mgr);
 
 // Serial managers
-SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', '=', 500, 64);
-SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', '=', 500, 64);
+SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
+SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', ';', '=', 500, 64);
 
 // Compass with smoothing filter size 15
 TLVCompassHandler compass(&commandMgrComputer, 15);
@@ -70,12 +70,12 @@ SoundManeuveringPage soundManeuveringPage(&NEXTION_SERIAL, &warningManager, &com
 SoundEmergencyPage soundEmergencyPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 SoundOtherPage soundOtherPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 SystemPage systemPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
-FlagsPage flagsPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
+//FlagsPage flagsPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 AboutPage aboutPage(&NEXTION_SERIAL);
 
 BaseDisplayPage* displayPages[] = { &splashPage, &homePage, &warningPage, &relayPage, &soundSignalsPage, 
     &soundOvertakingPage, &soundFogPage, &soundManeuveringPage, &soundEmergencyPage, &soundOtherPage,
-    &systemPage, &flagsPage, &aboutPage };
+    &systemPage, /*&flagsPage,*/ &aboutPage };
 NextionControl nextion(&NEXTION_SERIAL, displayPages, sizeof(displayPages) / sizeof(displayPages[0]));
 
 // link command handlers
@@ -138,8 +138,11 @@ void setup()
     }
 
     // Simplified broadcasting
-    broadcastManager.sendCommand(ConfigSoundRelayId, "v=" + String(config->hornRelayIndex));
-    broadcastManager.sendCommand(ConfigBoatType, "v=" + String(static_cast<int>(config->vesselType)));
+    char buffer[10];
+    snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+    broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
+    snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+    broadcastManager.sendCommand(ConfigBoatType, buffer);
     broadcastManager.sendCommand(SystemInitialized, "");
 
 	nextion.sendCommand(PageOne);
@@ -196,12 +199,15 @@ void loop()
 
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
-    String cmd = mgr->getCommand();
-    commandMgrComputer.sendError(String(F("Unknown command: ")) + cmd, F("LINKHANDLER"));
+    char cmd[64];
+	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+    commandMgrComputer.sendError(cmd, "LINKHANDLER");
 }
 
 void onComputerCommandReceived(SerialCommandManager* mgr)
 {
-    String cmd = mgr->getCommand();
-    commandMgrComputer.sendError(String(F("Unknown command: ")) + cmd, F("PCHANDLER"));
+    char cmd[64];
+	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+
+    commandMgrComputer.sendError(cmd, "PCHANDLER");
 }

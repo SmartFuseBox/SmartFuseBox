@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 #include <SerialCommandManager.h>
 #include "BroadcastManager.h"
 
@@ -22,14 +23,6 @@ protected:
         }
     }
     
-    static void sendDebug(SerialCommandManager* mgr, const String& message, const String& source = "")
-    {
-        if (mgr)
-        {
-            mgr->sendDebug(message, source);
-        }
-    }
-    
     /**
      * @brief Send an error message via provided manager.
      */
@@ -41,14 +34,6 @@ protected:
         }
     }
     
-    static void sendError(SerialCommandManager* mgr, const String& message, const String& source = "")
-    {
-        if (mgr)
-        {
-            mgr->sendError(message, source);
-        }
-    }
-
     static void sendCommand(SerialCommandManager* mgr, const char* command, const char* params = "") {
         if (mgr)
         {
@@ -79,22 +64,50 @@ protected:
     
     void sendDebug(const char* message, const char* source = "")
     {
-        LoggingSupport::sendDebug(_logger, message, source);
+        if (_logger)
+        {
+            LoggingSupport::sendDebug(_logger, message, source);
+        }
     }
-    
-    void sendDebug(const String& message, const String& source = "")
+
+	void sendDebug(const __FlashStringHelper* message, const __FlashStringHelper* source = nullptr)
     {
-        LoggingSupport::sendDebug(_logger, message, source);
+        if (_logger)
+        {
+            _logger->sendDebug(message, source);
+        }
     }
-    
+
+    void sendDebug(const char* message, const __FlashStringHelper* source = nullptr)
+    {
+        if (_logger)
+        {
+            _logger->sendDebug(message, source);
+        }
+    }
+
     void sendError(const char* message, const char* source = "")
     {
-        LoggingSupport::sendError(_logger, message, source);
+        if (_logger)
+        {
+            LoggingSupport::sendError(_logger, message, source);
+        }
     }
-    
-    void sendError(const String& message, const String& source = "")
+
+    void sendError(const __FlashStringHelper* message, const __FlashStringHelper* source = nullptr)
     {
-        LoggingSupport::sendError(_logger, message, source);
+        if (_logger)
+        {
+            _logger->sendError(message, source);
+        }
+    }
+
+    void sendError(const char* message, const __FlashStringHelper* source = nullptr)
+    {
+        if (_logger)
+        {
+            _logger->sendError(message, source);
+        }
     }
 };
 
@@ -118,23 +131,7 @@ protected:
         }
     }
     
-    void sendDebug(const String& message, const String& source = "")
-    {
-        if (_broadcaster)
-        {
-            _broadcaster->sendDebug(message, source);
-        }
-    }
-    
     void sendError(const char* message, const char* source = "")
-    {
-        if (_broadcaster)
-        {
-            _broadcaster->sendError(message, source);
-        }
-    }
-    
-    void sendError(const String& message, const String& source = "")
     {
         if (_broadcaster)
         {

@@ -56,8 +56,8 @@ void configureBluetoothSupport(Config* config);
 RelayController relayController(Relays, TotalRelays);
 SoundController soundController;
 
-SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', '=', 500, 64);
-SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', '=', 500, 64);
+SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
+SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', ';', '=', 500, 64);
 
 // Broadcast manager for coordinated messaging
 BroadcastManager broadcastManager(&commandMgrComputer, &commandMgrLink);
@@ -196,18 +196,18 @@ void configureWifiSupport(Config* config)
 {
 	// network command handlers
 	INetworkCommandHandler* networkHandlers[] = { &relayNetworkHandler, &soundNetworkHandler, &warningNetworkHandler,
-		&systemNetworkHandler, &sensorNetworkHandler };
+		&systemNetworkHandler, &sensorNetworkHandler, &configNetworkHandler };
 	size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
 	wifiController.registerHandlers(networkHandlers, networkHandlerCount);
 
 
 	// json status visitors for wifi
 	NetworkJsonVisitor* jsonVisitors[] = {
+		&systemNetworkHandler,
 		&configNetworkHandler,
 		&relayNetworkHandler,
 		&soundNetworkHandler,
 		&warningNetworkHandler,
-		&systemNetworkHandler,
 		&sensorNetworkHandler,
 	};
 	uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);

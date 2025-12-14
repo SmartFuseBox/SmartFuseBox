@@ -1,4 +1,5 @@
 #include "BroadcastManager.h"
+#include "BaseCommandHandler.h"
 
 constexpr unsigned long UpdateIntervalMs = 5000;
 
@@ -18,9 +19,11 @@ void BroadcastManager::update(unsigned long now)
         
         if (!config)
 			return;
-
-        sendCommand(ConfigSoundRelayId, "v=" + String(config->hornRelayIndex), true);
-        sendCommand(ConfigBoatType, "v=" + String(static_cast<int>(config->vesselType)), true);
+		char buffer[10];
+		snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+        sendCommand(ConfigSoundRelayId, buffer, true);
+		snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+        sendCommand(ConfigBoatType, buffer, true);
     }
 }
 
@@ -35,11 +38,6 @@ void BroadcastManager::sendCommand(const char* command, const char* params, bool
     {
         _linkSerial->sendCommand(command, params);
     }
-}
-
-void BroadcastManager::sendCommand(const String& command, const String& params, bool linkOnly)
-{
-    sendCommand(command.c_str(), params.c_str(), linkOnly);
 }
 
 void BroadcastManager::sendCommand(const char* command, const char* message, const char* identifier, StringKeyValue* params, uint8_t argLength)
@@ -67,20 +65,10 @@ void BroadcastManager::sendDebug(const char* message, const char* source)
     }
 }
 
-void BroadcastManager::sendDebug(const String& message, const String& source)
-{
-    sendDebug(message.c_str(), source.c_str());
-}
-
 void BroadcastManager::sendError(const char* message, const char* source)
 {
     if (_computerSerial)
     {
         _computerSerial->sendError(message, source);
     }
-}
-
-void BroadcastManager::sendError(const String& message, const String& source)
-{
-    sendError(message.c_str(), source.c_str());
 }

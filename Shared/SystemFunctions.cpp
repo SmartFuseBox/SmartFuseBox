@@ -3,6 +3,7 @@
 #include "Local.h"
 
 #if defined(ARDUINO_UNO_R4)
+#include <WiFiS3.h>
 extern "C" char* sbrk(int incr);
 #endif
 
@@ -25,6 +26,31 @@ uint16_t SystemFunctions::freeMemory()
 #else
 #error "You must define 'ARDUINO_MEGA2560' or 'ARDUINO_UNO_R4'"
 #endif
+}
+
+uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize)
+{
+    if (bufferSize < 15)
+        return BufferInvalid;
+
+#if defined(ARDUINO_UNO_R4)
+    uint8_t mac[6];
+    WiFi.macAddress(mac);
+
+    snprintf(buffer, bufferSize, "sfb-%02X%02X%02X", mac[3], mac[4], mac[5]);
+#else
+    // Use analog noise as seed
+    randomSeed(analogRead(A0) + analogRead(A1) + millis());
+    uint32_t storedID = random(0x10000000, 0xFFFFFFFF);
+
+    // Format: SFB12A1B2C3
+    snprintf(buffer, bufferSize, "sfb-%08X", storedID);
+
+#endif
+
+    buffer[bufferSize - 1] = '\0';
+
+    return BufferSuccess;
 }
 
 void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection)
@@ -76,9 +102,17 @@ bool SystemFunctions::hasElapsed(unsigned long now, unsigned long previous, unsi
 
 bool SystemFunctions::isProgmem(const char* ptr)
 {
+#if defined(ARDUINO_MEGA2560)
     // On AVR (Arduino Mega 2560), PROGMEM starts after RAM
     // RAMEND is defined by Arduino (typically 0x21FF for Mega 2560)
     return (uintptr_t)ptr >= RAMEND;
+#elif defined(ARDUINO_UNO_R4)
+    // On Arduino UNO R4 (Renesas RA4M1), PROGMEM is not used the same way
+    // Flash memory starts at 0x00000000, SRAM starts at 0x20000000
+    return (uintptr_t)ptr < 0x20000000;
+#else
+#error "You must define 'ARDUINO_MEGA2560' or 'ARDUINO_UNO_R4'"
+#endif
 }
 
 size_t SystemFunctions::copyString(char* dest, const char* src, size_t maxLen)
@@ -86,14 +120,115 @@ size_t SystemFunctions::copyString(char* dest, const char* src, size_t maxLen)
     if (!dest || !src || maxLen == 0)
         return 0;
 
+    size_t copied = 0;
+
     if (isProgmem(src))
     {
         // Copy from PROGMEM
-        return strlcpy_P(dest, src, maxLen);
+        while (copied < maxLen - 1)
+        {
+            char c = pgm_read_byte(src++);
+            if (c == '\0')
+                break;
+            dest[copied++] = c;
+        }
+        dest[copied] = '\0';
     }
     else
     {
         // Copy from RAM
-        return strlcpy(dest, src, maxLen);
+        while (copied < maxLen - 1 && src[copied] != '\0')
+        {
+            dest[copied] = src[copied];
+            copied++;
+        }
+        dest[copied] = '\0';
     }
+
+    return copied;
+}
+
+// Implementation
+size_t SystemFunctions::appendString(char* dest, size_t destSize, size_t offset, const char* src) {
+    if (!dest || !src || offset >= destSize - 1) return 0;
+    
+    size_t available = destSize - offset - 1; // Reserve space for null terminator
+    size_t written = 0;
+    
+    if (isProgmem(src)) {
+        while (available > 0) {
+            char c = pgm_read_byte(src++);
+            if (c == '\0') break;
+            dest[offset + written++] = c;
+            available--;
+        }
+    } else {
+        while (available > 0 && *src != '\0') {
+            dest[offset + written++] = *src++;
+            available--;
+        }
+    }
+    
+    dest[offset + written] = '\0';
+    return written;
+}
+
+size_t SystemFunctions::calculateLength(const char* str) {
+    if (!str) return 0;
+    
+    if (isProgmem(str)) {
+        return strlen_P(str);
+    } else {
+        return strlen(str);
+    }
+}
+
+bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start, size_t length)
+{
+    if (destSize == 0)
+        return false;
+
+    size_t srcLen = calculateLength(src);
+
+    if (start >= srcLen)
+    {
+        dest[0] = '\0';
+        return false;
+    }
+
+    size_t copyLen = (start + length > srcLen) ? (srcLen - start) : length;
+
+    if (copyLen >= destSize)
+    {
+        copyLen = destSize - 1;
+    }
+
+    for (size_t i = 0; i < copyLen; i++)
+    {
+        dest[i] = src[start + i];
+    }
+
+    dest[copyLen] = '\0';
+    return true;
+}
+
+bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start)
+{
+	return substr(dest, destSize, src, start, calculateLength(src) - start);
+}
+
+int32_t SystemFunctions::indexOf(const char* str, char ch, size_t start = 0)
+{
+    if (!str || !ch)
+        return -1;
+
+	size_t len = calculateLength(str);
+
+    for (size_t i = start; i < len; i++)
+    {
+        if (str[i] == ch)
+            return static_cast<int32_t>(i);
+    }
+
+	return -1;
 }

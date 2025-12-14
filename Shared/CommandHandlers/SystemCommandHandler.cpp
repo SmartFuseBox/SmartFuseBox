@@ -16,43 +16,44 @@ SystemCommandHandler::~SystemCommandHandler()
 {
 }
 
-const String* SystemCommandHandler::supportedCommands(size_t& count) const
+const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
 {
-    static const String cmds[] = { SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
+    static const char* cmds[] = { SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
         SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
 
-bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const String command, const StringKeyValue params[], uint8_t paramCount)
+bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
     (void)params;
     (void)paramCount;
 
-    String cmd = command;
-    cmd.trim();
-
-    if (cmd == SystemHeartbeatCommand)
+    if (strcmp(command, SystemHeartbeatCommand) == 0)
     {
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SystemInitialized)
+    else if (strcmp(command, SystemInitialized) == 0)
     {
-        sendAckOk(sender, cmd);
+        sendAckOk(sender, command);
     }
-    else if (cmd == SystemFreeMemory)
+    else if (strcmp(command, SystemFreeMemory) == 0)
     {
-        StringKeyValue param = { ValueParamName, String(SystemFunctions::freeMemory()) };
-        sendAckOk(sender, cmd, &param);
+        StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		snprintf(param.value, sizeof(param.value), "%u", SystemFunctions::freeMemory());
+        sendAckOk(sender, command, &param);
     }
-	else if (cmd == SystemCpuUsage)
+	else if (strcmp(command, SystemCpuUsage) == 0)
     {
-        StringKeyValue param = { ValueParamName, String(SystemCpuMonitor::getCpuUsage()) };
-        sendAckOk(sender, cmd, &param);
+        StringKeyValue param;
+        strncpy(param.key, ValueParamName, sizeof(param.key));
+        snprintf(param.value, sizeof(param.value), "%u", SystemCpuMonitor::getCpuUsage());
+        sendAckOk(sender, command, &param);
     }
 
 #if defined(ARDUINO_UNO_R4)
-	else if (cmd == SystemBluetoothStatus)
+	else if (strcmp(command, SystemBluetoothStatus) == 0)
     {
 		Config* config = ConfigManager::getConfigPtr();
 
@@ -63,17 +64,18 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
             
         if (_broadcaster)
         {
-            StringKeyValue param = { ValueParamName, enabled ? F("1") : F("0") };
-            sendAckOk(sender, cmd, &param);
+			char value = enabled ? '1' : '0';
+            StringKeyValue param = makeParam(ValueParamName, value);
+            sendAckOk(sender, command, &param);
         }
     }
-    else if (cmd == SystemWifiStatus)
+    else if (strcmp(command, SystemWifiStatus) == 0)
     {
         Config* config = ConfigManager::getConfigPtr();
 
         bool enabled = false;
-        String ipAddress = F("0.0.0.0");
-		String ssid = "";
+        char ipAddress[MaxIpAddressLength] = "0.0.0.0";
+		char ssid[MaxSSIDLength] = "";
         int rssi = 0;
 
         if (config)
@@ -82,40 +84,39 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         // Get IP address from WifiController if available
         if (_wifiController && enabled && _wifiController->isEnabled())
         {
-            ipAddress = _wifiController->getServer()->getIpAddress();
-			ssid = _wifiController->getServer()->getSSID();
+
+            _wifiController->getServer()->getIpAddress(ipAddress, MaxIpAddressLength);
+			_wifiController->getServer()->getSSID(ssid, MaxSSIDLength);
 			rssi = _wifiController->getServer()->getSignalStrength();
         }
 
         if (_broadcaster)
         {
             constexpr uint8_t argCount = 4;
+			char enabledValue = enabled ? '1' : '0';
             StringKeyValue params[argCount] = {
-                { ValueParamName, enabled ? F("1") : F("0") },
-                { "ip", ipAddress },
-				{ "ssid", ssid },
-                { "rssi", String(rssi)}
+                makeParam(ValueParamName, enabledValue),
+                makeParam("ip", ipAddress),
+				makeParam("ssid", ssid),
+                makeParam("rssi", rssi)
             };
-            sendAckOk(sender, cmd, params, argCount);
+            sendAckOk(sender, command, params, argCount);
         }
     }
 #endif
-    else if (cmd == SystemSetDateTime && paramCount == 1)
+    else if (strcmp(command, SystemSetDateTime) == 0 && paramCount == 1)
     {
-        String value = params[0].value;
-        value.trim();
-        
         bool success = false;
         
         // Try ISO 8601 format first (contains 'T' or '-')
-        if (value.indexOf('T') >= 0 || value.indexOf('-') >= 0)
+        if (strchr(params[0].value, 'T') != nullptr || strchr(params[0].value, '-') != nullptr)
         {
-            success = DateTimeManager::setDateTimeISO(value);
+            success = DateTimeManager::setDateTimeISO(params[0].value);
         }
         else
         {
             // Try Unix timestamp (all digits)
-            unsigned long timestamp = value.toInt();
+            unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
             if (timestamp > 0) {
                 DateTimeManager::setDateTime(timestamp);
                 success = true;
@@ -124,33 +125,37 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const Str
         
         if (success)
         {
-            StringKeyValue param = { ValueParamName, DateTimeManager::formatDateTime() };
-            sendAckOk(sender, cmd, &param);
+            StringKeyValue param;
+			strncpy(param.key, ValueParamName, sizeof(param.key));
+            DateTimeManager::formatDateTime(param.value, sizeof(param.value));
+            sendAckOk(sender, command, &param);
         }
         else
         {
-            sendAckErr(sender, cmd, F("Invalid datetime format"));
+            sendAckErr(sender, command, F("Invalid datetime format"));
         }
         
         return true;
     }
-	else if (cmd == SystemGetDateTime)
+	else if (strcmp(command, SystemGetDateTime) == 0)
     {
         if (DateTimeManager::isTimeSet())
         {
-            StringKeyValue param = { ValueParamName, DateTimeManager::formatDateTime() };
-            sendAckOk(sender, cmd, &param);
+            StringKeyValue param;
+            strncpy(param.key, ValueParamName, sizeof(param.key));
+            DateTimeManager::formatDateTime(param.value, sizeof(param.value));
+            sendAckOk(sender, command, &param);
         }
         else
         {
-            sendAckErr(sender, cmd, F("Date/time not set"));
+            sendAckErr(sender, command, F("Date/time not set"));
         }
         
         return true;
     }
     else
     {
-        sendAckErr(sender, cmd, F("Unknown system command"));
+        sendAckErr(sender, command, F("Unknown system command"));
     }
 
     return true;

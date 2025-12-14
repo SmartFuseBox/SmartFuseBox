@@ -3,9 +3,42 @@
 
 class SystemFunctions {
 public:
-    // Call once at startup (handles any board-specific init)
+	/**
+	* @brief Estimate free memory (RAM) available.
+    * 
+	* @return Estimated free memory in bytes
+    */
     static uint16_t freeMemory();
+
+    /**
+	* @brief Estimate available stack space.
+    * 
+	* @return Estimated available stack space in bytes
+    */
     static uint16_t stackAvailable();
+
+    /**
+     * @brief Generate a default password and write it to the provided buffer.
+     *
+     * Generates a default password string and stores it in the given buffer.
+     * The buffer must be large enough to hold the password and the null terminator.
+     *
+     * @param buffer Pointer to the character buffer where the password will be written.
+     * @param bufferSize Size of the buffer in bytes.
+     * @return BufferSuccess (0) if the password was generated and written successfully,
+     *         BufferInvalid (nonzero) if the buffer is invalid or too small.
+     */
+    static uint8_t GenerateDefaultPassword(char* buffer, size_t bufferSize);
+
+    /**
+     * @brief Initialize a HardwareSerial port with specified baud rate.
+     *
+     * Optionally waits for the serial connection to be established (useful for USB serial).
+     *
+     * @param serialPort Reference to HardwareSerial port (e.g., Serial, Serial1)
+     * @param baudRate Baud rate for serial communication
+     * @param waitForConnection If true, waits for serial connection to be established
+	 */
     static void initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection);
 
     /**
@@ -70,4 +103,135 @@ public:
      * @return Number of characters copied (excluding null terminator)
      */
     static size_t copyString(char* dest, const char* src, size_t maxLen);
+
+    /**
+     * @brief Concatenate multiple strings into a provided buffer.
+     * 
+     * Safely concatenates any number of strings (PROGMEM or RAM) into a destination buffer.
+     * 
+     * @param dest Destination buffer
+     * @param destSize Size of destination buffer (including null terminator)
+     * @param first First string to concatenate
+     * @param args Additional strings to concatenate
+     * @return Number of characters written (excluding null terminator), or 0 if buffer too small
+     */
+    template<typename... Args>
+    static size_t concatStrings(char* dest, size_t destSize, const char* first, Args... args) {
+        if (destSize == 0) return 0;
+        
+        size_t written = 0;
+        dest[0] = '\0';
+        
+        written += appendString(dest, destSize, written, first);
+        written += concatStringsImpl(dest, destSize, written, args...);
+        
+        return written;
+    }
+
+    /**
+	* @brief Check if a string starts with a given prefix.
+    * 
+	* @param str The main string to check
+	* @param prefix The prefix to look for
+	* @return true if str starts with prefix, false otherwise
+    */
+    static bool startsWith(const char* str, const char* prefix) {
+        return strncmp(str, prefix, strlen(prefix)) == 0;
+    }
+
+    /**
+    * @brief Check if a string starts with a given prefix stored in PROGMEM.
+    *
+    * @param str The main string to check (in RAM)
+    * @param prefix The prefix to look for (in PROGMEM via F() macro)
+    * @return true if str starts with prefix, false otherwise
+    */
+    static bool startsWith(const char* str, const __FlashStringHelper* prefix) {
+        if (!str || !prefix) return false;
+
+        const char* p = reinterpret_cast<const char*>(prefix);
+        size_t i = 0;
+
+        // Compare character by character, reading from PROGMEM
+        while (true) {
+            char prefixChar = pgm_read_byte(p + i);
+            if (prefixChar == '\0') {
+                return true; // Reached end of prefix, it's a match
+            }
+            if (str[i] == '\0' || str[i] != prefixChar) {
+                return false; // String ended or mismatch
+            }
+            i++;
+        }
+    }
+
+    /**
+     * @brief Calculate the length of a string (PROGMEM or RAM).
+     * 
+     * @param str String to measure
+     * @return Length of the string (excluding null terminator)
+	 */
+    static size_t calculateLength(const char* str);
+
+    /**
+     * @brief Extract a substring from a source string with specified length.
+     *
+     * @param dest Destination buffer
+     * @param destSize Size of destination buffer (including null terminator)
+     * @param src Source string
+     * @param start Starting position in source string
+     * @param length Number of characters to extract
+     * @return true if extraction successful, false if start position is out of bounds
+     */
+    static bool substr(char* dest, size_t destSize, const char* src, size_t start, size_t length);
+
+    /**
+     * @brief Extract a substring from a source string to the end.
+     *
+     * @param dest Destination buffer
+     * @param destSize Size of destination buffer (including null terminator)
+     * @param src Source string
+     * @param start Starting position in source string
+     * @return true if extraction successful, false if start position is out of bounds
+     */
+    static bool substr(char* dest, size_t destSize, const char* src, size_t start);
+
+    /**
+     * @brief Find the first occurrence of a character in a string starting from a position.
+     *
+     * @param str String to search
+     * @param ch Character to find
+     * @param start Starting position for search
+     * @return Index of first occurrence, or -1 if not found
+     */
+    static int32_t indexOf(const char* str, char ch, size_t start);
+private:
+    // Helper: Append a single string to buffer
+    static size_t appendString(char* dest, size_t destSize, size_t offset, const char* src);
+    
+    // Variadic recursion base case
+    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset) {
+        (void)dest;
+		(void)destSize;
+		(void)offset;
+        return 0;
+    }
+    
+    // Variadic recursion
+    template<typename... Args>
+    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset, const char* first, Args... args) {
+        size_t written = appendString(dest, destSize, offset, first);
+        return written + concatStringsImpl(dest, destSize, offset + written, args...);
+    }
+    
+    // Calculate total length needed
+    
+    template<typename... Args>
+    static size_t calculateTotalLength(const char* first, Args... args) {
+        return calculateLength(first) + calculateTotalLength(args...);
+    }
+    
+    static size_t calculateTotalLength() {
+        return 0;
+    }
 };

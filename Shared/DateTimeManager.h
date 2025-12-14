@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+constexpr uint8_t MaxDateTimeStringLength = 20; // "YYYY-MM-DDTHH:MM:SS" + null terminator
+
 /**
  * @class DateTimeManager
  * @brief Static date/time manager for tracking system time.
@@ -58,7 +60,7 @@ public:
      * @param isoDateTime ISO 8601 formatted date/time string
      * @return true if successfully parsed and set, false otherwise
      */
-    static bool setDateTimeISO(const String& isoDateTime);
+    static bool setDateTimeISO(const char* isoDateTime);
 
     /**
      * @brief Get the current Unix timestamp.
@@ -82,16 +84,20 @@ public:
     /**
      * @brief Format current date/time as ISO 8601 string.
      * Format: YYYY-MM-DDTHH:MM:SS
-     * @return Formatted date/time string, or "Not Set" if time not synchronized
+     * @param buffer Pointer to character buffer to receive formatted string
+     * @param bufferLength Size of the buffer (minimum 20 bytes recommended)
+     * @return true if time is set and formatted successfully, false if time not synchronized or buffer is null
      */
-    static String formatDateTime();
+    static bool formatDateTime(char* buffer, const uint8_t bufferLength);
 
     /**
      * @brief Format current date/time as human-readable string.
      * Format: YYYY-MM-DD HH:MM:SS
-     * @return Formatted date/time string, or "Not Set" if time not synchronized
+     * @param buffer Pointer to character buffer to receive formatted string
+     * @param bufferLength Size of the buffer (minimum 20 bytes recommended)
+     * @return true if time is set and formatted successfully, false if time not synchronized or buffer is null
      */
-    static String formatDateTimeReadable();
+    static bool formatDateTimeReadable(char* buffer, const uint8_t bufferLength);
 
     /**
      * @brief Reset/clear the stored time.

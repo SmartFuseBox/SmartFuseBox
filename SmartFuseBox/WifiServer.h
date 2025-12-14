@@ -28,6 +28,9 @@ enum class ClientHandlingState : uint8_t
 	KeepAlive
 };
 
+constexpr uint16_t MaximumRequestSize = 1024;
+constexpr uint8_t MaximumPathLength = 128;
+
 class WifiServer : public SingleLoggerSupport
 {
 private:
@@ -71,24 +74,23 @@ private:
 	struct ActiveClient
 	{
 		WiFiClient client;
-		String request;
+		char request[MaximumRequestSize + 1];
 		unsigned long startTime;
 		unsigned long lastActivity;
 		ClientHandlingState state;
 		bool isPersistent;
 	} _activeClient;
 	
-	void sendResponse(WiFiClient& client, int statusCode, const char* contentType, const String& body);
+	void sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body);
 	void send400(WiFiClient& client);
 	void send404(WiFiClient& client);
-	String parseQueryParameter(const String& query, const String& paramName);
 	void updateClientConnection();
 	void updateClientHandling();
 	void processClientRequest();
 	void startServer();
 	void stopServer();
-	bool handleIndex(WiFiClient& client, bool isPersistent, const String& path);
-	bool dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const String& path, const String& method, const String& query);
+	bool handleIndex(WiFiClient& client, bool isPersistent, const char* path);
+	bool dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query);
 	void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 	
 public:
@@ -111,7 +113,7 @@ public:
 	bool isInitialized() const { return _initialized; }
 	WifiConnectionState getConnectionState() const { return _connectionState; }
 	WifiMode getMode() const { return _mode; }
-	String getIpAddress() const;
-	String getSSID() const;
+	bool getIpAddress(char* buffer, const uint8_t bufferLength) const;
+	bool getSSID(char* buffer, const uint8_t bufferLength) const;
 	int getSignalStrength() const;
 };
