@@ -182,3 +182,53 @@ size_t SystemFunctions::calculateLength(const char* str) {
         return strlen(str);
     }
 }
+
+bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start, size_t length)
+{
+    if (destSize == 0)
+        return false;
+
+    size_t srcLen = calculateLength(src);
+
+    if (start >= srcLen)
+    {
+        dest[0] = '\0';
+        return false;
+    }
+
+    size_t copyLen = (start + length > srcLen) ? (srcLen - start) : length;
+
+    if (copyLen >= destSize)
+    {
+        copyLen = destSize - 1;
+    }
+
+    for (size_t i = 0; i < copyLen; i++)
+    {
+        dest[i] = src[start + i];
+    }
+
+    dest[copyLen] = '\0';
+    return true;
+}
+
+bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start)
+{
+	return substr(dest, destSize, src, start, calculateLength(src) - start);
+}
+
+int32_t SystemFunctions::indexOf(const char* str, char ch, size_t start = 0)
+{
+    if (!str || !ch)
+        return -1;
+
+	size_t len = calculateLength(str);
+
+    for (size_t i = start; i < len; i++)
+    {
+        if (str[i] == ch)
+            return static_cast<int32_t>(i);
+    }
+
+	return -1;
+}

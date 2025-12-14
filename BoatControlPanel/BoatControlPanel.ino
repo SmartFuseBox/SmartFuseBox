@@ -46,8 +46,8 @@ void onLinkCommandReceived(SerialCommandManager* mgr);
 void onComputerCommandReceived(SerialCommandManager* mgr);
 
 // Serial managers
-SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', '=', 500, 64);
-SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', '=', 500, 64);
+SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
+SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', ';', '=', 500, 64);
 
 // Compass with smoothing filter size 15
 TLVCompassHandler compass(&commandMgrComputer, 15);
@@ -138,8 +138,11 @@ void setup()
     }
 
     // Simplified broadcasting
-    broadcastManager.sendCommand(ConfigSoundRelayId, "v=" + String(config->hornRelayIndex));
-    broadcastManager.sendCommand(ConfigBoatType, "v=" + String(static_cast<int>(config->vesselType)));
+    char buffer[10];
+    snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+    broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
+    snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+    broadcastManager.sendCommand(ConfigBoatType, buffer);
     broadcastManager.sendCommand(SystemInitialized, "");
 
 	nextion.sendCommand(PageOne);

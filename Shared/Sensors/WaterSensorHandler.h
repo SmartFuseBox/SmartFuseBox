@@ -54,9 +54,9 @@ protected:
 		digitalWrite(WaterSensorActivePin, LOW);
 
 		StringKeyValue params[2];
-		strcpy(params[0].key, "avg");
+		strncpy(params[0].key, "avg", sizeof(params[0].key));
 		snprintf(params[0].value, sizeof(params[0].value), "%u", static_cast<unsigned int>(_waterPumpQueue.average()));
-		strcpy(params[1].key, "v");
+		strncpy(params[1].key, "v", sizeof(params[1].key));
 		snprintf(params[1].value, sizeof(params[1].value), "%u", static_cast<unsigned int>(sensorValue));
 
 		sendCommand(SensorWaterLevel, params, 2);

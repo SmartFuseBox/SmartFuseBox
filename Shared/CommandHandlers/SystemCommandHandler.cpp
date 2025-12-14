@@ -40,20 +40,20 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, SystemFreeMemory) == 0)
     {
         StringKeyValue param;
-		strcpy(param.key, ValueParamName);
+		strncpy(param.key, ValueParamName, sizeof(param.key));
 		snprintf(param.value, sizeof(param.value), "%u", SystemFunctions::freeMemory());
         sendAckOk(sender, command, &param);
     }
 	else if (strcmp(command, SystemCpuUsage) == 0)
     {
         StringKeyValue param;
-        strcpy(param.key, ValueParamName);
+        strncpy(param.key, ValueParamName, sizeof(param.key));
         snprintf(param.value, sizeof(param.value), "%u", SystemCpuMonitor::getCpuUsage());
         sendAckOk(sender, command, &param);
     }
 
 #if defined(ARDUINO_UNO_R4)
-	else if (strcmp(cmd, SystemBluetoothStatus) == 0)
+	else if (strcmp(command, SystemBluetoothStatus) == 0)
     {
 		Config* config = ConfigManager::getConfigPtr();
 
@@ -64,17 +64,18 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             
         if (_broadcaster)
         {
-            StringKeyValue param = { ValueParamName, enabled ? F("1") : F("0") };
-            sendAckOk(sender, cmd, &param);
+			char value = enabled ? '1' : '0';
+            StringKeyValue param = makeParam(ValueParamName, value);
+            sendAckOk(sender, command, &param);
         }
     }
-    else if (strcmp(cmd, SystemWifiStatus) == 0)
+    else if (strcmp(command, SystemWifiStatus) == 0)
     {
         Config* config = ConfigManager::getConfigPtr();
 
         bool enabled = false;
-        String ipAddress = F("0.0.0.0");
-		String ssid = "";
+        char ipAddress[MaxIpAddressLength] = "0.0.0.0";
+		char ssid[MaxSSIDLength] = "";
         int rssi = 0;
 
         if (config)
@@ -83,21 +84,23 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // Get IP address from WifiController if available
         if (_wifiController && enabled && _wifiController->isEnabled())
         {
-            ipAddress = _wifiController->getServer()->getIpAddress();
-			ssid = _wifiController->getServer()->getSSID();
+
+            _wifiController->getServer()->getIpAddress(ipAddress, MaxIpAddressLength);
+			_wifiController->getServer()->getSSID(ssid, MaxSSIDLength);
 			rssi = _wifiController->getServer()->getSignalStrength();
         }
 
         if (_broadcaster)
         {
             constexpr uint8_t argCount = 4;
+			char enabledValue = enabled ? '1' : '0';
             StringKeyValue params[argCount] = {
-                { ValueParamName, enabled ? F("1") : F("0") },
-                { "ip", ipAddress },
-				{ "ssid", ssid },
-                { "rssi", String(rssi)}
+                makeParam(ValueParamName, enabledValue),
+                makeParam("ip", ipAddress),
+				makeParam("ssid", ssid),
+                makeParam("rssi", rssi)
             };
-            sendAckOk(sender, cmd, params, argCount);
+            sendAckOk(sender, command, params, argCount);
         }
     }
 #endif
@@ -123,7 +126,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         if (success)
         {
             StringKeyValue param;
-			strcpy(param.key, ValueParamName);
+			strncpy(param.key, ValueParamName, sizeof(param.key));
             DateTimeManager::formatDateTime(param.value, sizeof(param.value));
             sendAckOk(sender, command, &param);
         }
@@ -139,7 +142,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         if (DateTimeManager::isTimeSet())
         {
             StringKeyValue param;
-            strcpy(param.key, ValueParamName);
+            strncpy(param.key, ValueParamName, sizeof(param.key));
             DateTimeManager::formatDateTime(param.value, sizeof(param.value));
             sendAckOk(sender, command, &param);
         }

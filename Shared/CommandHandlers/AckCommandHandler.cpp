@@ -72,9 +72,7 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
             }
             else
             {
-				char debugMsg[64];
-				snprintf(debugMsg, sizeof(debugMsg), "Invalid warning mask format: %s", params[1].value);
-                sendDebugMessage(debugMsg, AckCommand);
+                sendDebugMessage(F("Invalid warning mask format"), AckCommand);
                 return false;
             }
 
@@ -86,9 +84,7 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
 
             if (sender)
             {
-                char buffer[48];
-                snprintf(buffer, sizeof(buffer), "Remote warnings updated: 0x%lX", (unsigned long)remoteWarningMask);
-                sender->sendDebug(buffer, AckCommand);
+                sender->sendDebug("Remote warnings updated", AckCommand);
             }
 
             return true;
@@ -114,7 +110,6 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
 bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
     (void)sender;
-    sendDebugMessage("Processing ACK: " + String(command) + " (" + String(paramCount) + " params)", AckCommand);
     
     // Validate command
     if (command != AckCommand)
@@ -193,7 +188,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
         }
         else
         {
-			sendDebugMessage("Invalid R4 ACK format: paramCount=" + String(paramCount), AckCommand);
+			sendDebugMessage(F("Invalid R4 ACK format RelayStatusGet"), AckCommand);
         }
     }
     else if (strcmp(params[0].key, SoundSignalActive) == 0 && strcmp(params[0].value, AckSuccess) == 0)
@@ -207,7 +202,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
         }
         else
         {
-            sendDebugMessage("Invalid R4 ACK format: paramCount=" + String(paramCount), AckCommand);
+            sendDebugMessage(F("Invalid R4 ACK format Sound Signal Active"), AckCommand);
         }
     }
 	else if (strcmp(params[0].key, SystemCpuUsage) == 0 && strcmp(params[0].value, AckSuccess) == 0)
@@ -220,9 +215,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
         }
         else
         {
-            char debugMsg[64];
-            snprintf(debugMsg, sizeof(debugMsg), "Invalid F3 ACK format: paramCount=%d", paramCount);
-            sendDebugMessage(debugMsg, AckCommand);
+            sendDebugMessage(F("Invalid F3 ACK format: cpu"), AckCommand);
         }
     }
     else if (strcmp(params[0].key, SystemFreeMemory) == 0 && strcmp(params[0].value, AckSuccess) == 0)
@@ -235,9 +228,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
         }
         else
         {
-            char debugMsg[64];
-            snprintf(debugMsg, sizeof(debugMsg), "Invalid F23 ACK format: paramCount=%d", paramCount);
-            sendDebugMessage(debugMsg, AckCommand);
+            sendDebugMessage(F("Invalid F2 ACK format free memory"), AckCommand);
         }
 	}
 #endif

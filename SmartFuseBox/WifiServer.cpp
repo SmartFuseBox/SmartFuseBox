@@ -1,7 +1,9 @@
 #include "WifiServer.h"
 #include "SystemFunctions.h"
 
-constexpr uint16_t MaximumRequestSize = 1024;
+
+constexpr char response400[] = "\"error\":\"Bad Request\",\"message\":\"The request will not process due to client error\"";
+constexpr char response404[] = "\"error\":\"Not Found\",\"message\":\"The requested resource was not found\"";
 
 WifiServer::WifiServer(SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
 	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
@@ -82,13 +84,11 @@ bool WifiServer::begin()
 	
 	if (_mode == WifiMode::AccessPoint)
 	{
-		sendDebug(String(F("Initializing in Access Point mode: ")) + String(_ssid), F("WifiServer"));
-		
 		IPAddress apIp;
 
 		if (apIp.fromString(_ipAddress))
 		{
-			sendDebug(String(F("Access Point IP set to: ")) + apIp.toString(), F("WifiServer"));
+			sendDebug(F("Access Point IP set"), F("WifiServer"));
 		}
 		else
 		{
@@ -110,7 +110,7 @@ bool WifiServer::begin()
 		
 		if (success)
 		{
-			sendDebug(String(F("Access Point started with IP: ")) + WiFi.localIP().toString(), F("WifiServer"));
+			sendDebug(F("Access Point started."), F("WifiServer"));
 			_connectionState = WifiConnectionState::Connected;
 			startServer();
 		}
@@ -122,7 +122,7 @@ bool WifiServer::begin()
 	}
 	else // Client mode - non-blocking initialization
 	{
-		sendDebug(String(F("Starting WiFi client connection to: ")) + String(_ssid), F("WifiServer"));
+		sendDebug(F("Starting WiFi client connection"), F("WifiServer"));
 		
 		WiFi.begin(_ssid, _password);
 		_connectionState = WifiConnectionState::Connecting;
@@ -152,7 +152,7 @@ void WifiServer::startServer()
 		_serverActive = true;
 		_initialized = true;
 		
-		sendDebug(String(F("HTTP server started on port ")) + String(_port), F("WifiServer"));
+		sendDebug(F("HTTP server started"), F("WifiServer"));
 	}
 }
 
@@ -212,7 +212,7 @@ void WifiServer::updateClientHandling()
 			{
 				sendDebug(F("New client connected"), F("WifiServer"));
 				_activeClient.client = client;
-				_activeClient.request = "";
+				_activeClient.request[0] = '\0';
 				_activeClient.startTime = now;
 				_activeClient.lastActivity = now;
 				_activeClient.isPersistent = false;
@@ -243,21 +243,33 @@ void WifiServer::updateClientHandling()
 			
 			// Read available data (non-blocking)
 			bool requestComplete = false;
+			size_t requestLen = strlen(_activeClient.request);
+			
 			while (_activeClient.client.available())
 			{
 				char c = _activeClient.client.read();
-				_activeClient.request += c;
-				_activeClient.lastActivity = now;  // Update activity timestamp
 				
-				// Check for end of HTTP headers
-				if (_activeClient.request.endsWith("\r\n\r\n"))
+				// Append character to buffer
+				if (requestLen < MaximumRequestSize)
+				{
+					_activeClient.request[requestLen++] = c;
+					_activeClient.request[requestLen] = '\0';
+					_activeClient.lastActivity = now;  // Update activity timestamp
+				}
+				
+				// Check for end of HTTP headers (\r\n\r\n)
+				if (requestLen >= 4 && 
+					_activeClient.request[requestLen - 4] == '\r' &&
+					_activeClient.request[requestLen - 3] == '\n' &&
+					_activeClient.request[requestLen - 2] == '\r' &&
+					_activeClient.request[requestLen - 1] == '\n')
 				{
 					requestComplete = true;
 					break;
 				}
 				
 				// Safety check for request size
-				if (_activeClient.request.length() > MaximumRequestSize)
+				if (requestLen >= MaximumRequestSize)
 				{
 					sendDebug(F("Request too large"), F("WifiServer"));
 					send400(_activeClient.client);
@@ -347,7 +359,7 @@ void WifiServer::updateClientHandling()
 			if (_activeClient.client.available())
 			{
 				sendDebug(F("New request on persistent connection"), F("WifiServer"));
-				_activeClient.request = "";
+				_activeClient.request[0] = '\0';
 				_activeClient.startTime = now;
 				_activeClient.state = ClientHandlingState::ReadingRequest;
 			}
@@ -358,20 +370,19 @@ void WifiServer::updateClientHandling()
 
 void WifiServer::processClientRequest()
 {
-	if (_activeClient.request.length() == 0)
+	if (_activeClient.request[0] == '\0')
 	{
 		return;
 	}
 	
 	// Check for persistent connection header
-	bool isPersistent = _activeClient.request.indexOf(F("X-Connection-Type: persistent")) != -1;
+	bool isPersistent = strstr(_activeClient.request, "X-Connection-Type: persistent") != nullptr;
 	_activeClient.isPersistent = isPersistent;
 	
 	// Parse the request line (GET /path?query HTTP/1.1)
-	int firstSpace = _activeClient.request.indexOf(' ');
-	int secondSpace = _activeClient.request.indexOf(' ', firstSpace + 1);
-	
-	if (firstSpace == -1 || secondSpace == -1)
+	// Find first space (after method)
+	char* firstSpace = strchr(_activeClient.request, ' ');
+	if (!firstSpace)
 	{
 		send404(_activeClient.client);
 		if (!isPersistent)
@@ -387,10 +398,47 @@ void WifiServer::processClientRequest()
 		return;
 	}
 	
-	String method = _activeClient.request.substring(0, firstSpace);
-
+	// Extract method
+	size_t methodLen = firstSpace - _activeClient.request;
+	char method[8];  // Enough for "DELETE" + null
+	if (methodLen >= sizeof(method))
+	{
+		send404(_activeClient.client);
+		if (!isPersistent)
+		{
+			_activeClient.client.stop();
+			_activeClient.state = ClientHandlingState::Idle;
+		}
+		else
+		{
+			_activeClient.state = ClientHandlingState::KeepAlive;
+			_activeClient.lastActivity = millis();
+		}
+		return;
+	}
+	strncpy(method, _activeClient.request, methodLen);
+	method[methodLen] = '\0';
+	
+	// Find second space (before HTTP version)
+	char* secondSpace = strchr(firstSpace + 1, ' ');
+	if (!secondSpace)
+	{
+		send404(_activeClient.client);
+		if (!isPersistent)
+		{
+			_activeClient.client.stop();
+			_activeClient.state = ClientHandlingState::Idle;
+		}
+		else
+		{
+			_activeClient.state = ClientHandlingState::KeepAlive;
+			_activeClient.lastActivity = millis();
+		}
+		return;
+	}
+	
 	// Only support GET for now
-	if (method != "GET")
+	if (strcmp(method, "GET") != 0)
 	{
 		send404(_activeClient.client);
 		if (!isPersistent)
@@ -405,41 +453,89 @@ void WifiServer::processClientRequest()
 		}
 		return;
 	}
-
-	String fullPath = _activeClient.request.substring(firstSpace + 1, secondSpace);
 	
-	// Split path and query string
-	String path = fullPath;
-	String query = "";
-	int queryIndex = fullPath.indexOf('?');
-	if (queryIndex != -1)
+	// Extract full path (between first and second space)
+	size_t fullPathLen = secondSpace - (firstSpace + 1);
+	char fullPath[128];  // Buffer for path+query
+	if (fullPathLen >= sizeof(fullPath))
 	{
-		path = fullPath.substring(0, queryIndex);
-		query = fullPath.substring(queryIndex + 1);
+		send404(_activeClient.client);
+		if (!isPersistent)
+		{
+			_activeClient.client.stop();
+			_activeClient.state = ClientHandlingState::Idle;
+		}
+		else
+		{
+			_activeClient.state = ClientHandlingState::KeepAlive;
+			_activeClient.lastActivity = millis();
+		}
+		return;
+	}
+	strncpy(fullPath, firstSpace + 1, fullPathLen);
+	fullPath[fullPathLen] = '\0';
+	
+	// Split path and query string at '?'
+	char* queryStart = strchr(fullPath, '?');
+	char path[64];
+	char query[64];
+	
+	if (queryStart)
+	{
+		// Split into path and query
+		size_t pathLen = queryStart - fullPath;
+		if (pathLen >= sizeof(path))
+		{
+			send404(_activeClient.client);
+			if (!isPersistent)
+			{
+				_activeClient.client.stop();
+				_activeClient.state = ClientHandlingState::Idle;
+			}
+			else
+			{
+				_activeClient.state = ClientHandlingState::KeepAlive;
+				_activeClient.lastActivity = millis();
+			}
+			return;
+		}
+		strncpy(path, fullPath, pathLen);
+		path[pathLen] = '\0';
+		
+		// Copy query (skip the '?')
+		strncpy(query, queryStart + 1, sizeof(query) - 1);
+		query[sizeof(query) - 1] = '\0';
+	}
+	else
+	{
+		// No query string
+		strncpy(path, fullPath, sizeof(path) - 1);
+		path[sizeof(path) - 1] = '\0';
+		query[0] = '\0';
 	}
 	
-	sendDebug(String(F("Request: ")) + method + String(F(" ")) + path, F("WifiServer"));
+	sendDebug(F("Processing request"), F("WifiServer"));
 	bool handled = false;
-
-	if (path.startsWith(F("/api/index")))
+	
+	if (SystemFunctions::startsWith(path, F("/api/index")))
 	{
 		handleIndex(_activeClient.client, _activeClient.isPersistent, path);
 		handled = true;
 	}
-
+	
 	if (!handled && _handlers && _handlerCount > 0)
 	{
 		// Loop through handlers and find matching route
 		for (size_t i = 0; i < _handlerCount; i++)
 		{
-			if (_handlers[i] && path.startsWith(_handlers[i]->getRoute()))
+			if (_handlers[i] && SystemFunctions::startsWith(path, _handlers[i]->getRoute()))
 			{
 				handled = dispatchToHandler(_activeClient.client, _handlers[i], path, method, query);
 				break;
 			}
 		}
 	}
-
+	
 	if (!handled)
 	{
 		send404(_activeClient.client);
@@ -454,7 +550,7 @@ void WifiServer::processClientRequest()
 	}
 	else
 	{
-		_activeClient.request = "";  // Clear request buffer for next request
+		_activeClient.request[0] = '\0';  // Clear request buffer for next request
 		_activeClient.lastActivity = millis();
 		_activeClient.state = ClientHandlingState::KeepAlive;
 		sendDebug(F("Client kept alive (persistent)"), F("WifiServer"));
@@ -463,17 +559,15 @@ void WifiServer::processClientRequest()
 
 void WifiServer::send400(WiFiClient& client)
 {
-	String response = "\"error\":\"Bad Request\",\"message\":\"The request will not process due to client error\"";
-	sendResponse(client, 400, "application/json", response);
+	sendResponse(client, 400, "application/json", response400);
 }
 
 void WifiServer::send404(WiFiClient& client)
 {
-	String response = "\"error\":\"Not Found\",\"message\":\"The requested resource was not found\"";
-	sendResponse(client, 404, "application/json", response);
+	sendResponse(client, 404, "application/json", response404);
 }
 
-void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* contentType, const String& body)
+void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body)
 {
 	client.print(F("HTTP/1.1 "));
 	client.print(statusCode);
@@ -511,7 +605,7 @@ void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* co
 	}
 	
 	client.print(F("Content-Length: "));
-	client.println(body.length());
+	client.println(SystemFunctions::calculateLength(body));
 	client.println();
 	client.println(F("{"));
 	client.print(body);
@@ -595,9 +689,9 @@ int WifiServer::getSignalStrength() const
 	return WiFi.RSSI();
 }
 
-bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const String& path)
+bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const char* path)
 {
-	sendDebug(String(F("HandleIndex: ")) + path, F("WifiServer"));
+	sendDebug(path, F("WifiServer"));
 
 	// Send HTTP headers first
 	client.print(F("HTTP/1.1 200 OK\r\n"));
@@ -643,59 +737,61 @@ bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const String
 	return true;
 }
 
-bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const String& path, const String& method, const String& query)
+bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query)
 {
 	if (!handler)
 	{
 		return false;
 	}
 
-	sendDebug(String(F("dispatchToHandler: ")) + path, F("WifiServer"));
+	sendDebug(F("dispatchToHandler"), F("WifiServer"));
 	
 	// Extract command from path: /api/{handler}/{command}
 	// For example: /api/sound/H10 -> command = H10
 	//              /api/config/C8 -> command = C8
-	String command = "";
-	String handlerRoute = String(handler->getRoute());
+	char command[MaximumPathLength];
 	
-	if (path.length() > handlerRoute.length())
+	if (SystemFunctions::calculateLength(path) > SystemFunctions::calculateLength(handler->getRoute()))
 	{
 		// Extract everything after the handler route
-		command = path.substring(handlerRoute.length());
+		SystemFunctions::substr(command, sizeof(command), path, SystemFunctions::calculateLength(handler->getRoute()), MaximumPathLength);
 		
 		// Remove leading slash if present
-		if (command.startsWith("/"))
+		if (SystemFunctions::startsWith(command, F("/")))
 		{
-			command = command.substring(1);
+			SystemFunctions::substr(command, sizeof(command), command, 1);
 		}
 	}
 
 	// Parse query string into parameter array (max 6 parameters)
 	StringKeyValue params[MaximumParameterCount];
 	uint8_t paramCount = 0;
+	uint16_t queryLength = SystemFunctions::calculateLength(query);
 
-	if (query.length() > 0)
+	if (queryLength > 0)
 	{
 		uint8_t startIdx = 0;
 
-		while (paramCount < MaximumParameterCount && startIdx < query.length())
+		while (paramCount < MaximumParameterCount && startIdx < queryLength)
 		{
 			// Find the next '&' or end of string
-			int ampIdx = query.indexOf('&', startIdx);
+			int32_t ampIdx = SystemFunctions::indexOf(query, '&', startIdx);
 			if (ampIdx == -1)
 			{
-				ampIdx = query.length();
+				ampIdx = queryLength;
 			}
 
 			// Extract this parameter
-			String param = query.substring(startIdx, ampIdx);
+			char param[DefaultMaxParamKeyLength];
+			SystemFunctions::substr(param, sizeof(param), query, startIdx, ampIdx - startIdx);
 
 			// Split on '='
-			int equalsIdx = param.indexOf('=');
+			int32_t equalsIdx = SystemFunctions::indexOf(param, '=', 0);
+
 			if (equalsIdx != -1)
 			{
-				params[paramCount].key = param.substring(0, equalsIdx);
-				params[paramCount].value = param.substring(equalsIdx + 1);
+				SystemFunctions::substr(params[paramCount].key, sizeof(params[paramCount].key), param, 0, equalsIdx);
+				SystemFunctions::substr(params[paramCount].value, sizeof(params[paramCount].value), param, equalsIdx + 1);
 				paramCount++;
 			}
 
@@ -713,8 +809,8 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 	// Send response based on result
 	if (result.success)
 	{
-		sendResponse(client, 200, "application/json", String(responseBuffer));
-		sendDebug(String(F("Handler success: ")) + String(handler->getRoute()) + String(F("/")) + command, F("WifiServer"));
+		sendResponse(client, 200, "application/json", responseBuffer);
+		sendDebug(F("Handler success: "), F("WifiServer"));
 		return true;
 	}
 	else
@@ -722,11 +818,11 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 		// Check if buffer has error message
 		if (responseBuffer[0] != '\0')
 		{
-			sendResponse(client, 400, "application/json", String(responseBuffer));
+			sendResponse(client, 400, "application/json", responseBuffer);
 			return true;
 		}
 
-		sendDebug(String(F("Handler error: ")) + String(handler->getRoute()) + String(F("/")) + command, F("WifiServer"));
+		sendDebug(F("Handler error"), F("WifiServer"));
 	}
 
 	return false;
@@ -750,9 +846,7 @@ void WifiServer::updateClientConnection()
 					_connectionState = WifiConnectionState::Connected;
 					_consecutiveFailures = 0;
 					_lastRSSI = WiFi.RSSI();
-					sendDebug(String(F("WiFi connected! IP: ")) + WiFi.localIP().toString() + 
-							 String(F(" RSSI: ")) + String(_lastRSSI) + String(F(" dBm")), 
-							 F("WifiServer"));
+					sendDebug(F("WiFi connected!"), F("WifiServer"));
 					
 					// Start the HTTP server now that we're connected
 					startServer();
@@ -762,8 +856,7 @@ void WifiServer::updateClientConnection()
 					// Connection timeout
 					_connectionState = WifiConnectionState::Failed;
 					_consecutiveFailures++;
-					sendError(String(F("WiFi connection timeout (#")) + String(_consecutiveFailures) + 
-							 String(F("). Status: ")) + String(status), F("WifiServer"));
+					sendError(F("WiFi connection timeout"), F("WifiServer"));
 				}
 			}
 			break;
@@ -816,10 +909,7 @@ void WifiServer::updateClientConnection()
 			{
 				if (_consecutiveFailures >= MaxConsecutiveFailures)
 				{
-					sendDebug(String(F("WiFi reconnection attempt (")) + 
-							 String(_consecutiveFailures) + String(F(" failures, using ")) + 
-							 String(BackoffIntervalMs / 1000) + String(F("s backoff)...")), 
-							 F("WifiServer"));
+					sendDebug(F("WiFi reconnection attempt"), F("WifiServer"));
 				}
 				else
 				{

@@ -51,6 +51,9 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		rssi = _wifiController->getServer()->getSignalStrength();
 	}
 
+	char dateTimeStr[MaxDateTimeStringLength];
+	DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr));
+
 	// Enhanced JSON formatting with WiFi runtime details
 	snprintf(buffer, size,
 		"\"system\":{\"mem\":%d,\"cpu\":%d,\"bluetooth\":%d,\"wifi\":%d,\"rssi\":%d,\"time\":\"%s\"}",
@@ -59,7 +62,7 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		bluetoothEnabled,
 		wifiEnabled,
 		rssi,
-		DateTimeManager::formatDateTime().c_str());
+		dateTimeStr);
 }
 
 void SystemNetworkHandler::formatWifiStatusJson(WiFiClient* client)

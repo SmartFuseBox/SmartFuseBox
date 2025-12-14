@@ -134,7 +134,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, ConfigSoundRelayId) == 0)
     {
         // Expect "MAP <value>=<relay>" where relay 0..7 (or 255 to unmap)
-        if (paramCount == 1 && SystemFunctions::calculateLength(params[0].value) > 0)
+        if (paramCount == 1 && strlen(params[0].value) > 0)
         {
             uint8_t relay = atoi(params[0].value);
 

@@ -50,11 +50,25 @@ protected:
      * @param message Debug message content
      * @param identifier Command handler identifier
      */
-    void sendDebugMessage(const String& message, const String& identifier)
+    void sendDebugMessage(const __FlashStringHelper* message, const char* identifier)
     {
         if (_broadcaster)
         {
-            _broadcaster->sendDebug(message, identifier);
+            _broadcaster->sendDebug(reinterpret_cast<const char*>(message), identifier);
+        }
+    }
+
+    /**
+     * @brief Send a debug message to the computer serial (via BroadcastManager).
+     *
+     * @param message Debug message content
+     * @param identifier Command handler identifier
+     */
+    void sendDebugMessage(const __FlashStringHelper* message, const __FlashStringHelper* identifier)
+    {
+        if (_broadcaster)
+        {
+            _broadcaster->sendDebug(reinterpret_cast<const char*>(message), reinterpret_cast<const char*>(identifier));
         }
     }
 
@@ -78,11 +92,11 @@ protected:
      * @param message Error message content
      * @param identifier Command handler identifier
      */
-    void sendErrorMessage(const String& message, const String& identifier)
+    void sendErrorMessage(const __FlashStringHelper* message, const char* identifier)
     {
         if (_broadcaster)
         {
-            _broadcaster->sendError(message, identifier);
+            _broadcaster->sendError(reinterpret_cast<const char*>(message), identifier);
         }
     }
 

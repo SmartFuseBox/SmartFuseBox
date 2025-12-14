@@ -170,10 +170,7 @@ void RelayCommandHandler::configUpdated(Config* config)
 
         if (_commandMgrComputer != nullptr)
         {
-            _commandMgrComputer->sendDebug(
-                F("Invalid hornRelayIndex corrected to 0xFF"),
-                F("RELAY")
-            );
+            _commandMgrComputer->sendDebug(F("Invalid hornRelayIndex corrected to 0xFF"), F("RELAY"));
         }
     }
 
@@ -185,9 +182,7 @@ void RelayCommandHandler::configUpdated(Config* config)
         }
         else
         {
-			char msg[50];
-			snprintf(msg, sizeof(msg), "Reserved sound relay: %d", _relayController->getReservedSoundRelay());
-            _commandMgrComputer->sendDebug(msg, F("RELAY"));
+            _commandMgrComputer->sendDebug(F("Reserved sound relay has been set"), F("RELAY"));
         }
     }
 }

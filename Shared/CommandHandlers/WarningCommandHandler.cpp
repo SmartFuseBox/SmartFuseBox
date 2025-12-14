@@ -29,10 +29,9 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
     {
         // Return the active warnings as a bitmask value
         uint32_t activeWarnings = warningManager->getActiveWarningsMask();
-
-        StringKeyValue param;
-        strcpy(param.key, ValueParamName);
-        strcpy(param.value, (HexPrefix + String(activeWarnings, HEX)).c_str());
+        char warningsHex[32];
+        snprintf(warningsHex, sizeof(warningsHex), "%s%lx", HexPrefix, activeWarnings);
+        StringKeyValue param = makeParam(ValueParamName, warningsHex);
         sendAckOk(sender, command, &param);
         return true;
     }
@@ -40,10 +39,9 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
     {
         // Return the complete bitmask of active warnings as a single value
         uint32_t activeWarnings = warningManager->getActiveWarningsMask();
-
-        StringKeyValue param;
-        strcpy(param.key, ValueParamName);
-        strcpy(param.value, (HexPrefix + String(activeWarnings, HEX)).c_str());
+        char warningsHex[32];
+        snprintf(warningsHex, sizeof(warningsHex), "%s%lx", HexPrefix, activeWarnings);
+        StringKeyValue param = makeParam(ValueParamName, warningsHex);
         sendAckOk(sender, command, &param);
         return true;
     }
@@ -65,8 +63,8 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
         bool isActive = warningManager->isWarningActive(warningType);
 
         StringKeyValue param;
-        strcpy(param.key, params[0].key);
-        strcpy(param.value, (isActive ? "1" : "0"));
+        strncpy(param.key, params[0].key, sizeof(param.key));
+        strncpy(param.value, (isActive ? "1" : "0"), sizeof(param.value));
         sendAckOk(sender, command, &param);
 
         return true;
@@ -111,7 +109,7 @@ bool WarningCommandHandler::convertWarningTypeFromString(const char* str, Warnin
     uint32_t warningTypeInt = 0;
 
     // Parse the string based on format
-    if (SystemFunctions::startsWith(str, F("0x")) || SystemFunctions::startsWith(str, F("0X")))
+    if (SystemFunctions::startsWith(str, "0x") || SystemFunctions::startsWith(str, "0X"))
     {
         // Parse hexadecimal (skip the "0x" prefix)
         warningTypeInt = strtoul(str + 2, nullptr, 16);

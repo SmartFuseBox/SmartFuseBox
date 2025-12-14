@@ -58,7 +58,7 @@ protected:
 		_celsius = _dht11Sensor.temperature;
 
 		StringKeyValue params;
-		strcpy(params.key, ValueParamName);
+		strncpy(params.key, ValueParamName, sizeof(params.key));
 		snprintf(params.value, sizeof(params.value), "%f3.1", _celsius);
 		sendCommand(SensorTemperature, &params, 1);
 		snprintf(params.value, sizeof(params.value), "%f3.1", _humidity);

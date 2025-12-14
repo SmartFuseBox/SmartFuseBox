@@ -173,6 +173,38 @@ public:
 	 */
     static size_t calculateLength(const char* str);
 
+    /**
+     * @brief Extract a substring from a source string with specified length.
+     *
+     * @param dest Destination buffer
+     * @param destSize Size of destination buffer (including null terminator)
+     * @param src Source string
+     * @param start Starting position in source string
+     * @param length Number of characters to extract
+     * @return true if extraction successful, false if start position is out of bounds
+     */
+    static bool substr(char* dest, size_t destSize, const char* src, size_t start, size_t length);
+
+    /**
+     * @brief Extract a substring from a source string to the end.
+     *
+     * @param dest Destination buffer
+     * @param destSize Size of destination buffer (including null terminator)
+     * @param src Source string
+     * @param start Starting position in source string
+     * @return true if extraction successful, false if start position is out of bounds
+     */
+    static bool substr(char* dest, size_t destSize, const char* src, size_t start);
+
+    /**
+     * @brief Find the first occurrence of a character in a string starting from a position.
+     *
+     * @param str String to search
+     * @param ch Character to find
+     * @param start Starting position for search
+     * @return Index of first occurrence, or -1 if not found
+     */
+    static int32_t indexOf(const char* str, char ch, size_t start);
 private:
     // Helper: Append a single string to buffer
     static size_t appendString(char* dest, size_t destSize, size_t offset, const char* src);

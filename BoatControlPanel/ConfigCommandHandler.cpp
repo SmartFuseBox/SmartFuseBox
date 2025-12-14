@@ -176,7 +176,9 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             }
 
             cfg->hornRelayIndex = relay;
-			_broadcastManager->sendCommand(ConfigSoundRelayId, "v=" + String(relay), true);
+			char buffer[20];
+			snprintf(buffer, sizeof(buffer), "v=%u", relay);
+			_broadcastManager->sendCommand(ConfigSoundRelayId, buffer, true);
 
             // Auto-update the relay name to include "Sound Signals"
             if (relay != DefaultValue)
