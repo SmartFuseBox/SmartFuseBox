@@ -29,7 +29,7 @@ ConfigResult ConfigController::save()
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	return _configManager->save() ? ConfigResult::Success : ConfigResult::Failed;
+	return ConfigManager::save() ? ConfigResult::Success : ConfigResult::Failed;
 }
 
 ConfigResult ConfigController::reset()
@@ -37,7 +37,7 @@ ConfigResult ConfigController::reset()
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_configManager->resetToDefaults();
+	ConfigManager::resetToDefaults();
 	return ConfigResult::Success;
 }
 
