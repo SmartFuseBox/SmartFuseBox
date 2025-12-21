@@ -7,7 +7,11 @@ LedManager::LedManager(WifiController* wifiController)
 	_temperature(0),
 	_lastTemperatureUpdate(0),
 	_humididty(0),
-	_lastHumidityUpdate(0)
+	_lastHumidityUpdate(0),
+	_activeSequence(LedSequenceType::None),
+	_sequenceStep(0),
+	_sequenceLastStepTime(0),
+	_sequenceDelay(0)
 {
 	_matrix = new ArduinoLEDMatrix();
 	UpdateLedFrame(LedOff);
@@ -56,13 +60,18 @@ void LedManager::UpdateSignalStrength(int16_t strenth)
 
 void LedManager::ProcessLedMatrix(uint64_t currMillis)
 {
-	bool hasDelay = false;
-	
+	if (_activeSequence == LedSequenceType::Startup) {
+		processStartupSequence(currMillis);
+		return;
+	}
+	if (_activeSequence == LedSequenceType::Shutdown) {
+		processShutdownSequence(currMillis);
+		return;
+	}
+
 	if (_wifiController)
 	{
-
 		bool canUpdate = currMillis > _nextLedUpdate;
-		
 		if (canUpdate)
 		{
 			UpdateSignalStrength(_wifiController->getServer()->getSignalStrength());
@@ -70,14 +79,11 @@ void LedManager::ProcessLedMatrix(uint64_t currMillis)
 			_nextLedUpdate = currMillis + 300;
 		}
 	}
-		
+
 	updateTemperature(currMillis);
 	updateHumidity(currMillis);
 
-	updateLed(0);
-    
-	if (hasDelay)
-        delay(50);
+	updateLed();
 }
 
 void LedManager::UpdateLedFrame(uint8_t state)
@@ -113,69 +119,89 @@ void LedManager::UpdateColumn(uint8_t column, uint8_t state)
 	}
 }
 	
+// Non-blocking Startup Sequence
 void LedManager::StartupSequence()
 {
-	for (int i = 0; i < MaxLedRows; i++)
-	{
-		if (i % 2)
-		{
-			for (int j = MaxLedColumns -1; j >= 0; j--)
-			{
-				_ledFrame[i][j] = LedOn;
-				updateLed(30);
-			}
+	_activeSequence = LedSequenceType::Startup;
+	_sequenceStep = 0;
+	_sequenceLastStepTime = millis();
+	_sequenceDelay = 30;
+}
+
+void LedManager::processStartupSequence(uint64_t currMillis)
+{
+	static bool isOn = true;
+	if (_sequenceStep < MaxLedRows * MaxLedColumns) {
+		if (currMillis - _sequenceLastStepTime >= _sequenceDelay) {
+			int i = _sequenceStep / MaxLedColumns;
+			int j = (i % 2) ? (MaxLedColumns - 1 - (_sequenceStep % MaxLedColumns)) : (_sequenceStep % MaxLedColumns);
+			_ledFrame[i][j] = LedOn;
+			updateLed();
+			_sequenceStep++;
+			_sequenceLastStepTime = currMillis;
 		}
-		else
-		{
-			for (int j = 0; j < MaxLedColumns; j++)
-			{
-				_ledFrame[i][j] = LedOn;
-				updateLed(30);
-			}
+	} else if (_sequenceStep < MaxLedRows * MaxLedColumns + 10) {
+		if (currMillis - _sequenceLastStepTime >= 200) {
+			UpdateLedFrame(isOn ? LedOn : LedOff);
+			updateLed();
+			isOn = !isOn;
+			_sequenceStep++;
+			_sequenceLastStepTime = currMillis;
 		}
-	}
-	
-	bool isOn = true;
-	
-	for (int i = 0; i < 10; i++)
-	{
-		UpdateLedFrame(isOn ? LedOn : LedOff);
-		isOn = !isOn;
-		updateLed(200);
+	} else {
+		_activeSequence = LedSequenceType::None;
 	}
 }
 
+// Non-blocking Shutdown Sequence
 void LedManager::ShutdownSequence()
 {
-	UpdateLedFrame(LedOff);
-	updateLed(100);
-	int topRow = 0;
-	int bottomRow = 7;
-	int leftColumn = 0;
-	int rightColumn = 11;
-	
-	for (int i = 0; i < 5; i++)
-	{
-		UpdateRow(topRow, LedOn);
-		UpdateRow(bottomRow, LedOn);
-		UpdateColumn(leftColumn, LedOn);
-		UpdateColumn(rightColumn, LedOn);
-		updateLed(400);
-		
-		topRow++;
-		bottomRow--;
-		leftColumn++;
-		rightColumn--;
+	_activeSequence = LedSequenceType::Shutdown;
+	_sequenceStep = 0;
+	_sequenceLastStepTime = millis();
+	_sequenceDelay = 400;
+}
+
+void LedManager::processShutdownSequence(uint64_t currMillis)
+{
+	static int topRow = 0, bottomRow = 7, leftColumn = 0, rightColumn = 11;
+	if (_sequenceStep == 0) {
+		UpdateLedFrame(LedOff);
+		updateLed();
+		_sequenceLastStepTime = currMillis;
+		_sequenceStep++;
+	} else if (_sequenceStep <= 5) {
+		if (currMillis - _sequenceLastStepTime >= _sequenceDelay) {
+			UpdateRow(topRow, LedOn);
+			UpdateRow(bottomRow, LedOn);
+			UpdateColumn(leftColumn, LedOn);
+			UpdateColumn(rightColumn, LedOn);
+			updateLed();
+			topRow++; bottomRow--; leftColumn++; rightColumn--;
+			_sequenceStep++;
+			_sequenceLastStepTime = currMillis;
+		}
+	} else if (_sequenceStep == 6) {
+		if (currMillis - _sequenceLastStepTime >= 500) {
+			UpdateLedFrame(LedOff);
+			updateLed();
+			_sequenceStep++;
+			_sequenceLastStepTime = currMillis;
+		}
+	} else if (_sequenceStep == 7) {
+		if (currMillis - _sequenceLastStepTime >= 800) {
+			_ledFrame[2][3] = LedOn;
+			_ledFrame[2][4] = LedOn;
+			_ledFrame[2][7] = LedOn;
+			_ledFrame[2][8] = LedOn;
+			updateLed();
+			_sequenceStep++;
+			_sequenceLastStepTime = currMillis;
+		}
+	} else {
+		_activeSequence = LedSequenceType::None;
+		topRow = 0; bottomRow = 7; leftColumn = 0; rightColumn = 11;
 	}
-	
-	UpdateLedFrame(LedOff);
-	updateLed(500);
-	
-	_ledFrame[2][3] = LedOn;
-	_ledFrame[2][4] = LedOn;
-	_ledFrame[2][7] = LedOn;
-	_ledFrame[2][8] = LedOn;
-	updateLed(800);
 }
 
 void LedManager::SetTemperature(float temperature)
@@ -190,10 +216,9 @@ void LedManager::SetHumidity(float humidity)
 
 // Private methods
 
-void LedManager::updateLed(int delayMs)
+void LedManager::updateLed()
 {
 	_matrix->renderBitmap(_ledFrame, MaxLedRows, MaxLedColumns);
-	delay(delayMs);
 }
 
 void LedManager::updateTemperature(uint64_t currMillis)

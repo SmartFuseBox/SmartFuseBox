@@ -365,6 +365,5 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 
 void ConfigNetworkHandler::formatWifiStatusJson(WiFiClient* client)
 {
-    client->print("\"config\":");
 	formatStatusJson(client);
 }

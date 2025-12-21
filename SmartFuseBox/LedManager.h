@@ -23,6 +23,12 @@ const uint8_t LedOff = 0;
   { X, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
   
 */
+enum class LedSequenceType {
+	None,
+	Startup,
+	Shutdown
+};
+
 class LedManager
 {
 private:
@@ -34,10 +40,17 @@ private:
 	uint64_t _lastTemperatureUpdate;
 	float _humididty;
 	uint64_t _lastHumidityUpdate;
+	LedSequenceType _activeSequence;
+	uint8_t _sequenceStep;
+	unsigned long _sequenceLastStepTime;
+	int _sequenceDelay;
 
 	void updateTemperature(uint64_t currMillis);
 	void updateHumidity(uint64_t currMillis);
-	void updateLed(int delayMs);
+	void updateLed();
+	void processStartupSequence(uint64_t currMillis);
+	void processShutdownSequence(uint64_t currMillis);
+
 public:
 	LedManager(WifiController* wifiController);
 	~LedManager();
