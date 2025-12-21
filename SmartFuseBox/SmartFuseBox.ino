@@ -43,6 +43,8 @@
 #include "SensorController.h"
 #include "SoundController.h"
 
+#include "LedManager.h"
+
 
 #define COMPUTER_SERIAL Serial
 #define LINK_SERIAL Serial1
@@ -112,6 +114,9 @@ WarningNetworkHandler warningNetworkHandler(&warningManager);
 SystemNetworkHandler systemNetworkHandler(&wifiController);
 SensorNetworkHandler sensorNetworkHandler(&sensorController);
 
+// led
+LedManager ledManager(&wifiController);
+
 void setup()
 {
 	// Serial initialization is performed first to ensure that any logging or error messages
@@ -151,6 +156,8 @@ void setup()
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
 
+	ledManager.Initialize();
+
 	// open any relays that are default open
 	for (uint8_t i = 0; i < ConfigRelayCount; i++)
 	{
@@ -171,6 +178,10 @@ void loop()
 	SystemCpuMonitor::startTask();
 	commandMgrComputer.readCommands();
 	commandMgrLink.readCommands();
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	ledManager.ProcessLedMatrix(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();

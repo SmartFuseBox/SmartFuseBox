@@ -28,12 +28,12 @@ void LedManager::UpdateConnectedState(WifiConnectionState status)
 	_ledFrame[6][1] = LedOff;
 	_ledFrame[7][1] = LedOff;
 	
-    if (status == WL_CONNECTED)
+    if (status == WifiConnectionState::Connected)
     {
 		_ledFrame[6][1] = LedOn;
 		_ledFrame[7][1] = LedOn;
     }
-    else if (status == WL_CONNECTING)
+    else if (status == WifiConnectionState::Connecting)
     {
 		_ledFrame[7][1] = LedOn;
     }

@@ -1,12 +1,13 @@
 #pragma once
 
 #include <Arduino_LED_Matrix.h>
+#include "WifiController.h"
 
 #define LED_UPDATE_FREQUENCY 500
 
-const long rssiRate[5] = {-70, -80, -90, -100, -110 };
-const int MaxLedRows = 8;
-const int MaxLedColumns = 12;
+const long rssiRate[5] = {-470, -50, -60, -70, -80 };
+const uint8_t MaxLedRows = 8;
+const uint8_t MaxLedColumns = 12;
 const uint8_t LedOn = 1;
 const uint8_t LedOff = 0;
 
