@@ -43,7 +43,9 @@
 #include "SensorController.h"
 #include "SoundController.h"
 
-#include "LedManager.h"
+#include "LedMatrixManager.h"
+
+#include "MessageBus.h"
 
 
 #define COMPUTER_SERIAL Serial
@@ -55,8 +57,12 @@ void onLinkCommandReceived(SerialCommandManager* mgr);
 void configureWifiSupport(Config* config);
 void configureBluetoothSupport(Config* config);
 
+
+// led
+LedMatrixManager ledManager;
+
 // controllers
-RelayController relayController(Relays, TotalRelays);
+RelayController relayController(&ledManager, Relays, TotalRelays);
 SoundController soundController;
 
 SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
@@ -93,7 +99,7 @@ SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayController, &warningManager, &commandMgrComputer);
 
 WifiController wifiController(&commandMgrComputer, &warningManager);
-ConfigController configController(&soundController, &bluetoothController, &wifiController);
+ConfigController configController(&soundController, &bluetoothController, &wifiController, &relayController);
 
 // computer command handlers
 ConfigCommandHandler configHandler(&wifiController, &configController);
@@ -114,8 +120,6 @@ WarningNetworkHandler warningNetworkHandler(&warningManager);
 SystemNetworkHandler systemNetworkHandler(&wifiController);
 SensorNetworkHandler sensorNetworkHandler(&sensorController);
 
-// led
-LedManager ledManager(&wifiController);
 
 void setup()
 {
@@ -156,7 +160,8 @@ void setup()
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
 
-	ledManager.Initialize();
+
+	ledManager.Initialize(&wifiController);
 
 	// open any relays that are default open
 	for (uint8_t i = 0; i < ConfigRelayCount; i++)
@@ -181,7 +186,7 @@ void loop()
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();
-	ledManager.ProcessLedMatrix(now);
+	//ledManager.ProcessLedMatrix(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();

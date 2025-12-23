@@ -118,6 +118,13 @@ void ConfigManager::resetToDefaults()
         _cfg.defaulRelayState[i] = false; // default off (relay closed)
     }
 
+    // reset linked relays
+    for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+    {
+        _cfg.linkedRelays[i][0] = 0xFF;
+        _cfg.linkedRelays[i][1] = 0xFF;
+    }
+
 #if defined(ARDUINO_UNO_R4)
     _cfg.bluetoothEnabled = false;
     _cfg.wifiEnabled = false;

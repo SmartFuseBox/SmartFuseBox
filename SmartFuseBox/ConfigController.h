@@ -27,12 +27,14 @@ private:
 	SoundController* _soundController;
 	BluetoothController* _bluetoothController;
 	WifiController* _wifiController;
+	RelayController* _relayController;
 	Config* _config;
 
 	void updateSoundControllerConfig(); 
 public:
 	ConfigController(SoundController* soundController,
-		BluetoothController* bluetoothController, WifiController* wifiController);
+		BluetoothController* bluetoothController, WifiController* wifiController,
+		RelayController* relayController);
 	Config* getConfigPtr();
 	ConfigResult save();
 	ConfigResult reset();
@@ -51,4 +53,6 @@ public:
 	ConfigResult setWifiPort(const uint16_t port);
 	ConfigResult setWifiIpAddress(const char* ipAddress);
 	ConfigResult setRelayDefaultState(const uint8_t relayIndex, const bool isOpen);
+	ConfigResult linkRelays(uint8_t relayIndex, uint8_t linkedRelay);
+	ConfigResult unlinkRelay(uint8_t relayIndex);
 };

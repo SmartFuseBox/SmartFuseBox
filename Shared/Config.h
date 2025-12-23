@@ -28,7 +28,7 @@ enum class VesselType : uint8_t
 //
 // Keep struct packed and stable. Increase 'VERSION' when you change layout.
 // Packed POD for persistent configuration.
-constexpr uint8_t ConfigVersion = 1;
+constexpr uint8_t ConfigVersion = 0;
 constexpr uint8_t ConfigRelayCount = 8;
 constexpr uint8_t ConfigHomeButtons = 4;
 constexpr uint8_t ConfigMaxNameLength = 31; // max characters (inc null)
@@ -46,6 +46,7 @@ struct Config {
 	uint8_t hornRelayIndex; // 0..7 or 0xFF = none
 	uint16_t soundStartDelayMs; // 500ms default
     bool defaulRelayState[ConfigRelayCount]; // default on (relay open) states
+    uint8_t linkedRelays[ConfigMaxLinkedRelays][2];
 
 #if defined(ARDUINO_UNO_R4)
     bool bluetoothEnabled;

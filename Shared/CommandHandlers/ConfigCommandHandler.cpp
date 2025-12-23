@@ -23,7 +23,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     }
     else if (strcmp(command, ConfigGetSettings) == 0)
     {
-        char buffer[128];
+        char buffer[128]{};
         buffer[0] = '\0';
 
 		Config* config = _configController->getConfigPtr();
@@ -116,8 +116,15 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		// C18 Default relay states
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
         {
-            snprintf(buffer, sizeof(buffer), "r=%d;v=%s", i, (config->defaulRelayState[i] ? "1" : "0"));
+            snprintf(buffer, sizeof(buffer), "%d=%s", i, (config->defaulRelayState[i] ? "1" : "0"));
             sender->sendCommand(ConfigDefaultRelayState, buffer);
+		}
+
+		// C19 Linked relays
+        for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+        {
+            snprintf(buffer, sizeof(buffer), "%d=%d", config->linkedRelays[i][0], config->linkedRelays[i][1]);
+            sender->sendCommand(ConfigLinkRelays, buffer);
 		}
 
         result = ConfigResult::Success;
@@ -336,6 +343,30 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
     }
+    else if (strcmp(command, ConfigLinkRelays) == 0)
+    {
+        // Expect "C19:<relay1>=<relay2>" to link relay1 to relay2
+        // or "C19:<relay1>=0xFF" to unlink relay1
+        if (paramCount >= 1)
+        {
+            uint8_t relay1 = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+            uint8_t relay2 = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+            if (relay2 < MaxUint8Value)
+            {
+
+                result = _configController->linkRelays(relay1, relay2);
+            }
+            else
+            {
+                result = _configController->unlinkRelay(relay1);
+            }
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
     else
     {
         result = ConfigResult::InvalidCommand;
@@ -385,7 +416,7 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
         ConfigResetSettings, ConfigBoatType, ConfigSoundRelayId, ConfigSoundStartDelay,
         ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID, 
         ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
-        ConfigDefaultRelayState };
+        ConfigDefaultRelayState, ConfigLinkRelays };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }

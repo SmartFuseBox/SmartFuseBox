@@ -62,6 +62,7 @@ constexpr char ConfigWifiApIpAddress[] = "C17";
 #endif
 
 constexpr char ConfigDefaultRelayState[] = "C18";
+constexpr char ConfigLinkRelays[] = "C19";
 
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";
@@ -87,6 +88,8 @@ constexpr char ValueParamName[] = "v";
 constexpr unsigned long HeartbeatIntervalMs = 1000;
 constexpr unsigned long HeartbeatTimeoutMs = 3000;
 
+
+constexpr uint8_t ConfigMaxLinkedRelays = 2;
 
 
 constexpr uint8_t MaxUint8Value = 0xFF;

@@ -151,7 +151,7 @@
     <ClCompile Include="ConfigController.cpp">
       <Filter>Source Files\BusinessLogic</Filter>
     </ClCompile>
-    <ClCompile Include="LedManager.cpp">
+    <ClCompile Include="LedMatrixManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -285,7 +285,10 @@
     <ClInclude Include="ConfigController.h">
       <Filter>Header Files\BusinessLogic</Filter>
     </ClInclude>
-    <ClInclude Include="LedManager.h">
+    <ClInclude Include="LedMatrixManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageBus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
