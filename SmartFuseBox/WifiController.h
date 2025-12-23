@@ -7,12 +7,99 @@
 #include "WifiServer.h"
 #include "Config.h"
 #include "WarningManager.h"
+#include "MessageBus.h"
 
+constexpr unsigned long LedUpdateIntevalMs = 300;
 class WifiController
 {
+private:
+	MessageBus* _messageBus;
+    SerialCommandManager* _commandMgrComputer;
+    WarningManager* _warningManager;
+    WifiServer* _wifiServer;
+    bool _enabled;
+    INetworkCommandHandler** _handlerObjects;
+    uint8_t _handlerCount = 0;
+    uint16_t _port = 80;
+    NetworkJsonVisitor** _jsonVisitors;
+    uint8_t _jsonVisitorCount;
+	unsigned long _lastUpdateTime;
+
+    bool isConfigValid(const Config* cfg) const
+    {
+        if (!cfg)
+        {
+            return false;
+        }
+
+        // Check if SSID is provided and not empty
+        if (cfg->apSSID[0] == '\0')
+        {
+            return false;
+        }
+
+        // In Client mode, password is typically required (though some networks allow empty)
+        // In AP mode, password can be optional for open networks
+        // You can add additional validation here if needed
+
+        // Validate port number (optional)
+        if (cfg->wifiPort == 0)
+        {
+            return false;
+        }
+
+        if (cfg->accessMode == 0) // Access Point
+        {
+            // If apIpAddress is empty, allow using default IP (considered valid)
+            if (cfg->apIpAddress[0] != '\0') {
+                IPAddress testIp;
+                if (!testIp.fromString(cfg->apIpAddress))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    bool enableInternal()
+    {
+        if (_wifiServer != nullptr)
+        {
+            return true; // Already enabled
+        }
+
+        _wifiServer = new WifiServer(_commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
+
+        if (_wifiServer == nullptr)
+        {
+            if (_warningManager)
+            {
+                _warningManager->raiseWarning(WarningType::WifiInitFailed);
+            }
+            return false;
+        }
+
+        _enabled = true;
+        return true;
+    }
+
+    void disable()
+    {
+        if (_wifiServer != nullptr)
+        {
+            _wifiServer->end();
+            delete _wifiServer;
+            _wifiServer = nullptr;
+        }
+
+        _enabled = false;
+    }
 public:
-    WifiController(SerialCommandManager* commandMgrComputer, WarningManager* warningManager)
-        : _commandMgrComputer(commandMgrComputer),
+    WifiController(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager)
+		: _messageBus(messageBus),
+        _commandMgrComputer(commandMgrComputer),
 		_warningManager(warningManager),
         _wifiServer(nullptr),
         _enabled(false),
@@ -20,7 +107,8 @@ public:
 		_handlerCount(0),
 		_port(80),
         _jsonVisitors(nullptr),
-        _jsonVisitorCount(0)
+        _jsonVisitorCount(0),
+		_lastUpdateTime(0)
     {
     }
 
@@ -90,11 +178,18 @@ public:
         }
     }
 
-    void update()
+    void update(unsigned long now)
     {
         if (_enabled && _wifiServer)
         {
             _wifiServer->update();
+
+            if (now - _lastUpdateTime >= LedUpdateIntevalMs)
+            {
+                _lastUpdateTime = now;
+				_messageBus->publish<WifiConnectionStateChanged>(_wifiServer->getConnectionState());
+				_messageBus->publish<WifiSignalStrengthChanged>(_wifiServer->getSignalStrength());
+            }
         }
     }
 
@@ -128,86 +223,4 @@ public:
         _jsonVisitors = jsonVisitors;
     }
 
-private:
-    SerialCommandManager* _commandMgrComputer;
-    WarningManager* _warningManager;
-    WifiServer* _wifiServer;
-    bool _enabled;
-    INetworkCommandHandler** _handlerObjects;
-    uint8_t _handlerCount = 0;
-	uint16_t _port = 80;
-    NetworkJsonVisitor** _jsonVisitors;
-    uint8_t _jsonVisitorCount;
-
-    bool isConfigValid(const Config* cfg) const
-    {
-        if (!cfg)
-        {
-            return false;
-        }
-
-        // Check if SSID is provided and not empty
-        if (cfg->apSSID[0] == '\0')
-        {
-            return false;
-        }
-
-        // In Client mode, password is typically required (though some networks allow empty)
-        // In AP mode, password can be optional for open networks
-        // You can add additional validation here if needed
-
-        // Validate port number (optional)
-        if (cfg->wifiPort == 0)
-        {
-            return false;
-        }
-
-        if (cfg->accessMode == 0) // Access Point
-        {
-            // If apIpAddress is empty, allow using default IP (considered valid)
-            if (cfg->apIpAddress[0] != '\0') {
-                IPAddress testIp;
-                if (!testIp.fromString(cfg->apIpAddress))
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    bool enableInternal()
-    {
-        if (_wifiServer != nullptr)
-        {
-            return true; // Already enabled
-        }
-
-        _wifiServer = new WifiServer(_commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
-        
-        if (_wifiServer == nullptr)
-        {
-            if (_warningManager)
-            {
-                _warningManager->raiseWarning(WarningType::WifiInitFailed);
-            }
-            return false;
-        }
-
-        _enabled = true;
-        return true;
-    }
-
-    void disable()
-    {
-        if (_wifiServer != nullptr)
-        {
-            _wifiServer->end();
-            delete _wifiServer;
-            _wifiServer = nullptr;
-        }
-
-        _enabled = false;
-    }
 };

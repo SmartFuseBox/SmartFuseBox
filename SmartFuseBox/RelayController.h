@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SystemDefinitions.h"
+#include "ConfigManager.h"
+#include "MessageBus.h"
 
 enum class RelayResult : uint8_t
 {
@@ -13,6 +15,7 @@ enum class RelayResult : uint8_t
 class RelayController
 {
 private:
+	MessageBus* _messageBus;
 	bool* _relayStatus;
 	uint8_t* _relays;
 	uint8_t _relayCount;
@@ -33,12 +36,47 @@ private:
 		_relayStatus[relayIndex] = isOn;
 		digitalWrite(_relays[relayIndex], isOn ? LOW : HIGH);
 
+		Config* config = ConfigManager::getConfigPtr();
+
+		if (config != nullptr)
+		{
+			// Check for linked relays
+			for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
+			{
+				if (config->linkedRelays[i][0] == relayIndex)
+				{
+					uint8_t linkedRelay = config->linkedRelays[i][1];
+					if (linkedRelay < _relayCount)
+					{
+						_relayStatus[linkedRelay] = isOn;
+						digitalWrite(_relays[linkedRelay], isOn ? LOW : HIGH);
+					}
+				}
+			}
+		}
+
+		if (_messageBus)
+		{
+			// Update LED matrix relay status
+			uint8_t relayBitmask = 0;
+			for (uint8_t i = 0; i < _relayCount && i < 8; i++)
+			{
+				if (_relayStatus[i])
+				{
+					relayBitmask |= (1 << i);
+				}
+			}
+
+			_messageBus->publish<RelayStatusChanged>(relayBitmask);
+		}
+
 		return RelayResult::Success;
 	}
 
 public:
-	RelayController(const uint8_t* relayPins, uint8_t totalRelays)
-		: _relayStatus(nullptr), _relays(nullptr), _relayCount(totalRelays), _reservedSoundRelay(DefaultValue)
+	RelayController(MessageBus* messageBus, const uint8_t* relayPins, uint8_t totalRelays)
+		: _messageBus(messageBus), _relayStatus(nullptr), _relays(nullptr), _relayCount(totalRelays),
+		  _reservedSoundRelay(DefaultValue)
 	{
 		_relays = new uint8_t[_relayCount];
 		memcpy(_relays, relayPins, sizeof(uint8_t)* _relayCount);

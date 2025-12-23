@@ -15,6 +15,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 	(void)params;
 	(void)paramCount;
 	(void)responseBuffer;
+	(void)bufferSize;
 
 	if (strcmp(command, SensorBearing) == 0)
 	{

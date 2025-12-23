@@ -49,6 +49,8 @@ These are commands used to configure the system settings and can only be sent fr
 | `C16` — Wifi connection state (SFB) | `C16` | Wifi connection state, no params, returns WifiConnectionState value |
 | `C17` — Wifi AP Ip address (SFB) | `C17` | Sets the IP address when using access point mode, default is 192.168.4.1 |
 | `C18` — Initial relay on | `C18:3=1` — `C18:3=0`  | Set's the initial status of a relay to on by default. Param format: `<relay>:<value>`. `relay` must be 0..7 (`RELAY_COUNT`), `value` must be 0 (off by default) or 1 (on by default.  |
+| `C19` — Link Relays | `C19:3=4` | Links relays together, if one relay is switched on, the linked relay is switched on, and vice versa for switching off. Param format: `<relay>:<linkedrelay>`. `relay` must be 0..7 (`RELAY_COUNT`) `linkedrelay` must be 0..7 or 0xFF to unlink |
+
 
 
 Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `EEPROM commit failed`, `Unknown config command`.

@@ -17,6 +17,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	size_t bufferSize)
 {
 	(void)method;
+	(void)bufferSize;
 	ConfigResult result;
 	if (strcmp(command, ConfigSaveSettings) == 0)
 	{
@@ -234,6 +235,30 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
             result = ConfigResult::InvalidParameter;
         }
     }
+	else if (strcmp(command, ConfigLinkRelays) == 0)
+    {
+        // Expect "C19:<relay1>=<relay2>" to link relay1 to relay2
+        // or "C19:<relay1>=0xFF" to unlink relay1
+        if (paramCount >= 1)
+        {
+            uint8_t relay1 = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+            uint8_t relay2 = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+            if (relay2 < MaxUint8Value)
+            {
+                
+                result = _configController->linkRelays(relay1, relay2);
+            }
+            else
+            {
+                result = _configController->unlinkRelay(relay1);
+            }
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
     else
     {
         result = ConfigResult::InvalidCommand;
@@ -358,8 +383,23 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 		if (i > 0) client->print(",");
 		client->print(config->defaulRelayState[i] ? "true" : "false");
 	}
-	client->print("]");
 
+	client->print("],");
+
+	client->print("\"linkedRelays\":[");
+	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+    {
+        if (i > 0)
+            client->print(",");
+
+        client->print("[");
+        client->print(config->linkedRelays[i][0]);
+        client->print(",");
+        client->print(config->linkedRelays[i][1]);
+        client->print("]");
+    }
+
+    client->print("]");
 	client->print("}");
 }
 

@@ -30,3 +30,4 @@ Dht11SensorHandler.h|..\Shared\Sensors\Dht11SensorHandler.h
 WaterSensorHandler.h|..\Shared\Sensors\WaterSensorHandler.h
 DateTimeManager.h|..\Shared\DateTimeManager.h
 DateTimeManager.cpp|..\Shared\DateTimeManager.cpp
+MessageBus.h|..\Shared\MessageBus.h

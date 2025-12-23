@@ -43,7 +43,9 @@
 #include "SensorController.h"
 #include "SoundController.h"
 
-#include "LedManager.h"
+#include "LedMatrixManager.h"
+
+#include "MessageBus.h"
 
 
 #define COMPUTER_SERIAL Serial
@@ -55,8 +57,14 @@ void onLinkCommandReceived(SerialCommandManager* mgr);
 void configureWifiSupport(Config* config);
 void configureBluetoothSupport(Config* config);
 
+// message bus
+MessageBus messageBus;
+
+// led
+LedMatrixManager ledManager(&messageBus);
+
 // controllers
-RelayController relayController(Relays, TotalRelays);
+RelayController relayController(&messageBus, Relays, TotalRelays);
 SoundController soundController;
 
 SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
@@ -92,8 +100,8 @@ SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
 // configure bluetooth support
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayController, &warningManager, &commandMgrComputer);
 
-WifiController wifiController(&commandMgrComputer, &warningManager);
-ConfigController configController(&soundController, &bluetoothController, &wifiController);
+WifiController wifiController(&messageBus, &commandMgrComputer, &warningManager);
+ConfigController configController(&soundController, &bluetoothController, &wifiController, &relayController);
 
 // computer command handlers
 ConfigCommandHandler configHandler(&wifiController, &configController);
@@ -114,8 +122,6 @@ WarningNetworkHandler warningNetworkHandler(&warningManager);
 SystemNetworkHandler systemNetworkHandler(&wifiController);
 SensorNetworkHandler sensorNetworkHandler(&sensorController);
 
-// led
-LedManager ledManager(&wifiController);
 
 void setup()
 {
@@ -155,6 +161,7 @@ void setup()
 	soundController.configUpdated(config);
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
+
 
 	ledManager.Initialize();
 
@@ -197,7 +204,7 @@ void loop()
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();
-	wifiController.update();
+	wifiController.update(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::update();

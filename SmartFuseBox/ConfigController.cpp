@@ -1,5 +1,6 @@
 #include "ConfigController.h"
 #include "SystemDefinitions.h"
+#include "RelayController.h"
 
 #if defined(ARDUINO_UNO_R4)
 // from NextionIds.h
@@ -10,10 +11,12 @@ constexpr uint8_t ImageButtonColorYellow = 7;
 
 
 ConfigController::ConfigController(SoundController* soundController,
-	BluetoothController* bluetoothController, WifiController* wifiController)
+	BluetoothController* bluetoothController, WifiController* wifiController,
+	RelayController* relayController)
 	: _soundController(soundController),
 	  _bluetoothController(bluetoothController),
 	  _wifiController(wifiController),
+	  _relayController(relayController),
 	  _config(nullptr)
 {
 	_config = ConfigManager::getConfigPtr();
@@ -307,4 +310,78 @@ void ConfigController::updateSoundControllerConfig()
 	{
 		_soundController->configUpdated(_config);
 	}
+}
+
+ConfigResult ConfigController::linkRelays(uint8_t relayIndex, uint8_t linkedRelay)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	if (relayIndex >= ConfigRelayCount)
+		return ConfigResult::InvalidRelay;
+
+	if (linkedRelay >= ConfigRelayCount && linkedRelay != MaxUint8Value)
+		return ConfigResult::InvalidParameter;
+
+	if (relayIndex == linkedRelay)
+		return ConfigResult::InvalidParameter;
+
+	if (relayIndex == _relayController->getReservedSoundRelay() ||
+		linkedRelay == _relayController->getReservedSoundRelay())
+	{
+		// cannot link sound relay
+		return ConfigResult::InvalidParameter;
+	}
+
+	uint8_t availableIndex = MaxUint8Value;
+
+	// is the relay already linked?
+	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
+	{
+		if (_config->linkedRelays[i][0] == relayIndex || _config->linkedRelays[i][1] == relayIndex)
+		{
+			return ConfigResult::Failed;
+		}
+	}
+
+	// find next linked relay space
+	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
+	{
+		if (_config->linkedRelays[i][0] == MaxUint8Value)
+		{
+			availableIndex = i;
+			break;
+		}
+	}
+
+	if (availableIndex == MaxUint8Value)
+		return ConfigResult::Failed;
+
+	_config->linkedRelays[availableIndex][0] = relayIndex;
+	_config->linkedRelays[availableIndex][1] = linkedRelay;
+	return ConfigResult::Success;
+}
+
+
+ConfigResult ConfigController::unlinkRelay(uint8_t relayIndex)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	if (relayIndex >= ConfigRelayCount)
+		return ConfigResult::InvalidRelay;
+
+	// find next linked relay space
+	bool found = false;
+	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
+	{
+		if (_config->linkedRelays[i][0] == relayIndex || _config->linkedRelays[i][1] == relayIndex)
+		{
+			_config->linkedRelays[i][0] = MaxUint8Value;
+			_config->linkedRelays[i][1] = MaxUint8Value;
+			found = true;
+		}
+	}
+
+	return found ? ConfigResult::Success : ConfigResult::Failed;
 }

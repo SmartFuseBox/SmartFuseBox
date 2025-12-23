@@ -62,6 +62,7 @@ constexpr char ConfigWifiApIpAddress[] = "C17";
 #endif
 
 constexpr char ConfigDefaultRelayState[] = "C18";
+constexpr char ConfigLinkRelays[] = "C19";
 
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";
@@ -87,6 +88,8 @@ constexpr char ValueParamName[] = "v";
 constexpr unsigned long HeartbeatIntervalMs = 1000;
 constexpr unsigned long HeartbeatTimeoutMs = 3000;
 
+
+constexpr uint8_t ConfigMaxLinkedRelays = 2;
 
 
 constexpr uint8_t MaxUint8Value = 0xFF;
@@ -156,3 +159,28 @@ struct CommandResult {
         return CommandResult{ false, errorCode };
     }
 };
+
+
+// Wifi server enums
+enum class WifiMode : uint8_t
+{
+    AccessPoint = 0,
+    Client = 1
+};
+
+enum class WifiConnectionState : uint8_t
+{
+    Disconnected = 0,
+    Connecting = 1,
+    Connected = 2,
+    Failed = 3
+};
+
+enum class ClientHandlingState : uint8_t
+{
+    Idle,
+    ReadingRequest,
+    ProcessingRequest,
+    KeepAlive
+};
+

@@ -41,9 +41,32 @@
  * @endcode
  */
 class WarningManager {
+private:
+    SerialCommandManager* _commandMgr;      // For sending heartbeat commands
+    uint32_t _localWarnings;                // Bitmap of LOCAL warnings (raised by this device)
+    uint32_t _remoteWarnings;               // Bitmap of REMOTE warnings (from connected device)
+
+    // Heartbeat state
+    unsigned long _heartbeatInterval;       // How often to send heartbeat (ms)
+    unsigned long _heartbeatTimeout;        // Timeout before connection lost (ms)
+    unsigned long _lastHeartbeatSent;       // When last heartbeat was sent
+    unsigned long _lastHeartbeatReceived;   // When last ack was received
+    bool _heartbeatEnabled;                 // Is heartbeat active
+
+    /**
+     * @brief Send a heartbeat command.
+     */
+    void sendHeartbeat();
+
+    /**
+     * @brief Update connection state based on heartbeat.
+     * @param now Current time in milliseconds
+     */
+    void updateConnection(unsigned long now);
 public:
     /**
      * @brief Constructor.
+	 * @param ledManager Pointer to LedMatrixManager for updating warning indicators
      * @param commandMgr Pointer to SerialCommandManager for heartbeat commands (optional)
      * @param heartbeatInterval How often to send heartbeat in milliseconds
      * @param heartbeatTimeout Timeout before connection considered lost in milliseconds
@@ -117,27 +140,4 @@ public:
      * @return uint32_t containing only remotely-raised warning flags
      */
     uint32_t getRemoteWarningsMask() const;
-
-private:
-    SerialCommandManager* _commandMgr;      // For sending heartbeat commands
-    uint32_t _localWarnings;                // Bitmap of LOCAL warnings (raised by this device)
-    uint32_t _remoteWarnings;               // Bitmap of REMOTE warnings (from connected device)
-    
-    // Heartbeat state
-    unsigned long _heartbeatInterval;       // How often to send heartbeat (ms)
-    unsigned long _heartbeatTimeout;        // Timeout before connection lost (ms)
-    unsigned long _lastHeartbeatSent;       // When last heartbeat was sent
-    unsigned long _lastHeartbeatReceived;   // When last ack was received
-    bool _heartbeatEnabled;                 // Is heartbeat active
-
-    /**
-     * @brief Send a heartbeat command.
-     */
-    void sendHeartbeat();
-
-    /**
-     * @brief Update connection state based on heartbeat.
-     * @param now Current time in milliseconds
-     */
-    void updateConnection(unsigned long now);
 };
