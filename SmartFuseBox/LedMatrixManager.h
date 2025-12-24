@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Arduino_LED_Matrix.h>
+#include "new_Arduino_LED_Matrix.h"
 #include "MessageBus.h"
 
 constexpr auto LedUpdateFrequency = 500;
@@ -12,15 +12,17 @@ const uint8_t LedOn = 1;
 const uint8_t LedOff = 0;
 
 /*
+* X = Used
+* 0 = Unused
 
-  { X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, X },
-  { X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, X },
-  { X, 0, 0, X, X, 0, 0, 0, 0, 0, 0, X },
-  { X, 0, 0, X, X, 0, 0, 0, 0, 0, 0, X },
-  { X, 0, 0, X, X, 0, 0, 0, 0, 0, 0, X },
-  { X, X, 0, X, X, 0, 0, 0, 0, 0, 0, X },
-  { X, X, 0, X, X, 0, 0, 0, 0, 0, 0, X },
-  { X, X, 0, X, X, 0, 0, 0, 0, 0, 0, X }
+  { X, X, X, X, X, X, X, X, X, X, X, X },
+  { X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+  { X, 0, 0, X, X, 0, 0, 0, 0, 0, 0, 0 },
+  { X, 0, 0, X, X, 0, 0, 0, 0, 0, 0, 0 },
+  { X, 0, 0, X, X, 0, 0, 0, 0, 0, X, X },
+  { X, X, 0, X, X, 0, 0, 0, 0, 0, X, X },
+  { X, X, 0, X, X, 0, 0, 0, 0, 0, X, X },
+  { X, X, X, X, X, 0, 0, 0, 0, 0, X, X }
   
 */
 enum class LedSequenceType {
@@ -50,6 +52,7 @@ private:
 	uint8_t _shutdownBottomRow;
 	uint8_t _shutdownLeftColumn;
 	uint8_t _shutdownRightColumn;
+	bool _ledInitialized;
 
 	void updateTemperature(unsigned long currMillis);
 	void updateHumidity(unsigned long currMillis);

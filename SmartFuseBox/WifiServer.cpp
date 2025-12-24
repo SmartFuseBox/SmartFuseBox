@@ -5,9 +5,10 @@
 constexpr char response400[] = "\"error\":\"Bad Request\",\"message\":\"The request will not process due to client error\"";
 constexpr char response404[] = "\"error\":\"Not Found\",\"message\":\"The requested resource was not found\"";
 
-WifiServer::WifiServer(SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
+WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
 	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
 	:   SingleLoggerSupport(commandMgrComputer), 
+		_messageBus(messageBus),
 		_serverActive(false),
 		_server(port),
 		_mode(WifiMode::AccessPoint),
@@ -515,6 +516,10 @@ void WifiServer::processClientRequest()
 		query[0] = '\0';
 	}
 	
+	if (_messageBus)
+	{
+		_messageBus->publish<WifiServerProcessingRequestChanged>(method, path, query, true);
+	}
 	sendDebug(F("Processing request"), F("WifiServer"));
 	bool handled = false;
 	
@@ -555,6 +560,11 @@ void WifiServer::processClientRequest()
 		_activeClient.lastActivity = millis();
 		_activeClient.state = ClientHandlingState::KeepAlive;
 		sendDebug(F("Client kept alive (persistent)"), F("WifiServer"));
+	}
+
+	if (_messageBus)
+	{
+		_messageBus->publish<WifiServerProcessingRequestChanged>(method, path, query, false);
 	}
 }
 

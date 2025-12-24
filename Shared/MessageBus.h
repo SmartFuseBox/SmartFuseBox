@@ -13,7 +13,11 @@ struct TemperatureUpdated {
 };
 
 struct HumidityUpdated {
-    using Callback = std::function<void(float newHumidity)>;
+    using Callback = std::function<void(uint8_t newHumidity)>;
+};
+
+struct WaterLevelUpdated {
+    using Callback = std::function<void(uint16_t newWaterLevel, uint16_t averageWaterLevel)>;
 };
 
 struct WifiConnectionStateChanged {
@@ -26,6 +30,10 @@ struct WifiSignalStrengthChanged {
 
 struct RelayStatusChanged {
     using Callback = std::function<void(uint8_t status)>;
+};
+
+struct WifiServerProcessingRequestChanged {
+    using Callback = std::function<void(const char* method, const char* path, const char* query, bool isProcessing)>;
 };
 
 class MessageBus {

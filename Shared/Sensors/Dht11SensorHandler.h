@@ -7,6 +7,7 @@
 #include "WarningManager.h"
 #include "WarningType.h"
 #include "BaseSensor.h"
+#include "MessageBus.h"
 
 constexpr unsigned long TempHumidityCheckMs = 2500;
 
@@ -19,6 +20,7 @@ constexpr unsigned long TempHumidityCheckMs = 2500;
 class Dht11SensorHandler : public BaseSensor, public BroadcastLoggerSupport
 {
 private:
+	MessageBus* _messageBus;
 	SensorCommandHandler* _sensorCommandHandler;
 	WarningManager* _warningManager;
 	dht11 _dht11Sensor;
@@ -57,6 +59,12 @@ protected:
 		_humidity = _dht11Sensor.humidity;
 		_celsius = _dht11Sensor.temperature;
 
+		if (_messageBus)
+		{
+			_messageBus->publish<TemperatureUpdated>(_celsius);
+			_messageBus->publish<HumidityUpdated>(static_cast<uint8_t>(_humidity));
+		}
+
 		StringKeyValue params;
 		strncpy(params.key, ValueParamName, sizeof(params.key));
 		snprintf(params.value, sizeof(params.value), "%f3.1", _celsius);
@@ -73,9 +81,9 @@ protected:
 		return TempHumidityCheckMs;
 	}
 public:
-	Dht11SensorHandler(BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
+	Dht11SensorHandler(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
 		WarningManager* warningManager, uint8_t sensorPin)
-		: BroadcastLoggerSupport(broadcastManager), _sensorCommandHandler(sensorCommandHandler),
+		: BroadcastLoggerSupport(broadcastManager), _messageBus(messageBus), _sensorCommandHandler(sensorCommandHandler),
 			_warningManager(warningManager), _dht11Sensor(), _sensorPin(sensorPin), _humidity(0.0f), _celsius(0.0f)
 	{
 	}

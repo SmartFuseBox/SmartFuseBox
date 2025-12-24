@@ -70,7 +70,7 @@ private:
             return true; // Already enabled
         }
 
-        _wifiServer = new WifiServer(_commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
+        _wifiServer = new WifiServer(_messageBus, _commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
 
         if (_wifiServer == nullptr)
         {
