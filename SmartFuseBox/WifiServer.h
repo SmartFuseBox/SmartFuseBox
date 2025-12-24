@@ -5,6 +5,7 @@
 #include "SystemDefinitions.h"
 #include "INetworkCommandHandler.h"
 #include "WarningManager.h"
+#include "MessageBus.h"
 
 constexpr uint16_t MaximumRequestSize = 1024;
 constexpr uint8_t MaximumPathLength = 128;
@@ -12,6 +13,7 @@ constexpr uint8_t MaximumPathLength = 128;
 class WifiServer : public SingleLoggerSupport
 {
 private:
+	MessageBus* _messageBus;
 	bool _serverActive;
 	WiFiServer _server;
 	WifiMode _mode;
@@ -72,7 +74,7 @@ private:
 	void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 	
 public:
-	WifiServer(SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
+	WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
 		INetworkCommandHandler** handlers, uint8_t handlerCount,
 		NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 	~WifiServer();

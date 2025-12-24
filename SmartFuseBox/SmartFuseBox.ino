@@ -88,8 +88,8 @@ AckCommandHandler ackHandler(&broadcastManager, &warningManager);
 SystemCommandHandler systemCommandHandler(&broadcastManager, &warningManager);
 
 // Sensors
-WaterSensorHandler waterSensorHandler(&broadcastManager, &sensorCommandHandler, WaterSensorPin, WaterSensorActivePin);
-Dht11SensorHandler dht11SensorHandler(&broadcastManager, &sensorCommandHandler, &warningManager, Dht11SensorPin);
+WaterSensorHandler waterSensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, WaterSensorPin, WaterSensorActivePin);
+Dht11SensorHandler dht11SensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, Dht11SensorPin);
 
 BaseSensorHandler* sensorHandlers[] = {
 	&waterSensorHandler, &dht11SensorHandler

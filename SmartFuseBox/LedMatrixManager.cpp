@@ -1,4 +1,5 @@
 #include "LedMatrixManager.h"
+#include "SmartFuseBoxConstants.h"
 
 LedMatrixManager::LedMatrixManager(MessageBus* messageBus)
 	: _messageBus(messageBus),
@@ -33,6 +34,13 @@ LedMatrixManager::LedMatrixManager(MessageBus* messageBus)
 		});
 		messageBus->subscribe<HumidityUpdated>([this](float newHumidity) {
 			this->SetHumidity(newHumidity);
+		});
+		messageBus->subscribe<WifiServerProcessingRequestChanged>([this](const char* method, const char* path, const char* query, bool isProcessing) {
+			(void)method;
+			(void)path;
+			(void)query;
+			this->_ledFrame[7][2] = isProcessing ? LedOn : LedOff;
+			this->updateLed();
 		});
 	}
 }
@@ -278,11 +286,17 @@ void LedMatrixManager::setRelayStatus(uint8_t relayStatus)
 	_relayStates = relayStatus;
 
 	// Update the LED matrix for each relay
-	for (uint8_t relay = 0; relay < MaxLedRows; ++relay)
+	for (uint8_t relay = 0; relay < TotalRelays; ++relay)
 	{
+		uint8_t row = relay;
+		uint8_t col = relay < 4 ? 10 : 11;
+
+		if (col == 10)
+			row += 4;
+
 		// Check if the corresponding bit is set (relay is ON)
 		bool isOn = (relayStatus & (1 << relay)) != 0;
-		_ledFrame[relay][MaxLedColumns - 1] = isOn ? LedOn : LedOff;
+		_ledFrame[row][col] = isOn ? LedOn : LedOff;
 	}
 
 	updateLed();
