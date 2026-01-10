@@ -23,6 +23,8 @@
 
 #include "WaterSensorHandler.h"
 #include "Dht11SensorHandler.h"
+#include "LightSensorHandler.h"
+#include "GpsSensorHandler.h"
 #include "SensorManager.h"
 
 #include "BluetoothManager.h"
@@ -94,9 +96,11 @@ SystemCommandHandler systemCommandHandler(&broadcastManager, &warningManager);
 // Sensors
 WaterSensorHandler waterSensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, WaterSensorPin, WaterSensorActivePin);
 Dht11SensorHandler dht11SensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, Dht11SensorPin);
+LightSensorHandler lightSensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, LightSensorPin);
+GpsSensorHandler gpsSensor(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, GpsRxPin, GpsTxPin);
 
 BaseSensorHandler* sensorHandlers[] = {
-	&waterSensorHandler, &dht11SensorHandler
+	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &gpsSensor
 };
 uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
 SensorManager sensorManager(sensorHandlers, sensorHandlerCount);

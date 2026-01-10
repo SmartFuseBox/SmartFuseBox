@@ -24,7 +24,14 @@ enum class PageUpdateType : uint8_t
     WaterPumpActive = 0x0A,
     SoundSignal = 0x0B,
 	CpuUsage = 0x0C,
-	MemoryUsage = 0x0D
+	MemoryUsage = 0x0D,
+	GpsLatitude = 0x0E,
+	GpsLongitude = 0x0F,
+	GpsSatellites = 0x10,
+	GpsAltitude = 0x11,
+	GpsSpeed = 0x12,
+	GpsCourse = 0x13,
+	Daytime = 0x14
 };
 
 // Data structure for relay state updates

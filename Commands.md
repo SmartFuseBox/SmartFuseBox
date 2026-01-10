@@ -111,6 +111,8 @@ These commands are used to send sensor data from the Boat Control Panel to a com
 | `S5` — Compass Temp | `S5:v=23.4` | Send compass temperature sensor data. Param format: `<sensor>=<value>`. |
 | `S6` — Water Level | `S6:v=3.4` | Send water level sensor data. Param format: `<sensor>=<value>`. |
 | `S7` — Water Pump Active  | `S7:v=1` | Send water pump active status. Param format: `<sensor>=<value>`, 0 = off, 1 = on. |
+| `S8` — Horn Active | `S6:v=3.4` | Send water level sensor data. Param format: `<sensor>=<value>`. |
+| `S9` — Light Sensor Active  | `S8:v=1` | Send light sensor daytime value. Param format: `<sensor>=<value>`, 0 = off (night time), 1 = on (day time). |
 
 
 ### Wifi Sensor Commands (SFB)
