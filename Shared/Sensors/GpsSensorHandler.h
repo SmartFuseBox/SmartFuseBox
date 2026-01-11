@@ -125,9 +125,13 @@ private:
 		dtostrf(_altitude, 8, 2, altParam.value);
 		sendCommand(SensorGpsAltitude, &altParam, 1);
 
-		// Send speed
-		dtostrf(_speedKmh, 8, 2, altParam.value);
-		sendCommand(SensorGpsSpeed, &altParam, 1);
+		// Send speed with course as second parameter
+		StringKeyValue speedParams[2];
+		strncpy(speedParams[0].key, ValueParamName, sizeof(speedParams[0].key));
+		dtostrf(_speedKmh, 8, 2, speedParams[0].value);
+		strncpy(speedParams[1].key, "course", sizeof(speedParams[1].key));
+		dtostrf(_courseDeg, 8, 2, speedParams[1].value);
+		sendCommand(SensorGpsSpeed, speedParams, 2);
 
 		// Send satellites (integers work fine with snprintf)
 		snprintf(altParam.value, sizeof(altParam.value), "%lu", _satellites);
@@ -139,6 +143,7 @@ private:
 			_sensorCommandHandler->setGpsLocation(_latitude, _longitude);
 			_sensorCommandHandler->setGpsAltitude(_altitude);
 			_sensorCommandHandler->setGpsSpeed(_speedKmh);
+			_sensorCommandHandler->setGpsCourse(_courseDeg);
 			_sensorCommandHandler->setGpsSatellites(_satellites);
 		}
 

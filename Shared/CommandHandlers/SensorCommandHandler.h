@@ -39,6 +39,7 @@ private:
 	double _gpsLongitude;
 	double _altitude;
 	double _gpsSpeed;
+	double _gpsCourse;
 	uint32_t _gpsSatellites;
 public:
 #if defined(BOAT_CONTROL_PANEL)
@@ -72,12 +73,14 @@ public:
 	void setGpsLocation(double lat, double lon) { _gpsLatitude = lat; _gpsLongitude = lon; }
 	void setGpsAltitude(double alt) { _altitude = alt; }
 	void setGpsSpeed(double speed) { _gpsSpeed = speed; }
+	void setGpsCourse(double course) { _gpsCourse = course; }
 	void setGpsSatellites(uint32_t sats) { _gpsSatellites = sats; }
 
 	double getGpsLatitude() const { return _gpsLatitude; }
 	double getGpsLongitude() const { return _gpsLongitude; }
 	double getGpsAltitude() const { return _altitude; }
 	double getGpsSpeed() const { return _gpsSpeed; }
+	double getGpsCourse() const { return _gpsCourse; }
 	uint32_t getGpsSatellites() const { return _gpsSatellites; }
 };
 

@@ -126,6 +126,14 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         _gpsSpeed = atof(params[0].value);
         FloatStateUpdate update = { static_cast<float>(_gpsSpeed) };
         notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::GpsSpeed), &update);
+        
+        // Check for optional course parameter (second parameter)
+        if (paramCount >= 2)
+        {
+            _gpsCourse = atof(params[1].value);
+            FloatStateUpdate courseUpdate = { static_cast<float>(_gpsCourse) };
+            notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::GpsCourse), &courseUpdate);
+        }
     }
     else if (strcmp(command, SensorGpsSatellites) == 0)
     {
