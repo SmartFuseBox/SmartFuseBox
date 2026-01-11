@@ -82,6 +82,13 @@ private:
 			// Update DateTimeManager with GPS time (UTC)
 			if (DateTimeManager::setDateTimeISO(isoDateTime))
 			{
+
+				// Send F6 command to notify of time update
+				StringKeyValue timeParam;
+				strncpy(timeParam.key, ValueParamName, sizeof(timeParam.key));
+				strncpy(timeParam.value, isoDateTime, sizeof(timeParam.value));
+				sendCommand(SystemSetDateTime, &timeParam, 1);
+
 				_lastTimeSync = millis();
 			}
 		}
@@ -126,16 +133,27 @@ private:
 		sendCommand(SensorGpsAltitude, &altParam, 1);
 
 		// Send speed with course as second parameter
-		StringKeyValue speedParams[2];
+		StringKeyValue speedParams[3];
 		strncpy(speedParams[0].key, ValueParamName, sizeof(speedParams[0].key));
 		dtostrf(_speedKmh, 8, 2, speedParams[0].value);
 		strncpy(speedParams[1].key, "course", sizeof(speedParams[1].key));
 		dtostrf(_courseDeg, 8, 2, speedParams[1].value);
-		sendCommand(SensorGpsSpeed, speedParams, 2);
+		strncpy(speedParams[2].key, "dir", sizeof(speedParams[2].key)); 
+		snprintf(speedParams[2].value, sizeof(speedParams[2].value), "%s", getDirection());
+		sendCommand(SensorGpsSpeed, speedParams, 3);
 
 		// Send satellites (integers work fine with snprintf)
 		snprintf(altParam.value, sizeof(altParam.value), "%lu", _satellites);
 		sendCommand(SensorGpsSatellites, &altParam, 1);
+
+		// send GPS direction string
+		StringKeyValue dirParam;
+		strncpy(dirParam.key, ValueParamName, sizeof(dirParam));
+		strncpy(dirParam.value, getDirection(), sizeof(dirParam.value));
+		sendCommand(SensorDirection, &dirParam, 1);
+		dtostrf(_courseDeg, 8, 2, dirParam.value);
+		sendCommand(SensorBearing, &dirParam, 1);
+
 
 		// Update sensor command handler if available
 		if (_sensorCommandHandler)
@@ -145,6 +163,7 @@ private:
 			_sensorCommandHandler->setGpsSpeed(_speedKmh);
 			_sensorCommandHandler->setGpsCourse(_courseDeg);
 			_sensorCommandHandler->setGpsSatellites(_satellites);
+			_sensorCommandHandler->setGpsDirection(getDirection());
 		}
 
 		_lastStatusUpdate = now;
@@ -193,6 +212,9 @@ protected:
 			_speedKmh = _gps->speed.isValid() ? _gps->speed.kmph() : 0.0;
 			_courseDeg = _gps->course.isValid() ? _gps->course.deg() : 0.0;
 			_satellites = _gps->satellites.isValid() ? _gps->satellites.value() : 0;
+			if (_courseDeg >= 360.0) {
+				_courseDeg = fmod(_courseDeg, 360.0);  // Normalize to 0-359.99
+			}
 
 			// Sync time from GPS periodically or if never synced
 			if (!DateTimeManager::isTimeSet() ||
@@ -309,4 +331,5 @@ public:
 	double getSpeed() const { return _speedKmh; }
 	double getCourse() const { return _courseDeg; }
 	uint32_t getSatellites() const { return _satellites; }
+	const char* getDirection() const { return compassDirections[static_cast<int>((_courseDeg + 11.25) / 22.5) % 16]; }
 };

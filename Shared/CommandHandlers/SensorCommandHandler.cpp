@@ -134,6 +134,14 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             FloatStateUpdate courseUpdate = { static_cast<float>(_gpsCourse) };
             notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::GpsCourse), &courseUpdate);
         }
+
+		if (paramCount >= 3)
+        {
+            CharStateUpdate dirUpdate = {};
+            dirUpdate.length = min(SystemFunctions::calculateLength(params[2].value), static_cast<unsigned int>((CharStateUpdate::MaxLength - 1)));
+            snprintf(dirUpdate.value, CharStateUpdate::MaxLength, "%s", params[2].value);
+            notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Direction), &dirUpdate);
+        }
     }
     else if (strcmp(command, SensorGpsSatellites) == 0)
     {

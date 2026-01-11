@@ -41,6 +41,7 @@ private:
 	double _gpsSpeed;
 	double _gpsCourse;
 	uint32_t _gpsSatellites;
+	const char* _gpsDirection;
 public:
 #if defined(BOAT_CONTROL_PANEL)
     explicit SensorCommandHandler(BroadcastManager* broadcastManager, NextionControl* nextionControl, WarningManager* warningManager);
@@ -81,6 +82,8 @@ public:
 	double getGpsAltitude() const { return _altitude; }
 	double getGpsSpeed() const { return _gpsSpeed; }
 	double getGpsCourse() const { return _gpsCourse; }
+	void setGpsDirection(const char* dir) { _gpsDirection = dir; }
+	const char* getGpsDirection() const { return _gpsDirection; }
 	uint32_t getGpsSatellites() const { return _gpsSatellites; }
 };
 
