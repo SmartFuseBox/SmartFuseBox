@@ -175,16 +175,6 @@ void setup()
     nextion.begin();
     
     sensorManager.setup();
-    //commandMgrComputer.sendError(memBuffer, "MEMORY");
-
-    //if (!compass.begin())
-    //{
-    //    snprintf(memBuffer, sizeof(memBuffer), "Compass failed: %d", freeMemory());
-    //    commandMgrComputer.sendError(memBuffer, "MEMORY");
-    //    
-    //    warningManager.raiseWarning(WarningType::SensorFailure);
-    //    warningManager.raiseWarning(WarningType::CompassFailure);
-    //}
 
     // Simplified broadcasting
     char buffer[10];
@@ -196,6 +186,7 @@ void setup()
 
 	nextion.sendCommand(PageOne);
 }
+
 void loop()
 {
     unsigned long now = millis();
@@ -224,32 +215,6 @@ void loop()
     sensorManager.update(now);
     SystemCpuMonitor::endTask();
 
-    SystemCpuMonitor::startTask();
-    if (now - lastUpdate >= UpdateIntervalMs)
-    {
-        lastUpdate = now;
-
-        commandMgrLink.sendCommand(WarningsList, "");
-
-        if (!warningManager.isWarningActive(WarningType::CompassFailure))
-        {
-            // Only update HomePage if it's the currently active page
-            if (nextion.getCurrentPage() == &homePage)
-            {
-                if (speed > 40)
-                    speed = 0;
-                else
-					speed += 2;
-
-                //homePage.setBearing(compass.getHeading());
-                //homePage.setDirection(compass.getDirection());
-                homePage.setSpeed(speed);
-                //homePage.setCompassTemperature(compass.getTemperature());
-            }
-        }
-    }
-
-    SystemCpuMonitor::endTask();
     SystemCpuMonitor::update();
 }
 

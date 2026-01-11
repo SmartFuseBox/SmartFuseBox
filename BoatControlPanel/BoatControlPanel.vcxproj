@@ -120,8 +120,7 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
-    <ClInclude Include="..\Shared\Sensors\GpsSensorHandler.h" />
-    <ClInclude Include="..\Shared\Sensors\SensorHandler.h" />
+    <ClInclude Include="GpsSensorHandler.h" />
     <ClInclude Include="BuoysPage.h" />
     <ClInclude Include="CardinalMarkersPage.h" />
     <ClInclude Include="DateTimeManager.h" />

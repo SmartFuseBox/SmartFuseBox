@@ -148,7 +148,7 @@ private:
 
 		// send GPS direction string
 		StringKeyValue dirParam;
-		strncpy(dirParam.key, ValueParamName, sizeof(dirParam));
+		strncpy(dirParam.key, ValueParamName, sizeof(dirParam.key));
 		strncpy(dirParam.value, getDirection(), sizeof(dirParam.value));
 		sendCommand(SensorDirection, &dirParam, 1);
 		dtostrf(_courseDeg, 8, 2, dirParam.value);
