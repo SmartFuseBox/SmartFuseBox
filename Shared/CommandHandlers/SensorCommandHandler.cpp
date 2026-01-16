@@ -78,6 +78,11 @@ const char* SensorCommandHandler::getGpsDirection() const
 	return _gpsDirection;
 }
 
+double SensorCommandHandler::getGpsDistance() const
+{
+    return _gpsDistance;
+}
+
 uint32_t SensorCommandHandler::getGpsSatellites() const
 {
 	return _gpsSatellites;
@@ -188,7 +193,7 @@ void SensorCommandHandler::setGpsCourse(double course)
 	_gpsCourse = course;
 #if defined(BOAT_CONTROL_PANEL)
 	FloatStateUpdate update = { static_cast<float>(_gpsCourse) };
-	notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::GpsCourse), &update);
+	notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Bearing), &update);
 #endif
 }
 
@@ -209,6 +214,16 @@ void SensorCommandHandler::setGpsDirection(const char* dir)
 	update.length = min(SystemFunctions::calculateLength(dir), static_cast<unsigned int>((CharStateUpdate::MaxLength - 1)));
 	snprintf(update.value, CharStateUpdate::MaxLength, "%s", dir);
 	notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Direction), &update);
+#endif
+}
+
+void SensorCommandHandler::setGpsDistance(double distance)
+{
+    _gpsDistance = distance;
+#if defined(BOAT_CONTROL_PANEL)
+    DoubleStateUpdate update = {};
+    update.value = getGpsDistance();
+    notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::GpsDistance), &update);
 #endif
 }
 

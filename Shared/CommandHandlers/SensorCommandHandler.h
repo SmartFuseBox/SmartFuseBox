@@ -41,6 +41,7 @@ private:
 	double _gpsCourse;
 	uint32_t _gpsSatellites;
 	const char* _gpsDirection;
+	double _gpsDistance = 0;
     bool _lastHornActive = false;
 public:
 #if defined(BOAT_CONTROL_PANEL)
@@ -65,9 +66,11 @@ public:
 	double getGpsLongitude() const;
 	double getGpsAltitude() const;
 	double getGpsCourse() const;
+	double getGpsDistance() const;
 	const char* getGpsDirection() const;
 	uint32_t getGpsSatellites() const;
 	bool getHornActive() const;
+	
 
 	// Setters
 	void setTemperature(float value);
@@ -83,6 +86,7 @@ public:
 	void setGpsCourse(double course);
 	void setGpsSatellites(uint32_t sats);
 	void setGpsDirection(const char* dir);
+	void setGpsDistance(double distance);
 	void setHornActive(bool value);
 };
 

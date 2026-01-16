@@ -52,6 +52,11 @@ private:
 	unsigned long _lastTimeSync;
 	unsigned long _lastStatusUpdate;
 
+	double _prevLatitude;
+	double _prevLongitude;
+	double _totalDistanceKm;
+	bool _firstFix;
+
 	/**
  * @brief Synchronize DateTimeManager with GPS UTC time.
  * Converts GPS date/time to Unix timestamp and updates DateTimeManager.
@@ -154,6 +159,12 @@ private:
 		dtostrf(_courseDeg, 8, 2, dirParam.value);
 		sendCommand(SensorBearing, &dirParam, 1);
 
+		// Send total distance
+		StringKeyValue distParam;
+		strncpy(distParam.key, ValueParamName, sizeof(distParam.key));
+		dtostrf(_totalDistanceKm, 8, 2, distParam.value);
+		sendCommand(SensorGpsDistance, &distParam, 1);
+
 
 		// Update sensor command handler if available
 		if (_sensorCommandHandler)
@@ -164,10 +175,35 @@ private:
 			_sensorCommandHandler->setGpsCourse(_courseDeg);
 			_sensorCommandHandler->setGpsSatellites(_satellites);
 			_sensorCommandHandler->setGpsDirection(getDirection());
+			_sensorCommandHandler->setGpsDistance(getTotalDistance());
 		}
 
 		_lastStatusUpdate = now;
 	}
+
+	double calculateDistance(double lat1, double lon1, double lat2, double lon2)
+	{
+		const double R = 6371.0; // Earth radius in kilometers
+
+		// Convert degrees to radians
+		double lat1Rad = lat1 * DEG_TO_RAD;
+		double lon1Rad = lon1 * DEG_TO_RAD;
+		double lat2Rad = lat2 * DEG_TO_RAD;
+		double lon2Rad = lon2 * DEG_TO_RAD;
+
+		// Haversine formula
+		double dLat = lat2Rad - lat1Rad;
+		double dLon = lon2Rad - lon1Rad;
+
+		double a = sin(dLat / 2.0) * sin(dLat / 2.0) +
+			cos(lat1Rad) * cos(lat2Rad) *
+			sin(dLon / 2.0) * sin(dLon / 2.0);
+
+		double c = 2.0 * atan2(sqrt(a), sqrt(1.0 - a));
+
+		return R * c;
+	}
+
 protected:
 	void initialize() override
 	{
@@ -199,15 +235,34 @@ protected:
 			_hasValidFix = true;
 			_lastValidData = now;
 			
-			// Clear any previous GPS failure warnings
-			if (_warningManager && _warningManager->isWarningActive(WarningType::GpsFailure))
+			
+			double newLat = _gps->location.lat();
+			double newLon = _gps->location.lng();
+			
+			// Calculate distance since last update
+			if (!_firstFix)
 			{
-				_warningManager->clearWarning(WarningType::GpsFailure);
+				double segmentDistance = calculateDistance(_prevLatitude, _prevLongitude, newLat, newLon);
+				
+				// Only add if movement is reasonable (filter out GPS noise)
+				// Typical GPS accuracy is ~5m, so ignore movements < 10m
+				if (segmentDistance > 0.01) // 10 meters = 0.01 km
+				{
+					_totalDistanceKm += segmentDistance;
+				}
 			}
-
-			// Update stored values
-			_latitude = _gps->location.lat();
-			_longitude = _gps->location.lng();
+			else
+			{
+				_firstFix = false;
+			}
+			
+			// Store current position for next calculation
+			_prevLatitude = newLat;
+			_prevLongitude = newLon;
+			
+			// Update other stored values
+			_latitude = newLat;
+			_longitude = newLon;
 			_altitude = _gps->altitude.isValid() ? _gps->altitude.meters() : 0.0;
 			_speedKmh = _gps->speed.isValid() ? _gps->speed.kmph() : 0.0;
 			_courseDeg = _gps->course.isValid() ? _gps->course.deg() : 0.0;
@@ -269,7 +324,11 @@ public:
 		  _satellites(0),
 		  _hasValidFix(false),
 		  _lastValidData(0),
-		_lastStatusUpdate(0)
+		_lastStatusUpdate(0),
+      _prevLatitude(0.0),
+      _prevLongitude(0.0),
+      _totalDistanceKm(0.0),
+      _firstFix(true)
 	{
 	}
 
@@ -332,4 +391,12 @@ public:
 	double getCourse() const { return _courseDeg; }
 	uint32_t getSatellites() const { return _satellites; }
 	const char* getDirection() const { return compassDirections[static_cast<int>((_courseDeg + 11.25) / 22.5) % 16]; }
+	double getTotalDistance() const { return _totalDistanceKm; }
+    
+    void resetTotalDistance() { 
+        _totalDistanceKm = 0.0; 
+        _firstFix = true;
+    }
+
+private:
 };

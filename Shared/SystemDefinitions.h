@@ -84,6 +84,7 @@ constexpr char SensorGpsLatLong[] = "S10";
 constexpr char SensorGpsAltitude[] = "S11";
 constexpr char SensorGpsSpeed[] = "S12";
 constexpr char SensorGpsSatellites[] = "S13";
+constexpr char SensorGpsDistance[] = "S14";
 
 
 constexpr char AckSuccess[] = "ok";
@@ -130,7 +131,6 @@ constexpr const char* compassDirections[16] = {
     "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
     "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
 };
-
 
 constexpr uint16_t MaximumJsonResponseBufferSize = 512;
 

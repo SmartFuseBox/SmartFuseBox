@@ -30,3 +30,4 @@ TLVCompassHandler.cpp|..\Shared\Sensors\TLVCompassHandler.cpp
 GpsSensorHandler.h|..\Shared\Sensors\GpsSensorHandler.h
 DateTimeManager.h|..\Shared\DateTimeManager.h
 DateTimeManager.cpp|..\Shared\DateTimeManager.cpp
+Astronomy.h|..\Shared\Astronomy.h

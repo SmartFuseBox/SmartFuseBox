@@ -34,6 +34,7 @@
 #include "FlagsPage.h"
 #include "CardinalMarkersPage.h"
 #include "BuoysPage.h"
+#include "MoonPhasePage.h"
 #include "AboutPage.h"
 
 #include "Config.h"
@@ -92,11 +93,12 @@ SystemPage systemPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &comman
 FlagsPage flagsPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 CardinalMarkersPage cardinalMarkersPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 BuoysPage buoysPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
+MoonPhasePage moonPhasePage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 AboutPage aboutPage(&NEXTION_SERIAL);
 
 BaseDisplayPage* displayPages[] = { &splashPage, &homePage, &warningPage, &relayPage, &soundSignalsPage, 
     &soundOvertakingPage, &soundFogPage, &soundManeuveringPage, &soundEmergencyPage, &soundOtherPage,
-    &systemPage, &flagsPage, & cardinalMarkersPage, &buoysPage, &aboutPage };
+    &systemPage, &flagsPage, & cardinalMarkersPage, &buoysPage, &moonPhasePage, &aboutPage };
 NextionControl nextion(&NEXTION_SERIAL, displayPages, sizeof(displayPages) / sizeof(displayPages[0]));
 
 // link command handlers

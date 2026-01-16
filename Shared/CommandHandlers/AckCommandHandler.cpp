@@ -167,6 +167,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
             // Format: ACK:R2=ok:0=0 (with relay index and state)
             if (!SystemFunctions::isAllDigits(params[1].key) || !SystemFunctions::isAllDigits(params[1].value))
             {
+                sendDebugMessage("Invalid R2 Ack response", "AckCommandHandler");
                 return true;
             }
 

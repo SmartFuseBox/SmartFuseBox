@@ -86,7 +86,7 @@ void SystemPage::handleTouch(uint8_t compId, uint8_t eventType)
     switch (compId)
     {
     case ButtonPrevious:
-        setPage(PageFlags);
+        setPage(PageBuoys);
         break;
 
     case ButtonNext:
