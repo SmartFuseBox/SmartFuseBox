@@ -146,7 +146,7 @@
       <Filter>Source Files\Pages</Filter>
     </ClCompile>
     <ClCompile Include="BuoysPage.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,9 +243,6 @@
     <ClInclude Include="DateTimeManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sensors\BaseSensor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SystemDefinitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -261,11 +258,14 @@
     <ClInclude Include="BuoysPage.h">
       <Filter>Header Files\Pages</Filter>
     </ClInclude>
-    <ClInclude Include="GpsSensorHandler.h">
-      <Filter>Header Files\Sensors</Filter>
-    </ClInclude>
-    <ClInclude Include="SensorHandler.h">
+    <ClInclude Include="Sensors\BaseSensor.h">
       <Filter>Header Files\SharedCode\Sensors</Filter>
+    </ClInclude>
+    <ClInclude Include="GpsSensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Astronomy.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

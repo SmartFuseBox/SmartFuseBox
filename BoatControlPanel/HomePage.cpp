@@ -1,4 +1,6 @@
 #include "HomePage.h"
+#include "DateTimeManager.h"
+#include "Astronomy.h"
 
 
 // Nextion Names/Ids on current Home Page
@@ -7,26 +9,38 @@ constexpr char ControlHumidity[] = "t3";
 constexpr char ControlTemperature[] = "t2";
 constexpr char ControlBearingText[] = "t6";
 constexpr char ControlBearingDirection[] = "t4";
-constexpr char ControlSpeed[] = "t5";
+constexpr char ControlLonValue[] = "t5";
+constexpr char ControlLatValue[] = "t7";
+constexpr char ControlCurrTime[] = "t8";
+constexpr char ControlDistance[] = "t10";
+constexpr char ControlSpeed[] = "tSpeed";
 constexpr char ControlBoatName[] = "tBoatName";
 constexpr char ControlWarning[] = "pHomeWarning";
-constexpr char SpeedUnitKnots[] = "%d kn";
+constexpr char ControlMoonPhase[] = "p2";
+constexpr char SpeedUnitKnots[] = "%d kn/h";
+constexpr char SpeedUnitKilometer[] = "%d km/h";
+constexpr char DistanceUnitKnots[] = "%s nm";
+constexpr char DistanceUnitKilometer[] = "%s km";
 constexpr char BearingFormat[] = "%d°";
 constexpr char CelsiusSuffix[] = "C";
 constexpr char ButtonOn[] = "=1";
 constexpr char ButtonOff[] = "=0";
 
+constexpr char HomeButtonPrefix[] = "b";
 
-constexpr uint8_t Button1 = 1; // b1
-constexpr uint8_t Button2 = 2; // b2
-constexpr uint8_t Button3 = 3; // b3
-constexpr uint8_t Button4 = 4; // b4
+constexpr uint8_t Button1 = 1; // bHomeRelay1
+constexpr uint8_t Button2 = 2; // bHomeRelay2
+constexpr uint8_t Button3 = 3; // bHomeRelay3
+constexpr uint8_t Button4 = 4; // bHomeRelay4
+constexpr uint8_t ButtonSpeed = 9; //tSpeed / swap between kn/km
+constexpr uint8_t ButtonVhf = 10; //p0
 constexpr uint8_t ButtonNext = 12;
 constexpr uint8_t ButtonWarning = 13;
+constexpr uint8_t ButtonMoon = 23;
 constexpr uint8_t ButtonIdOffset = 1; // Offset to map button IDs to array indices
 
 constexpr unsigned long RefreshUpdateIntervalMs = 10000;
-constexpr char HomeButtonPrefix[] = "b";
+constexpr double GpsNoiseThresholdDegrees = 0.00001;
 
 
 HomePage::HomePage(Stream* serialPort,
@@ -48,8 +62,8 @@ void HomePage::begin()
 
     for (uint8_t i = 1; i <= ConfigHomeButtons; ++i)
     {
-        char cmd[10];
-		snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, i);
+        char cmd[15];
+        snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, i);
         setPicture(cmd, ImageButtonColorGrey);
 	}
     _compassTempAboveNorm = 0;
@@ -96,6 +110,10 @@ void HomePage::refresh(unsigned long now)
         // Update connection-related displays
         if (warningMgr->isWarningActive(WarningType::ConnectionLost) || warningMgr->isWarningActive(WarningType::TemperatureSensorFailure))
         {
+            // Reset internal state to NaN to prevent flickering
+            _lastTemp = NAN;
+            _lastHumidity = NAN;
+            
             sendText(ControlHumidity, NoValueText);
             sendText(ControlTemperature, NoValueText);
         }
@@ -109,6 +127,10 @@ void HomePage::updateAllDisplayItems()
     updateBearing();
     updateSpeed();
 	updateDirection();
+    updateLatLon();
+    updateDistance();
+    updateTime();
+    updateMoonPhase();
 }
 
 // Handle touch events for buttons
@@ -143,13 +165,26 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
             buttonIndex = compId - ButtonIdOffset;
             break;
 
+        case ButtonSpeed:
+            _speedInKnots = !_speedInKnots;
+			updateSpeed();
+            return;
+
+        case ButtonVhf:
+            setPage(PageVhfCall);
+			return;
+
         case ButtonNext: 
             setPage(PageRelay);
             return;
 
+        case ButtonMoon:
+            setPage(PageMoonPhases);
+            return;
+
         case ButtonWarning:
             setPage(PageWarning);
-            return;  
+            return;
 
         default:
             return;
@@ -193,8 +228,8 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
         _buttonImage[buttonIndex] = newColor;
 
         // Update the button appearance
-        char cmd[10];
-        snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, buttonIndex + 1);
+        char cmd[15];
+        snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, buttonIndex + 1);
         setPicture(cmd, newColor);
         setPicture2(cmd, newColor);
 
@@ -204,6 +239,9 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
             // Send relay command
             snprintf(cmd, sizeof(cmd), "%d%s", relayIndex, _buttonOn[buttonIndex] ? ButtonOn : ButtonOff);
             commandMgrLink->sendCommand(RelaySetState, cmd);
+
+			// Reset refresh timer so display updates
+            _lastRefreshTime = millis() - RefreshUpdateIntervalMs;
         }
     }
 }
@@ -230,7 +268,10 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
         {
             if (_slotToRelay[buttonIndex] == update->relayIndex)
             {
-                
+                char debugMsg[64];
+                snprintf(debugMsg, sizeof(debugMsg), "Page update for relay updated %d = %d", buttonIndex, update->isOn);
+                getCommandMgrComputer()->sendDebug(debugMsg, "HomePage");
+
                 // Update internal state
                 _buttonOn[buttonIndex] = update->isOn;
 
@@ -239,8 +280,8 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
                 _buttonImage[buttonIndex] = newColor;
 
                 // Update the button appearance on display
-                char cmd[10];
-                snprintf(cmd, sizeof(cmd), "%s%d", HomeButtonPrefix, buttonIndex + 1);
+                char cmd[15];
+                snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, buttonIndex + 1);
                 setPicture(cmd, newColor);
                 setPicture2(cmd, newColor);
 
@@ -278,6 +319,25 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
     {
         const FloatStateUpdate* update = static_cast<const FloatStateUpdate*>(data);
         setCompassTemperature(update->value);
+    }
+    else if (updateType == static_cast<uint8_t>(PageUpdateType::GpsLatitude) && data != nullptr)
+    {
+        // FloatStateUpdate is used for GPS lat/lon notifications
+        const FloatStateUpdate* update = static_cast<const FloatStateUpdate*>(data);
+        _lastLatitude = update->value;
+        updateLatLon();
+    }
+    else if (updateType == static_cast<uint8_t>(PageUpdateType::GpsLongitude) && data != nullptr)
+    {
+        const FloatStateUpdate* update = static_cast<const FloatStateUpdate*>(data);
+        _lastLongitude = update->value;
+        updateLatLon();
+    }
+	else if (updateType == static_cast<uint8_t>(PageUpdateType::GpsDistance) && data != nullptr)
+    {
+        const FloatStateUpdate* update = static_cast<const FloatStateUpdate*>(data);
+        _lastDistance = update->value;
+        updateDistance();
     }
 }
 
@@ -405,7 +465,8 @@ void HomePage::updateBearing()
     }
 
     char buffer[10];
-    snprintf(buffer, sizeof(buffer), BearingFormat, (int)_lastBearing);
+    // Use explicit single-byte degree symbol (0xB0) to avoid UTF-8 two-byte sequence
+    snprintf(buffer, sizeof(buffer), "%d%c", (int)_lastBearing, (char)176);
     sendText(ControlBearingText, buffer);
 }
 
@@ -413,13 +474,135 @@ void HomePage::updateSpeed()
 {
     if (isnan(_lastSpeed))
     {
-        sendText(ControlSpeed, NoValueText);
-        return;
+        _lastSpeed = 0;
     }
 
     char buffer[10];
-    snprintf(buffer, sizeof(buffer), SpeedUnitKnots, (int)_lastSpeed);
+    float displaySpeed = _lastSpeed;
+    const char* format = SpeedUnitKilometer;
+
+    if (_speedInKnots)
+    {
+        // Convert km/h to knots (1 km/h = 0.539957 knots)
+        displaySpeed = _lastSpeed * 0.539957f;
+        format = SpeedUnitKnots;
+    }
+
+    snprintf(buffer, sizeof(buffer), format, (int)displaySpeed);
     sendText(ControlSpeed, buffer);
+}
+
+void HomePage::updateLatLon()
+{
+    if (isnan(_lastLatitude))
+    {
+        sendText(ControlLatValue, NoValueText);
+        _displayedLatitude = NAN;
+    }
+    else
+    {
+        // Only update display if change is significant or first time
+        bool shouldUpdate = isnan(_displayedLatitude) || 
+                           fabs(_lastLatitude - _displayedLatitude) > GpsNoiseThresholdDegrees;
+        
+        if (shouldUpdate)
+        {
+            _displayedLatitude = _lastLatitude;
+            
+            char latBuf[20];
+            dtostrf(_lastLatitude, 10, 6, latBuf);
+            char* pLat = latBuf;
+
+            while (*pLat == ' ') 
+                pLat++;
+            
+            sendText(ControlLatValue, pLat);
+        }
+    }
+
+    if (isnan(_lastLongitude))
+    {
+        sendText(ControlLonValue, NoValueText);
+        _displayedLongitude = NAN;
+    }
+    else
+    {
+        // Only update display if change is significant or first time
+        bool shouldUpdate = isnan(_displayedLongitude) || 
+                           fabs(_lastLongitude - _displayedLongitude) > GpsNoiseThresholdDegrees;
+        
+        if (shouldUpdate)
+        {
+            _displayedLongitude = _lastLongitude;
+            
+            char lonBuf[20];
+            dtostrf(_lastLongitude, 10, 6, lonBuf);
+
+            char* pLon = lonBuf;
+
+            while (*pLon == ' ')
+                pLon++;
+
+            sendText(ControlLonValue, pLon);
+        }
+    }
+}
+
+void HomePage::updateDistance()
+{
+    if (isnan(_lastDistance))
+    {
+        _lastDistance = 0.00;
+    }
+
+    char buffer[16];
+    float displayDistance = _lastDistance;
+    const char* format = DistanceUnitKilometer;
+
+    if (_speedInKnots)
+    {
+        // Convert km to knots (1 km = 0.539957 knots)
+        displayDistance = _lastDistance * 0.539957f;
+        format = DistanceUnitKnots;
+    }
+
+    char num[10];
+    dtostrf(displayDistance, 0, 1, num);
+    snprintf(buffer, sizeof(buffer), format, num);
+    sendText(ControlDistance, buffer);
+}
+
+void HomePage::updateTime()
+{
+    char buf[MaxDateTimeStringLength + 5];
+    if (!DateTimeManager::formatDateTimeReadable(buf, sizeof(buf)))
+    {
+        sendText(ControlCurrTime, NoValueText);
+        return;
+    }
+
+    char timeBuf[13]; 
+    if (strlen(buf) >= 19)
+    {
+        memcpy(timeBuf, buf + 11, 8);
+        timeBuf[8] = '\0';
+        strcat(timeBuf, " UTC");
+    }
+    else
+    {
+        // fallback: use whatever is available and append UTC
+        strncpy(timeBuf, buf, sizeof(timeBuf) - 5);
+        timeBuf[sizeof(timeBuf) - 5] = '\0';
+        strcat(timeBuf, " UTC");
+    }
+
+    sendText(ControlCurrTime, timeBuf);
+}
+
+void HomePage::updateMoonPhase()
+{
+	MoonPhase phase = Astronomy::getMoonPhaseFromUnix(DateTimeManager::getCurrentTime());
+    setPicture(ControlMoonPhase, MoonImages[static_cast<uint8_t>(phase)]);
 }
 
 void HomePage::updateDirection()
@@ -441,7 +624,7 @@ void HomePage::configUpdated()
     for (uint8_t button = 0; button < ConfigHomeButtons; ++button)
     {
         char buffer[15];
-        snprintf(buffer, sizeof(buffer), "%s%d", HomeButtonPrefix, button + 1);
+        snprintf(buffer, sizeof(buffer), "%sHomeRelay%d", HomeButtonPrefix, button + 1);
 
         uint8_t relayIndex = config->homePageMapping[button];
         if (relayIndex <= 7)

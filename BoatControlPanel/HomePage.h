@@ -18,7 +18,14 @@ private:
     float _lastSpeed = NAN;
     char _lastDirection[5] = "";
     float _lastCompassTemp = NAN;
+    double _lastLatitude = NAN;
+    double _lastLongitude = NAN;
+    double _displayedLatitude = NAN;
+    double _displayedLongitude = NAN;
+	float _lastDistance = NAN;
+
     byte _compassTempAboveNorm = 0;
+	bool _speedInKnots = true;
 	bool _buttonOn[ConfigHomeButtons] = { false, false, false, false };
 	byte _buttonImage[ConfigHomeButtons] = { ImageButtonColorGrey, ImageButtonColorGrey, ImageButtonColorGrey, ImageButtonColorGrey };
 	const byte _buttonImageOn[ConfigHomeButtons] = { ImageButtonColorBlue, ImageButtonColorBlue, ImageButtonColorBlue, ImageButtonColorBlue };
@@ -31,6 +38,10 @@ private:
     void updateBearing();
     void updateSpeed();
     void updateDirection();
+    void updateLatLon();
+    void updateDistance();
+    void updateTime();
+    void updateMoonPhase();
     void updateAllDisplayItems();
 
 protected:

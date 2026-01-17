@@ -14,7 +14,10 @@ constexpr uint8_t PageSystem = 10;
 constexpr uint8_t PageFlags = 11;
 constexpr uint8_t PageCardinalMarkers = 12;
 constexpr uint8_t PageBuoys = 13;
-constexpr uint8_t PageAbout = 17;
+constexpr uint8_t PageAbout = 14;
+constexpr uint8_t PageMoon = 15;
+constexpr uint8_t PageMoonPhases = 15;
+constexpr uint8_t PageVhfCall = 16;
 
 constexpr uint8_t InvalidButtonIndex = 0xFF;
 
@@ -34,6 +37,28 @@ constexpr uint8_t ImageWarning = 10;
 constexpr uint8_t ImageBlank = 11;
 constexpr uint8_t ImageBackButton = 12;
 constexpr uint8_t ImageNextButton = 13;
+
+
+constexpr uint8_t ImageMoonPhaseNew = 73;
+constexpr uint8_t ImageMoonPhaseWaxingCrescent = 74;
+constexpr uint8_t ImageMoonPhaseFirstQuarter = 75;
+constexpr uint8_t ImageMoonPhaseWaxingGibbous = 76;
+constexpr uint8_t ImageMoonPhaseFull = 77;
+constexpr uint8_t ImageMoonPhaseWaningGibbous = 78;
+constexpr uint8_t ImageMoonPhaseLastQuarter = 79;
+constexpr uint8_t ImageMoonPhaseWaningCrescent = 80;
+
+
+constexpr uint8_t MoonImages[8] = {
+    ImageMoonPhaseNew,
+    ImageMoonPhaseWaxingCrescent,
+    ImageMoonPhaseFirstQuarter,
+    ImageMoonPhaseWaxingGibbous,
+    ImageMoonPhaseFull,
+    ImageMoonPhaseWaningGibbous,
+    ImageMoonPhaseLastQuarter,
+    ImageMoonPhaseWaningCrescent
+};
 
 // page
 constexpr char PageOne[] = "page 1";
