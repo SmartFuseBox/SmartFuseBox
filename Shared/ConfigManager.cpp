@@ -125,6 +125,11 @@ void ConfigManager::resetToDefaults()
         _cfg.linkedRelays[i][1] = 0xFF;
     }
 
+	strncpy(_cfg.mMSI, "000000000", ConfigMmsiLength - 1);
+	strncpy(_cfg.callSign, "NOCALL", ConfigCallSignLength - 1);
+	strncpy(_cfg.homePort, "Unknown", ConfigHomePortLength - 1);
+	_cfg.timezoneOffset = 0; // UTC
+
 #if defined(ARDUINO_UNO_R4)
     _cfg.bluetoothEnabled = false;
     _cfg.wifiEnabled = false;

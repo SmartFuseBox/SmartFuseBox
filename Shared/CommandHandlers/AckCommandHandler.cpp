@@ -31,18 +31,13 @@ bool AckCommandHandler::processHeartbeatAck(SerialCommandManager* sender, const 
     // Notify the current page about the heartbeat acknowledgement
     notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::HeartbeatAck), nullptr);
 
-    if (sender)
-    {
-        sender->sendDebug("Heartbeat ACK received", AckCommand);
-    }
-
     return true;
 }
 
 bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, const char* key, const char* value, const StringKeyValue params[], uint8_t paramCount)
 {
     // Check for warnings list acknowledgement (W1=ok)
-    if (strcmp(key, SystemHeartbeatCommand) != 0 || strcmp(value, AckSuccess) != 0)
+    if (strcmp(key, WarningsList) != 0 || strcmp(value, AckSuccess) != 0)
         return false;
 
     WarningManager* warningManager = getWarningManager();
@@ -83,10 +78,7 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
             // Notify the warning page to update display
             notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Warning), nullptr);
 
-            if (sender)
-            {
-                sender->sendDebug("Remote warnings updated", AckCommand);
-            }
+            sendDebugMessage(F("Remote warnings updated"), AckCommand);
 
             return true;
         }
@@ -99,7 +91,7 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
         
         if (sender)
         {
-            sender->sendDebug("W1 ACK received (no warnings)", AckCommand);
+            sendDebugMessage(F("W1 ACK received (no warnings)"), AckCommand);
         }
         return true;
     }
@@ -138,7 +130,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
     if (strcmp(params[0].value, AckSuccess) != 0)
     {
         char debugMsg[100];
-        snprintf(debugMsg, sizeof(debugMsg), "ACK indicates failure: key='%s', val='%s'", params[0].key, params[0].value);
+        snprintf_P(debugMsg, sizeof(debugMsg), PSTR("ACK indicates failure: key='%s', val='%s'"), params[0].key, params[0].value);
         _broadcaster->sendDebug(debugMsg, AckCommand);
         return false;
     }
@@ -167,7 +159,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
             // Format: ACK:R2=ok:0=0 (with relay index and state)
             if (!SystemFunctions::isAllDigits(params[1].key) || !SystemFunctions::isAllDigits(params[1].value))
             {
-                sendDebugMessage("Invalid R2 Ack response", "AckCommandHandler");
+                sendDebugMessage(F("Invalid R2 Ack response"), F("AckCommandHandler"));
                 return true;
             }
 

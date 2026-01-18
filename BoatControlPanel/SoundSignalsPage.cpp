@@ -81,7 +81,7 @@ void SoundSignalsPage::handleTouch(uint8_t compId, uint8_t eventType)
         return;
 
     case ButtonPrevious:
-        setPage(PageRelay);
+        setPage(PageVhfRadio);
         return;
 
     default:

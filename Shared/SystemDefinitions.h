@@ -63,6 +63,10 @@ constexpr char ConfigWifiApIpAddress[] = "C17";
 
 constexpr char ConfigDefaultRelayState[] = "C18";
 constexpr char ConfigLinkRelays[] = "C19";
+constexpr char ConfigTimeZoneOffset[] = "C20";
+constexpr char ConfigMmsi[] = "C21";
+constexpr char ConfigCallSign[] = "C22";
+constexpr char ConfigHomePort[] = "C23";
 
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";

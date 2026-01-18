@@ -31,34 +31,38 @@ These are commands used to configure the system settings and can only be sent fr
 | Command | Example | Purpose |
 |---|---|---|
 | `C0` — Save settings | `C0` | Persist current in-memory config to EEPROM. Responds `SAVED` on success; error `EEPROM commit failed` on failure. No params. |
-| `C1` — Get settings | `C1` | Request full config. Device replies with multiple commands: `C3 <boatName>`, `C4 <idx>:<shortName|longName>` for each relay, `C5 <slot>:<relay>` for each home-slot mapping, then `OK`. No params. |
+| `C1` — Get settings | `C1` | Request full config. Device replies with multiple commands: `C3 <boatName>`, `C4 <idx>:<shortName|longName>` for each relay, `C5 <slot>:<relay>` for each home-slot mapping, `C6 <idx>=<color>` for each button color, `C7 v=<type>` for vessel type, `C8 v=<relay>` for sound relay, `C9 v=<delay>` for sound delay, `C10`-`C17` for WiFi/Bluetooth settings (Arduino Uno R4 only), `C18 <relay>=<state>` for default relay states, `C19 <relay>=<linkedrelay>` for linked relays, `C20 v=<offset>` for timezone, `C21 <mmsi>` for MMSI, `C22 <callsign>` for call sign, `C23 <homeport>` for home port, then `OK`. No params. |
 | `C2` — Reset settings | `C2` | Request full reset of all config settings. No params. |
 | `C3` — Rename boat (BCP) | `C3:Sea Wolf` or `C3:name=SeaWolf` | Set the boat name. `<key>:<value>` pair (value is used as boat name. Empty name → error. Name is truncated to configured max length. |
 | `C4` — Rename relay (BCP) | `C4:2=Bilge` or `C4:2=Bilge\|Bilge Pump` | Rename a relay. Param format: `<idx>=<shortName>` or `<idx>=<shortName|longName>`. `idx` must be 0..7 (`RELAY_COUNT`). If no pipe character or long name provided, the short name is used for both. Short name is truncated to 5 chars (used on home page), long name is truncated to 20 chars (used on buttons page). Missing name → error. |
 | `C5` — Map home button (BCP) | `C5:1=3` (map) — `C5:1=255` (unmap) | Map a home-page slot to a relay. Param format: `<slot>:<relay>`. `button` must be 0..3 (`HOME_BUTTONS`). `relay` must be 0..7 or `255` to clear/unmap. |
 | `C6` — Map home button color (BCP) | `C6:0=4` (map button 1 to Red when activated) — `C6:1=255` (unmap colors) | Map a home-page button to a color when activated (on). Param format: `<slot>:<relay>`. `slot` must be 0..3 (`ConfigManager::HOME_SLOTS`). `relay` must be 0..7 or `255` to clear/unmap. |
 | `C7` — Set vessel type | `C7:v=1` | Set the vessel type. Param format: `v=<type>`. Possible values for `<type>` are: 0 (Motor), 1 (Sail), 2 (Fishing), 3 (Yacht). Uses enum values as defined in `Config.h`. Invalid or missing value → error. |
-| `C8` — Sound relay button | `C8:v=3` (map) — `C8:v=255` (unmap) | Map the sound system (horn) to a relay. Param format: `<value>:<relay>`. `button` must be 0..7 (`RELAY_COUNT`). `relay` must be 0..7 or `255` to clear/unmap. |
+| `C8` — Sound relay button | `C8:v=3` (map) — `C8:v=255` (unmap) | Map the sound system (horn) to a relay. Param format: `v=<relay>`. `relay` must be 0..7 or `255` to clear/unmap. Auto-renames relay to "Sound" / "Sound\r\nSignals" if not already named. |
 | `C9` — Sound delay Start | `C9:v=0xFF` | Sets the delay before the sound is started in milliseconds, allows other processing to continue so as sounds are not cut off. Invalid or missing value → error. |
 | `C10` — Bluetooth Enabled (SFB) | `C10:v=1` | Sets the enabled state of bluetooth, 0 disabled, 1 enabled, if disabling then a restart is required. Invalid or missing value → error. |
 | `C11` — Wifi Enabled (SFB) | `C11:v=1` | Sets the enabled state of wifi, 0 disabled, 1 enabled, if disabling then a restart is required. Invalid or missing value → error. |
 | `C12` — Wifi Access Mode (SFB) | `C12:v=1` | Sets access mode, 0 is AP and 1 is client |
-| `C13` — Wifi SSID (SFB) | `C13:v=RouterName` | Set's the wifi SSID, only available if access mode is client |
-| `C14` — Wifi Password (SFB) | `C14:v=Password123` | Set's the wifi password, only available if access mode is client |
-| `C15` — Wifi Port (SFB) | `C15:v=80` | Set's the wifi port, this is the port used to listen on, default value is 80 |
-| `C16` — Wifi connection state (SFB) | `C16` | Wifi connection state, no params, returns WifiConnectionState value |
-| `C17` — Wifi AP Ip address (SFB) | `C17` | Sets the IP address when using access point mode, default is 192.168.4.1 |
-| `C18` — Initial relay on | `C18:3=1` — `C18:3=0`  | Set's the initial status of a relay to on by default. Param format: `<relay>:<value>`. `relay` must be 0..7 (`RELAY_COUNT`), `value` must be 0 (off by default) or 1 (on by default.  |
-| `C19` — Link Relays | `C19:3=4` | Links relays together, if one relay is switched on, the linked relay is switched on, and vice versa for switching off. Param format: `<relay>:<linkedrelay>`. `relay` must be 0..7 (`RELAY_COUNT`) `linkedrelay` must be 0..7 or 0xFF to unlink |
+| `C13` — Wifi SSID (SFB) | `C13:RouterName` | Set's the wifi SSID, only available if access mode is client. Param format: SSID value directly (no v= prefix). |
+| `C14` — Wifi Password (SFB) | `C14:Password123` | Set's the wifi password, only available if access mode is client. Param format: password value directly (no v= prefix). |
+| `C15` — Wifi Port (SFB) | `C15:v=80` | Set's the wifi port, this is the port used to listen on, default value is 80. Invalid or zero port → error. |
+| `C16` — Wifi connection state (SFB) | `C16` | Wifi connection state, no params, returns WifiConnectionState value. Note: Not implemented in ConfigCommandHandler - use SystemCommandHandler. |
+| `C17` — Wifi AP Ip address (SFB) | `C17:192.168.4.1` | Sets the IP address when using access point mode, default is 192.168.4.1. Param format: IP address directly (no v= prefix). |
+| `C18` — Initial relay on | `C18:3=1` — `C18:3=0`  | Set's the initial status of a relay to on by default. Param format: `<relay>=<value>`. `relay` must be 0..7 (`RELAY_COUNT`), `value` must be 0 (off by default) or 1 (on by default). |
+| `C19` — Link Relays | `C19:3=4` — `C19:3=255` (unlink) | Links relays together, if one relay is switched on, the linked relay is switched on, and vice versa for switching off. Param format: `<relay>=<linkedrelay>`. `relay` must be 0..7 (`RELAY_COUNT`) `linkedrelay` must be 0..7 or `0xFF` (255) to unlink. |
+| `C20` — Timezone Offset | `C20:v=-5` or `C20:v=8` | Set timezone offset from UTC in hours. Param format: `v=<offset>`. Valid range: -12 to +14. Invalid offset → error. |
+| `C21` — MMSI | `C21:123456789` | Set Maritime Mobile Service Identity (MMSI) number. Param format: MMSI value directly (no v= prefix). Must be exactly 9 digits. Invalid length → error. |
+| `C22` — Call Sign | `C22:ABCD123` | Set vessel call sign. Param format: call sign value directly (no v= prefix). Truncated to configured max length (ConfigCallSignLength). |
+| `C23` — Home Port | `C23:Miami` | Set vessel home port. Param format: port name directly (no v= prefix). Truncated to configured max length (ConfigHomePortLength). |
 
 
 
-Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `EEPROM commit failed`, `Unknown config command`.
+Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`.
 
 
 ### Wifi Configuration Commands (SFB)
 Route: /api/config/{command}
-Example: Specify sound relay button = /api/config/F8?v=3 
+Example: Specify sound relay button = /api/config/C8?v=3 
 
 
 ------

@@ -111,7 +111,7 @@ void RelayPage::handleTouch(uint8_t compId, uint8_t eventType)
         break;
 
     case ButtonNext:
-        setPage(PageSoundSignals);
+        setPage(PageVhfRadio);
         return;
 
     case ButtonPrevious:

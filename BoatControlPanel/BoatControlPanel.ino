@@ -35,6 +35,9 @@
 #include "CardinalMarkersPage.h"
 #include "BuoysPage.h"
 #include "MoonPhasePage.h"
+#include "VhfRadioPage.h"
+#include "VhfChannelsPage.h"
+#include "VhfDistressPage.h"
 #include "AboutPage.h"
 
 #include "Config.h"
@@ -94,11 +97,15 @@ FlagsPage flagsPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandM
 CardinalMarkersPage cardinalMarkersPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 BuoysPage buoysPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 MoonPhasePage moonPhasePage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
+VhfRadioPage radioPage(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
+VhfDistressPage radioPageDistress(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
+VhfChannelsPage radioPageChannels(&NEXTION_SERIAL, &warningManager, &commandMgrLink, &commandMgrComputer);
 AboutPage aboutPage(&NEXTION_SERIAL);
 
 BaseDisplayPage* displayPages[] = { &splashPage, &homePage, &warningPage, &relayPage, &soundSignalsPage, 
     &soundOvertakingPage, &soundFogPage, &soundManeuveringPage, &soundEmergencyPage, &soundOtherPage,
-    &systemPage, &flagsPage, & cardinalMarkersPage, &buoysPage, &moonPhasePage, &aboutPage };
+    &systemPage, &flagsPage, & cardinalMarkersPage, &buoysPage, &moonPhasePage, &radioPage, 
+    &radioPageDistress, &radioPageChannels, &aboutPage };
 NextionControl nextion(&NEXTION_SERIAL, displayPages, sizeof(displayPages) / sizeof(displayPages[0]));
 
 // link command handlers
@@ -173,6 +180,8 @@ void setup()
     homePage.configSet(config);
     warningPage.configSet(config);
 	relayPage.configSet(config);
+    radioPage.configSet(config);
+	radioPageDistress.configSet(config);
 
     nextion.begin();
     
@@ -220,11 +229,26 @@ void loop()
     SystemCpuMonitor::update();
 }
 
+void resetSerial(Stream& serial)
+{
+    // Flush outgoing data
+    serial.flush();
+
+    // Clear incoming buffer
+    while (serial.available() > 0)
+    {
+        serial.read();
+    }
+}
+
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
 	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
     commandMgrComputer.sendError(cmd, "LINKHANDLER");
+
+	// Reset serial to clear any residual data
+	resetSerial(LINK_SERIAL);
 }
 
 void onComputerCommandReceived(SerialCommandManager* mgr)
@@ -233,4 +257,7 @@ void onComputerCommandReceived(SerialCommandManager* mgr)
 	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
 
     commandMgrComputer.sendError(cmd, "PCHANDLER");
+
+    // Reset serial to clear any residual data
+	resetSerial(COMPUTER_SERIAL);
 }

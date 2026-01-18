@@ -16,7 +16,7 @@ constexpr char ControlDistance[] = "t10";
 constexpr char ControlSpeed[] = "tSpeed";
 constexpr char ControlBoatName[] = "tBoatName";
 constexpr char ControlWarning[] = "pHomeWarning";
-constexpr char ControlMoonPhase[] = "p2";
+constexpr char ControlMoonPhase[] = "pHomeMoon";
 constexpr char SpeedUnitKnots[] = "%d kn/h";
 constexpr char SpeedUnitKilometer[] = "%d km/h";
 constexpr char DistanceUnitKnots[] = "%s nm";
@@ -86,6 +86,7 @@ void HomePage::onEnterPage()
 void HomePage::refresh(unsigned long now)
 {
     updateAllDisplayItems();
+
     // Send R2 command every 10 seconds to refresh relay states
     if (now - _lastRefreshTime >= RefreshUpdateIntervalMs)
     {
@@ -171,7 +172,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
             return;
 
         case ButtonVhf:
-            setPage(PageVhfCall);
+            setPage(PageVhfRadio);
 			return;
 
         case ButtonNext: 
@@ -270,7 +271,7 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
             {
                 char debugMsg[64];
                 snprintf(debugMsg, sizeof(debugMsg), "Page update for relay updated %d = %d", buttonIndex, update->isOn);
-                getCommandMgrComputer()->sendDebug(debugMsg, "HomePage");
+                getCommandMgrComputer()->sendDebug(debugMsg, F("HomePage"));
 
                 // Update internal state
                 _buttonOn[buttonIndex] = update->isOn;

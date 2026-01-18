@@ -79,6 +79,7 @@
     <ClCompile Include="DateTimeManager.cpp" />
     <ClCompile Include="FlagsPage.cpp" />
     <ClCompile Include="MoonPhasePage.cpp" />
+    <ClCompile Include="Phonetic.cpp" />
     <ClCompile Include="SystemFunctions.cpp" />
     <ClCompile Include="AboutPage.cpp" />
     <ClCompile Include="SystemCpuMonitor.cpp" />
@@ -104,20 +105,16 @@
     <ClCompile Include="SoundOvertakingPage.cpp" />
     <ClCompile Include="SoundSignalsPage.cpp" />
     <ClCompile Include="SystemPage.cpp" />
-    <ClCompile Include="TLVCompassHandler.cpp">
-      <DeploymentContent>true</DeploymentContent>
-    </ClCompile>
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="VhfChannelsPage.cpp" />
+    <ClCompile Include="VhfDistressPage.cpp" />
+    <ClCompile Include="VhfRadioPage.cpp" />
     <ClCompile Include="WarningCommandHandler.cpp" />
     <ClCompile Include="WarningManager.cpp" />
     <ClCompile Include="WarningPage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HomePage.h">
-      <FileType>CppCode</FileType>
-      <DeploymentContent>true</DeploymentContent>
-    </ClCompile>
-    <ClCompile Include="TLVCompassHandler.h">
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
@@ -128,6 +125,7 @@
     <ClInclude Include="DateTimeManager.h" />
     <ClInclude Include="FlagsPage.h" />
     <ClInclude Include="MoonPhasePage.h" />
+    <ClInclude Include="Phonetic.h" />
     <ClInclude Include="Sensors\BaseSensor.h" />
     <ClInclude Include="SystemDefinitions.h" />
     <ClInclude Include="LoggingSupport.h" />
@@ -137,6 +135,9 @@
     <ClInclude Include="SystemFunctions.h" />
     <ClInclude Include="BroadcastManager.h" />
     <ClInclude Include="SystemPage.h" />
+    <ClInclude Include="VhfChannelsPage.h" />
+    <ClInclude Include="VhfDistressPage.h" />
+    <ClInclude Include="VhfRadioPage.h" />
     <ClInclude Include="WarningType.h" />
     <ClInclude Include="BaseBoatCommandHandler.h" />
     <ClInclude Include="BaseBoatPage.h" />

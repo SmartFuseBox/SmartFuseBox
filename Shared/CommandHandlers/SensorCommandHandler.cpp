@@ -362,7 +362,7 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         return false;
     }
 
-    sendAckOk(sender, params[0].key);
+    sendAckOk(sender, command);
     return true;
 }
 
