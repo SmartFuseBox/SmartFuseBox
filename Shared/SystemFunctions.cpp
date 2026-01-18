@@ -176,3 +176,70 @@ int32_t SystemFunctions::indexOf(const char* str, char ch, size_t start = 0)
 
 	return -1;
 }
+
+void SystemFunctions::wrapTextAtWordBoundary(const char* input, char* output, size_t outputSize, size_t maxLineLength)
+{
+    size_t outPos = 0;
+    size_t currentLineLength = 0;
+    size_t i = 0;
+
+    while (input[i] != '\0' && outPos < outputSize - 1)
+    {
+        // Handle existing line breaks
+        if (input[i] == '\r')
+        {
+            output[outPos++] = input[i++];
+            continue;
+        }
+        if (input[i] == '\n')
+        {
+            output[outPos++] = input[i++];
+            currentLineLength = 0;
+            continue;
+        }
+
+        // Skip leading spaces on a new line
+        if (currentLineLength == 0 && input[i] == ' ')
+        {
+            i++;
+            continue;
+        }
+
+        // Find the next word (up to space, \r, \n, or end)
+        size_t wordStart = i;
+        size_t wordLength = 0;
+        while (input[i] != '\0' && input[i] != ' ' && input[i] != '\r' && input[i] != '\n')
+        {
+            wordLength++;
+            i++;
+        }
+
+        // Check if we need to wrap before adding this word
+        // Don't wrap if we're at the start of a line or if word itself exceeds max length
+        if (currentLineLength > 0 && currentLineLength + wordLength > maxLineLength)
+        {
+            if (outPos < outputSize - 3)
+            {
+                output[outPos++] = '\r';
+                output[outPos++] = '\n';
+                currentLineLength = 0;
+            }
+        }
+
+        // Copy the word
+        for (size_t j = 0; j < wordLength && outPos < outputSize - 1; ++j)
+        {
+            output[outPos++] = input[wordStart + j];
+        }
+        currentLineLength += wordLength;
+
+        // Copy trailing spaces (but count them for line length)
+        while (input[i] == ' ' && outPos < outputSize - 1)
+        {
+            output[outPos++] = input[i++];
+            currentLineLength++;
+        }
+    }
+
+    output[outPos] = '\0';
+}

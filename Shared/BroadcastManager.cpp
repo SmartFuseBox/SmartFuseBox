@@ -1,7 +1,7 @@
 #include "BroadcastManager.h"
 #include "BaseCommandHandler.h"
 
-constexpr unsigned long UpdateIntervalMs = 5000;
+constexpr unsigned long UpdateIntervalMs = 60000;
 
 BroadcastManager::BroadcastManager(SerialCommandManager* computerSerial, SerialCommandManager* linkSerial)
 	: _computerSerial(computerSerial), _linkSerial(linkSerial), _nextUpdateTime(0)
@@ -10,7 +10,7 @@ BroadcastManager::BroadcastManager(SerialCommandManager* computerSerial, SerialC
 
 void BroadcastManager::update(unsigned long now)
 {
-    // Perform periodic updates every 5 seconds: send configuration values to serial interfaces
+    // Perform periodic updates every 1 minute: send configuration values to serial interfaces
 	if (now > _nextUpdateTime)
     {
         _nextUpdateTime = now + UpdateIntervalMs;

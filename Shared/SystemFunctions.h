@@ -188,6 +188,8 @@ public:
      * @return Index of first occurrence, or -1 if not found
      */
     static int32_t indexOf(const char* str, char ch, size_t start);
+
+    static void wrapTextAtWordBoundary(const char* input, char* output, size_t outputSize, size_t maxLineLength);
 private:
     // Helper: Append a single string to buffer
     static size_t appendString(char* dest, size_t destSize, size_t offset, const char* src);

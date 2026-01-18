@@ -64,13 +64,14 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
             if (pipeIndex >= 0)
             {
-                // Pipe character found - split into short and long names
                 char tmpShortName[6] = "";
                 char tmpLongName[21] = "";
-				SystemFunctions::substr(tmpShortName, sizeof(tmpShortName), params[0].value, 0, pipeIndex);
-				SystemFunctions::substr(tmpLongName, sizeof(tmpLongName), params[0].value, pipeIndex + 1);
-				strncpy(shortName, tmpShortName, sizeof(shortName) - 1);
+                SystemFunctions::substr(tmpShortName, sizeof(tmpShortName), params[0].value, 0, pipeIndex);
+                SystemFunctions::substr(tmpLongName, sizeof(tmpLongName), params[0].value, pipeIndex + 1);
+                strncpy(shortName, tmpShortName, sizeof(shortName) - 1);
+                shortName[sizeof(shortName) - 1] = '\0';
                 strncpy(longName, tmpLongName, sizeof(longName) - 1);
+                longName[sizeof(longName) - 1] = '\0';
             }
 
             // Copy short name with truncation to relay short name length
@@ -189,6 +190,306 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             sendAckErr(sender, command, F("Missing params"));
         }
     }
+    else if (strcmp(command, ConfigSoundStartDelay) == 0)
+    {
+        // C9 - Set sound start delay in milliseconds
+        if (paramCount >= 1)
+        {
+            uint16_t delay = static_cast<uint16_t>(strtoul(params[0].value, nullptr, 0));
+            cfg->soundStartDelayMs = delay;
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+#if defined(ARDUINO_UNO_R4)
+    else if (strcmp(command, ConfigBluetoothEnable) == 0)
+    {
+        // C10 - Enable/disable Bluetooth
+        if (paramCount >= 1)
+        {
+            uint8_t enabled = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+            if (enabled > 1)
+            {
+                sendAckErr(sender, command, F("Invalid value (0 or 1)"), &params[0]);
+                return true;
+            }
+            cfg->bluetoothEnabled = (enabled == 1);
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiEnable) == 0)
+    {
+        // C11 - Enable/disable WiFi
+        if (paramCount >= 1)
+        {
+            uint8_t enabled = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+            if (enabled > 1)
+            {
+                sendAckErr(sender, command, F("Invalid value (0 or 1)"), &params[0]);
+                return true;
+            }
+            cfg->wifiEnabled = (enabled == 1);
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiMode) == 0)
+    {
+        // C12 - Set WiFi mode (0=AP, 1=Client)
+        if (paramCount >= 1)
+        {
+            uint8_t mode = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+            if (mode > 1)
+            {
+                sendAckErr(sender, command, F("Invalid mode (0=AP, 1=Client)"), &params[0]);
+                return true;
+            }
+            cfg->accessMode = mode;
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiSSID) == 0)
+    {
+        // C13 - Set WiFi SSID
+        if (paramCount >= 1)
+        {
+            if (cfg->accessMode != static_cast<uint8_t>(WifiMode::Client))
+            {
+                sendAckErr(sender, command, F("Only available in Client mode"));
+                return true;
+            }
+            strncpy(cfg->apSSID, params[0].value, sizeof(cfg->apSSID) - 1);
+            cfg->apSSID[sizeof(cfg->apSSID) - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiPassword) == 0)
+    {
+        // C14 - Set WiFi password
+        if (paramCount >= 1)
+        {
+            if (cfg->accessMode != static_cast<uint8_t>(WifiMode::Client))
+            {
+                sendAckErr(sender, command, F("Only available in Client mode"));
+                return true;
+            }
+            strncpy(cfg->apPassword, params[0].value, sizeof(cfg->apPassword) - 1);
+            cfg->apPassword[sizeof(cfg->apPassword) - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiPort) == 0)
+    {
+        // C15 - Set WiFi port
+        if (paramCount >= 1)
+        {
+            uint16_t port = static_cast<uint16_t>(strtoul(params[0].value, nullptr, 0));
+            if (port == 0)
+            {
+                sendAckErr(sender, command, F("Invalid port"), &params[0]);
+                return true;
+            }
+            cfg->wifiPort = port;
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigWifiState) == 0)
+    {
+        // C16 - Get WiFi connection state (read-only, would need WiFi manager reference)
+        // This should likely be handled by SystemCommandHandler instead
+        sendAckErr(sender, command, F("Not implemented - use SystemCommandHandler"));
+    }
+    else if (strcmp(command, ConfigWifiApIpAddress) == 0)
+    {
+        // C17 - Set AP IP address
+        if (paramCount >= 1)
+        {
+            strncpy(cfg->apIpAddress, params[0].value, sizeof(cfg->apIpAddress) - 1);
+            cfg->apIpAddress[sizeof(cfg->apIpAddress) - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+#endif
+    else if (strcmp(command, ConfigDefaultRelayState) == 0)
+    {
+        // C18 - Set initial relay state (format: <relay>=<value>)
+        if (paramCount >= 1)
+        {
+            uint8_t relay = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+            uint8_t value = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+            if (relay >= ConfigRelayCount)
+            {
+                sendAckErr(sender, command, F("Relay out of range"), &params[0]);
+                return true;
+            }
+
+            if (value > 1)
+            {
+                sendAckErr(sender, command, F("Invalid value (0 or 1)"), &params[0]);
+                return true;
+            }
+
+            cfg->defaulRelayState[relay] = (value == 1);
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing params"));
+        }
+    }
+    else if (strcmp(command, ConfigLinkRelays) == 0)
+    {
+        // C19 - Link relays together (format: <relay>=<linkedrelay>)
+        if (paramCount >= 1)
+        {
+            uint8_t relay = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+            uint8_t linkedRelay = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+            if (relay >= ConfigRelayCount)
+            {
+                sendAckErr(sender, command, F("Relay out of range"), &params[0]);
+                return true;
+            }
+
+            if (linkedRelay >= ConfigRelayCount && linkedRelay != 0xFF)
+            {
+                sendAckErr(sender, command, F("Linked relay out of range (or 255 to unlink)"), &params[0]);
+                return true;
+            }
+
+            // Find existing link or empty slot
+            bool found = false;
+            for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+            {
+                if (cfg->linkedRelays[i][0] == relay || cfg->linkedRelays[i][0] == 0xFF)
+                {
+                    if (linkedRelay == 0xFF)
+                    {
+                        // Unlink
+                        cfg->linkedRelays[i][0] = 0xFF;
+                        cfg->linkedRelays[i][1] = 0xFF;
+                    }
+                    else
+                    {
+                        // Link
+                        cfg->linkedRelays[i][0] = relay;
+                        cfg->linkedRelays[i][1] = linkedRelay;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                sendAckErr(sender, command, F("No available link slots"));
+                return true;
+            }
+
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing params"));
+        }
+    }
+    else if (strcmp(command, ConfigTimeZoneOffset) == 0)
+    {
+        // C20 - Set timezone offset
+        if (paramCount >= 1)
+        {
+            int8_t offset = static_cast<int8_t>(strtol(params[0].value, nullptr, 0));
+            if (offset < -12 || offset > 14)
+            {
+                sendAckErr(sender, command, F("Invalid offset (-12 to +14)"), &params[0]);
+                return true;
+            }
+            cfg->timezoneOffset = static_cast<uint8_t>(offset);
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigMmsi) == 0)
+    {
+        // C21 - Set MMSI
+        if (paramCount >= 1)
+        {
+            if (SystemFunctions::calculateLength(params[0].value) != 9)
+            {
+                sendAckErr(sender, command, F("MMSI must be 9 digits"), &params[0]);
+                return true;
+            }
+            strncpy(cfg->mMSI, params[0].value, ConfigMmsiLength - 1);
+            cfg->mMSI[ConfigMmsiLength - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigCallSign) == 0)
+    {
+        // C22 - Set call sign
+        if (paramCount >= 1)
+        {
+            strncpy(cfg->callSign, params[0].value, ConfigCallSignLength - 1);
+            cfg->callSign[ConfigCallSignLength - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
+    else if (strcmp(command, ConfigHomePort) == 0)
+    {
+        // C23 - Set home port
+        if (paramCount >= 1)
+        {
+            strncpy(cfg->homePort, params[0].value, ConfigHomePortLength - 1);
+            cfg->homePort[ConfigHomePortLength - 1] = '\0';
+            sendAckOk(sender, command, &params[0]);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing param"));
+        }
+    }
     else if (strcmp(command, ConfigSaveSettings) == 0)
     {
         // Recompute checksum and persist to EEPROM
@@ -240,6 +541,67 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         snprintf(buffer, sizeof(buffer), "v=%u", cfg->hornRelayIndex);
         sender->sendCommand(ConfigSoundRelayId, buffer);
 
+        // C9 Sound start delay
+        snprintf(buffer, sizeof(buffer), "v=%u", cfg->soundStartDelayMs);
+        sender->sendCommand(ConfigSoundStartDelay, buffer);
+
+#if defined(ARDUINO_UNO_R4)
+        // C10 Bluetooth enabled
+        snprintf(buffer, sizeof(buffer), "v=%u", cfg->bluetoothEnabled ? 1 : 0);
+        sender->sendCommand(ConfigBluetoothEnable, buffer);
+
+        // C11 WiFi enabled
+        snprintf(buffer, sizeof(buffer), "v=%u", cfg->wifiEnabled ? 1 : 0);
+        sender->sendCommand(ConfigWifiEnable, buffer);
+
+        // C12 WiFi mode
+        snprintf(buffer, sizeof(buffer), "v=%u", cfg->accessMode);
+        sender->sendCommand(ConfigWifiMode, buffer);
+
+        // C13 WiFi SSID
+        sender->sendCommand(ConfigWifiSSID, cfg->apSSID);
+
+        // C14 WiFi password (consider security implications)
+        sender->sendCommand(ConfigWifiPassword, cfg->apPassword);
+
+        // C15 WiFi port
+        snprintf(buffer, sizeof(buffer), "v=%u", cfg->wifiPort);
+        sender->sendCommand(ConfigWifiPort, buffer);
+
+        // C17 AP IP address
+        sender->sendCommand(ConfigWifiApIpAddress, cfg->apIpAddress);
+#endif
+
+        // C18 Default relay states
+        for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+        {
+            snprintf(buffer, sizeof(buffer), "%u=%u", i, cfg->defaulRelayState[i] ? 1 : 0);
+            sender->sendCommand(ConfigDefaultRelayState, buffer);
+        }
+
+        // C19 Linked relays
+        for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+        {
+            if (cfg->linkedRelays[i][0] != 0xFF)
+            {
+                snprintf(buffer, sizeof(buffer), "%u=%u", cfg->linkedRelays[i][0], cfg->linkedRelays[i][1]);
+                sender->sendCommand(ConfigLinkRelays, buffer);
+            }
+        }
+
+        // C20 Timezone offset
+        snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int8_t>(cfg->timezoneOffset));
+        sender->sendCommand(ConfigTimeZoneOffset, buffer);
+
+        // C21 MMSI
+        sender->sendCommand(ConfigMmsi, cfg->mMSI);
+
+        // C22 Call sign
+        sender->sendCommand(ConfigCallSign, cfg->callSign);
+
+        // C23 Home port
+        sender->sendCommand(ConfigHomePort, cfg->homePort);
+
         sendAckOk(sender, command);
     }
     else if (strcmp(command, ConfigBoatType) == 0)
@@ -282,8 +644,16 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 {
-    static const char* cmds[] = { ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, ConfigRename,
-        ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor, ConfigBoatType, ConfigSoundRelayId };
+    static const char* cmds[] = { 
+        ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, ConfigRename,
+        ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor, ConfigBoatType, 
+        ConfigSoundRelayId, ConfigSoundStartDelay, ConfigDefaultRelayState, ConfigLinkRelays,
+        ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort
+#if defined(ARDUINO_UNO_R4)
+        , ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID,
+        ConfigWifiPassword, ConfigWifiPort, ConfigWifiApIpAddress
+#endif
+    };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }

@@ -81,7 +81,7 @@ private:
 
 			// Format as ISO 8601 string: YYYY-MM-DDTHH:MM:SS
 			char isoDateTime[20];
-			snprintf(isoDateTime, sizeof(isoDateTime), "%04d-%02d-%02dT%02d:%02d:%02d",
+			snprintf_P(isoDateTime, sizeof(isoDateTime), PSTR("%04d-%02d-%02dT%02d:%02d:%02d"),
 				year, month, day, hour, minute, second);
 
 			// Update DateTimeManager with GPS time (UTC)
@@ -114,8 +114,6 @@ private:
 		{
 			return;
 		}
-
-		sendDebug("Valid GPS fix", getSensorName());
 
 		// Send commands to serial
 		StringKeyValue params[2];  // Array for lat/long
@@ -267,8 +265,12 @@ protected:
 			_speedKmh = _gps->speed.isValid() ? _gps->speed.kmph() : 0.0;
 			_courseDeg = _gps->course.isValid() ? _gps->course.deg() : 0.0;
 			_satellites = _gps->satellites.isValid() ? _gps->satellites.value() : 0;
+
 			if (_courseDeg >= 360.0) {
-				_courseDeg = fmod(_courseDeg, 360.0);  // Normalize to 0-359.99
+				_courseDeg = fmod(_courseDeg, 359.9);  // Normalize to 0-359.99
+			}
+			else if (_courseDeg < 0.0) {
+				_courseDeg = 0.0;
 			}
 
 			// Sync time from GPS periodically or if never synced
@@ -282,7 +284,6 @@ protected:
 		}
 		else
 		{
-			sendDebug("No valid GPS fix", getSensorName());
 			// Check if GPS data is stale (no valid fix for 30 seconds)
 			if (now - _lastValidData > 30000)
 			{

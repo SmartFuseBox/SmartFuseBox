@@ -37,47 +37,63 @@ enum class WarningType : uint32_t {
 
 // Warning type display strings - keep in sync with WarningType enum
 // Index corresponds to bit position (0-31)
-constexpr const char* WARNING_TYPE_STRINGS[32] = {
-    "Fuse box Default Configuration",           // Bit 0 - DefaultConfigurationFuseBox
-    "Control Panel Default Configuration",      // Bit 1 - DefaultConfigurationControlPanel
-    "Connection Lost To Fuse Box",              // Bit 2 - ConnectionLost
-    "High Compass Temperature",                 // Bit 3 - HighCompassTemperature
-    "Low Battery",                              // Bit 4 - LowBattery
-    "",                                         // Bit 5 - Unused
-    "",                                         // Bit 6 - Unused
-    "",                                         // Bit 7 - Unused
-    "",                                         // Bit 8 - Unused
-    "",                                         // Bit 9 - Unused
-    "",                                         // Bit 10 - Unused
-    "",                                         // Bit 11 - Unused
-    "",                                         // Bit 12 - Unused
-    "",                                         // Bit 13 - Unused
-    "",                                         // Bit 14 - Unused
-    "",                                         // Bit 15 - Unused
-    "",                                         // Bit 16 - Unused
-    "",                                         // Bit 17 - Unused
-    "",                                         // Bit 18 - Unused
-    "",                                         // Bit 19 - Unused
-    "Sensor Failure",                           // Bit 20 - SensorFailure
-    "Temperature Sensor Failure",               // Bit 21 - TemperatureSensorFailure
-    "Compass Failure",                          // Bit 22 - CompassFailure
-    "GPS Module Failure",                       // Bit 23 - Unused
-    "",                                         // Bit 24 - Unused
-    "",                                         // Bit 25 - Unused
-    "",                                         // Bit 26 - Unused
-    "",                                         // Bit 27 - Unused
-    "",                                         // Bit 28 - Unused
-    "",                                         // Bit 29 - Unused
-    "",                                         // Bit 30 - Unused
-    ""                                          // Bit 31 - Unused
-};
+static const char WT_0[]  PROGMEM = "Fuse box Default Configuration";
+static const char WT_1[]  PROGMEM = "Control Panel Default Configuration";
+static const char WT_2[]  PROGMEM = "Connection Lost To Fuse Box";
+static const char WT_3[]  PROGMEM = "High Compass Temperature";
+static const char WT_4[]  PROGMEM = "Low Battery";
+static const char WT_5[]  PROGMEM = "";
+static const char WT_6[]  PROGMEM = "";
+static const char WT_7[]  PROGMEM = "";
+static const char WT_8[]  PROGMEM = "";
+static const char WT_9[]  PROGMEM = "";
+static const char WT_10[] PROGMEM = "";
+static const char WT_11[] PROGMEM = "";
+static const char WT_12[] PROGMEM = "";
+static const char WT_13[] PROGMEM = "";
+static const char WT_14[] PROGMEM = "";
+static const char WT_15[] PROGMEM = "";
+static const char WT_16[] PROGMEM = "";
+static const char WT_17[] PROGMEM = "";
+static const char WT_18[] PROGMEM = "";
+static const char WT_19[] PROGMEM = "";
+static const char WT_20[] PROGMEM = "Sensor Failure";
+static const char WT_21[] PROGMEM = "Temperature Sensor Failure";
+static const char WT_22[] PROGMEM = "Compass Failure";
+static const char WT_23[] PROGMEM = "GPS Module Failure";
+static const char WT_24[] PROGMEM = "";
+static const char WT_25[] PROGMEM = "";
+static const char WT_26[] PROGMEM = "";
+static const char WT_27[] PROGMEM = "";
+static const char WT_28[] PROGMEM = "";
+static const char WT_29[] PROGMEM = "";
+static const char WT_30[] PROGMEM = "";
+static const char WT_31[] PROGMEM = "";
 
+// Array of pointers (in PROGMEM) to the strings above.
+// Note: pointers themselves are stored in flash; to read them use pgm_read_ptr.
+static const char* const WARNING_TYPE_STRINGS_PROGMEM[32] PROGMEM = {
+    WT_0,  WT_1,  WT_2,  WT_3,  WT_4,  WT_5,  WT_6,  WT_7,
+    WT_8,  WT_9,  WT_10, WT_11, WT_12, WT_13, WT_14, WT_15,
+    WT_16, WT_17, WT_18, WT_19, WT_20, WT_21, WT_22, WT_23,
+    WT_24, WT_25, WT_26, WT_27, WT_28, WT_29, WT_30, WT_31
+};
 // Helper function to get warning string from bit position
 inline const char* getWarningString(uint8_t bitPosition) {
+    static char buf[64]; // ensure this is large enough for the longest warning string
     if (bitPosition < 32) {
-        return WARNING_TYPE_STRINGS[bitPosition];  // Return directly (may be "")
+        const char* progPtr = reinterpret_cast<const char*>(pgm_read_ptr(&WARNING_TYPE_STRINGS_PROGMEM[bitPosition]));
+        if (progPtr == nullptr) {
+            buf[0] = '\0';
+            return buf;
+        }
+        // copy from PROGMEM into RAM buffer
+        strncpy_P(buf, progPtr, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = '\0';
+        return buf;
     }
-    return "";  // Out of range returns empty string
+    buf[0] = '\0';
+    return buf;
 }
 
 // Helper function to get warning string from WarningType
