@@ -121,9 +121,6 @@
     <ClCompile Include="WarningNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="DateTimeManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SystemNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
@@ -142,9 +139,6 @@
     <ClCompile Include="SensorNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="SystemFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
@@ -156,6 +150,15 @@
     </ClCompile>
     <ClCompile Include="SensorController.h">
       <Filter>Header Files\SharedCode\Sensors</Filter>
+    </ClCompile>
+    <ClCompile Include="DateTimeManager.cpp">
+      <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemFunctions.cpp">
+      <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigSyncManager.cpp">
+      <Filter>Source Files\BusinessLogic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,9 +191,6 @@
     </ClInclude>
     <ClInclude Include="WarningType.h">
       <Filter>Header Files\SharedCode</Filter>
-    </ClInclude>
-    <ClInclude Include="WarningManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ConfigCommandHandler.h">
       <Filter>Header Files\SharedCode\SerialCommandHandlers</Filter>
@@ -258,13 +258,7 @@
     <ClInclude Include="WarningNetworkHandler.h">
       <Filter>Header Files\NetworkCommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="DateTimeManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="JsonVisitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemDefinitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SensorNetworkHandler.h">
@@ -275,9 +269,6 @@
     </ClInclude>
     <ClInclude Include="SystemNetworkHandler.h">
       <Filter>Header Files\NetworkCommandHandlers</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemFunctions.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ConfigNetworkHandler.h">
       <Filter>Header Files\NetworkCommandHandlers</Filter>
@@ -300,5 +291,23 @@
     <ClInclude Include="BaseSensor.h">
       <Filter>Header Files\SharedCode\Sensors</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigSyncManager.h">
+      <Filter>Header Files\BusinessLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemDefinitions.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemFunctions.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="WarningManager.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="DateTimeManager.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SmartFuseBox\SMART_RETRY_STRATEGY.md" />
   </ItemGroup>
 </Project>

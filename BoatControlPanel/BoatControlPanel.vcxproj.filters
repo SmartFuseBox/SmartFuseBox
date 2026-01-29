@@ -163,6 +163,12 @@
     <ClCompile Include="RelaySettingsPage.cpp">
       <Filter>Source Files\Pages</Filter>
     </ClCompile>
+    <ClCompile Include="EnvironmentPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SunCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.BoatControlPanel.vsarduino.h">
@@ -273,9 +279,6 @@
     <ClInclude Include="BuoysPage.h">
       <Filter>Header Files\Pages</Filter>
     </ClInclude>
-    <ClInclude Include="Sensors\BaseSensor.h">
-      <Filter>Header Files\SharedCode\Sensors</Filter>
-    </ClInclude>
     <ClInclude Include="GpsSensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -302,6 +305,21 @@
     </ClInclude>
     <ClInclude Include="RelaySettingsPage.h">
       <Filter>Header Files\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvironmentPage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RgbLedFade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SunCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sensors\BaseSensor.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,11 @@
 #include "AckCommandHandler.h"
 #include "SystemFunctions.h"
 
+#if defined(FUSE_BOX_CONTROLLER)
+#include "ConfigSyncManager.h"
+#include "ConfigController.h"
+#endif
+
 
 const char AckCommand[] = "ACK";
 
@@ -9,7 +14,9 @@ AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, Nextion
     : BaseBoatCommandHandler(broadcastManager, nextionControl, warningManager)
 #elif defined(FUSE_BOX_CONTROLLER)
 AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, WarningManager* warningManager)
-    : SharedBaseCommandHandler(broadcastManager, warningManager)
+    : SharedBaseCommandHandler(broadcastManager, warningManager),
+      _configSyncManager(nullptr),
+      _configController(nullptr)
 #endif
 {
 
@@ -96,6 +103,28 @@ bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, con
         return true;
     }
 
+    return false;
+}
+#endif
+
+#if defined(FUSE_BOX_CONTROLLER)
+void AckCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager, ConfigController* configController)
+{
+    _configSyncManager = syncManager;
+    _configController = configController;
+}
+
+bool AckCommandHandler::processConfigAck(SerialCommandManager* sender, const char* key, const char* value)
+{
+    // Handle C1 (ConfigGetSettings) acknowledgement
+    if (strcmp(key, ConfigGetSettings) == 0 && strcmp(value, AckSuccess) == 0)
+    {
+        sendDebugMessage(F("Config sync started"), AckCommand);
+        return true;
+    }
+
+    // All other config ACKs (C3-C27) are handled by ConfigCommandHandler
+    // Just acknowledge them here
     return false;
 }
 #endif
@@ -222,12 +251,14 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
         }
         else
         {
-            sendDebugMessage(F("Invalid F2 ACK format free memory"), AckCommand);
-        }
+			sendDebugMessage(F("Invalid F2 ACK format free memory"), AckCommand);
+		}
 	}
+#elif defined(FUSE_BOX_CONTROLLER)
+	processConfigAck(sender, params[0].key, params[0].value);
 #endif
 
-    return true;
+	return true;
 }
 
 const char* const* AckCommandHandler::supportedCommands(size_t& count) const

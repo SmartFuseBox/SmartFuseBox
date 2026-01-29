@@ -40,6 +40,7 @@
 #include "SensorNetworkHandler.h"
 
 #include "ConfigController.h"
+#include "ConfigSyncManager.h"
 #include "RelayController.h"
 #include "SensorController.h"
 #include "SoundController.h"
@@ -109,6 +110,8 @@ BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHan
 WifiController wifiController(&messageBus, &commandMgrComputer, &warningManager);
 ConfigController configController(&soundController, &bluetoothController, &wifiController, &relayController);
 
+ConfigSyncManager configSyncManager(&commandMgrComputer, &commandMgrLink, &configController, &warningManager);
+
 // computer command handlers
 ConfigCommandHandler configHandler(&wifiController, &configController);
 
@@ -160,6 +163,10 @@ void setup()
 	size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
 	commandMgrComputer.registerHandlers(computerHandlers, computerHandlerCount);
 
+	// Link config sync manager to handlers so they can coordinate config synchronization
+	ackHandler.setConfigSyncManager(&configSyncManager, &configController);
+	configHandler.setConfigSyncManager(&configSyncManager);
+
 	Config* config = ConfigManager::getConfigPtr();
 
 	configureWifiSupport(config);
@@ -181,6 +188,8 @@ void setup()
 			relayController.setRelayState(i, true);
 		}
 	}
+
+	configSyncManager.requestSync();
 
 	// indicate system initialized
 	commandMgrComputer.sendCommand(SystemInitialized, "");
@@ -215,6 +224,10 @@ void loop()
 
 	SystemCpuMonitor::startTask();
 	wifiController.update(now);
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	configSyncManager.update(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::update();

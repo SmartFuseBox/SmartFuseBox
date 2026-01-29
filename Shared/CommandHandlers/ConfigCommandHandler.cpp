@@ -1,4 +1,5 @@
 #include "ConfigCommandHandler.h"
+#include "ConfigSyncManager.h"
 
 #if defined(ARDUINO_UNO_R4)
 #include "BluetoothController.h"
@@ -7,17 +8,29 @@
 
 
 ConfigCommandHandler::ConfigCommandHandler(WifiController* wifiController, ConfigController* configController)
-    : _wifiController(wifiController),
-	  _configController(configController)
+	: _wifiController(wifiController),
+	  _configController(configController),
+	  _configSyncManager(nullptr)
 {
+}
+
+void ConfigCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager)
+{
+	_configSyncManager = syncManager;
 }
 
 bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
-    // Access the in-memory config
-    ConfigResult result;
+	// Notify sync manager that a config command was received (if syncing)
+	if (_configSyncManager)
+	{
+		_configSyncManager->notifyConfigReceived();
+	}
 
-    if (strcmp(command, ConfigSaveSettings) == 0)
+	// Access the in-memory config
+	ConfigResult result;
+
+	if (strcmp(command, ConfigSaveSettings) == 0)
     {
 		result = _configController->save();
     }
