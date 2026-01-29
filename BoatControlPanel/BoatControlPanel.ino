@@ -150,19 +150,19 @@ uint8_t speed = 0;
 
 void setup()
 {
-    systemLedStatus.setWarning(false);
-    systemLedStatus.setDayTime(false);
-    systemLedStatus.setColor(120, 0, 180);
+    systemLedStatus.begin();
     systemLedStatus.setFadeSpeed(0.008f);
     systemLedStatus.setMaxBrightness(60);
     systemLedStatus.setMinBrightness(10);
-    systemLedStatus.begin();
+    systemLedStatus.setWarning(false);
+    systemLedStatus.setDayTime(true); // Start in day mode
+    systemLedStatus.setColor(120, 0, 180);
     systemLedStatus.update(0);
 
     DateTimeManager::setDateTime();
 
     ISerialCommandHandler* linkHandlers[] = { &interceptDebugHandler, &ackHandler, &sensorCommandHandler,
-        &warningCommandHandler, &systemCommandHandler };
+        &warningCommandHandler, &systemCommandHandler, &configHandler };
     size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
     commandMgrLink.registerHandlers(linkHandlers, linkHandlerCount);
 
@@ -205,23 +205,24 @@ void setup()
 	radioPageDistress.configSet(config);
     settingsPage.configSet(config);
 	relaySettingsPage.configSet(config);
-    environmentPage.configSet(config);
-    systemLedStatus.configSet(config);
+	environmentPage.configSet(config);
+	systemLedStatus.configSet(config);
 
-    nextion.begin();
-    
-    sensorManager.setup();
+    systemLedStatus.setDayTime(true); // Use day mode colors after config load
 
-    // Simplified broadcasting
-    char buffer[10];
-    snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
-    broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
-    snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
-    broadcastManager.sendCommand(ConfigBoatType, buffer);
-    broadcastManager.sendCommand(SystemInitialized, "");
+	nextion.begin();
+
+	sensorManager.setup();
+
+	// Simplified broadcasting
+	char buffer[10];
+	snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+	broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
+	snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+	broadcastManager.sendCommand(ConfigBoatType, buffer);
+	broadcastManager.sendCommand(SystemInitialized, "");
 
 	nextion.sendCommand(PageOne);
-    systemLedStatus.setColor(180, 240, 255);
 }
 
 void loop()

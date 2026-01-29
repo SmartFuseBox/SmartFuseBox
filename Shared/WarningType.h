@@ -27,6 +27,7 @@ enum class WarningType : uint32_t {
 	WifiInitFailed = 1UL << 6,                        // 0x00000040 - WiFi initialization failed
 	WifiInvalidConfig = 1UL << 7,                     // 0x00000080 - WiFi configuration invalid
 	WeakWifiSignal = 1UL << 8,                        // 0x00000100 - WiFi signal weak
+	SyncFailed = 1UL << 9,                            // 0x00000200 - Configuration sync issue detected
 
     // Sensor warnings (bits 20+)
     SensorFailure = 1UL << 20,                        // 0x00100000 - Sensor communication failure
@@ -42,11 +43,11 @@ static const char WT_1[]  PROGMEM = "Control Panel Default Configuration";
 static const char WT_2[]  PROGMEM = "Connection Lost To Fuse Box";
 static const char WT_3[]  PROGMEM = "High Compass Temperature";
 static const char WT_4[]  PROGMEM = "Low Battery";
-static const char WT_5[]  PROGMEM = "";
-static const char WT_6[]  PROGMEM = "";
-static const char WT_7[]  PROGMEM = "";
-static const char WT_8[]  PROGMEM = "";
-static const char WT_9[]  PROGMEM = "";
+static const char WT_5[]  PROGMEM = "Bluetooth Init Failed";
+static const char WT_6[]  PROGMEM = "Wifi Init Failed";
+static const char WT_7[]  PROGMEM = "Wifi Invalid Config";
+static const char WT_8[]  PROGMEM = "Weak Wifi Signal";
+static const char WT_9[]  PROGMEM = "Synchronization Failed";
 static const char WT_10[] PROGMEM = "";
 static const char WT_11[] PROGMEM = "";
 static const char WT_12[] PROGMEM = "";
