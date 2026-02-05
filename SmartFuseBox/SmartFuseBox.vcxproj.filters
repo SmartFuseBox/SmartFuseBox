@@ -160,7 +160,7 @@
     <ClCompile Include="ConfigSyncManager.cpp">
       <Filter>Source Files\BusinessLogic</Filter>
     </ClCompile>
-    <ClCompile Include="Shared\CommandHandlers\SensorCommandHandler.cpp">
+    <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -312,5 +312,10 @@
     <ClInclude Include="Shared\Sensors\GpsSensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CONFIG_SYNC_README.md" />
+    <None Include="SYNC_WARNING_IMPLEMENTATION.md" />
+    <None Include="CONFIG_SYNC_QUICK_REFERENCE.md" />
   </ItemGroup>
 </Project>

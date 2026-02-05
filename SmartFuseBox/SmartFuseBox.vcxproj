@@ -125,7 +125,7 @@
     <ClInclude Include="NetworkJsonVisitor.h" />
     <ClInclude Include="new_Arduino_LED_Matrix.h" />
     <ClInclude Include="ConfigSyncManager.h" />
-    <ClInclude Include="Shared\Sensors\GpsSensorHandler.h" />
+    <ClInclude Include="GpsSensorHandler.h" />
     <ClInclude Include="SystemDefinitions.h" />
     <ClInclude Include="DateTimeManager.h" />
     <ClInclude Include="INetworkCommandHandler.h" />
@@ -165,6 +165,11 @@
     <ClInclude Include="WifiController.h" />
     <ClInclude Include="WifiServer.h" />
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CONFIG_SYNC_QUICK_REFERENCE.md" />
+    <None Include="CONFIG_SYNC_README.md" />
+    <None Include="SYNC_WARNING_IMPLEMENTATION.md" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
