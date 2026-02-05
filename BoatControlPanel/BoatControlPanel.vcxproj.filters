@@ -297,9 +297,6 @@
     <ClInclude Include="SunCalculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sensors\BaseSensor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SoundManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -323,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="GpsSensorHandler.h">
       <Filter>Header Files\Sensors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Sensors\BaseSensor.h">
+      <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
