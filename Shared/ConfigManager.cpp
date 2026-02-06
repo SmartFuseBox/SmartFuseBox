@@ -134,7 +134,7 @@ void ConfigManager::resetToDefaults()
 
 #if defined(ARDUINO_UNO_R4)
     _cfg.bluetoothEnabled = false;
-    _cfg.wifiEnabled = false;
+    _cfg.wifiEnabled = true;
     _cfg.accessMode = 0; // 0 = AP, 1 = Client
     strncpy(_cfg.apSSID, "SmartFuseBox", sizeof(_cfg.apSSID) - 1);
     _cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';

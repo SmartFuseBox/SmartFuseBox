@@ -200,6 +200,21 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			config->ledConfig.systemEnabled ? "1" : "0");
 		sender->sendCommand(ConfigLedEnable, buffer);
 
+		// C28 Control Panel Tones - Good tone
+		snprintf(buffer, sizeof(buffer), "t=0;h=%u;d=%u;p=%u;r=0", 
+			config->soundConfig.good_toneHz,
+			config->soundConfig.good_durationMs,
+			config->soundConfig.goodPreset);
+		sender->sendCommand(ControlPanelTones, buffer);
+
+		// C28 Control Panel Tones - Bad tone
+		snprintf(buffer, sizeof(buffer), "t=1;h=%u;d=%u;p=%u;r=%lu", 
+			config->soundConfig.bad_toneHz,
+			config->soundConfig.bad_durationMs,
+			config->soundConfig.badPreset,
+			config->soundConfig.bad_repeatMs);
+		sender->sendCommand(ControlPanelTones, buffer);
+
 		result = ConfigResult::Success;
     }
     else if (strcmp(command, ConfigResetSettings) == 0)
@@ -587,6 +602,38 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
     }
+    else if (strcmp(command, ControlPanelTones) == 0)
+    {
+        // C28 - Configure control panel tones
+        // Format: C28:t=0;h=400;d=500;p=0;r=30000
+        // t=type (0=good, 1=bad), h=tone Hz, d=duration ms, p=preset, r=repeat interval ms (bad only)
+        if (paramCount >= 4)
+        {
+            uint8_t type = 0, preset = 0;
+            uint16_t toneHz = 0, durationMs = 0;
+            uint32_t repeatMs = 0;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "h") == 0)
+                    toneHz = static_cast<uint16_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "d") == 0)
+                    durationMs = static_cast<uint16_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "p") == 0)
+                    preset = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "r") == 0)
+                    repeatMs = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
+            }
+
+            result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
     else
     {
         result = ConfigResult::InvalidCommand;
@@ -642,7 +689,8 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 #endif
         ConfigDefaultRelayState, ConfigLinkRelays,
         ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort,
-        ConfigLedColor, ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable
+        ConfigLedColor, ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable,
+        ControlPanelTones
     };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;

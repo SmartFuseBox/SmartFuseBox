@@ -63,4 +63,5 @@ public:
 	ConfigResult setLedBrightness(const uint8_t type, const uint8_t brightness);
 	ConfigResult setLedAutoSwitch(const bool enabled);
 	ConfigResult setLedEnableStates(const bool gps, const bool warning, const bool system);
+	ConfigResult setControlPanelTones(const uint8_t type, const uint8_t preset, const uint16_t toneHz, const uint16_t durationMs, const uint32_t repeatMs);
 };

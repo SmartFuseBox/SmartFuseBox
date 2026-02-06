@@ -663,6 +663,20 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             cfg->ledConfig.systemEnabled ? "true" : "false");
         sender->sendCommand(ConfigLedEnable, buffer);
 
+        // C28 Control panel tones (send both good and bad tone configs)
+        snprintf(buffer, sizeof(buffer), "t=0;h=%u;d=%u;p=%u;r=0",
+            cfg->soundConfig.good_toneHz,
+            cfg->soundConfig.good_durationMs,
+            cfg->soundConfig.goodPreset);
+        sender->sendCommand(ControlPanelTones, buffer);
+
+        snprintf(buffer, sizeof(buffer), "t=1;h=%u;d=%u;p=%u;r=%lu",
+            cfg->soundConfig.bad_toneHz,
+            cfg->soundConfig.bad_durationMs,
+            cfg->soundConfig.badPreset,
+            cfg->soundConfig.bad_repeatMs);
+        sender->sendCommand(ControlPanelTones, buffer);
+
         sendAckOk(sender, command);
     }
     else if (strcmp(command, ConfigBoatType) == 0)
@@ -833,11 +847,11 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             bool gpsEnabled = false;
             bool warningEnabled = false;
             bool systemEnabled = false;
-            
+
             for (uint8_t i = 0; i < paramCount; ++i)
             {
                 bool value = (strcmp(params[i].value, "true") == 0 || strcmp(params[i].value, "1") == 0);
-                
+
                 if (strcmp(params[i].key, "g") == 0)
                     gpsEnabled = value;
                 else if (strcmp(params[i].key, "w") == 0)
@@ -845,16 +859,74 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 else if (strcmp(params[i].key, "s") == 0)
                     systemEnabled = value;
             }
-            
+
             cfg->ledConfig.gpsEnabled = gpsEnabled;
             cfg->ledConfig.warningEnabled = warningEnabled;
             cfg->ledConfig.systemEnabled = systemEnabled;
-            
+
             sendAckOk(sender, command);
         }
         else
         {
             sendAckErr(sender, command, F("Missing params (g,w,s)"));
+        }
+    }
+    else if (strcmp(command, ControlPanelTones) == 0)
+    {
+        // Expect "C28:t=0;h=400;d=500;p=0;r=30000"
+        // t = type (0=good, 1=bad)
+        // h = tone Hz
+        // d = duration in milliseconds
+        // p = preset (0=custom, 1=submarine ping, 2=double beep, 3=rising chirp, 4=descending alert, 5=nautical bell, 0xFFFF=no sound)
+        // r = repeat interval in milliseconds (0=no repeat, only for bad sounds)
+        if (paramCount >= 5)
+        {
+            uint8_t type = 0;
+            uint16_t hz = 0;
+            uint16_t duration = 0;
+            uint8_t preset = 0;
+            uint32_t repeat = 0;
+
+            for (uint8_t i = 0; i < paramCount; ++i)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(strtoul(params[i].value, nullptr, 0));
+                else if (strcmp(params[i].key, "h") == 0)
+                    hz = static_cast<uint16_t>(strtoul(params[i].value, nullptr, 0));
+                else if (strcmp(params[i].key, "d") == 0)
+                    duration = static_cast<uint16_t>(strtoul(params[i].value, nullptr, 0));
+                else if (strcmp(params[i].key, "p") == 0)
+                    preset = static_cast<uint8_t>(strtoul(params[i].value, nullptr, 0));
+                else if (strcmp(params[i].key, "r") == 0)
+                    repeat = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
+            }
+
+            if (type > 1)
+            {
+                sendAckErr(sender, command, F("Invalid type (0=good, 1=bad)"), &params[0]);
+                return true;
+            }
+
+            // Store settings based on type
+            if (type == 0) // Good tone
+            {
+                cfg->soundConfig.goodPreset = preset;
+                cfg->soundConfig.good_toneHz = hz;
+                cfg->soundConfig.good_durationMs = duration;
+            }
+            else // Bad tone
+            {
+                cfg->soundConfig.badPreset = preset;
+                cfg->soundConfig.bad_toneHz = hz;
+                cfg->soundConfig.bad_durationMs = duration;
+                cfg->soundConfig.bad_repeatMs = repeat;
+            }
+
+            sendAckOk(sender, command);
+        }
+        else
+        {
+            sendAckErr(sender, command, F("Missing params (t,h,d,p,r)"));
         }
     }
     else
@@ -871,17 +943,17 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 {
-    static const char* cmds[] = { 
-        ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, ConfigRename,
-        ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor, ConfigBoatType,
-        ConfigSoundRelayId, ConfigSoundStartDelay, ConfigDefaultRelayState, ConfigLinkRelays,
-        ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort, ConfigLedColor,
-		ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable
+	static const char* cmds[] = { 
+		ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, ConfigRename,
+		ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor, ConfigBoatType,
+		ConfigSoundRelayId, ConfigSoundStartDelay, ConfigDefaultRelayState, ConfigLinkRelays,
+		ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort, ConfigLedColor,
+		ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable, ControlPanelTones
 #if defined(ARDUINO_UNO_R4)
-        , ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID,
-        ConfigWifiPassword, ConfigWifiPort, ConfigWifiApIpAddress
+		, ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID,
+		ConfigWifiPassword, ConfigWifiPort, ConfigWifiApIpAddress
 #endif
-    };
-    count = sizeof(cmds) / sizeof(cmds[0]);
-    return cmds;
+	};
+	count = sizeof(cmds) / sizeof(cmds[0]);
+	return cmds;
 }

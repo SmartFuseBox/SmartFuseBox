@@ -540,3 +540,39 @@ ConfigResult ConfigController::setLedEnableStates(const bool gps, const bool war
 
 	return ConfigResult::Success;
 }
+
+// C28: Set control panel tones
+ConfigResult ConfigController::setControlPanelTones(const uint8_t type, const uint8_t preset, 
+													const uint16_t toneHz, const uint16_t durationMs, 
+													const uint32_t repeatMs)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	// type: 0=good, 1=bad
+	if (type > 1)
+		return ConfigResult::InvalidParameter;
+
+	// preset: 0=custom, 1=submarine ping, 2=double beep, 3=rising chirp, 
+	//         4=descending alert, 5=nautical bell, 0xFFFF=no sound
+	// For preset validation, we allow 0-5 or 0xFFFF (65535)
+	if (preset > 5 && preset != 0xFF)
+		return ConfigResult::InvalidParameter;
+
+	if (type == 0) // Good tone
+	{
+		_config->soundConfig.goodPreset = preset;
+		_config->soundConfig.good_toneHz = toneHz;
+		_config->soundConfig.good_durationMs = durationMs;
+		// repeat is only for bad sounds, ignore for good
+	}
+	else // Bad tone
+	{
+		_config->soundConfig.badPreset = preset;
+		_config->soundConfig.bad_toneHz = toneHz;
+		_config->soundConfig.bad_durationMs = durationMs;
+		_config->soundConfig.bad_repeatMs = repeatMs;
+	}
+
+	return ConfigResult::Success;
+}
