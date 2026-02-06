@@ -670,16 +670,33 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // Expect "C24:t=0;r=255;g=50;b=213" where t=0 (day) or t=1 (night)
         if (paramCount >= 5)
         {
-            uint8_t type = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
-            uint8_t r = static_cast<uint8_t>(strtoul(params[1].value, nullptr, 0));
-            uint8_t g = static_cast<uint8_t>(strtoul(params[2].value, nullptr, 0));
-            uint8_t b = static_cast<uint8_t>(strtoul(params[3].value, nullptr, 0));
-            
+            uint8_t type = 0, colorSet = 0, r = 0, g = 0, b = 0;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "c") == 0)
+                    colorSet = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "r") == 0)
+                    r = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "g") == 0)
+                    g = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "b") == 0)
+                    b = static_cast<uint8_t>(atoi(params[i].value));
+            }
+
             if (type > 1)
             {
                 sendAckErr(sender, command, F("Invalid type (0=day, 1=night)"), &params[0]);
                 return true;
             }
+
+            if (colorSet > 1)
+            {
+                sendAckErr(sender, command, F("Invalid color set (0=good, 1=bad)"), &params[0]);
+                return true;
+			}
             
             // Check which color set to update based on param key
             bool isGoodColor = false;
