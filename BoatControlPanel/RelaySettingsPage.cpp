@@ -351,7 +351,7 @@ void RelaySettingsPage::handleText(const char* text)
     }
     else
     {
-        snprintf(_externalData, sizeof(_externalData), "%s", text);
+        snprintf_P(_externalData, sizeof(_externalData), PSTR("%s"), text);
     }
 }
 

@@ -236,33 +236,199 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
         }
     }
 	else if (strcmp(command, ConfigLinkRelays) == 0)
-    {
-        // Expect "C19:<relay1>=<relay2>" to link relay1 to relay2
-        // or "C19:<relay1>=0xFF" to unlink relay1
-        if (paramCount >= 1)
-        {
-            uint8_t relay1 = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
-            uint8_t relay2 = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+	{
+		// Expect "C19:<relay1>=<relay2>" to link relay1 to relay2
+		// or "C19:<relay1>=0xFF" to unlink relay1
+		if (paramCount >= 1)
+		{
+			uint8_t relay1 = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t relay2 = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
 
-            if (relay2 < MaxUint8Value)
-            {
-                
-                result = _configController->linkRelays(relay1, relay2);
-            }
-            else
-            {
-                result = _configController->unlinkRelay(relay1);
-            }
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else
-    {
-        result = ConfigResult::InvalidCommand;
-    }
+			if (relay2 < MaxUint8Value)
+			{
+
+				result = _configController->linkRelays(relay1, relay2);
+			}
+			else
+			{
+				result = _configController->unlinkRelay(relay1);
+			}
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigTimeZoneOffset) == 0)
+	{
+		// C20 - Set timezone offset
+		if (paramCount >= 1)
+		{
+			int8_t offset = static_cast<int8_t>(atoi(params[0].value));
+			result = _configController->setTimezoneOffset(offset);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigMmsi) == 0)
+	{
+		// C21 - Set MMSI
+		if (paramCount >= 1)
+		{
+			result = _configController->setMmsi(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigCallSign) == 0)
+	{
+		// C22 - Set call sign
+		if (paramCount >= 1)
+		{
+			result = _configController->setCallSign(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigHomePort) == 0)
+	{
+		// C23 - Set home port
+		if (paramCount >= 1)
+		{
+			result = _configController->setHomePort(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigLedColor) == 0)
+	{
+		// C24 - Set LED RGB color
+		if (paramCount >= 5)
+		{
+			uint8_t type = 0, colorSet = 0, r = 0, g = 0, b = 0;
+
+			for (uint8_t i = 0; i < paramCount; i++)
+			{
+				if (strcmp(params[i].key, "t") == 0)
+					type = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "c") == 0)
+					colorSet = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "r") == 0)
+					r = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "g") == 0)
+					g = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "b") == 0)
+					b = static_cast<uint8_t>(atoi(params[i].value));
+			}
+
+			result = _configController->setLedColor(type, colorSet, r, g, b);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigLedBrightness) == 0)
+	{
+		// C25 - Set LED brightness
+		if (paramCount >= 2)
+		{
+			uint8_t type = 0, brightness = 0;
+
+			for (uint8_t i = 0; i < paramCount; i++)
+			{
+				if (strcmp(params[i].key, "t") == 0)
+					type = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "b") == 0)
+					brightness = static_cast<uint8_t>(atoi(params[i].value));
+			}
+
+			result = _configController->setLedBrightness(type, brightness);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigLedAutoSwitch) == 0)
+	{
+		// C26 - Enable/disable auto day/night switching
+		if (paramCount >= 1)
+		{
+			bool enabled = SystemFunctions::parseBooleanValue(params[0].value);
+			result = _configController->setLedAutoSwitch(enabled);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigLedEnable) == 0)
+	{
+		// C27 - Enable/disable individual LEDs
+		if (paramCount >= 3)
+		{
+			bool gps = false, warning = false, system = false;
+
+			for (uint8_t i = 0; i < paramCount; i++)
+			{
+				if (strcmp(params[i].key, "g") == 0)
+					gps = SystemFunctions::parseBooleanValue(params[i].value);
+				else if (strcmp(params[i].key, "w") == 0)
+					warning = SystemFunctions::parseBooleanValue(params[i].value);
+				else if (strcmp(params[i].key, "s") == 0)
+					system = SystemFunctions::parseBooleanValue(params[i].value);
+			}
+
+			result = _configController->setLedEnableStates(gps, warning, system);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ControlPanelTones) == 0)
+	{
+		// C28 - Configure control panel tones
+		if (paramCount >= 4)
+		{
+			uint8_t type = 0, preset = 0;
+			uint16_t toneHz = 0, durationMs = 0;
+			uint32_t repeatMs = 0;
+
+			for (uint8_t i = 0; i < paramCount; i++)
+			{
+				if (strcmp(params[i].key, "t") == 0)
+					type = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "h") == 0)
+					toneHz = static_cast<uint16_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "d") == 0)
+					durationMs = static_cast<uint16_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "p") == 0)
+					preset = static_cast<uint8_t>(atoi(params[i].value));
+				else if (strcmp(params[i].key, "r") == 0)
+					repeatMs = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
+			}
+
+			result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else
+	{
+		result = ConfigResult::InvalidCommand;
+	}
 
 	if (result == ConfigResult::Success)
     {
@@ -388,18 +554,115 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 
 	client->print("\"linkedRelays\":[");
 	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-    {
-        if (i > 0)
-            client->print(",");
+	{
+		if (i > 0)
+			client->print(",");
 
-        client->print("[");
-        client->print(config->linkedRelays[i][0]);
-        client->print(",");
-        client->print(config->linkedRelays[i][1]);
-        client->print("]");
-    }
+		client->print("[");
+		client->print(config->linkedRelays[i][0]);
+		client->print(",");
+		client->print(config->linkedRelays[i][1]);
+		client->print("]");
+	}
 
-    client->print("]");
+	client->print("],");
+
+	// C20 Timezone offset
+	client->print("\"timezoneOffset\":");
+	client->print(static_cast<int>(config->timezoneOffset));
+	client->print(",");
+
+	// C21 MMSI
+	client->print("\"mmsi\":\"");
+	client->print(config->mMSI);
+	client->print("\",");
+
+	// C22 Call sign
+	client->print("\"callSign\":\"");
+	client->print(config->callSign);
+	client->print("\",");
+
+	// C23 Home port
+	client->print("\"homePort\":\"");
+	client->print(config->homePort);
+	client->print("\",");
+
+	// C24 LED Colors
+	client->print("\"ledColors\":{");
+	client->print("\"dayGood\":[");
+	client->print(config->ledConfig.dayGoodColor[0]);
+	client->print(",");
+	client->print(config->ledConfig.dayGoodColor[1]);
+	client->print(",");
+	client->print(config->ledConfig.dayGoodColor[2]);
+	client->print("],");
+
+	client->print("\"dayBad\":[");
+	client->print(config->ledConfig.dayBadColor[0]);
+	client->print(",");
+	client->print(config->ledConfig.dayBadColor[1]);
+	client->print(",");
+	client->print(config->ledConfig.dayBadColor[2]);
+	client->print("],");
+
+	client->print("\"nightGood\":[");
+	client->print(config->ledConfig.nightGoodColor[0]);
+	client->print(",");
+	client->print(config->ledConfig.nightGoodColor[1]);
+	client->print(",");
+	client->print(config->ledConfig.nightGoodColor[2]);
+	client->print("],");
+
+	client->print("\"nightBad\":[");
+	client->print(config->ledConfig.nightBadColor[0]);
+	client->print(",");
+	client->print(config->ledConfig.nightBadColor[1]);
+	client->print(",");
+	client->print(config->ledConfig.nightBadColor[2]);
+	client->print("]");
+	client->print("},");
+
+	// C25 LED Brightness
+	client->print("\"ledBrightness\":{");
+	client->print("\"day\":");
+	client->print(config->ledConfig.dayBrightness);
+	client->print(",\"night\":");
+	client->print(config->ledConfig.nightBrightness);
+	client->print("},");
+
+	// C26 LED Auto-switch
+	client->print("\"ledAutoSwitch\":");
+	client->print(config->ledConfig.autoSwitch ? "true" : "false");
+	client->print(",");
+
+	// C27 LED Enable states
+	client->print("\"ledEnable\":{");
+	client->print("\"gps\":");
+	client->print(config->ledConfig.gpsEnabled ? "true" : "false");
+	client->print(",\"warning\":");
+	client->print(config->ledConfig.warningEnabled ? "true" : "false");
+	client->print(",\"system\":");
+	client->print(config->ledConfig.systemEnabled ? "true" : "false");
+	client->print("},");
+
+	// C28 Control Panel Tones
+	client->print("\"soundConfig\":{");
+	client->print("\"goodPreset\":");
+	client->print(config->soundConfig.goodPreset);
+	client->print(",\"goodToneHz\":");
+	client->print(config->soundConfig.good_toneHz);
+	client->print(",\"goodDurationMs\":");
+	client->print(config->soundConfig.good_durationMs);
+	client->print(",\"badPreset\":");
+	client->print(config->soundConfig.badPreset);
+	client->print(",\"badToneHz\":");
+	client->print(config->soundConfig.bad_toneHz);
+	client->print(",\"badDurationMs\":");
+	client->print(config->soundConfig.bad_durationMs);
+	client->print(",\"badRepeatMs\":");
+	client->print(config->soundConfig.bad_repeatMs);
+	client->print("}");
+
 	client->print("}");
 }
 

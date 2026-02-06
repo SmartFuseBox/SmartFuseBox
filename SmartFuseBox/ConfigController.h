@@ -55,4 +55,13 @@ public:
 	ConfigResult setRelayDefaultState(const uint8_t relayIndex, const bool isOpen);
 	ConfigResult linkRelays(uint8_t relayIndex, uint8_t linkedRelay);
 	ConfigResult unlinkRelay(uint8_t relayIndex);
+	ConfigResult setTimezoneOffset(const int8_t offset);
+	ConfigResult setMmsi(const char* mmsi);
+	ConfigResult setCallSign(const char* callSign);
+	ConfigResult setHomePort(const char* homePort);
+	ConfigResult setLedColor(const uint8_t type, const uint8_t colorSet, const uint8_t r, const uint8_t g, const uint8_t b);
+	ConfigResult setLedBrightness(const uint8_t type, const uint8_t brightness);
+	ConfigResult setLedAutoSwitch(const bool enabled);
+	ConfigResult setLedEnableStates(const bool gps, const bool warning, const bool system);
+	ConfigResult setControlPanelTones(const uint8_t type, const uint8_t preset, const uint16_t toneHz, const uint16_t durationMs, const uint32_t repeatMs);
 };

@@ -40,14 +40,14 @@ uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize
     uint8_t mac[6];
     WiFi.macAddress(mac);
 
-    snprintf(buffer, bufferSize, "sfb-%02X%02X%02X", mac[3], mac[4], mac[5]);
+    snprintf_P(buffer, bufferSize, PSTR("sfb-%02X%02X%02X"), mac[3], mac[4], mac[5]);
 #else
     // Use analog noise as seed
     randomSeed(analogRead(A0) + analogRead(A1) + millis());
     uint32_t storedID = random(0x10000000, 0xFFFFFFFF);
 
     // Format: SFB12A1B2C3
-    snprintf(buffer, bufferSize, "sfb-%08X", static_cast<int>(storedID));
+    snprintf_P(buffer, bufferSize, PSTR("sfb-%08X"), static_cast<int>(storedID));
 
 #endif
 

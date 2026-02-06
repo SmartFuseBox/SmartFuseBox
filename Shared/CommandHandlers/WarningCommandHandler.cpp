@@ -30,7 +30,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
         // Return the active warnings as a bitmask value
         uint32_t activeWarnings = warningManager->getActiveWarningsMask();
         char warningsHex[32];
-        snprintf(warningsHex, sizeof(warningsHex), "%s%lx", HexPrefix, activeWarnings);
+        snprintf_P(warningsHex, sizeof(warningsHex), PSTR("%s%lx"), HexPrefix, activeWarnings);
         StringKeyValue param = makeParam(ValueParamName, warningsHex);
         sendAckOk(sender, command, &param);
         return true;
@@ -40,7 +40,7 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
         // Return the complete bitmask of active warnings as a single value
         uint32_t activeWarnings = warningManager->getActiveWarningsMask();
         char warningsHex[32];
-        snprintf(warningsHex, sizeof(warningsHex), "%s%lx", HexPrefix, activeWarnings);
+        snprintf_P(warningsHex, sizeof(warningsHex), PSTR("%s%lx"), HexPrefix, activeWarnings);
         StringKeyValue param = makeParam(ValueParamName, warningsHex);
         sendAckOk(sender, command, &param);
         return true;

@@ -67,9 +67,9 @@ protected:
 
 		StringKeyValue params;
 		strncpy(params.key, ValueParamName, sizeof(params.key));
-		snprintf(params.value, sizeof(params.value), "%f3.1", _celsius);
+		snprintf(params.value, sizeof(params.value), "%.1f", _celsius);
 		sendCommand(SensorTemperature, &params, 1);
-		snprintf(params.value, sizeof(params.value), "%f3.1", _humidity);
+		snprintf(params.value, sizeof(params.value), "%.1f", _humidity);
 		sendCommand(SensorHumidity, &params, 1);
 
 		if (_sensorCommandHandler)
@@ -92,8 +92,8 @@ public:
 	{
 		char celsius[8];
 		char humidity[8];
-		dtostrf(_celsius, 6, 1, celsius);
-		dtostrf(_humidity, 6, 1, humidity);
+		dtostrf(_celsius, 1, 1, celsius);
+		dtostrf(_humidity, 1, 1, humidity);
 		snprintf(buffer, size, "\"temperature\":%s,\"humidity\":%s",
 			celsius, humidity);
 	}

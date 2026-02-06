@@ -47,7 +47,7 @@
 #include "Config.h"
 #include "ConfigManager.h"
 #include "WarningManager.h"
-
+#include "ToneManager.h"
 #include "RgbLedFade.h"
 
 // sensors
@@ -77,6 +77,9 @@ constexpr unsigned long UpdateIntervalMs = 600;
 void onLinkCommandReceived(SerialCommandManager* mgr);
 void onComputerCommandReceived(SerialCommandManager* mgr);
 
+// sound
+ToneManager toneManager(22);
+
 // led indicators
 RgbLedFade systemLedStatus(4, 3, 2);
 
@@ -88,7 +91,7 @@ SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', '
 BroadcastManager broadcastManager(&commandMgrComputer, &commandMgrLink);
 
 // Warning manager with heartbeat monitoring
-WarningManager warningManager(&commandMgrLink, HeartbeatIntervalMs, HeartbeatTimeoutMs, &systemLedStatus);
+WarningManager warningManager(&commandMgrLink, HeartbeatIntervalMs, HeartbeatTimeoutMs, &systemLedStatus, &toneManager);
 
 // Nextion display setup
 SplashPage splashPage(&NEXTION_SERIAL);
@@ -207,8 +210,9 @@ void setup()
 	relaySettingsPage.configSet(config);
 	environmentPage.configSet(config);
 	systemLedStatus.configSet(config);
+	toneManager.configSet(&config->soundConfig);
 
-    systemLedStatus.setDayTime(true); // Use day mode colors after config load
+	systemLedStatus.setDayTime(true);
 
 	nextion.begin();
 
@@ -216,13 +220,14 @@ void setup()
 
 	// Simplified broadcasting
 	char buffer[10];
-	snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->hornRelayIndex);
 	broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
-	snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vesselType));
 	broadcastManager.sendCommand(ConfigBoatType, buffer);
 	broadcastManager.sendCommand(SystemInitialized, "");
 
 	nextion.sendCommand(PageOne);
+	toneManager.play(ToneType::Good);
 }
 
 void loop()
@@ -257,6 +262,10 @@ void loop()
     systemLedStatus.update(now);
     SystemCpuMonitor::endTask();
 
+    SystemCpuMonitor::startTask();
+    toneManager.update(now);
+    SystemCpuMonitor::endTask();
+
     SystemCpuMonitor::update();
 }
 
@@ -275,7 +284,7 @@ void resetSerial(Stream& serial)
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
-	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+	snprintf_P(cmd, sizeof(cmd), PSTR("%s"), mgr->getCommand());
     commandMgrComputer.sendError(cmd, F("LINKHANDLER"));
 
 	// Reset serial to clear any residual data
@@ -285,7 +294,7 @@ void onLinkCommandReceived(SerialCommandManager* mgr)
 void onComputerCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
-	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+	snprintf_P(cmd, sizeof(cmd), PSTR("%s"), mgr->getCommand());
 
     commandMgrComputer.sendError(cmd, F("PCHANDLER"));
 

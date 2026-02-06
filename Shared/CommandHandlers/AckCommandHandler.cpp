@@ -137,7 +137,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
     if (strncmp(command, AckCommand, 3) != 0)
     {
         char debugMsg[64];
-        snprintf(debugMsg, sizeof(debugMsg), "Unknown ACK command %s", command);
+        snprintf_P(debugMsg, sizeof(debugMsg), PSTR("Unknown ACK command %s"), command);
         sendDebugMessage(debugMsg, AckCommand);
         return false;
     }

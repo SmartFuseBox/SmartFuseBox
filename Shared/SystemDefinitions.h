@@ -71,6 +71,7 @@ constexpr char ConfigLedColor[] = "C24";
 constexpr char ConfigLedBrightness[] = "C25";
 constexpr char ConfigLedAutoSwitch[] = "C26";
 constexpr char ConfigLedEnable[] = "C27";
+constexpr char ControlPanelTones[] = "C28";
 
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";

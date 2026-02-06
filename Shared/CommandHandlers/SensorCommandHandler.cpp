@@ -212,7 +212,7 @@ void SensorCommandHandler::setGpsDirection(const char* dir)
 #if defined(BOAT_CONTROL_PANEL)
 	CharStateUpdate update = {};
 	update.length = min(SystemFunctions::calculateLength(dir), static_cast<unsigned int>((CharStateUpdate::MaxLength - 1)));
-	snprintf(update.value, CharStateUpdate::MaxLength, "%s", dir);
+	snprintf_P(update.value, CharStateUpdate::MaxLength, PSTR("%s"), dir);
 	notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Direction), &update);
 #endif
 }
@@ -238,12 +238,58 @@ void SensorCommandHandler::setHornActive(bool value)
 
 bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
-    // the first param indicates the value (v=23 or v=NNW)
-
+    // Handle query requests (no parameters) - return current sensor values
     if (paramCount == 0)
     {
+        char buffer[32];
+
+        if (strcmp(command, SensorLightSensor) == 0)
+        {
+            // S9 query - return current day/night status
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _isDaytime ? 1 : 0);
+            sender->sendCommand(SensorLightSensor, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+        else if (strcmp(command, SensorTemperature) == 0)
+        {
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%.1f"), _lastTemperature);
+            sender->sendCommand(SensorTemperature, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+        else if (strcmp(command, SensorHumidity) == 0)
+        {
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastHumidity);
+            sender->sendCommand(SensorHumidity, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+        else if (strcmp(command, SensorWaterLevel) == 0)
+        {
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastWaterLevel);
+            sender->sendCommand(SensorWaterLevel, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+        else if (strcmp(command, SensorWaterPumpActive) == 0)
+        {
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastWaterPumpActive ? 1 : 0);
+            sender->sendCommand(SensorWaterPumpActive, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+        else if (strcmp(command, SensorHornActive) == 0)
+        {
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastHornActive ? 1 : 0);
+            sender->sendCommand(SensorHornActive, buffer);
+            sendAckOk(sender, command);
+            return true;
+        }
+
+        // Unknown query command
         sendDebugMessage(F("No parameters in sensor command"), F("SensorCommandHandler"));
-        return true;
+        return false;
     }
 
     if (strcmp(command, SensorTemperature) == 0)
@@ -300,7 +346,7 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, SensorGpsLatLong) == 0)
     {
         sendDebugMessage(F("GPS LatLong"), F("SensorCommandHandler"));
-        
+
         // GPS sends lat/lon with named parameters: lat=value&lon=value
         // Need to find which param is lat and which is lon
         if (paramCount >= 2)
@@ -309,7 +355,7 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             double lon = 0.0;
             bool hasLat = false;
             bool hasLon = false;
-            
+
             for (uint8_t i = 0; i < paramCount; i++)
             {
                 if (strcmp(params[i].key, "lat") == 0)
@@ -323,7 +369,7 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                     hasLon = true;
                 }
             }
-            
+
             if (hasLat && hasLon)
             {
                 setGpsLocation(lat, lon);
@@ -339,7 +385,7 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     {
         sendDebugMessage(F("GPS Speed"), F("SensorCommandHandler"));
         setSpeed(atof(params[0].value));
-        
+
         // Check for optional course parameter (second parameter)
         if (paramCount >= 2)
         {
@@ -356,6 +402,11 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         sendDebugMessage(F("GPS Satellites"), F("SensorCommandHandler"));
         setGpsSatellites(strtoul(params[0].value, nullptr, 0));
     }
+	else if (strcmp(command, SensorGpsDistance) == 0)
+    {
+        sendDebugMessage(F("GPS Distance"), F("SensorCommandHandler"));
+        setGpsDistance(atof(params[0].value));
+    }
     else
     {
         sendDebugMessage(F("Unknown or invalid Sensor command"), F("SensorCommandHandler"));
@@ -371,7 +422,7 @@ const char* const* SensorCommandHandler::supportedCommands(size_t& count) const
     static const char* cmds[] = { SensorTemperature, SensorHumidity, SensorBearing,
         SensorDirection, SensorSpeed, SensorCompassTemp, SensorWaterLevel,
         SensorWaterPumpActive, SensorHornActive, SensorLightSensor, SensorGpsLatLong,
-        SensorGpsAltitude, SensorGpsSpeed, SensorGpsSatellites };
+        SensorGpsAltitude, SensorGpsSpeed, SensorGpsSatellites, SensorGpsDistance };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }

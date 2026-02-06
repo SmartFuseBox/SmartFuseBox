@@ -15,8 +15,8 @@ constexpr uint8_t ButtonPrevious = 2;
 constexpr unsigned long RefreshSystemIntervalMs = 1000;
 
 constexpr char BytesSuffix[] = " bytes";
-constexpr char MemoryFormat[] = "%d bytes";
-constexpr char CpuFormat[] = "%d%%";
+const char MemoryFormat[] PROGMEM = "%d bytes";
+const char CpuFormat[] PROGMEM = "%d%%";
 
 SystemPage::SystemPage(Stream* serialPort,
     WarningManager* warningMgr,
@@ -141,13 +141,13 @@ void SystemPage::updateControlPanelCpu()
 {
 	uint8_t cpu = SystemCpuMonitor::getCpuUsage();
 
-    if (cpu != _lastControlPanelCpu)
-    {
-        _lastControlPanelCpu = cpu;
-        char value[10];
-		snprintf(value, sizeof(value), CpuFormat, cpu);
-        sendText(ControlPanelCpu, value);
-    }
+	if (cpu != _lastControlPanelCpu)
+	{
+		_lastControlPanelCpu = cpu;
+		char value[10];
+		snprintf_P(value, sizeof(value), CpuFormat, cpu);
+		sendText(ControlPanelCpu, value);
+	}
 }
 
 void SystemPage::updateControlPanelMemory()
@@ -155,12 +155,12 @@ void SystemPage::updateControlPanelMemory()
 	uint16_t memory = SystemFunctions::freeMemory();
 
 	if (memory != _lastControlPanelMemory)
-    {
-        _lastControlPanelMemory = memory;
-        char value[15];
-		snprintf(value, sizeof(value), MemoryFormat, memory);
-        sendText(ControlPanelMemory, value);
-    }
+	{
+		_lastControlPanelMemory = memory;
+		char value[15];
+		snprintf_P(value, sizeof(value), MemoryFormat, memory);
+		sendText(ControlPanelMemory, value);
+	}
 }
 
 void SystemPage::updateFuseBoxCpu()
@@ -172,7 +172,7 @@ void SystemPage::updateFuseBoxCpu()
     }
 
     char buffer[12];
-    snprintf(buffer, sizeof(buffer), CpuFormat, _lastFuseBoxCpu);
+    snprintf_P(buffer, sizeof(buffer), CpuFormat, _lastFuseBoxCpu);
     sendText(ControlFuseBoxCpu, buffer);
 }
 
@@ -185,6 +185,6 @@ void SystemPage::updateFuseBoxMemory()
     }
 
     char buffer[16];
-    snprintf(buffer, sizeof(buffer), MemoryFormat, _lastFuseBoxMemory);
+    snprintf_P(buffer, sizeof(buffer), MemoryFormat, _lastFuseBoxMemory);
     sendText(ControlFuseBoxMemory, buffer);
 }

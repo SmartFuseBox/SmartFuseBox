@@ -160,6 +160,30 @@
     <ClCompile Include="ConfigSyncManager.cpp">
       <Filter>Source Files\BusinessLogic</Filter>
     </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files\SharedCode\SerialCommandHandlers</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToneManager.cpp">
+      <Filter>Source Files\SharedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
@@ -306,8 +330,23 @@
     <ClInclude Include="DateTimeManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
+    <ClInclude Include="GpsSensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToneManager.h">
+      <Filter>Header Files\SharedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SmartFuseBox\SMART_RETRY_STRATEGY.md" />
+    <None Include="C20-C27_IMPLEMENTATION.md" />
   </ItemGroup>
 </Project>

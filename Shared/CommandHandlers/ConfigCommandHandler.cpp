@@ -134,13 +134,88 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		}
 
 		// C19 Linked relays
-        for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-        {
-            snprintf(buffer, sizeof(buffer), "%d=%d", config->linkedRelays[i][0], config->linkedRelays[i][1]);
-            sender->sendCommand(ConfigLinkRelays, buffer);
+		for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+		{
+			snprintf(buffer, sizeof(buffer), "%d=%d", config->linkedRelays[i][0], config->linkedRelays[i][1]);
+			sender->sendCommand(ConfigLinkRelays, buffer);
 		}
 
-        result = ConfigResult::Success;
+		// C20 Timezone offset
+		snprintf(buffer, sizeof(buffer), "v=%d", config->timezoneOffset);
+		sender->sendCommand(ConfigTimeZoneOffset, buffer);
+
+		// C21 MMSI
+		sender->sendCommand(ConfigMmsi, config->mMSI);
+
+		// C22 Call sign
+		sender->sendCommand(ConfigCallSign, config->callSign);
+
+		// C23 Home port
+		sender->sendCommand(ConfigHomePort, config->homePort);
+
+		// C24 LED Colors (send all 4: day/good, day/bad, night/good, night/bad)
+		// Day mode, good color
+		snprintf(buffer, sizeof(buffer), "t=0;c=0;r=%u;g=%u;b=%u", 
+			config->ledConfig.dayGoodColor[0], 
+			config->ledConfig.dayGoodColor[1], 
+			config->ledConfig.dayGoodColor[2]);
+		sender->sendCommand(ConfigLedColor, buffer);
+
+		// Day mode, bad color
+		snprintf(buffer, sizeof(buffer), "t=0;c=1;r=%u;g=%u;b=%u", 
+			config->ledConfig.dayBadColor[0], 
+			config->ledConfig.dayBadColor[1], 
+			config->ledConfig.dayBadColor[2]);
+		sender->sendCommand(ConfigLedColor, buffer);
+
+		// Night mode, good color
+		snprintf(buffer, sizeof(buffer), "t=1;c=0;r=%u;g=%u;b=%u", 
+			config->ledConfig.nightGoodColor[0], 
+			config->ledConfig.nightGoodColor[1], 
+			config->ledConfig.nightGoodColor[2]);
+		sender->sendCommand(ConfigLedColor, buffer);
+
+		// Night mode, bad color
+		snprintf(buffer, sizeof(buffer), "t=1;c=1;r=%u;g=%u;b=%u", 
+			config->ledConfig.nightBadColor[0], 
+			config->ledConfig.nightBadColor[1], 
+			config->ledConfig.nightBadColor[2]);
+		sender->sendCommand(ConfigLedColor, buffer);
+
+		// C25 LED Brightness (send both day and night)
+		snprintf(buffer, sizeof(buffer), "t=0;b=%u", config->ledConfig.dayBrightness);
+		sender->sendCommand(ConfigLedBrightness, buffer);
+
+		snprintf(buffer, sizeof(buffer), "t=1;b=%u", config->ledConfig.nightBrightness);
+		sender->sendCommand(ConfigLedBrightness, buffer);
+
+		// C26 LED Auto-switch
+		snprintf(buffer, sizeof(buffer), "v=%s", config->ledConfig.autoSwitch ? "1" : "0");
+		sender->sendCommand(ConfigLedAutoSwitch, buffer);
+
+		// C27 LED Enable states
+		snprintf(buffer, sizeof(buffer), "g=%s;w=%s;s=%s", 
+			config->ledConfig.gpsEnabled ? "1" : "0",
+			config->ledConfig.warningEnabled ? "1" : "0",
+			config->ledConfig.systemEnabled ? "1" : "0");
+		sender->sendCommand(ConfigLedEnable, buffer);
+
+		// C28 Control Panel Tones - Good tone
+		snprintf(buffer, sizeof(buffer), "t=0;h=%u;d=%u;p=%u;r=0", 
+			config->soundConfig.good_toneHz,
+			config->soundConfig.good_durationMs,
+			config->soundConfig.goodPreset);
+		sender->sendCommand(ControlPanelTones, buffer);
+
+		// C28 Control Panel Tones - Bad tone
+		snprintf(buffer, sizeof(buffer), "t=1;h=%u;d=%u;p=%u;r=%lu", 
+			config->soundConfig.bad_toneHz,
+			config->soundConfig.bad_durationMs,
+			config->soundConfig.badPreset,
+			config->soundConfig.bad_repeatMs);
+		sender->sendCommand(ControlPanelTones, buffer);
+
+		result = ConfigResult::Success;
     }
     else if (strcmp(command, ConfigResetSettings) == 0)
     {
@@ -380,6 +455,185 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
     }
+    else if (strcmp(command, ConfigTimeZoneOffset) == 0)
+    {
+        // C20 - Set timezone offset (hours from UTC, -12 to +14)
+        // Format: C20:v=-5 or C20:v=8
+        if (paramCount >= 1)
+        {
+            int8_t offset = static_cast<int8_t>(atoi(params[0].value));
+            result = _configController->setTimezoneOffset(offset);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigMmsi) == 0)
+    {
+        // C21 - Set MMSI (9 digits)
+        // Format: C21:123456789
+        if (paramCount >= 1)
+        {
+            result = _configController->setMmsi(params[0].value);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigCallSign) == 0)
+    {
+        // C22 - Set call sign
+        // Format: C22:ABCD123
+        if (paramCount >= 1)
+        {
+            result = _configController->setCallSign(params[0].value);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigHomePort) == 0)
+    {
+        // C23 - Set home port
+        // Format: C23:Miami
+        if (paramCount >= 1)
+        {
+            result = _configController->setHomePort(params[0].value);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigLedColor) == 0)
+    {
+        // C24 - Set LED RGB color
+        // Format: C24:t=0;c=0;r=255;g=50;b=213
+        // t=type (0=day, 1=night), c=colorset (0=good, 1=bad), r/g/b=0-255
+        if (paramCount >= 5)
+        {
+            uint8_t type = 0, colorSet = 0, r = 0, g = 0, b = 0;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "c") == 0)
+                    colorSet = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "r") == 0)
+                    r = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "g") == 0)
+                    g = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "b") == 0)
+                    b = static_cast<uint8_t>(atoi(params[i].value));
+            }
+
+            result = _configController->setLedColor(type, colorSet, r, g, b);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigLedBrightness) == 0)
+    {
+        // C25 - Set LED brightness
+        // Format: C25:t=0;b=75
+        // t=type (0=day, 1=night), b=brightness (0-100)
+        if (paramCount >= 2)
+        {
+            uint8_t type = 0, brightness = 0;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "b") == 0)
+                    brightness = static_cast<uint8_t>(atoi(params[i].value));
+            }
+
+            result = _configController->setLedBrightness(type, brightness);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigLedAutoSwitch) == 0)
+    {
+        // C26 - Enable/disable auto day/night switching
+        // Format: C26:v=true or C26:v=1
+        if (paramCount >= 1)
+        {
+            bool enabled = SystemFunctions::parseBooleanValue(params[0].value);
+            result = _configController->setLedAutoSwitch(enabled);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ConfigLedEnable) == 0)
+    {
+        // C27 - Enable/disable individual LEDs
+        // Format: C27:g=true;w=true;s=false
+        // g=GPS LED, w=Warning LED, s=System LED
+        if (paramCount >= 3)
+        {
+            bool gps = false, warning = false, system = false;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "g") == 0)
+                    gps = SystemFunctions::parseBooleanValue(params[i].value);
+                else if (strcmp(params[i].key, "w") == 0)
+                    warning = SystemFunctions::parseBooleanValue(params[i].value);
+                else if (strcmp(params[i].key, "s") == 0)
+                    system = SystemFunctions::parseBooleanValue(params[i].value);
+            }
+
+            result = _configController->setLedEnableStates(gps, warning, system);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
+    else if (strcmp(command, ControlPanelTones) == 0)
+    {
+        // C28 - Configure control panel tones
+        // Format: C28:t=0;h=400;d=500;p=0;r=30000
+        // t=type (0=good, 1=bad), h=tone Hz, d=duration ms, p=preset, r=repeat interval ms (bad only)
+        if (paramCount >= 4)
+        {
+            uint8_t type = 0, preset = 0;
+            uint16_t toneHz = 0, durationMs = 0;
+            uint32_t repeatMs = 0;
+
+            for (uint8_t i = 0; i < paramCount; i++)
+            {
+                if (strcmp(params[i].key, "t") == 0)
+                    type = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "h") == 0)
+                    toneHz = static_cast<uint16_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "d") == 0)
+                    durationMs = static_cast<uint16_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "p") == 0)
+                    preset = static_cast<uint8_t>(atoi(params[i].value));
+                else if (strcmp(params[i].key, "r") == 0)
+                    repeatMs = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
+            }
+
+            result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
+        }
+        else
+        {
+            result = ConfigResult::InvalidParameter;
+        }
+    }
     else
     {
         result = ConfigResult::InvalidCommand;
@@ -425,11 +679,19 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 {
-    static const char* cmds[] = { ConfigSaveSettings, ConfigGetSettings, 
-        ConfigResetSettings, ConfigBoatType, ConfigSoundRelayId, ConfigSoundStartDelay,
+    static const char* cmds[] = { 
+        ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, 
+        ConfigRename, ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor,
+        ConfigBoatType, ConfigSoundRelayId, ConfigSoundStartDelay,
+#if defined(ARDUINO_UNO_R4)
         ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID, 
         ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
-        ConfigDefaultRelayState, ConfigLinkRelays };
+#endif
+        ConfigDefaultRelayState, ConfigLinkRelays,
+        ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort,
+        ConfigLedColor, ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable,
+        ControlPanelTones
+    };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }

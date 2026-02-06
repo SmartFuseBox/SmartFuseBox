@@ -74,6 +74,8 @@
     <ProjectCapability Include="VisualMicroLinux" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ToneManager.cpp" />
+    <ClCompile Include="SensorCommandHandler.cpp" />
     <ClCompile Include="BluetoothManager.cpp" />
     <ClCompile Include="BluetoothRelayService.cpp" />
     <ClCompile Include="BluetoothSensorService.cpp" />
@@ -115,6 +117,8 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClInclude Include="GpsSensorHandler.h" />
+    <ClInclude Include="ToneManager.h" />
     <ClInclude Include="LightSensorHandler.h" />
     <ClInclude Include="MessageBus.h" />
     <ClInclude Include="BaseSensor.h" />
@@ -124,6 +128,7 @@
     <ClInclude Include="NetworkJsonVisitor.h" />
     <ClInclude Include="new_Arduino_LED_Matrix.h" />
     <ClInclude Include="ConfigSyncManager.h" />
+    <ClInclude Include="Dht11SensorHandler.h" />
     <ClInclude Include="SystemDefinitions.h" />
     <ClInclude Include="DateTimeManager.h" />
     <ClInclude Include="INetworkCommandHandler.h" />
@@ -165,7 +170,7 @@
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SmartFuseBox\SMART_RETRY_STRATEGY.md" />
+    <None Include="C20-C27_IMPLEMENTATION.md" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

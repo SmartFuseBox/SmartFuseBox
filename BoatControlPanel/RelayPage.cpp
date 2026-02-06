@@ -43,12 +43,12 @@ void RelayPage::begin()
         configUpdated();
     }
 
-    for (uint8_t i = 0; i < ConfigRelayCount; ++i)
-    {
-        char variable[10];
-        snprintf(variable, sizeof(variable), "%s%d", RelayButtonPrefix, i + 1);
-        setPicture(variable, ImageButtonColorGrey + ImageButtonColorOffset);
-        setPicture2(variable, ImageButtonColorGrey + ImageButtonColorOffset);
+	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+	{
+		char variable[10];
+		snprintf_P(variable, sizeof(variable), PSTR("%s%d"), RelayButtonPrefix, i + 1);
+		setPicture(variable, ImageButtonColorGrey + ImageButtonColorOffset);
+		setPicture2(variable, ImageButtonColorGrey + ImageButtonColorOffset);
 	}
 }
 
@@ -147,7 +147,7 @@ void RelayPage::handleTouch(uint8_t compId, uint8_t eventType)
 
             // R3 to update relay status in fuse box
             char buffer[12];
-            snprintf(buffer, sizeof(buffer), "%u", relayIndex);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u"), relayIndex);
             
             StringKeyValue param;
             strncpy(param.key, buffer, DefaultMaxParamKeyLength);
@@ -189,7 +189,7 @@ void RelayPage::handleExternalUpdate(uint8_t updateType, const void* data)
 
                 // Update the button appearance on display
                 char buttonName[15];
-                snprintf(buttonName, sizeof(buttonName), "%s%d", RelayButtonPrefix, buttonIndex);
+                snprintf_P(buttonName, sizeof(buttonName), PSTR("%s%d"), RelayButtonPrefix, buttonIndex);
                 setPicture(buttonName, newColor);
                 setPicture2(buttonName, newColor);
 
@@ -224,7 +224,7 @@ void RelayPage::configUpdated()
         _buttonImage[button] = ImageButtonColorGrey + ImageButtonColorOffset;
 
         char relayPrefix[15];
-        snprintf(relayPrefix, sizeof(relayPrefix), "%s%d", RelayButtonPrefix, button);
+        snprintf_P(relayPrefix, sizeof(relayPrefix), PSTR("%s%d"), RelayButtonPrefix, button);
 
         setPicture(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);
         setPicture2(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);

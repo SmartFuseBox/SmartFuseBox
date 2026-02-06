@@ -385,3 +385,194 @@ ConfigResult ConfigController::unlinkRelay(uint8_t relayIndex)
 
 	return found ? ConfigResult::Success : ConfigResult::Failed;
 }
+
+// C20: Set timezone offset
+ConfigResult ConfigController::setTimezoneOffset(const int8_t offset)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	// Validate range: -12 to +14 hours
+	if (offset < -12 || offset > 14)
+		return ConfigResult::InvalidParameter;
+
+	_config->timezoneOffset = offset;
+	return ConfigResult::Success;
+}
+
+// C21: Set MMSI
+ConfigResult ConfigController::setMmsi(const char* mmsi)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	if (mmsi == nullptr)
+		return ConfigResult::InvalidParameter;
+
+	// Validate MMSI is exactly 9 digits
+	size_t len = strlen(mmsi);
+	if (len != 9)
+		return ConfigResult::InvalidParameter;
+
+	for (size_t i = 0; i < len; i++)
+	{
+		if (!isdigit(mmsi[i]))
+			return ConfigResult::InvalidParameter;
+	}
+
+	strncpy(_config->mMSI, mmsi, sizeof(_config->mMSI) - 1);
+	_config->mMSI[sizeof(_config->mMSI) - 1] = '\0';
+	return ConfigResult::Success;
+}
+
+// C22: Set call sign
+ConfigResult ConfigController::setCallSign(const char* callSign)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	if (callSign == nullptr)
+		return ConfigResult::InvalidParameter;
+
+	strncpy(_config->callSign, callSign, sizeof(_config->callSign) - 1);
+	_config->callSign[sizeof(_config->callSign) - 1] = '\0';
+	return ConfigResult::Success;
+}
+
+// C23: Set home port
+ConfigResult ConfigController::setHomePort(const char* homePort)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	if (homePort == nullptr)
+		return ConfigResult::InvalidParameter;
+
+	strncpy(_config->homePort, homePort, sizeof(_config->homePort) - 1);
+	_config->homePort[sizeof(_config->homePort) - 1] = '\0';
+	return ConfigResult::Success;
+}
+
+// C24: Set LED RGB color
+ConfigResult ConfigController::setLedColor(const uint8_t type, const uint8_t colorSet, 
+										   const uint8_t r, const uint8_t g, const uint8_t b)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	// type: 0=day, 1=night
+	// colorSet: 0=good, 1=bad
+	if (type > 1 || colorSet > 1)
+		return ConfigResult::InvalidParameter;
+
+	if (type == 0) // Day mode
+	{
+		if (colorSet == 0) // Good color
+		{
+			_config->ledConfig.dayGoodColor[0] = r;
+			_config->ledConfig.dayGoodColor[1] = g;
+			_config->ledConfig.dayGoodColor[2] = b;
+		}
+		else // Bad color
+		{
+			_config->ledConfig.dayBadColor[0] = r;
+			_config->ledConfig.dayBadColor[1] = g;
+			_config->ledConfig.dayBadColor[2] = b;
+		}
+	}
+	else // Night mode
+	{
+		if (colorSet == 0) // Good color
+		{
+			_config->ledConfig.nightGoodColor[0] = r;
+			_config->ledConfig.nightGoodColor[1] = g;
+			_config->ledConfig.nightGoodColor[2] = b;
+		}
+		else // Bad color
+		{
+			_config->ledConfig.nightBadColor[0] = r;
+			_config->ledConfig.nightBadColor[1] = g;
+			_config->ledConfig.nightBadColor[2] = b;
+		}
+	}
+
+	return ConfigResult::Success;
+}
+
+// C25: Set LED brightness
+ConfigResult ConfigController::setLedBrightness(const uint8_t type, const uint8_t brightness)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	// type: 0=day, 1=night
+	// brightness: 0-100
+	if (type > 1 || brightness > 100)
+		return ConfigResult::InvalidParameter;
+
+	if (type == 0)
+		_config->ledConfig.dayBrightness = brightness;
+	else
+		_config->ledConfig.nightBrightness = brightness;
+
+	return ConfigResult::Success;
+}
+
+// C26: Set LED auto-switch
+ConfigResult ConfigController::setLedAutoSwitch(const bool enabled)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	_config->ledConfig.autoSwitch = enabled;
+	return ConfigResult::Success;
+}
+
+// C27: Set LED enable states
+ConfigResult ConfigController::setLedEnableStates(const bool gps, const bool warning, const bool system)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	_config->ledConfig.gpsEnabled = gps;
+	_config->ledConfig.warningEnabled = warning;
+	_config->ledConfig.systemEnabled = system;
+
+	return ConfigResult::Success;
+}
+
+// C28: Set control panel tones
+ConfigResult ConfigController::setControlPanelTones(const uint8_t type, const uint8_t preset, 
+													const uint16_t toneHz, const uint16_t durationMs, 
+													const uint32_t repeatMs)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	// type: 0=good, 1=bad
+	if (type > 1)
+		return ConfigResult::InvalidParameter;
+
+	// preset: 0=custom, 1=submarine ping, 2=double beep, 3=rising chirp, 
+	//         4=descending alert, 5=nautical bell, 0xFFFF=no sound
+	// For preset validation, we allow 0-5 or 0xFFFF (65535)
+	if (preset > 5 && preset != 0xFF)
+		return ConfigResult::InvalidParameter;
+
+	if (type == 0) // Good tone
+	{
+		_config->soundConfig.goodPreset = preset;
+		_config->soundConfig.good_toneHz = toneHz;
+		_config->soundConfig.good_durationMs = durationMs;
+		// repeat is only for bad sounds, ignore for good
+	}
+	else // Bad tone
+	{
+		_config->soundConfig.badPreset = preset;
+		_config->soundConfig.bad_toneHz = toneHz;
+		_config->soundConfig.bad_durationMs = durationMs;
+		_config->soundConfig.bad_repeatMs = repeatMs;
+	}
+
+	return ConfigResult::Success;
+}

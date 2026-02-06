@@ -1,4 +1,7 @@
 #include "WarningManager.h"
+#if defined(BOAT_CONTROL_PANEL)
+#include "ToneManager.h"
+#endif
 
 // Define sensor warning mask (bits 20-31)
 constexpr uint32_t SENSOR_WARNING_MASK = 0xFFF00000U; // Bits 20-31 set
@@ -6,16 +9,22 @@ constexpr uint32_t SENSOR_WARNING_MASK = 0xFFF00000U; // Bits 20-31 set
 WarningManager::WarningManager(SerialCommandManager* commandMgr, unsigned long heartbeatInterval, 
 	unsigned long heartbeatTimeout
 #if defined(BOAT_CONTROL_PANEL)
-	, RgbLedFade* warningStatus
+	, RgbLedFade* warningStatus,
+	ToneManager* toneManager
 #endif
 	)
 
 	: _commandMgr(commandMgr),
 #if defined(BOAT_CONTROL_PANEL)
 	_warningStatus(warningStatus),
+	_toneManager(toneManager),
 #endif
 	  _localWarnings(0),
 	  _remoteWarnings(0),
+#if defined(BOAT_CONTROL_PANEL)
+	  _previousWarnings(0),
+	  _lastTonePlayed(0),
+#endif
 	  _heartbeatInterval(heartbeatInterval),
 	  _heartbeatTimeout(heartbeatTimeout),
 	  _lastHeartbeatSent(0),
@@ -33,10 +42,55 @@ void WarningManager::update(unsigned long now)
 	{
 		updateConnection(now);
 	}
-	
+
 #if defined(BOAT_CONTROL_PANEL)
 	// Update LED status every loop iteration
 	updateLedStatus();
+
+	// Handle warning tone alerts
+	if (_toneManager)
+	{
+		uint32_t currentWarnings = _localWarnings | _remoteWarnings;
+
+		// Check if warnings are active
+		if (currentWarnings != 0)
+		{
+			// Detect NEW warnings (bits that weren't set before)
+			uint32_t newWarnings = currentWarnings & ~_previousWarnings;
+
+			if (newWarnings != 0)
+			{
+				// New warning(s) appeared - play bad tone immediately
+				_toneManager->play(ToneType::Bad);
+				_lastTonePlayed = now;
+			}
+			else if (_lastTonePlayed > 0 && !_toneManager->isPlaying())
+			{
+				// Check if we need to repeat the tone
+				unsigned long repeatInterval = _toneManager->getRepeatIntervalMs();
+				if (repeatInterval == 0)
+					repeatInterval = 5000; // Fallback if 0 configured
+
+				if (now - _lastTonePlayed >= repeatInterval)
+				{
+					_toneManager->play(ToneType::Bad);
+					_lastTonePlayed = now;
+				}
+			}
+		}
+		else
+		{
+			// No warnings active - stop any playing tone and reset timer
+			if (_toneManager->isPlaying())
+			{
+				_toneManager->stop();
+			}
+
+			_lastTonePlayed = 0;
+		}
+
+		_previousWarnings = currentWarnings;
+	}
 #endif
 }
 
@@ -52,7 +106,7 @@ void WarningManager::raiseWarning(WarningType type)
 {
 	if (type == WarningType::None)
 		return;
-	
+
 	uint32_t warningBit = static_cast<uint32_t>(type);
 	_localWarnings |= warningBit;
 	
@@ -70,7 +124,7 @@ void WarningManager::clearWarning(WarningType type)
 {
 	if (type == WarningType::None)
 		return;
-	
+
 	uint32_t warningBit = static_cast<uint32_t>(type);
 	_localWarnings &= ~warningBit;
 	
@@ -133,15 +187,21 @@ void WarningManager::updateConnection(unsigned long now)
 	// Check for timeout (only after we've sent at least one heartbeat)
 	if (_lastHeartbeatSent > 0 || now >= _heartbeatTimeout)
 	{
-		bool connected = (_lastHeartbeatReceived > 0) && 
-						(now - _lastHeartbeatReceived) < _heartbeatTimeout;
+		// Protect against race condition: if lastHeartbeatReceived is in the future
+		// (due to notifyHeartbeatAck calling millis() after we captured 'now'),
+		// treat it as just received (delta = 0)
+		unsigned long delta = (_lastHeartbeatReceived > now) ? 0 : (now - _lastHeartbeatReceived);
 
-		// Update warning state based on connection status
-		if (connected)
+		bool connected = (_lastHeartbeatReceived > 0) && (delta < _heartbeatTimeout);
+
+		bool wasConnected = !isWarningActive(WarningType::ConnectionLost);
+
+		// Only update warning state if connection status changed
+		if (connected && !wasConnected)
 		{
 			clearWarning(WarningType::ConnectionLost);
 		}
-		else
+		else if (!connected && wasConnected)
 		{
 			raiseWarning(WarningType::ConnectionLost);
 			_remoteWarnings = 0; // Clear remote warnings on connection loss

@@ -119,15 +119,14 @@ private:
 		}
 
 		// Send commands to serial
-		StringKeyValue params[2];  // Array for lat/long
+		StringKeyValue params[2];
 
-		// Populate latitude parameter (use dtostrf for Arduino compatibility)
 		strncpy(params[0].key, "lat", sizeof(params[0].key));
-		dtostrf(_latitude, 10, 6, params[0].value);
+		dtostrf(_latitude, 1, 6, params[0].value);
 
 		// Populate longitude parameter  
 		strncpy(params[1].key, "lon", sizeof(params[1].key));
-		dtostrf(_longitude, 10, 6, params[1].value);
+		dtostrf(_longitude, 1, 6, params[1].value);
 
 		// Send both lat and long as a single command
 		sendCommand(SensorGpsLatLong, params, 2);
@@ -135,21 +134,21 @@ private:
 		// Send altitude
 		StringKeyValue altParam;
 		strncpy(altParam.key, ValueParamName, sizeof(altParam.key));
-		dtostrf(_altitude, 8, 2, altParam.value);
+		dtostrf(_altitude, 1, 2, altParam.value);
 		sendCommand(SensorGpsAltitude, &altParam, 1);
 
 		// Send speed with course as second parameter
 		StringKeyValue speedParams[3];
 		strncpy(speedParams[0].key, ValueParamName, sizeof(speedParams[0].key));
-		dtostrf(_speedKmh, 8, 2, speedParams[0].value);
+		dtostrf(_speedKmh, 1, 2, speedParams[0].value);
 		strncpy(speedParams[1].key, "course", sizeof(speedParams[1].key));
-		dtostrf(_courseDeg, 8, 2, speedParams[1].value);
+		dtostrf(_courseDeg, 1, 2, speedParams[1].value);
 		strncpy(speedParams[2].key, "dir", sizeof(speedParams[2].key)); 
-		snprintf(speedParams[2].value, sizeof(speedParams[2].value), "%s", getDirection());
+		snprintf_P(speedParams[2].value, sizeof(speedParams[2].value), PSTR("%s"), getDirection());
 		sendCommand(SensorGpsSpeed, speedParams, 3);
 
 		// Send satellites (integers work fine with snprintf)
-		snprintf(altParam.value, sizeof(altParam.value), "%lu", _satellites);
+		snprintf_P(altParam.value, sizeof(altParam.value), PSTR("%lu"), _satellites);
 		sendCommand(SensorGpsSatellites, &altParam, 1);
 
 		// send GPS direction string
@@ -157,13 +156,13 @@ private:
 		strncpy(dirParam.key, ValueParamName, sizeof(dirParam.key));
 		strncpy(dirParam.value, getDirection(), sizeof(dirParam.value));
 		sendCommand(SensorDirection, &dirParam, 1);
-		dtostrf(_courseDeg, 8, 2, dirParam.value);
+		dtostrf(_courseDeg, 1, 2, dirParam.value);
 		sendCommand(SensorBearing, &dirParam, 1);
 
 		// Send total distance
 		StringKeyValue distParam;
 		strncpy(distParam.key, ValueParamName, sizeof(distParam.key));
-		dtostrf(_totalDistanceKm, 8, 2, distParam.value);
+		dtostrf(_totalDistanceKm, 1, 2, distParam.value);
 		sendCommand(SensorGpsDistance, &distParam, 1);
 
 
@@ -358,14 +357,14 @@ public:
 		char speed[12];
 		char course[12];
 		
-		dtostrf(_latitude, 10, 6, lat);
-		dtostrf(_longitude, 10, 6, lon);
-		dtostrf(_altitude, 8, 2, alt);
-		dtostrf(_speedKmh, 8, 2, speed);
-		dtostrf(_courseDeg, 8, 2, course);
+		dtostrf(_latitude, 1, 6, lat);
+		dtostrf(_longitude, 1, 6, lon);
+		dtostrf(_altitude, 1, 2, alt);
+		dtostrf(_speedKmh, 1, 2, speed);
+		dtostrf(_courseDeg, 1, 2, course);
 
-		snprintf(buffer, size, 
-			"\"gps\":{\"lat\":%s,\"lon\":%s,\"alt\":%s,\"speed\":%s,\"course\":%s,\"sats\":%lu,\"valid\":%s}",
+		snprintf_P(buffer, size, 
+			PSTR("\"gps\":{\"lat\":%s,\"lon\":%s,\"alt\":%s,\"speed\":%s,\"course\":%s,\"sats\":%lu,\"valid\":%s}"),
 			lat, lon, alt, speed, course, _satellites, _hasValidFix ? "true" : "false");
 	}
 #endif

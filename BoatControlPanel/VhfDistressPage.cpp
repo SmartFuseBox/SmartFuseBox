@@ -103,7 +103,7 @@ void VhfDistressPage::formatGpsPosition(double latitude, double longitude, char*
     // Check for invalid GPS data
     if (isnan(latitude) || isnan(longitude))
     {
-        snprintf(outBuf, outBufSize, "GPS position unavailable");
+        snprintf_P(outBuf, outBufSize, PSTR("GPS position unavailable"));
         return;
     }
 

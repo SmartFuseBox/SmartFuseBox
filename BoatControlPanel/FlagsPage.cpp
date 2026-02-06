@@ -7,7 +7,6 @@ constexpr uint8_t ButtonNext = 3;
 constexpr uint8_t ButtonPrevious = 2;
 constexpr uint8_t BtnPrevFlag = 7;
 constexpr uint8_t BtnNextFlag = 6;
-constexpr char FlagTextName[] = "flagText";
 constexpr char FlagImageName[] = "flagImg";
 
 constexpr uint8_t FlagFirst = 21;
@@ -89,12 +88,12 @@ void FlagsPage::updateFlagDisplay()
         char buffer[128];
 		strcpy_P(buffer, meaningPtr);
 
-        sendText(FlagTextName, buffer);
+        sendText(F("flagText"), buffer);
     }
     else
     {
         // Not a letter flag, send empty string
-        sendText(FlagTextName, "");
+        sendText(F("flagText"), "");
     }
 }
 
