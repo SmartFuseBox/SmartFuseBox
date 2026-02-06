@@ -5,13 +5,13 @@
 // Preset identifiers (shared for good and bad)
 enum class TonePreset : uint8_t
 {
-    UserDefined     = 0, // Uses toneHz / durationMs from SoundSignalConfig
-    SubmarinePing   = 1, // Sonar-style sweep + echoes
-    DoubleBeep      = 2, // Two short pips
-    RisingChirp     = 3, // Ascending four-tone
+    UserDefined = 0, // Uses toneHz / durationMs from SoundSignalConfig
+    SubmarinePing = 1, // Sonar-style sweep + echoes
+    DoubleBeep = 2, // Two short pips
+    RisingChirp = 3, // Ascending four-tone
     DescendingAlert = 4, // Descending three-tone
-    NauticalBell    = 5, // Quick double ding
-    PresetCount
+    NauticalBell = 5, // Quick double ding
+    NoSound = 0xFF, // Special value to indicate silence (ignores toneHz/durationMs)
 };
 
 enum class ToneType : uint8_t

@@ -58,7 +58,7 @@ These are commands used to configure the system settings and can only be sent fr
 | `C25` — LED Brightness | `C25:t=0;b=75` | Set LED brightness. Param format: `t=<type>;b=<brightness>`. `type` must be 0 (day) or 1 (night). `brightness` must be 0-100. |
 | `C26` — LED Auto Switch | `C26:v=true` or `C26:v=1` | Enable/disable auto day/night switching. Param format: `v=<value>`. `value` must be true/false or 1/0. |
 | `C27` — LED Enable States | `C27:g=true;w=true;s=false` | Enable/disable individual LEDs. Param format: `g=<gps>;w=<warning>;s=<system>`. Each value must be true/false or 1/0. `g`=GPS LED, `w`=Warning LED, `s`=System LED. |
-| `C28` — Control Panel Tones | `C28:t=0;h=400;d=500;p=0;r=30000` | Configure control panel tones, 2 categories, good and bad, good is only used at startup to indicate all is working, bad is used in response to warnings. t=0 or 1 (0 good or 1 bad), h = tone Hz, d = duration in milliseconds, p = preset 0 custom tone/duration, 1 = submaring ping, 2 = double beep, 3 = rising chirp, 4 = descending alert, 5 = nautical bell, 0xFFFF = no sound.  r = repeat interval in milliseconds where 0 is do not repeat, this is only used for bad sounds. |
+| `C28` — Control Panel Tones | `C28:t=0;h=400;d=500;p=0;r=30000` | Configure control panel tones, 2 categories, good and bad, good is only used at startup to indicate all is working, bad is used in response to warnings. t=0 or 1 (0 good or 1 bad), h = tone Hz, d = duration in milliseconds, p = preset 0 custom tone/duration, 1 = submaring ping, 2 = double beep, 3 = rising chirp, 4 = descending alert, 5 = nautical bell, 0xFF = no sound.  r = repeat interval in milliseconds where 0 is do not repeat, this is only used for bad sounds. |
 
 
 

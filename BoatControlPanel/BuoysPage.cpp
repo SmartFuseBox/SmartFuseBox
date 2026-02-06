@@ -8,7 +8,6 @@ constexpr uint8_t ButtonNext = 3;
 constexpr uint8_t ButtonPrevious = 2;
 constexpr uint8_t BtnPrevBuoy = 4;
 constexpr uint8_t BtnNextBuoy = 5;
-constexpr char BuoyTextName[] = "buoyText";
 constexpr char BuoyImageName[] = "buoyImg";
 
 constexpr uint8_t BuoyFirst = 64;
@@ -62,7 +61,7 @@ void BuoysPage::updateBuoyDisplay()
     char buffer[100];
     strcpy_P(buffer, meaningPtr);
 
-    sendText(BuoyTextName, buffer);
+    sendText(F("buoyText"), buffer);
 }
 
 void BuoysPage::cycleNextBuoy()

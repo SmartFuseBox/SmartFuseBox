@@ -169,9 +169,9 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-            cfg->hornRelayIndex = relay;
+			cfg->hornRelayIndex = relay;
 			char buffer[20];
-			snprintf(buffer, sizeof(buffer), "v=%u", relay);
+			snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), relay);
 			_broadcastManager->sendCommand(ConfigSoundRelayId, buffer, true);
 
             // Auto-update the relay name to include "Sound Signals"
@@ -541,47 +541,47 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C4 entries - send both short and long names in format: <idx>=<shortName|longName>
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
         {
-            snprintf(buffer, sizeof(buffer), "%u=%s|%s", i, cfg->relayShortNames[i], cfg->relayLongNames[i]);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%s|%s"), i, cfg->relayShortNames[i], cfg->relayLongNames[i]);
             sender->sendCommand(ConfigRenameRelay, buffer);
         }
 
         // C5 entries
         for (uint8_t s = 0; s < ConfigHomeButtons; ++s)
         {
-            snprintf(buffer, sizeof(buffer), "%u=%u", s, cfg->homePageMapping[s]);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), s, cfg->homePageMapping[s]);
             sender->sendCommand(ConfigMapHomeButton, buffer);
         }
 
-        // C6 Send home page button color mappings
-        for (uint8_t i = 0; i < ConfigRelayCount; i++)
-        {
-			snprintf(buffer, sizeof(buffer), "%u=%u", i, cfg->buttonImage[i]);
-            sender->sendCommand(ConfigSetButtonColor, buffer);
-        }
+		// C6 Send home page button color mappings
+		for (uint8_t i = 0; i < ConfigRelayCount; i++)
+		{
+			snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->buttonImage[i]);
+			sender->sendCommand(ConfigSetButtonColor, buffer);
+		}
 
 		// C7 Boat type
-        snprintf(buffer, sizeof(buffer), "v=%u", static_cast<int>(cfg->vesselType));
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<int>(cfg->vesselType));
 		sender->sendCommand(ConfigBoatType, buffer);
 
 		// C8 Sound relay ID
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->hornRelayIndex);
-        sender->sendCommand(ConfigSoundRelayId, buffer);
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->hornRelayIndex);
+		sender->sendCommand(ConfigSoundRelayId, buffer);
 
         // C9 Sound start delay
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->soundStartDelayMs);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->soundStartDelayMs);
         sender->sendCommand(ConfigSoundStartDelay, buffer);
 
 #if defined(ARDUINO_UNO_R4)
         // C10 Bluetooth enabled
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->bluetoothEnabled ? 1 : 0);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->bluetoothEnabled ? 1 : 0);
         sender->sendCommand(ConfigBluetoothEnable, buffer);
 
         // C11 WiFi enabled
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->wifiEnabled ? 1 : 0);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->wifiEnabled ? 1 : 0);
         sender->sendCommand(ConfigWifiEnable, buffer);
 
         // C12 WiFi mode
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->accessMode);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->accessMode);
         sender->sendCommand(ConfigWifiMode, buffer);
 
         // C13 WiFi SSID
@@ -591,7 +591,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         sender->sendCommand(ConfigWifiPassword, cfg->apPassword);
 
         // C15 WiFi port
-        snprintf(buffer, sizeof(buffer), "v=%u", cfg->wifiPort);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->wifiPort);
         sender->sendCommand(ConfigWifiPort, buffer);
 
         // C17 AP IP address
@@ -601,7 +601,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C18 Default relay states
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
         {
-            snprintf(buffer, sizeof(buffer), "%u=%u", i, cfg->defaulRelayState[i] ? 1 : 0);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->defaulRelayState[i] ? 1 : 0);
             sender->sendCommand(ConfigDefaultRelayState, buffer);
         }
 
@@ -610,13 +610,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         {
             if (cfg->linkedRelays[i][0] != 0xFF)
             {
-                snprintf(buffer, sizeof(buffer), "%u=%u", cfg->linkedRelays[i][0], cfg->linkedRelays[i][1]);
+                snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), cfg->linkedRelays[i][0], cfg->linkedRelays[i][1]);
                 sender->sendCommand(ConfigLinkRelays, buffer);
             }
         }
 
         // C20 Timezone offset
-        snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int8_t>(cfg->timezoneOffset));
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), static_cast<int8_t>(cfg->timezoneOffset));
         sender->sendCommand(ConfigTimeZoneOffset, buffer);
 
         // C21 MMSI
@@ -629,48 +629,48 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         sender->sendCommand(ConfigHomePort, cfg->homePort);
 
         // C24 LED colors (send 4 color configs: day good, day bad, night good, night bad)
-        snprintf(buffer, sizeof(buffer), "t=0;c=0;r=%u;g=%u;b=%u", 
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;c=0;r=%u;g=%u;b=%u"), 
             cfg->ledConfig.dayGoodColor[0], cfg->ledConfig.dayGoodColor[1], cfg->ledConfig.dayGoodColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
-        
-        snprintf(buffer, sizeof(buffer), "t=0;c=1;r=%u;g=%u;b=%u", 
+
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;c=1;r=%u;g=%u;b=%u"), 
             cfg->ledConfig.dayBadColor[0], cfg->ledConfig.dayBadColor[1], cfg->ledConfig.dayBadColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
-        
-        snprintf(buffer, sizeof(buffer), "t=1;c=0;r=%u;g=%u;b=%u", 
+
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;c=0;r=%u;g=%u;b=%u"), 
             cfg->ledConfig.nightGoodColor[0], cfg->ledConfig.nightGoodColor[1], cfg->ledConfig.nightGoodColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
-        
-        snprintf(buffer, sizeof(buffer), "t=1;c=1;r=%u;g=%u;b=%u", 
+
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;c=1;r=%u;g=%u;b=%u"), 
             cfg->ledConfig.nightBadColor[0], cfg->ledConfig.nightBadColor[1], cfg->ledConfig.nightBadColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
         
         // C25 LED brightness
-        snprintf(buffer, sizeof(buffer), "t=0;b=%u", cfg->ledConfig.dayBrightness);
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;b=%u"), cfg->ledConfig.dayBrightness);
         sender->sendCommand(ConfigLedBrightness, buffer);
-        
-        snprintf(buffer, sizeof(buffer), "t=1;b=%u", cfg->ledConfig.nightBrightness);
+
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;b=%u"), cfg->ledConfig.nightBrightness);
         sender->sendCommand(ConfigLedBrightness, buffer);
         
         // C26 LED auto-switch
-        snprintf(buffer, sizeof(buffer), "v=%s", cfg->ledConfig.autoSwitch ? "true" : "false");
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%s"), cfg->ledConfig.autoSwitch ? "true" : "false");
         sender->sendCommand(ConfigLedAutoSwitch, buffer);
         
         // C27 LED enable states
-        snprintf(buffer, sizeof(buffer), "g=%s;w=%s;s=%s",
+        snprintf_P(buffer, sizeof(buffer), PSTR("g=%s;w=%s;s=%s"),
             cfg->ledConfig.gpsEnabled ? "true" : "false",
             cfg->ledConfig.warningEnabled ? "true" : "false",
             cfg->ledConfig.systemEnabled ? "true" : "false");
         sender->sendCommand(ConfigLedEnable, buffer);
 
         // C28 Control panel tones (send both good and bad tone configs)
-        snprintf(buffer, sizeof(buffer), "t=0;h=%u;d=%u;p=%u;r=0",
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;h=%u;d=%u;p=%u;r=0"),
             cfg->soundConfig.good_toneHz,
             cfg->soundConfig.good_durationMs,
             cfg->soundConfig.goodPreset);
         sender->sendCommand(ControlPanelTones, buffer);
 
-        snprintf(buffer, sizeof(buffer), "t=1;h=%u;d=%u;p=%u;r=%lu",
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;h=%u;d=%u;p=%u;r=%lu"),
             cfg->soundConfig.bad_toneHz,
             cfg->soundConfig.bad_durationMs,
             cfg->soundConfig.badPreset,

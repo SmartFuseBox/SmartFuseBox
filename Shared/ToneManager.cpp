@@ -18,24 +18,45 @@ void ToneManager::configSet(SoundSignalConfig* config)
 
 void ToneManager::play(ToneType type)
 {
+    Serial.print(F("[ToneManager::play] Type="));
+    Serial.println(type == ToneType::Good ? F("Good") : F("Bad"));
+
     stop();
     buildSequence(type);
 
     if (_totalSteps > 0)
     {
+        Serial.print(F("[ToneManager::play] Starting sequence - steps="));
+        Serial.println(_totalSteps);
         _playing = true;
         _currentStep = 0;
         _stepStartTime = millis();
         startCurrentStep();
     }
+    else
+    {
+        Serial.println(F("[ToneManager::play] No steps built"));
+    }
 }
 
 void ToneManager::stop()
 {
+    Serial.print(F("[ToneManager::stop] Called - _playing="));
+    Serial.println(_playing);
+
+    if (_playing)
+    {
+        Serial.println(F("[ToneManager::stop] Calling noTone()"));
+        noTone(_pin);
+    }
+    else
+    {
+        Serial.println(F("[ToneManager::stop] Skipped noTone() - not playing"));
+    }
+
     _playing = false;
     _currentStep = 0;
     _totalSteps = 0;
-    noTone(_pin);
 }
 
 bool ToneManager::isPlaying() const
@@ -50,7 +71,8 @@ uint32_t ToneManager::getRepeatIntervalMs() const
 
 void ToneManager::update(unsigned long now)
 {
-    if (!_playing) return;
+    if (!_playing)
+        return;
 
     if (now - _stepStartTime >= _steps[_currentStep].durationMs)
     {
@@ -58,10 +80,12 @@ void ToneManager::update(unsigned long now)
 
         if (_currentStep >= _totalSteps)
         {
+            Serial.println(F("[ToneManager::update] Sequence complete"));
             stop();
             return;
         }
 
+        Serial.println(F("[ToneManager::update] Advancing to next step"));
         _stepStartTime = now;
         startCurrentStep();
     }
@@ -75,12 +99,23 @@ void ToneManager::startCurrentStep()
 {
     const ToneStep& step = _steps[_currentStep];
 
+    Serial.print(F("[ToneManager::startCurrentStep] Step "));
+    Serial.print(_currentStep);
+    Serial.print(F("/"));
+    Serial.print(_totalSteps);
+    Serial.print(F(" - Hz="));
+    Serial.print(step.frequencyHz);
+    Serial.print(F(", ms="));
+    Serial.println(step.durationMs);
+
     if (step.frequencyHz > 0)
     {
+        Serial.println(F("[ToneManager::startCurrentStep] Calling tone()"));
         tone(_pin, step.frequencyHz, step.durationMs);
     }
     else
     {
+        Serial.println(F("[ToneManager::startCurrentStep] Calling noTone() - silence step"));
         noTone(_pin);
     }
 }
@@ -104,15 +139,38 @@ void ToneManager::buildSequence(ToneType type)
         ms     = _config ? _config->bad_durationMs : 200;
     }
 
-    switch (static_cast<TonePreset>(preset))
-    {
-        case TonePreset::SubmarinePing:    _totalSteps = buildSubmarinePing();     break;
-        case TonePreset::DoubleBeep:       _totalSteps = buildDoubleBeep();        break;
-        case TonePreset::RisingChirp:      _totalSteps = buildRisingChirp();       break;
-        case TonePreset::DescendingAlert:  _totalSteps = buildDescendingAlert();   break;
-        case TonePreset::NauticalBell:     _totalSteps = buildNauticalBell();      break;
-        default:                           _totalSteps = buildUserDefined(hz, ms); break;
-    }
+	switch (static_cast<TonePreset>(preset))
+	{
+		case TonePreset::SubmarinePing:
+			_totalSteps = buildSubmarinePing();
+			break;
+
+		case TonePreset::DoubleBeep:
+			_totalSteps = buildDoubleBeep();
+			break;
+
+		case TonePreset::RisingChirp:      
+			_totalSteps = buildRisingChirp();       
+			break;
+
+		case TonePreset::DescendingAlert:  
+			_totalSteps = buildDescendingAlert();   
+			break;
+
+		case TonePreset::NauticalBell:     
+			_totalSteps = buildNauticalBell();      
+			break;
+
+		case TonePreset::UserDefined:
+			_totalSteps = buildUserDefined(hz, ms);
+			break;
+
+		case TonePreset::NoSound:
+		default:                           
+			_totalSteps = 0;
+			break;
+
+	}
 }
 
 // ---------------------------------------------------------------------------

@@ -212,7 +212,7 @@ void SensorCommandHandler::setGpsDirection(const char* dir)
 #if defined(BOAT_CONTROL_PANEL)
 	CharStateUpdate update = {};
 	update.length = min(SystemFunctions::calculateLength(dir), static_cast<unsigned int>((CharStateUpdate::MaxLength - 1)));
-	snprintf(update.value, CharStateUpdate::MaxLength, "%s", dir);
+	snprintf_P(update.value, CharStateUpdate::MaxLength, PSTR("%s"), dir);
 	notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Direction), &update);
 #endif
 }
@@ -246,42 +246,42 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         if (strcmp(command, SensorLightSensor) == 0)
         {
             // S9 query - return current day/night status
-            snprintf(buffer, sizeof(buffer), "v=%d", _isDaytime ? 1 : 0);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _isDaytime ? 1 : 0);
             sender->sendCommand(SensorLightSensor, buffer);
             sendAckOk(sender, command);
             return true;
         }
         else if (strcmp(command, SensorTemperature) == 0)
         {
-            snprintf(buffer, sizeof(buffer), "v=%.1f", _lastTemperature);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%.1f"), _lastTemperature);
             sender->sendCommand(SensorTemperature, buffer);
             sendAckOk(sender, command);
             return true;
         }
         else if (strcmp(command, SensorHumidity) == 0)
         {
-            snprintf(buffer, sizeof(buffer), "v=%d", _lastHumidity);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastHumidity);
             sender->sendCommand(SensorHumidity, buffer);
             sendAckOk(sender, command);
             return true;
         }
         else if (strcmp(command, SensorWaterLevel) == 0)
         {
-            snprintf(buffer, sizeof(buffer), "v=%d", _lastWaterLevel);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastWaterLevel);
             sender->sendCommand(SensorWaterLevel, buffer);
             sendAckOk(sender, command);
             return true;
         }
         else if (strcmp(command, SensorWaterPumpActive) == 0)
         {
-            snprintf(buffer, sizeof(buffer), "v=%d", _lastWaterPumpActive ? 1 : 0);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastWaterPumpActive ? 1 : 0);
             sender->sendCommand(SensorWaterPumpActive, buffer);
             sendAckOk(sender, command);
             return true;
         }
         else if (strcmp(command, SensorHornActive) == 0)
         {
-            snprintf(buffer, sizeof(buffer), "v=%d", _lastHornActive ? 1 : 0);
+            snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), _lastHornActive ? 1 : 0);
             sender->sendCommand(SensorHornActive, buffer);
             sendAckOk(sender, command);
             return true;
@@ -292,7 +292,6 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         return false;
     }
 
-    // Handle sensor data updates (with parameters) - existing code below
     if (strcmp(command, SensorTemperature) == 0)
     {
         sendDebugMessage(F("Sensor Temperature"), F("SensorCommandHandler"));
@@ -402,6 +401,11 @@ bool SensorCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     {
         sendDebugMessage(F("GPS Satellites"), F("SensorCommandHandler"));
         setGpsSatellites(strtoul(params[0].value, nullptr, 0));
+    }
+	else if (strcmp(command, SensorGpsDistance) == 0)
+    {
+        sendDebugMessage(F("GPS Distance"), F("SensorCommandHandler"));
+        setGpsDistance(atof(params[0].value));
     }
     else
     {

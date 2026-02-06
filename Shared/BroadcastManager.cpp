@@ -20,9 +20,9 @@ void BroadcastManager::update(unsigned long now)
         if (!config)
 			return;
 		char buffer[10];
-		snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->hornRelayIndex);
         sendCommand(ConfigSoundRelayId, buffer, true);
-		snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vesselType));
         sendCommand(ConfigBoatType, buffer, true);
     }
 }

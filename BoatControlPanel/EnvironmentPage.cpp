@@ -228,7 +228,7 @@ void EnvironmentPage::updateSunriseSunset()
     int sunriseMin = (int)((suntimes.sunrise - (int)suntimes.sunrise) * 60);
     if (sunriseMin < 0) sunriseMin += 60;
 
-    snprintf(cmd, sizeof(cmd), "%02d:%02d", sunriseHour, sunriseMin);
+    snprintf_P(cmd, sizeof(cmd), PSTR("%02d:%02d"), sunriseHour, sunriseMin);
     sendText(ControlSunriseTime, cmd);
 
     int sunsetHour = (int)suntimes.sunset;
@@ -238,7 +238,7 @@ void EnvironmentPage::updateSunriseSunset()
     int sunsetMin = (int)((suntimes.sunset - (int)suntimes.sunset) * 60);
     if (sunsetMin < 0) sunsetMin += 60;
 
-    snprintf(cmd, sizeof(cmd), "%02d:%02d", sunsetHour, sunsetMin);
+    snprintf_P(cmd, sizeof(cmd), PSTR("%02d:%02d"), sunsetHour, sunsetMin);
     sendText(ControlSunsetTime, cmd);
 }
 

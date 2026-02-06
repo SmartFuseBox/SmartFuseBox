@@ -41,14 +41,14 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     {
         StringKeyValue param;
 		strncpy(param.key, ValueParamName, sizeof(param.key));
-		snprintf(param.value, sizeof(param.value), "%u", SystemFunctions::freeMemory());
+		snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemFunctions::freeMemory());
         sendAckOk(sender, command, &param);
     }
 	else if (strcmp(command, SystemCpuUsage) == 0)
     {
         StringKeyValue param;
         strncpy(param.key, ValueParamName, sizeof(param.key));
-        snprintf(param.value, sizeof(param.value), "%u", SystemCpuMonitor::getCpuUsage());
+        snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemCpuMonitor::getCpuUsage());
         sendAckOk(sender, command, &param);
     }
 

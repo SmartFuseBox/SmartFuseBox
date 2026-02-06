@@ -144,11 +144,11 @@ private:
 		strncpy(speedParams[1].key, "course", sizeof(speedParams[1].key));
 		dtostrf(_courseDeg, 1, 2, speedParams[1].value);
 		strncpy(speedParams[2].key, "dir", sizeof(speedParams[2].key)); 
-		snprintf(speedParams[2].value, sizeof(speedParams[2].value), "%s", getDirection());
+		snprintf_P(speedParams[2].value, sizeof(speedParams[2].value), PSTR("%s"), getDirection());
 		sendCommand(SensorGpsSpeed, speedParams, 3);
 
 		// Send satellites (integers work fine with snprintf)
-		snprintf(altParam.value, sizeof(altParam.value), "%lu", _satellites);
+		snprintf_P(altParam.value, sizeof(altParam.value), PSTR("%lu"), _satellites);
 		sendCommand(SensorGpsSatellites, &altParam, 1);
 
 		// send GPS direction string
@@ -363,8 +363,8 @@ public:
 		dtostrf(_speedKmh, 1, 2, speed);
 		dtostrf(_courseDeg, 1, 2, course);
 
-		snprintf(buffer, size, 
-			"\"gps\":{\"lat\":%s,\"lon\":%s,\"alt\":%s,\"speed\":%s,\"course\":%s,\"sats\":%lu,\"valid\":%s}",
+		snprintf_P(buffer, size, 
+			PSTR("\"gps\":{\"lat\":%s,\"lon\":%s,\"alt\":%s,\"speed\":%s,\"course\":%s,\"sats\":%lu,\"valid\":%s}"),
 			lat, lon, alt, speed, course, _satellites, _hasValidFix ? "true" : "false");
 	}
 #endif

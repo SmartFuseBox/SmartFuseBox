@@ -5,9 +5,9 @@
 
 #include "ToneManager.h"
 
-constexpr char DefaultBoatName[] = "My Boat";
-constexpr char RelayNameShort[] = "R %u";
-constexpr char RelayNameLong[] = "Relay %u";
+const char DefaultBoatName[] PROGMEM = "My Boat";
+constexpr char RelayNameShort[] PROGMEM = "R %u";
+constexpr char RelayNameLong[] PROGMEM = "Relay %u";
 // Static storage (use the shared Config from Config.h)
 Config ConfigManager::_cfg;
 
@@ -80,20 +80,21 @@ void ConfigManager::resetToDefaults()
     _cfg.version = ConfigVersion;
 
     // Default boat name
-    strncpy(_cfg.name, DefaultBoatName, ConfigMaxNameLength);
+    strncpy_P(_cfg.name, DefaultBoatName, ConfigMaxNameLength - 1);
+    _cfg.name[ConfigMaxNameLength - 1] = '\0';  // Ensure null termination
 
     // Default relay names (both short and long)
     for (uint8_t i = 0; i < ConfigRelayCount; ++i)
     {
         // Default short name: "R0", "R1", etc.
         char shortBuf[ConfigShortRelayNameLength]{ 0 };
-        snprintf(shortBuf, sizeof(shortBuf), RelayNameShort, (unsigned)i);
+        snprintf_P(shortBuf, sizeof(shortBuf), RelayNameShort, (unsigned)i);
         strncpy(_cfg.relayShortNames[i], shortBuf, ConfigShortRelayNameLength - 1);
         _cfg.relayShortNames[i][ConfigShortRelayNameLength - 1] = '\0';
 
         // Default long name: "Relay 0", "Relay 1", etc.
         char longBuf[ConfigLongRelayNameLength]{ 0 };
-        snprintf(longBuf, sizeof(longBuf), RelayNameLong, (unsigned)i);
+        snprintf_P(longBuf, sizeof(longBuf), RelayNameLong, (unsigned)i);
         strncpy(_cfg.relayLongNames[i], longBuf, ConfigLongRelayNameLength - 1);
         _cfg.relayLongNames[i][ConfigLongRelayNameLength - 1] = '\0';
     }
@@ -173,7 +174,7 @@ void ConfigManager::resetToDefaults()
     _cfg.soundConfig.badPreset      = static_cast<uint8_t>(TonePreset::DescendingAlert);
     _cfg.soundConfig.bad_toneHz     = 500;
     _cfg.soundConfig.bad_durationMs = 200;
-	_cfg.soundConfig.bad_repeatMs = 30000;
+	_cfg.soundConfig.bad_repeatMs = 60000;
 
     // compute checksum
     _cfg.checksum = 0;

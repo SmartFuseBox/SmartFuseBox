@@ -172,7 +172,7 @@ bool DateTimeManager::formatDateTime(char* buffer, const uint8_t bufferLength)
     uint8_t month, day, hour, minute, second;
     unixToDateTime(currentTime, year, month, day, hour, minute, second);
 
-    snprintf(buffer, bufferLength, "%04d-%02d-%02dT%02d:%02d:%02d",
+    snprintf_P(buffer, bufferLength, PSTR("%04d-%02d-%02dT%02d:%02d:%02d"),
              year, month, day, hour, minute, second);
     return true;
 }
@@ -189,7 +189,7 @@ bool DateTimeManager::formatDateTimeReadable(char* buffer, const uint8_t bufferL
     uint8_t month, day, hour, minute, second;
     unixToDateTime(currentTime, year, month, day, hour, minute, second);
 
-    snprintf(buffer, bufferLength, "%04d-%02d-%02d %02d:%02d:%02d",
+    snprintf_P(buffer, bufferLength, PSTR("%04d-%02d-%02d %02d:%02d:%02d"),
              year, month, day, hour, minute, second);
     return true;
 }

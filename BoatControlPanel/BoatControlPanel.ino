@@ -220,9 +220,9 @@ void setup()
 
 	// Simplified broadcasting
 	char buffer[10];
-	snprintf(buffer, sizeof(buffer), "v=%u", config->hornRelayIndex);
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->hornRelayIndex);
 	broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
-	snprintf(buffer, sizeof(buffer), "v=%u", static_cast<uint8_t>(config->vesselType));
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vesselType));
 	broadcastManager.sendCommand(ConfigBoatType, buffer);
 	broadcastManager.sendCommand(SystemInitialized, "");
 
@@ -284,7 +284,7 @@ void resetSerial(Stream& serial)
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
-	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+	snprintf_P(cmd, sizeof(cmd), PSTR("%s"), mgr->getCommand());
     commandMgrComputer.sendError(cmd, F("LINKHANDLER"));
 
 	// Reset serial to clear any residual data
@@ -294,7 +294,7 @@ void onLinkCommandReceived(SerialCommandManager* mgr)
 void onComputerCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
-	snprintf(cmd, sizeof(cmd), "%s", mgr->getCommand());
+	snprintf_P(cmd, sizeof(cmd), PSTR("%s"), mgr->getCommand());
 
     commandMgrComputer.sendError(cmd, F("PCHANDLER"));
 

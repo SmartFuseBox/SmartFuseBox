@@ -80,7 +80,12 @@ void WarningManager::update(unsigned long now)
 		}
 		else
 		{
-			// No warnings active - reset timer
+			// No warnings active - stop any playing tone and reset timer
+			if (_toneManager->isPlaying())
+			{
+				_toneManager->stop();
+			}
+
 			_lastTonePlayed = 0;
 		}
 
@@ -101,7 +106,7 @@ void WarningManager::raiseWarning(WarningType type)
 {
 	if (type == WarningType::None)
 		return;
-	
+
 	uint32_t warningBit = static_cast<uint32_t>(type);
 	_localWarnings |= warningBit;
 	
@@ -119,7 +124,7 @@ void WarningManager::clearWarning(WarningType type)
 {
 	if (type == WarningType::None)
 		return;
-	
+
 	uint32_t warningBit = static_cast<uint32_t>(type);
 	_localWarnings &= ~warningBit;
 	
@@ -182,15 +187,21 @@ void WarningManager::updateConnection(unsigned long now)
 	// Check for timeout (only after we've sent at least one heartbeat)
 	if (_lastHeartbeatSent > 0 || now >= _heartbeatTimeout)
 	{
-		bool connected = (_lastHeartbeatReceived > 0) && 
-						(now - _lastHeartbeatReceived) < _heartbeatTimeout;
+		// Protect against race condition: if lastHeartbeatReceived is in the future
+		// (due to notifyHeartbeatAck calling millis() after we captured 'now'),
+		// treat it as just received (delta = 0)
+		unsigned long delta = (_lastHeartbeatReceived > now) ? 0 : (now - _lastHeartbeatReceived);
 
-		// Update warning state based on connection status
-		if (connected)
+		bool connected = (_lastHeartbeatReceived > 0) && (delta < _heartbeatTimeout);
+
+		bool wasConnected = !isWarningActive(WarningType::ConnectionLost);
+
+		// Only update warning state if connection status changed
+		if (connected && !wasConnected)
 		{
 			clearWarning(WarningType::ConnectionLost);
 		}
-		else
+		else if (!connected && wasConnected)
 		{
 			raiseWarning(WarningType::ConnectionLost);
 			_remoteWarnings = 0; // Clear remote warnings on connection loss

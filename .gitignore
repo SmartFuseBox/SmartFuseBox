@@ -332,3 +332,6 @@ ASALocalRun/
 BoatControlPanel/__vm/
 StaticElectrics/__vm/
 /SmartFuseBox/__vm/
+/SmartFuseBox/__vm
+/SmartFuseBox/__vm/Compile.vmps.xml
+/SmartFuseBox/__vm/Upload.vmps.xml

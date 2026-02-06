@@ -17,11 +17,11 @@ constexpr char ControlSpeed[] = "tSpeed";
 constexpr char ControlBoatName[] = "tBoatName";
 constexpr char ControlWarning[] = "pHomeWarning";
 constexpr char ControlMoonPhase[] = "pHomeMoon";
-constexpr char SpeedUnitKnots[] = "%d kn/h";
-constexpr char SpeedUnitKilometer[] = "%d km/h";
-constexpr char DistanceUnitKnots[] = "%s nm";
-constexpr char DistanceUnitKilometer[] = "%s km";
-constexpr char BearingFormat[] = "%d°";
+const char SpeedUnitKnots[] PROGMEM = "%d kn/h";
+const char SpeedUnitKilometer[] PROGMEM = "%d km/h";
+const char DistanceUnitKnots[] PROGMEM = "%s nm";
+const char DistanceUnitKilometer[] PROGMEM = "%s km";
+const char BearingFormat[] PROGMEM = "%d°";
 constexpr char ButtonOn[] = "=1";
 constexpr char ButtonOff[] = "=0";
 
@@ -61,11 +61,11 @@ void HomePage::begin()
         configUpdated();
     }
 
-    for (uint8_t i = 1; i <= ConfigHomeButtons; ++i)
-    {
-        char cmd[15];
-        snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, i);
-        setPicture(cmd, ImageButtonColorGrey);
+	for (uint8_t i = 1; i <= ConfigHomeButtons; ++i)
+	{
+		char cmd[15];
+		snprintf_P(cmd, sizeof(cmd), PSTR("%sHomeRelay%d"), HomeButtonPrefix, i);
+		setPicture(cmd, ImageButtonColorGrey);
 	}
     _compassTempAboveNorm = 0;
 }
@@ -212,21 +212,21 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
 
     if (eventType == EventPress)
     {
-        if (commandMgrComputer)
-        {
+		if (commandMgrComputer)
+		{
 			char debugMsg[64];
-			snprintf(debugMsg, sizeof(debugMsg), "%s pressed", config->relayShortNames[relayIndex]);
-            commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
-        }
+			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s pressed"), config->relayShortNames[relayIndex]);
+			commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
+		}
     }
     else if (eventType == EventRelease)
     {
-        if (commandMgrComputer)
-        {
+		if (commandMgrComputer)
+		{
 			char debugMsg[64];
-			snprintf(debugMsg, sizeof(debugMsg), "%s released", config->relayShortNames[relayIndex]);
-            commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
-        }
+			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s released"), config->relayShortNames[relayIndex]);
+			commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
+		}
 
         // Toggle button state
         _buttonOn[buttonIndex] = !_buttonOn[buttonIndex];
@@ -237,7 +237,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
 
         // Update the button appearance
         char cmd[15];
-        snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, buttonIndex + 1);
+        snprintf_P(cmd, sizeof(cmd), PSTR("%sHomeRelay%d"), HomeButtonPrefix, buttonIndex + 1);
         setPicture(cmd, newColor);
         setPicture2(cmd, newColor);
 
@@ -245,7 +245,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
         if (commandMgrLink)
         {
             // Send relay command
-            snprintf(cmd, sizeof(cmd), "%d%s", relayIndex, _buttonOn[buttonIndex] ? ButtonOn : ButtonOff);
+            snprintf_P(cmd, sizeof(cmd), PSTR("%d%s"), relayIndex, _buttonOn[buttonIndex] ? ButtonOn : ButtonOff);
             commandMgrLink->sendCommand(RelaySetState, cmd);
 
 			// Reset refresh timer so display updates
@@ -257,7 +257,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
 void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
 {
 	char debugMsg[64];
-	snprintf(debugMsg, sizeof(debugMsg), "HomePage::handleExternalUpdate type=%u", updateType);
+	snprintf_P(debugMsg, sizeof(debugMsg), PSTR("HomePage::handleExternalUpdate type=%u"), updateType);
 	SerialCommandManager* commandMgrComputer = getCommandMgrComputer();
     if (commandMgrComputer)
     {
@@ -277,7 +277,7 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
             if (_slotToRelay[buttonIndex] == update->relayIndex)
             {
                 char debugMsg[64];
-                snprintf(debugMsg, sizeof(debugMsg), "Page update for relay updated %d = %d", buttonIndex, update->isOn);
+                snprintf_P(debugMsg, sizeof(debugMsg), PSTR("Page update for relay updated %d = %d"), buttonIndex, update->isOn);
                 getCommandMgrComputer()->sendDebug(debugMsg, F("HomePage"));
 
                 // Update internal state
@@ -289,7 +289,7 @@ void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
 
                 // Update the button appearance on display
                 char cmd[15];
-                snprintf(cmd, sizeof(cmd), "%sHomeRelay%d", HomeButtonPrefix, buttonIndex + 1);
+                snprintf_P(cmd, sizeof(cmd), PSTR("%sHomeRelay%d"), HomeButtonPrefix, buttonIndex + 1);
                 setPicture(cmd, newColor);
                 setPicture2(cmd, newColor);
 
@@ -474,7 +474,7 @@ void HomePage::updateBearing()
 
     char buffer[10];
     // Use explicit single-byte degree symbol (0xB0) to avoid UTF-8 two-byte sequence
-    snprintf(buffer, sizeof(buffer), "%d%c", (int)_lastBearing, (char)176);
+    snprintf_P(buffer, sizeof(buffer), PSTR("%d%c"), (int)_lastBearing, (char)176);
     sendText(ControlBearingText, buffer);
 }
 
@@ -496,7 +496,7 @@ void HomePage::updateSpeed()
         format = SpeedUnitKnots;
     }
 
-    snprintf(buffer, sizeof(buffer), format, (int)displaySpeed);
+    snprintf_P(buffer, sizeof(buffer), format, (int)displaySpeed);
     sendText(ControlSpeed, buffer);
 }
 
@@ -576,7 +576,7 @@ void HomePage::updateDistance()
 
     char num[10];
     dtostrf(displayDistance, 0, 1, num);
-    snprintf(buffer, sizeof(buffer), format, num);
+    snprintf_P(buffer, sizeof(buffer), format, num);
     sendText(ControlDistance, buffer);
 }
 
@@ -632,7 +632,7 @@ void HomePage::configUpdated()
     for (uint8_t button = 0; button < ConfigHomeButtons; ++button)
     {
         char buffer[15];
-        snprintf(buffer, sizeof(buffer), "%sHomeRelay%d", HomeButtonPrefix, button + 1);
+        snprintf_P(buffer, sizeof(buffer), PSTR("%sHomeRelay%d"), HomeButtonPrefix, button + 1);
 
         uint8_t relayIndex = config->homePageMapping[button];
         if (relayIndex <= 7)
