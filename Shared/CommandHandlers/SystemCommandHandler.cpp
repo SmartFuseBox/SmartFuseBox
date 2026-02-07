@@ -107,20 +107,13 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, SystemSetDateTime) == 0 && paramCount == 1)
     {
         bool success = false;
-        _broadcaster->getComputerSerial()->sendDebug(command, params[0].value);
-        // Try ISO 8601 format first (contains 'T' or '-')
-        if (strchr(params[0].value, 'T') != nullptr || strchr(params[0].value, '-') != nullptr)
+
+        // Only supports Unix timestamp (all digits)
+        unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
+        if (timestamp > 0)
         {
-            success = DateTimeManager::setDateTimeISO(params[0].value);
-        }
-        else
-        {
-            // Try Unix timestamp (all digits)
-            unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
-            if (timestamp > 0) {
-                DateTimeManager::setDateTime(timestamp);
-                success = true;
-            }
+            DateTimeManager::setDateTime(timestamp);
+            success = true;
         }
         
         if (success)

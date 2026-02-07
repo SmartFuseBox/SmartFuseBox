@@ -119,7 +119,7 @@ private:
 			second = DateTimeManager::getSecond();
 		}
 
-		// Format as ISO 8601 string: YYYY-MM-DDTHH:MM:SS
+		// Convert to Unix timestamp using ISO format (setDateTimeISO handles the conversion)
 		char isoDateTime[20];
 		snprintf_P(isoDateTime, sizeof(isoDateTime), PSTR("%04d-%02d-%02dT%02d:%02d:%02d"),
 			year, month, day, hour, minute, second);
@@ -127,11 +127,13 @@ private:
 		// Update DateTimeManager with GPS time (UTC)
 		if (DateTimeManager::setDateTimeISO(isoDateTime))
 		{
+			// Get the Unix timestamp we just set
+			unsigned long unixTime = DateTimeManager::getCurrentTime();
 
-			// Send F6 command to notify of time update
+			// Send F6 command with Unix timestamp
 			StringKeyValue timeParam;
 			strncpy(timeParam.key, ValueParamName, sizeof(timeParam.key));
-			strncpy(timeParam.value, isoDateTime, sizeof(timeParam.value));
+			snprintf_P(timeParam.value, sizeof(timeParam.value), PSTR("%lu"), unixTime);
 			sendCommand(SystemSetDateTime, &timeParam, 1);
 
 			_lastTimeSync = millis();
