@@ -108,13 +108,28 @@ void WarningManager::raiseWarning(WarningType type)
 		return;
 
 	uint32_t warningBit = static_cast<uint32_t>(type);
+	bool wasActive = (_localWarnings & warningBit) != 0;
 	_localWarnings |= warningBit;
-	
+
+	// Broadcast warning change if it's new
+	if (!wasActive)
+	{
+		broadcastWarningChange(type, true);
+	}
+
 	// Auto-raise SensorFailure for any sensor-related warning (bit 20+)
 	if (warningBit & SENSOR_WARNING_MASK) {
-		_localWarnings |= static_cast<uint32_t>(WarningType::SensorFailure);
+		uint32_t sensorFailureBit = static_cast<uint32_t>(WarningType::SensorFailure);
+		bool sensorFailureWasActive = (_localWarnings & sensorFailureBit) != 0;
+		_localWarnings |= sensorFailureBit;
+
+		// Broadcast SensorFailure if it wasn't already active
+		if (!sensorFailureWasActive)
+		{
+			broadcastWarningChange(WarningType::SensorFailure, true);
+		}
 	}
-	
+
 #if defined(BOAT_CONTROL_PANEL)
 	updateLedStatus();
 #endif
@@ -126,17 +141,32 @@ void WarningManager::clearWarning(WarningType type)
 		return;
 
 	uint32_t warningBit = static_cast<uint32_t>(type);
+	bool wasActive = (_localWarnings & warningBit) != 0;
 	_localWarnings &= ~warningBit;
-	
+
+	// Broadcast warning change if it was active
+	if (wasActive)
+	{
+		broadcastWarningChange(type, false);
+	}
+
 	// Auto-clear SensorFailure only if no sensor warnings remain (check bits 20+)
 	if (warningBit & SENSOR_WARNING_MASK) {
 		// Check if any other sensor warnings are still active (excluding SensorFailure itself)
 		uint32_t otherSensorWarnings = _localWarnings & SENSOR_WARNING_MASK & ~static_cast<uint32_t>(WarningType::SensorFailure);
 		if (otherSensorWarnings == 0) {
-			_localWarnings &= ~static_cast<uint32_t>(WarningType::SensorFailure);
+			uint32_t sensorFailureBit = static_cast<uint32_t>(WarningType::SensorFailure);
+			bool sensorFailureWasActive = (_localWarnings & sensorFailureBit) != 0;
+			_localWarnings &= ~sensorFailureBit;
+
+			// Broadcast SensorFailure clear if it was active
+			if (sensorFailureWasActive)
+			{
+				broadcastWarningChange(WarningType::SensorFailure, false);
+			}
 		}
 	}
-	
+
 #if defined(BOAT_CONTROL_PANEL)
 	updateLedStatus();
 #endif
@@ -171,7 +201,11 @@ void WarningManager::sendHeartbeat()
 {
 	if (_commandMgr)
 	{
-		_commandMgr->sendCommand(SystemHeartbeatCommand, "");
+		// Include local warnings in heartbeat
+		char params[32];
+		snprintf_P(params, sizeof(params), PSTR("w=%s%lx"),
+			HexPrefix, _localWarnings);
+		_commandMgr->sendCommand(SystemHeartbeatCommand, params);
 	}
 }
 
@@ -228,10 +262,28 @@ uint32_t WarningManager::getRemoteWarningsMask() const
 void WarningManager::updateRemoteWarnings(uint32_t remoteWarningMask)
 {
 	_remoteWarnings = remoteWarningMask;
-	
+
 #if defined(BOAT_CONTROL_PANEL)
 	updateLedStatus();
 #endif
+}
+
+void WarningManager::broadcastWarningChange(WarningType type, bool isActive)
+{
+	if (!_commandMgr || type == WarningType::None)
+		return;
+
+	// Format warning type as hex string (e.g., "0x800")
+	char warningHex[12];
+	uint32_t warningValue = static_cast<uint32_t>(type);
+	snprintf_P(warningHex, sizeof(warningHex), PSTR("%s%lx"), HexPrefix, warningValue);
+
+	// Format as W2:<hex>=<0|1>
+	char params[32];
+	snprintf_P(params, sizeof(params), PSTR("%s=%d"), warningHex, isActive ? 1 : 0);
+
+	// Send W2 command via LINK
+	_commandMgr->sendCommand(WarningStatus, params);
 }
 
 #if defined(BOAT_CONTROL_PANEL)

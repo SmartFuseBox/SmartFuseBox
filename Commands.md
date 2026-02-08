@@ -12,8 +12,10 @@ These are commands used to configure the system settings and can only be sent fr
 | `F3` — Cpu Usage | `F3` | When received will return the current CPU usage. No params. |
 | `F4` — Bluetooth Enabled | `F4` | When received will return the current enabled state of bluetooth 0 off 1 on. No params. |
 | `F5` — Wifi Enabled | `F5` | When received will return the current enabled state of wifi 0 off 1 on. No params. |
-| `F6` — Set DateTime | `F6:v=2025-12-04T15:30:00` or `F6:v=1733328600` | Set current date/time. Accepts ISO 8601 datetime string `YYYY-MM-DDTHH:MM:SS` or Unix timestamp (seconds since epoch). Returns current stored time. |
+| `F6` — Set DateTime | `F6:v=1733328600` | Set current date/time. Accepts Unix timestamp (seconds since epoch). Returns current stored time. |
 | `F7` — Get DateTime | `F7` | Get current date/time as ISO 8601 datetime string `YYYY-MM-DDTHH:MM:SS`. |
+| `F8` — SD Card Present | `F8` | Query if SD card is present. Returns `v=0` (not present) or `v=1` (present). No params. |
+| `F9` — SD Card Log File Size | `F9` | Get current log file size in bytes. Returns `v=<bytes>` where bytes is the size of the active log file. Returns `v=0` if no file is open. No params. |
 
 
 ### Wifi System Commands (SFB)
@@ -59,7 +61,8 @@ These are commands used to configure the system settings and can only be sent fr
 | `C26` — LED Auto Switch | `C26:v=true` or `C26:v=1` | Enable/disable auto day/night switching. Param format: `v=<value>`. `value` must be true/false or 1/0. |
 | `C27` — LED Enable States | `C27:g=true;w=true;s=false` | Enable/disable individual LEDs. Param format: `g=<gps>;w=<warning>;s=<system>`. Each value must be true/false or 1/0. `g`=GPS LED, `w`=Warning LED, `s`=System LED. |
 | `C28` — Control Panel Tones | `C28:t=0;h=400;d=500;p=0;r=30000` | Configure control panel tones, 2 categories, good and bad, good is only used at startup to indicate all is working, bad is used in response to warnings. t=0 or 1 (0 good or 1 bad), h = tone Hz, d = duration in milliseconds, p = preset 0 custom tone/duration, 1 = submaring ping, 2 = double beep, 3 = rising chirp, 4 = descending alert, 5 = nautical bell, 0xFF = no sound.  r = repeat interval in milliseconds where 0 is do not repeat, this is only used for bad sounds. |
-
+| `C29` — Reload Config from SD (SFB) | `C29` | **Local only (Serial/USB)**. Reload configuration from SD card config.txt file... |
+| `C30` — Export Config to SD (SFB) | `C30` | **Local only (Serial/USB)**. Export current in-memory configuration to SD card... |
 
 
 Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`, `Invalid type (0=day, 1=night)`, `Brightness must be 0-100`, `Invalid value (true/false or 0/1)`, `Missing params (t,r,g,b)`, `Missing params (t,b)`, `Missing params (g,w,s)`.

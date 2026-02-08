@@ -50,11 +50,7 @@
 #include "ToneManager.h"
 #include "RgbLedFade.h"
 
-// sensors
-//#include "TLVCompassHandler.h"
-
 #include "GpsSensorHandler.h"
-#include "SensorCommandHandler.h"
 
 #if defined(ARDUINO_MEGA2560)
 #define NEXTION_SERIAL Serial1
@@ -178,7 +174,7 @@ void setup()
 
 #if defined(ARDUINO_MEGA2560)
     SystemFunctions::initializeSerial(NEXTION_SERIAL, 19200, false);
-    SystemFunctions::initializeSerial(LINK_SERIAL, 9600, false);
+    SystemFunctions::initializeSerial(LINK_SERIAL, 19200, false);
 	SystemFunctions::initializeSerial(GPS_SERIAL, 9600, false);
 #elif defined(ARDUINO_R4_MINIMA)
 	NEXTION_SERIAL.begin(19200);
@@ -269,18 +265,6 @@ void loop()
     SystemCpuMonitor::update();
 }
 
-void resetSerial(Stream& serial)
-{
-    // Flush outgoing data
-    serial.flush();
-
-    // Clear incoming buffer
-    while (serial.available() > 0)
-    {
-        serial.read();
-    }
-}
-
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
     char cmd[64];
@@ -288,7 +272,7 @@ void onLinkCommandReceived(SerialCommandManager* mgr)
     commandMgrComputer.sendError(cmd, F("LINKHANDLER"));
 
 	// Reset serial to clear any residual data
-	resetSerial(LINK_SERIAL);
+	SystemFunctions::resetSerial(LINK_SERIAL);
 }
 
 void onComputerCommandReceived(SerialCommandManager* mgr)
@@ -299,5 +283,5 @@ void onComputerCommandReceived(SerialCommandManager* mgr)
     commandMgrComputer.sendError(cmd, F("PCHANDLER"));
 
     // Reset serial to clear any residual data
-	resetSerial(COMPUTER_SERIAL);
+    SystemFunctions::resetSerial(COMPUTER_SERIAL);
 }

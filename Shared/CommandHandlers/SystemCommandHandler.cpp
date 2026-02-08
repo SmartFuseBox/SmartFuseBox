@@ -18,8 +18,11 @@ SystemCommandHandler::~SystemCommandHandler()
 
 const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
 {
-    static const char* cmds[] = { SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
-        SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime };
+    static const char* cmds[] = { 
+        SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
+        SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
+        SystemSdCardPresent, SystemSdCardLogFileSize
+    };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }
@@ -107,20 +110,13 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, SystemSetDateTime) == 0 && paramCount == 1)
     {
         bool success = false;
-        
-        // Try ISO 8601 format first (contains 'T' or '-')
-        if (strchr(params[0].value, 'T') != nullptr || strchr(params[0].value, '-') != nullptr)
+
+        // Only supports Unix timestamp (all digits)
+        unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
+        if (timestamp > 0)
         {
-            success = DateTimeManager::setDateTimeISO(params[0].value);
-        }
-        else
-        {
-            // Try Unix timestamp (all digits)
-            unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
-            if (timestamp > 0) {
-                DateTimeManager::setDateTime(timestamp);
-                success = true;
-            }
+            DateTimeManager::setDateTime(timestamp);
+            success = true;
         }
         
         if (success)
@@ -132,6 +128,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         }
         else
         {
+            _broadcaster->getComputerSerial()->sendDebug(command, F("Invalid Datetime"));
             sendAckErr(sender, command, F("Invalid datetime format"));
         }
         
@@ -153,6 +150,37 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         
         return true;
     }
+    else if (strcmp(command, SystemSdCardPresent) == 0)
+    {
+        bool present = false;
+
+#if defined(ARDUINO_UNO_R4)
+        if (_sdCardLogger)
+        {
+            present = _sdCardLogger->isSdCardPresent();
+        }
+#endif
+
+        char value = present ? '1' : '0';
+        StringKeyValue param = makeParam(ValueParamName, value);
+        sendAckOk(sender, command, &param);
+    }
+    else if (strcmp(command, SystemSdCardLogFileSize) == 0)
+    {
+        uint32_t fileSize = 0;
+
+#if defined(ARDUINO_UNO_R4)
+        if (_sdCardLogger)
+        {
+            fileSize = _sdCardLogger->getCurrentLogFileSize();
+        }
+#endif
+
+        StringKeyValue param;
+        strncpy(param.key, ValueParamName, sizeof(param.key));
+        snprintf_P(param.value, sizeof(param.value), PSTR("%lu"), (unsigned long)fileSize);
+        sendAckOk(sender, command, &param);
+    }
     else
     {
         sendAckErr(sender, command, F("Unknown system command"));
@@ -162,6 +190,12 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 }
 
 #if defined(ARDUINO_UNO_R4)
+
+void SystemCommandHandler::setSdCardLogger(SdCardLogger* sdCardLogger)
+{
+    _sdCardLogger = sdCardLogger;
+}
+
 void SystemCommandHandler::setWifiController(WifiController* wifiController)
 { 
     _wifiController = wifiController;
