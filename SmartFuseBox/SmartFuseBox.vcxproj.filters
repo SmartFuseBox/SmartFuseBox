@@ -160,37 +160,16 @@
     <ClCompile Include="ConfigSyncManager.cpp">
       <Filter>Source Files\BusinessLogic</Filter>
     </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files\SharedCode\SerialCommandHandlers</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ToneManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SdCardLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCardConfigLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
@@ -342,9 +321,6 @@
     <ClInclude Include="DateTimeManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="GpsSensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -364,6 +340,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SensorDataRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCardConfigLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SdCardLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
