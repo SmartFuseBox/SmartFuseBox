@@ -76,6 +76,14 @@ private:
      */
     void updateConnection(unsigned long now);
 
+    /**
+     * @brief Broadcast warning change to connected device via LINK.
+     * Sends W2 command with warning status.
+     * @param type The warning type that changed
+     * @param isActive True if warning is now active, false if cleared
+     */
+    void broadcastWarningChange(WarningType type, bool isActive);
+
 #if defined(BOAT_CONTROL_PANEL)
     void updateLedStatus();
 #endif

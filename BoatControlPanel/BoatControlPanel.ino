@@ -174,7 +174,7 @@ void setup()
 
 #if defined(ARDUINO_MEGA2560)
     SystemFunctions::initializeSerial(NEXTION_SERIAL, 19200, false);
-    SystemFunctions::initializeSerial(LINK_SERIAL, 9600, false);
+    SystemFunctions::initializeSerial(LINK_SERIAL, 19200, false);
 	SystemFunctions::initializeSerial(GPS_SERIAL, 9600, false);
 #elif defined(ARDUINO_R4_MINIMA)
 	NEXTION_SERIAL.begin(19200);

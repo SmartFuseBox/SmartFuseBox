@@ -119,7 +119,7 @@ private:
     bool isBufferEmpty() const;
     void updateFileName(unsigned long now);
     void checkForDateChange(unsigned long now);
-    void checkCardPresence(unsigned long now);
+    void checkCardPresence();
     bool isCardMissingError();
     
 public:

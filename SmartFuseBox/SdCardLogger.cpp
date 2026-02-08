@@ -66,37 +66,20 @@ bool SdCardLogger::initializeSdCard()
         return false;
     }
     
-    Serial.println(F("SD card initialized successfully!"));
-    
-    // Print card info for debugging
-    uint32_t cardSize = _sd.card()->sectorCount() * 512UL / (1024 * 1024);
-    Serial.print(F("Card size: "));
-    Serial.print(cardSize);
-    Serial.println(F(" MB"));
-    
     return true;
 }
 
 void SdCardLogger::update(unsigned long now)
 {
-    bool checkingPresence = false;
-
     // Periodically check for card presence changes (insertion/removal)
     if (now - _lastCardPresenceCheck >= SD_CARD_PRESENCE_CHECK_MS)
     {
-        checkingPresence = true;
-        Serial.println("Checking card presence");
-        checkCardPresence(now);
+        checkCardPresence();
         _lastCardPresenceCheck = now;
     }
 
     if (!_initialized || !_sdCardPresent)
     {
-        if (checkingPresence)
-        {
-            Serial.println("SD not initialized/present");
-        }
-
         return;
     }
 
@@ -110,15 +93,12 @@ void SdCardLogger::update(unsigned long now)
     // Capture sensor snapshot and write to SD every second
     if (now - _lastWriteTime >= SD_WRITE_INTERVAL_MS)
     {
-        Serial.println("Capturing sensor snapshot");
-        
         // Capture current sensor state
         captureSensorSnapshot();
         
         // Write buffered records
         if (!isBufferEmpty())
         {
-            Serial.println("Writing logs to SD");
             if (writeRecordsToCard(SD_MAX_WRITES_PER_LOOP))
             {
                 _lastWriteTime = now;
@@ -287,7 +267,6 @@ void SdCardLogger::writeSnapshotToCsv(const SensorSnapshot& snapshot)
 
 bool SdCardLogger::openOrCreateFile(unsigned long now)
 {
-    Serial.println("SD open or create file");
     // Close existing file if open
     if (_currentFile)
     {
@@ -309,7 +288,6 @@ bool SdCardLogger::openOrCreateFile(unsigned long now)
     // Write CSV header if new file
     if (!fileExists)
     {
-        Serial.println("Writing SD header");
         _currentFile.println(F("Timestamp,Temp,Humidity,Bearing,CompassTemp,Speed,WaterLevel,WaterPump,GPSLat,GPSLon,Altitude,GPSCourse,GPSSats,GPSDistance,Warnings,Horn"));
         _currentFile.flush();
     }
@@ -321,7 +299,6 @@ void SdCardLogger::closeCurrentFile()
 {
     if (_currentFile)
     {
-        Serial.println("SD closing file");
         _currentFile.flush();
         _currentFile.close();
     }
@@ -386,14 +363,12 @@ void SdCardLogger::addSnapshotToBuffer(const SensorSnapshot& snapshot)
 {
     if (isBufferFull())
     {
-        Serial.println("SD buffer full");
         // Buffer is full, drop oldest record (overwrite tail)
         _recordsDropped++;
         _bufferTail = (_bufferTail + 1) % SD_BUFFER_SIZE;
         _bufferCount--;
     }
     
-    Serial.println("Add to SD buffer");
     // Add new record at head
     _buffer[_bufferHead] = snapshot;
     _bufferHead = (_bufferHead + 1) % SD_BUFFER_SIZE;
@@ -426,17 +401,14 @@ void SdCardLogger::flush()
     closeCurrentFile();
 }
 
-void SdCardLogger::checkCardPresence(unsigned long now)
+void SdCardLogger::checkCardPresence()
 {
-	(void)now; // Unused parameter, but could be used for future enhancements
-
     // Try to re-initialize SD card with slower speed for reliability
     bool cardPresent = _sd.begin(_csPin, SD_SCK_MHZ(4));
 
     // Card state changed from missing to present
     if (cardPresent && !_sdCardPresent)
     {
-        Serial.println("Card Present");
         _sdCardPresent = true;
         _initialized = true;
 
@@ -453,17 +425,19 @@ void SdCardLogger::checkCardPresence(unsigned long now)
             _sdCardErrorRaised = false;
         }
     }
-    // Card state changed from present to missing
-    else if (!cardPresent && _sdCardPresent)
+    // Card is not present (either just removed or still missing)
+    else if (!cardPresent)
     {
-        Serial.println("Card not present");
+        // Close any open files if card was previously present
+        if (_sdCardPresent)
+        {
+            closeCurrentFile();
+        }
+        
         _sdCardPresent = false;
         _initialized = false;
 
-        // Close any open files
-        closeCurrentFile();
-
-        // Determine if card is missing or there's an error
+        // Determine if card is missing or there's another error
         if (isCardMissingError())
         {
             // Clear error warning if it was raised
@@ -473,7 +447,7 @@ void SdCardLogger::checkCardPresence(unsigned long now)
                 _sdCardErrorRaised = false;
             }
 
-            // Raise missing warning if not already raised
+            // Raise/maintain missing warning
             if (!_sdCardMissingRaised)
             {
                 _warningManager->raiseWarning(WarningType::SdCardMissing);
@@ -482,7 +456,6 @@ void SdCardLogger::checkCardPresence(unsigned long now)
         }
         else
         {
-            Serial.println("Card Missing or other error");
             // Clear missing warning if it was raised
             if (_sdCardMissingRaised)
             {
@@ -490,7 +463,7 @@ void SdCardLogger::checkCardPresence(unsigned long now)
                 _sdCardMissingRaised = false;
             }
 
-            // Raise error warning if not already raised
+            // Raise/maintain error warning for non-missing errors
             if (!_sdCardErrorRaised)
             {
                 _warningManager->raiseWarning(WarningType::SdCardError);
@@ -498,6 +471,7 @@ void SdCardLogger::checkCardPresence(unsigned long now)
             }
         }
     }
+    // Card present and state unchanged - no action needed
 }
 
 bool SdCardLogger::isCardMissingError()
@@ -509,9 +483,6 @@ bool SdCardLogger::isCardMissingError()
     // - 0xFF or 0x01: Card not present (no response on SPI bus)
 
     uint8_t errorCode = _sd.card()->errorCode();
-
-    Serial.print("Card error code: ");
-    Serial.println(errorCode);
 
     // Error codes that typically indicate missing card:
     // 0x01 = SD_CARD_ERROR_CMD0 (card not present/responding)

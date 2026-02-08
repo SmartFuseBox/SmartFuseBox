@@ -116,6 +116,8 @@ void AckCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager, Con
 
 bool AckCommandHandler::processConfigAck(SerialCommandManager* sender, const char* key, const char* value)
 {
+	(void)sender;
+
     // Handle C1 (ConfigGetSettings) acknowledgement
     if (strcmp(key, ConfigGetSettings) == 0 && strcmp(value, AckSuccess) == 0)
     {
