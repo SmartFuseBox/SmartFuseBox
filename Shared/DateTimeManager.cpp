@@ -37,7 +37,10 @@ void DateTimeManager::setDateTime(unsigned long unixTimestamp)
     _syncedMillis = millis();
     _isSet = true;
 
-    _rtcDriver.writeTimestamp(unixTimestamp);
+    if (_rtcDriver.isAvailable())
+    {
+        _rtcDriver.writeTimestamp(unixTimestamp);
+    }
 }
 
 bool DateTimeManager::setDateTimeISO(const char* isoDateTime)
