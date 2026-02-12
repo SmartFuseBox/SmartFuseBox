@@ -2,10 +2,33 @@
 
 constexpr unsigned long DefaultTimestamp = 1735689600UL;
 
-// Static member initialization
+#if defined(BOAT_CONTROL_PANEL)
+RtcDS1302Driver DateTimeManager::_rtcDriver;
+#endif
+
 unsigned long DateTimeManager::_syncedTimestamp = 0;
 unsigned long DateTimeManager::_syncedMillis = 0;
 bool DateTimeManager::_isSet = false;
+int8_t DateTimeManager::_timezoneOffset = 0;
+
+void DateTimeManager::begin()
+{
+#if defined(BOAT_CONTROL_PANEL)
+	_rtcDriver.begin();
+
+	if (_rtcDriver.isAvailable())
+	{
+		unsigned long rtcTimestamp = _rtcDriver.readTimestamp();
+		if (rtcTimestamp > 0)
+		{
+			setDateTime(rtcTimestamp);
+			return;
+		}
+	}
+#endif
+
+	setDateTime(DefaultTimestamp);
+}
 
 void DateTimeManager::setDateTime()
 {
@@ -18,6 +41,13 @@ void DateTimeManager::setDateTime(unsigned long unixTimestamp)
     _syncedTimestamp = unixTimestamp;
     _syncedMillis = millis();
     _isSet = true;
+
+#if defined(BOAT_CONTROL_PANEL)
+    if (_rtcDriver.isAvailable())
+    {
+        _rtcDriver.writeTimestamp(unixTimestamp);
+    }
+#endif
 }
 
 bool DateTimeManager::setDateTimeISO(const char* isoDateTime)
@@ -64,21 +94,23 @@ unsigned long DateTimeManager::getCurrentTime()
         return 0;
     }
 
-    // Calculate elapsed time since sync (handle millis() overflow)
     unsigned long currentMillis = millis();
     unsigned long elapsedMillis;
-    
+
     if (currentMillis >= _syncedMillis)
     {
         elapsedMillis = currentMillis - _syncedMillis;
-    } else {
-        // millis() has overflowed (after ~49.7 days)
+    }
+    else
+    {
         elapsedMillis = (0xFFFFFFFF - _syncedMillis) + currentMillis + 1;
     }
 
-    // Convert milliseconds to seconds and add to synced timestamp
     unsigned long elapsedSeconds = elapsedMillis / 1000;
-    return _syncedTimestamp + elapsedSeconds;
+    unsigned long utcTime = _syncedTimestamp + elapsedSeconds;
+
+    long offsetSeconds = static_cast<long>(_timezoneOffset) * 3600L;
+    return utcTime + offsetSeconds;
 }
 
 bool DateTimeManager::isTimeSet()
@@ -225,6 +257,19 @@ void DateTimeManager::reset()
     _isSet = false;
 }
 
+void DateTimeManager::setTimezoneOffset(int8_t offsetHours)
+{
+    if (offsetHours >= -12 && offsetHours <= 14)
+    {
+        _timezoneOffset = offsetHours;
+    }
+}
+
+int8_t DateTimeManager::getTimezoneOffset()
+{
+    return _timezoneOffset;
+}
+
 unsigned long DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint8_t day,
     uint8_t hour, uint8_t minute, uint8_t second)
 {
@@ -321,7 +366,17 @@ void DateTimeManager::unixToDateTime(unsigned long unixTime, uint16_t& year, uin
         month++;
     }
     
-    day = days + 1;
+	day = days + 1;
 }
 
+#if defined(BOAT_CONTROL_PANEL)
+bool DateTimeManager::isRtcAvailable()
+{
+	return _rtcDriver.isAvailable();
+}
 
+bool DateTimeManager::rtcDiagnostic(char* buffer, const uint8_t bufferLength)
+{
+	return _rtcDriver.runDiagnostics(buffer, bufferLength);
+}
+#endif
