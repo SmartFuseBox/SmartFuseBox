@@ -6,7 +6,7 @@ These are commands used to configure the system settings and can only be sent fr
 
 | Command | Example | Purpose |
 |---|---|---|
-| `F0` — Heart beat | `F0` | Send at rated intervals, if no ACK received indicates there is no connection available between control panel and fuse box. No params. |
+| `F0` — Heart beat | `F0:w=0x00` (SFB) or `F0:w=0x00;t=1733328600` (BCP) | Send at rated intervals to monitor connection health. If no ACK received, indicates connection loss. **Params:** `w=<hex_warnings>` - bitmask of active local warnings (hex format). `t=<timestamp>` - (BCP only) Unix timestamp for continuous time sync. Smart Fuse Box automatically updates clock from `t=` parameter. |
 | `F1` — System Initialized | `F1` | Sent by the system when initialization is complete to signal readiness. No params. Used to notify connected devices or software that the control panel is ready for operation. |
 | `F2` — Free Memory | `F2` | When received will return the amount of free memory. |
 | `F3` — Cpu Usage | `F3` | When received will return the current CPU usage. No params. |
@@ -18,7 +18,14 @@ These are commands used to configure the system settings and can only be sent fr
 | `F9` — SD Card Log File Size | `F9` | Get current log file size in bytes. Returns `v=<bytes>` where bytes is the size of the active log file. Returns `v=0` if no file is open. No params. |
 | `F10` — RTC Diagnostic | `F10` | Perform DS1302 RTC diagnostics. Returns status message with RTC health (availability, running state, write protection, time validity). Returns error message if RTC fails any check. No params. |
 
-
+**Heartbeat Behavior:**
+- Sent every 1 second (1000ms) from both devices
+- Boat Control Panel (BCP) includes time sync: `F0:w=0x00;t=1733328600`
+- Smart Fuse Box (SFB) includes only warnings: `F0:w=0x00`
+- Connection timeout occurs after 3 seconds without response
+- Time synchronization is automatic - no separate F6 commands needed during normal operation
+- F6 command can still be used for manual time updates or initial configuration
+- 
 ### Wifi System Commands (SFB)
 Only F0 is supported via wifi.
 Route: /api/system/{command}

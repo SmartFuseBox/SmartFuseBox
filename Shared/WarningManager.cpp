@@ -1,6 +1,8 @@
 #include "WarningManager.h"
 #if defined(BOAT_CONTROL_PANEL)
+#include "Local.h"
 #include "ToneManager.h"
+#include "DateTimeManager.h"
 #endif
 
 // Define sensor warning mask (bits 20-31)
@@ -202,9 +204,15 @@ void WarningManager::sendHeartbeat()
 	if (_commandMgr)
 	{
 		// Include local warnings in heartbeat
-		char params[32];
+		char params[64];
+
+#if defined(BOAT_CONTROL_PANEL)
+		snprintf_P(params, sizeof(params), PSTR("w=%s%lx;t=%lu"),
+			HexPrefix, _localWarnings, DateTimeManager::getCurrentTime());
+#else
 		snprintf_P(params, sizeof(params), PSTR("w=%s%lx"),
 			HexPrefix, _localWarnings);
+#endif
 		_commandMgr->sendCommand(SystemHeartbeatCommand, params);
 	}
 }
@@ -234,6 +242,18 @@ void WarningManager::updateConnection(unsigned long now)
 		if (connected && !wasConnected)
 		{
 			clearWarning(WarningType::ConnectionLost);
+
+#if defined(BOAT_CONTROL_PANEL)
+			Serial.println(F("Connection established - sending time sync if set"));
+			// Send time sync when connection is established
+			if (_commandMgr && DateTimeManager::isTimeSet())
+			{
+				char buffer[20];
+				snprintf_P(buffer, sizeof(buffer), PSTR("v=%lu"), DateTimeManager::getCurrentTime());
+				_commandMgr->sendCommand(SystemSetDateTime, buffer);
+				Serial.println(F("Time sync sent"));
+			}
+#endif
 		}
 		else if (!connected && wasConnected)
 		{

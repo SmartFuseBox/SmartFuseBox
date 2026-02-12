@@ -2,7 +2,10 @@
 
 constexpr unsigned long DefaultTimestamp = 1735689600UL;
 
+#if defined(BOAT_CONTROL_PANEL)
 RtcDS1302Driver DateTimeManager::_rtcDriver;
+#endif
+
 unsigned long DateTimeManager::_syncedTimestamp = 0;
 unsigned long DateTimeManager::_syncedMillis = 0;
 bool DateTimeManager::_isSet = false;
@@ -10,6 +13,7 @@ int8_t DateTimeManager::_timezoneOffset = 0;
 
 void DateTimeManager::begin()
 {
+#if defined(BOAT_CONTROL_PANEL)
 	_rtcDriver.begin();
 
 	if (_rtcDriver.isAvailable())
@@ -21,6 +25,7 @@ void DateTimeManager::begin()
 			return;
 		}
 	}
+#endif
 
 	setDateTime(DefaultTimestamp);
 }
@@ -37,10 +42,12 @@ void DateTimeManager::setDateTime(unsigned long unixTimestamp)
     _syncedMillis = millis();
     _isSet = true;
 
+#if defined(BOAT_CONTROL_PANEL)
     if (_rtcDriver.isAvailable())
     {
         _rtcDriver.writeTimestamp(unixTimestamp);
     }
+#endif
 }
 
 bool DateTimeManager::setDateTimeISO(const char* isoDateTime)
@@ -362,6 +369,7 @@ void DateTimeManager::unixToDateTime(unsigned long unixTime, uint16_t& year, uin
 	day = days + 1;
 }
 
+#if defined(BOAT_CONTROL_PANEL)
 bool DateTimeManager::isRtcAvailable()
 {
 	return _rtcDriver.isAvailable();
@@ -371,4 +379,4 @@ bool DateTimeManager::rtcDiagnostic(char* buffer, const uint8_t bufferLength)
 {
 	return _rtcDriver.runDiagnostics(buffer, bufferLength);
 }
-
+#endif

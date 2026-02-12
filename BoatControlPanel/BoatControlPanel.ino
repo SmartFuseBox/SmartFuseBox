@@ -77,7 +77,7 @@ void onComputerCommandReceived(SerialCommandManager* mgr);
 ToneManager toneManager(22);
 
 // led indicators
-RgbLedFade systemLedStatus(4, 3, 2);
+RgbLedFade systemLedStatus(PinRgbRed, PinRgbGreen, PinRgbBlue);
 
 // Serial managers
 SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 512, 64);
@@ -216,11 +216,18 @@ void setup()
 	sensorManager.setup();
 
 	// Simplified broadcasting
-	char buffer[10];
+	char buffer[20];
 	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->hornRelayIndex);
 	broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
 	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vesselType));
 	broadcastManager.sendCommand(ConfigBoatType, buffer);
+
+	if (DateTimeManager::isTimeSet())
+	{
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%lu"), DateTimeManager::getCurrentTime());
+		broadcastManager.sendCommand(SystemSetDateTime, buffer);
+	}
+
 	broadcastManager.sendCommand(SystemInitialized, "");
 
 	nextion.sendCommand(PageOne);

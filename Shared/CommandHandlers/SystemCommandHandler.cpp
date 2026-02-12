@@ -34,6 +34,26 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
     if (strcmp(command, SystemHeartbeatCommand) == 0)
     {
+        for (uint8_t i = 0; i < paramCount; i++)
+        {
+            // Handle time synchronization parameter (t=timestamp)
+            if (strcmp(params[i].key, "t") == 0)
+            {
+                unsigned long timestamp = static_cast<unsigned long>(strtoul(params[i].value, nullptr, 0));
+                if (timestamp > 0)
+                {
+                    DateTimeManager::setDateTime(timestamp);
+                }
+            }
+            // Handle warnings parameter (w=0x00) - received from Control Panel
+            else if (strcmp(params[i].key, "w") == 0)
+            {
+                // Warning bitmask received from Control Panel
+                // Could be processed here if needed for logging or monitoring
+                // Currently just acknowledged
+            }
+        }
+
         sendAckOk(sender, command);
     }
     else if (strcmp(command, SystemInitialized) == 0)
@@ -184,8 +204,9 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
     else if (strcmp(command, SystemRtcDiagnostic) == 0)
     {
         char diagnosticMsg[64];
-        bool success = DateTimeManager::rtcDiagnostic(diagnosticMsg, sizeof(diagnosticMsg));
 
+#if defined(BOAT_CONTROL_PANEL)
+        bool success = DateTimeManager::rtcDiagnostic(diagnosticMsg, sizeof(diagnosticMsg));
         StringKeyValue param;
         strncpy(param.key, ValueParamName, sizeof(param.key));
         strncpy(param.value, diagnosticMsg, sizeof(param.value));
@@ -198,6 +219,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         {
             sendAckErr(sender, command, param.value);
         }
+#endif
     }
     else
     {

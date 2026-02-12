@@ -1,7 +1,12 @@
 #pragma once
 
 #include <Arduino.h>
+
+#include "Local.h"
+
+#if defined(BOAT_CONTROL_PANEL)
 #include "RtcDS1302Driver.h"
+#endif
 
 constexpr uint8_t DateTimeBufferLength = 20;     // "YYYY-MM-DD HH:MM:SS" + null terminator
 constexpr uint8_t DateTimeISOBufferLength = 20;  // "YYYY-MM-DDTHH:MM:SS" + null terminator
@@ -186,7 +191,9 @@ public:
     static bool rtcDiagnostic(char* buffer, const uint8_t bufferLength);
 
 private:
+#if defined(BOAT_CONTROL_PANEL)
     static RtcDS1302Driver _rtcDriver;
+#endif
     static unsigned long _syncedTimestamp;
     static unsigned long _syncedMillis;
     static bool _isSet;
