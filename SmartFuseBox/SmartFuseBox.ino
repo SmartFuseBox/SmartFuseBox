@@ -46,6 +46,9 @@
 #include "SensorController.h"
 #include "SoundController.h"
 
+#include "MicroSdDriver.h"
+
+
 #if defined(ARDUINO_UNO_R4) && defined(LED_MANAGER)
 #include "LedMatrixManager.h"
 #endif
@@ -138,7 +141,7 @@ SystemNetworkHandler systemNetworkHandler(&wifiController);
 SensorNetworkHandler sensorNetworkHandler(&sensorController);
 
 // SD card logger
-SdCardLogger sdCardLogger(&sensorCommandHandler, &warningManager, SdCardCsPin);
+SdCardLogger sdCardLogger(&sensorCommandHandler, &warningManager);
 
 #if defined(CARD_CONFIG_LOADER)
 SdCardConfigLoader sdCardConfigLoader(&commandMgrComputer, &commandMgrLink, &configController, &configSyncManager, SdCardCsPin);
@@ -192,6 +195,9 @@ void setup()
 	soundController.configUpdated(config);
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
+
+	MicroSdDriver& microSdDriver = MicroSdDriver::getInstance();
+	microSdDriver.beginInitialize(SdCardCsPin, config->sdCardInitializeSpeed);
 
 	// Initialize SD card logger
 	sdCardLogger.initialize();
@@ -257,6 +263,11 @@ void loop()
 
 	SystemCpuMonitor::startTask();
 	configSyncManager.update(now);
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	MicroSdDriver& microSdDriver = MicroSdDriver::getInstance();
+	microSdDriver.update(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();

@@ -407,23 +407,15 @@ bool SdCardConfigLoader::loadConfigFromSd()
     logInfo("Checking for SD config...");
 
     // Temporarily release SD card if logger is using it
-    bool loggerWasActive = false;
     if (_sdCardLogger && _sdCardLogger->isSdCardReady())
     {
         logInfo("Releasing SD card from logger...");
         _sdCardLogger->releaseSDCard();
-        loggerWasActive = true;
     }
 
     if (!checkSdCard())
     {
         logInfo("SD card not present or not accessible");
-
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
 
         return false;
     }
@@ -431,12 +423,6 @@ bool SdCardConfigLoader::loadConfigFromSd()
     if (!configFileExists())
     {
         logInfo("Config file not found on SD card");
-
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
 
         return false;
     }
@@ -447,12 +433,6 @@ bool SdCardConfigLoader::loadConfigFromSd()
     if (!configFile)
     {
         logError("Failed to open config file");
-
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
 
         return false;
     }
@@ -510,25 +490,12 @@ bool SdCardConfigLoader::loadConfigFromSd()
             snprintf(summary, sizeof(summary), "SD config loaded: %u commands applied, %u errors", successCount, errorCount);
             logInfo(summary);
 
-            // Reacquire SD card for logger if it was active
-            if (loggerWasActive && _sdCardLogger)
-            {
-                logInfo("Reacquiring SD card for logger...");
-                _sdCardLogger->reacquireSDCard();
-            }
-
             return true;
         }
         else
         {
             logError("Failed to save config to EEPROM");
         }
-    }
-
-    // Reacquire SD card for logger if it was active
-    if (loggerWasActive && _sdCardLogger)
-    {
-        _sdCardLogger->reacquireSDCard();
     }
 
     return false;
@@ -544,24 +511,15 @@ bool SdCardConfigLoader::exportConfigToSd()
 {
     logInfo("Exporting config to SD card...");
 
-    // Temporarily release SD card if logger is using it
-    bool loggerWasActive = false;
     if (_sdCardLogger && _sdCardLogger->isSdCardReady())
     {
         logInfo("Releasing SD card from logger...");
         _sdCardLogger->releaseSDCard();
-        loggerWasActive = true;
     }
 
     if (!checkSdCard())
     {
         logError("SD card not present or not accessible");
-
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
 
         return false;
     }
@@ -577,12 +535,6 @@ bool SdCardConfigLoader::exportConfigToSd()
     {
         logError("Failed to create config file");
 
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
-
         return false;
     }
 
@@ -591,12 +543,6 @@ bool SdCardConfigLoader::exportConfigToSd()
     {
         configFile.close();
         logError("Config not available");
-
-        // Reacquire SD card for logger if it was active
-        if (loggerWasActive && _sdCardLogger)
-        {
-            _sdCardLogger->reacquireSDCard();
-        }
 
         return false;
     }
@@ -787,13 +733,6 @@ bool SdCardConfigLoader::exportConfigToSd()
     configFile.close();
 
     logInfo("Config exported to SD card");
-
-    // Reacquire SD card for logger if it was active
-    if (loggerWasActive && _sdCardLogger)
-    {
-        logInfo("Reacquiring SD card for logger...");
-        _sdCardLogger->reacquireSDCard();
-    }
 
     return true;
 }
