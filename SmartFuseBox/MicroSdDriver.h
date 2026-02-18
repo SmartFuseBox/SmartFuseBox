@@ -9,7 +9,7 @@ class WarningManager;
 // Configuration constants
 constexpr uint8_t SdMaximumOpenFiles = 3;            // Maximum simultaneous open files
 constexpr uint16_t SdCardPresenceCheckMs = 5000;       // Card presence check interval (5 seconds)
-constexpr uint32_t SdFreeSpaceCacheMs = 43200000;      // Free space cache validity (12 hours)
+constexpr uint32_t SdFreeSpaceCacheMs = 3600000;      // Free space cache validity (1 hour)
 constexpr uint16_t SdCardSettlingDelayMs = 2000;       // Card settling time after init (2 seconds)
 
 /**
