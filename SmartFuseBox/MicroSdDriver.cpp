@@ -75,11 +75,30 @@ bool MicroSdDriver::isCardPresent(bool forceCheck)
         return false;
     }
 
-    // Try to access card - if this fails, card is likely missing
+    // Try to access card - if this fails, card is likely missing or has errors
     uint8_t errorCode = _sd.card()->errorCode();
-    _cardPresent = (errorCode == 0);
 
-    return _cardPresent;
+    if (errorCode != 0)
+    {
+        // Card has communication errors
+        _cardPresent = false;
+
+        if (_warningManager)
+        {
+            _warningManager->raiseWarning(WarningType::SdCardError);
+        }
+
+        return false;
+    }
+
+    // Card is responding correctly
+    if (_warningManager)
+    {
+        _warningManager->clearWarning(WarningType::SdCardError);
+    }
+
+    _cardPresent = true;
+    return true;
 }
 
 FsFile* MicroSdDriver::openFile(MicroSdFileHandle handle, const char* fileName, oflag_t oflag)
@@ -122,10 +141,20 @@ FsFile* MicroSdDriver::openFile(MicroSdFileHandle handle, const char* fileName, 
     // Attempt to open file
     if (!fileInfo->file.open(fileName, oflag))
     {
+        // File open failed - raise SD card error warning
+        if (_warningManager)
+        {
+            _warningManager->raiseWarning(WarningType::SdCardError);
+        }
         return nullptr;
     }
 
-    // Successfully opened
+    // Successfully opened - clear any previous error
+    if (_warningManager)
+    {
+        _warningManager->clearWarning(WarningType::SdCardError);
+    }
+
     fileInfo->isOpen = true;
     strncpy(fileInfo->fileName, fileName, sizeof(fileInfo->fileName) - 1);
     fileInfo->fileName[sizeof(fileInfo->fileName) - 1] = '\0';
@@ -257,10 +286,11 @@ void MicroSdDriver::update(unsigned long now)
             // Read card serial number for change detection
             _cardSerialNumber = readCardSerialNumber();
 
-            // Clear SD card missing warning
+            // Clear SD card warnings - card initialized successfully
             if (_warningManager)
             {
                 _warningManager->clearWarning(WarningType::SdCardMissing);
+                _warningManager->clearWarning(WarningType::SdCardError);
             }
         }
         else
@@ -320,10 +350,11 @@ void MicroSdDriver::update(unsigned long now)
                 _cardSerialNumber = 0;
                 _lastFreeSpaceUpdate = 0;
 
-                // Raise SD card missing warning
+                // Raise SD card missing warning, clear others (no card = no errors/low space)
                 if (_warningManager)
                 {
                     _warningManager->raiseWarning(WarningType::SdCardMissing);
+                    _warningManager->clearWarning(WarningType::SdCardError);
                     _warningManager->clearWarning(WarningType::SdCardLowSpace);
                 }
             }
@@ -378,7 +409,17 @@ void MicroSdDriver::updateCardInfo(bool forceExpensiveCheck)
     // Fast: Read total size from FAT32 boot sector (single 512-byte sector read)
     _totalSize = readTotalSizeFromBootSector();
 
-    // Expensive: Only recalculate free space if forced or cache is stale (> 5 minutes)
+    if (_totalSize == 0)
+    {
+        // Failed to read card size - card error
+        if (_warningManager)
+        {
+            _warningManager->raiseWarning(WarningType::SdCardError);
+        }
+        return;
+    }
+
+    // Expensive: Only recalculate free space if forced or cache is stale (> 1 hour)
     unsigned long now = millis();
     bool freeSpaceStale = (now - _lastFreeSpaceUpdate) >= SdFreeSpaceCacheMs;
 
@@ -387,9 +428,25 @@ void MicroSdDriver::updateCardInfo(bool forceExpensiveCheck)
         // This is the expensive operation (200-1000ms on large cards)
         uint32_t freeClusterCount = _sd.freeClusterCount();
         uint32_t sectorsPerCluster = _sd.sectorsPerCluster();
-        _freeSpace = static_cast<uint64_t>(freeClusterCount) * sectorsPerCluster * 512ULL;
 
+        if (freeClusterCount == 0 && sectorsPerCluster == 0)
+        {
+            // Failed to read free space - card error
+            if (_warningManager)
+            {
+                _warningManager->raiseWarning(WarningType::SdCardError);
+            }
+            return;
+        }
+
+        _freeSpace = static_cast<uint64_t>(freeClusterCount) * sectorsPerCluster * 512ULL;
         _lastFreeSpaceUpdate = now;
+
+        // Successfully read card info - clear error warning
+        if (_warningManager)
+        {
+            _warningManager->clearWarning(WarningType::SdCardError);
+        }
 
         // Check if free space warning should be raised/cleared
         checkFreeSpaceWarning();
@@ -407,7 +464,18 @@ uint32_t MicroSdDriver::readCardSerialNumber()
 
     if (!_sd.card()->readCID(&cid))
     {
+        // Failed to read CID - card communication error
+        if (_warningManager)
+        {
+            _warningManager->raiseWarning(WarningType::SdCardError);
+        }
         return 0;
+    }
+
+    // Successfully read CID - clear error warning
+    if (_warningManager)
+    {
+        _warningManager->clearWarning(WarningType::SdCardError);
     }
 
     return cid.psn(); // Product Serial Number (32-bit unique ID)
