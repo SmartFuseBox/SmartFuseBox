@@ -28,10 +28,15 @@ WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrC
 {
 	_ssid[0] = '\0';
 	_password[0] = '\0';
-	_activeClient.state = ClientHandlingState::Idle;
-	_activeClient.lastActivity = 0;
-	_activeClient.isPersistent = false;
-	_activeClient.request[0] = '\0';
+
+	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+	{
+		_activeClients[i].state = ClientHandlingState::Idle;
+		_activeClients[i].lastActivity = 0;
+		_activeClients[i].isPersistent = false;
+		_activeClients[i].request[0] = '\0';
+	}
+
 	registerJsonVisitors(jsonVisitors, jsonVisitorCount);
 }
 
@@ -186,13 +191,13 @@ void WifiServer::update()
 	{
 		return;
 	}
-	
+
 	// Handle client mode connection state machine
 	if (_mode == WifiMode::Client)
 	{
 		updateClientConnection();
 	}
-	
+
 	// Only handle HTTP clients if we're connected and server is running
 	if (_serverActive && isConnected())
 	{
@@ -200,310 +205,412 @@ void WifiServer::update()
 	}
 }
 
+int8_t WifiServer::findFreeClientSlot()
+{
+	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+	{
+		if (_activeClients[i].state == ClientHandlingState::Idle)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+uint8_t WifiServer::getPersistentClientCount()
+{
+	uint8_t count = 0;
+	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+	{
+		if (_activeClients[i].isPersistent && 
+			_activeClients[i].state != ClientHandlingState::Idle)
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+void WifiServer::cleanupClient(uint8_t index)
+{
+	char msg[32];
+	snprintf(msg, sizeof(msg), "Cleanup client [slot %d]", index);
+	sendDebug(msg, F("WifiServer"));
+
+	// Stop immediately - don't flush as it can block on slow/dead connections
+	_activeClients[index].client.stop();
+	_activeClients[index].state = ClientHandlingState::Idle;
+	_activeClients[index].isPersistent = false;
+	_activeClients[index].request[0] = '\0';
+}
+
+bool WifiServer::isStaticAssetRequest(const char* path)
+{
+	if (path == nullptr)
+	{
+		return false;
+	}
+
+	// Find the last dot in the path
+	const char* lastDot = strrchr(path, '.');
+	if (lastDot == nullptr)
+	{
+		return false;
+	}
+
+	// Check for common browser static file requests
+	// (This is a JSON-only API server, so reject these early with specific logging)
+	const char* ext = lastDot + 1;
+	return (strcmp(ext, "css") == 0 ||
+			strcmp(ext, "js") == 0 ||
+			strcmp(ext, "ico") == 0 ||      // favicon.ico
+			strcmp(ext, "png") == 0 ||
+			strcmp(ext, "jpg") == 0 ||
+			strcmp(ext, "jpeg") == 0 ||
+			strcmp(ext, "gif") == 0 ||
+			strcmp(ext, "svg") == 0 ||
+			strcmp(ext, "woff") == 0 ||     // web fonts
+			strcmp(ext, "woff2") == 0 ||
+			strcmp(ext, "ttf") == 0);
+}
+
+bool WifiServer::acceptNewClient(WiFiClient& client, unsigned long now)
+{
+	int8_t slot = findFreeClientSlot();
+	if (slot < 0)
+	{
+		return false;
+	}
+
+	char msg[32];
+	snprintf(msg, sizeof(msg), "Client connected [slot %d]", slot);
+	sendDebug(msg, F("WifiServer"));
+
+	_activeClients[slot].client = client;
+	_activeClients[slot].request[0] = '\0';
+	_activeClients[slot].startTime = now;
+	_activeClients[slot].lastActivity = now;
+	_activeClients[slot].isPersistent = false;
+	_activeClients[slot].state = ClientHandlingState::ReadingRequest;
+
+	return true;
+}
+
 void WifiServer::updateClientHandling()
 {
 	unsigned long now = millis();
-	
-	switch (_activeClient.state)
+
+	// Process all active clients
+	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	{
-		case ClientHandlingState::Idle:
+		if (_activeClients[i].state != ClientHandlingState::Idle)
 		{
-			// Check for new client connection
-			WiFiClient client = _server.available();
-			if (client)
-			{
-				sendDebug(F("New client connected"), F("WifiServer"));
-				_activeClient.client = client;
-				_activeClient.request[0] = '\0';
-				_activeClient.startTime = now;
-				_activeClient.lastActivity = now;
-				_activeClient.isPersistent = false;
-				_activeClient.state = ClientHandlingState::ReadingRequest;
-			}
-			break;
+			handleClientState(i, now);
 		}
-		
-		case ClientHandlingState::ReadingRequest:
+	}
+
+	// Check for new client connection
+	WiFiClient newClient = _server.available();
+	if (newClient)
+	{
+		if (!acceptNewClient(newClient, now))
 		{
-			// Check for timeout first (before checking for new clients)
-			if (SystemFunctions::hasElapsed(now, _activeClient.startTime, ClientReadTimeoutMs))
-			{
-				sendDebug(F("Client read timeout"), F("WifiServer"));
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
-				break;
-			}
-			
-			// Check if client is still connected
-			if (!_activeClient.client.connected())
-			{
-				sendDebug(F("Client disconnected during read"), F("WifiServer"));
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
-				break;
-			}
-			
-			// Read available data (non-blocking)
-			bool requestComplete = false;
-			size_t requestLen = strlen(_activeClient.request);
-			
-			while (_activeClient.client.available())
-			{
-				char c = _activeClient.client.read();
-				
-				// Append character to buffer
-				if (requestLen < MaximumRequestSize)
-				{
-					_activeClient.request[requestLen++] = c;
-					_activeClient.request[requestLen] = '\0';
-					_activeClient.lastActivity = now;  // Update activity timestamp
-				}
-				
-				// Check for end of HTTP headers (\r\n\r\n)
-				if (requestLen >= 4 && 
-					_activeClient.request[requestLen - 4] == '\r' &&
-					_activeClient.request[requestLen - 3] == '\n' &&
-					_activeClient.request[requestLen - 2] == '\r' &&
-					_activeClient.request[requestLen - 1] == '\n')
-				{
-					requestComplete = true;
-					break;
-				}
-				
-				// Safety check for request size
-				if (requestLen >= MaximumRequestSize)
-				{
-					sendDebug(F("Request too large"), F("WifiServer"));
-					send400(_activeClient.client);
-					_activeClient.client.stop();
-					_activeClient.state = ClientHandlingState::Idle;
-					return;  // Exit early
-				}
-			}
-			
-			// Only check for concurrent connections AFTER attempting to read
-			// This prevents interfering with the active connection
-			WiFiClient newClient = _server.available();
-			if (newClient)
-			{
-				sendDebug(F("Rejecting concurrent connection (reading)"), F("WifiServer"));
-				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
-				newClient.println(F("Content-Type: text/plain"));
-				newClient.println(F("Connection: close"));
-				newClient.println(F("Retry-After: 2"));
-				newClient.println();
-				newClient.println(F("Server busy"));
-				newClient.stop();
-			}
-			
-			// Transition to processing if request is complete
-			if (requestComplete)
-			{
-				_activeClient.state = ClientHandlingState::ProcessingRequest;
-			}
-			
-			break;
-		}
-		
-		case ClientHandlingState::ProcessingRequest:
-		{
-			WiFiClient newClient = _server.available();
-			if (newClient)
-			{
-				sendDebug(F("Rejecting concurrent connection (processing)"), F("WifiServer"));
-				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
-				newClient.println(F("Content-Type: text/plain"));
-				newClient.println(F("Connection: close"));
-				newClient.println(F("Retry-After: 2"));
-				newClient.println();
-				newClient.println(F("Server busy"));
-				newClient.stop();
-			}
-			
-			processClientRequest();
-			break;
-		}
-		
-		case ClientHandlingState::KeepAlive:
-		{
-			WiFiClient newClient = _server.available();
-			if (newClient)
-			{
-				sendDebug(F("Rejecting concurrent connection (keepalive)"), F("WifiServer"));
-				newClient.println(F("HTTP/1.1 503 Service Unavailable"));
-				newClient.println(F("Content-Type: text/plain"));
-				newClient.println(F("Connection: close"));
-				newClient.println(F("Retry-After: 2"));
-				newClient.println();
-				newClient.println(F("Server busy"));
-				newClient.stop();
-			}
-			
-			// Check for timeout (30 seconds of inactivity)
-			if (SystemFunctions::hasElapsed(now, _activeClient.lastActivity, PersistentTimeoutMs))
-			{
-				sendDebug(F("Persistent connection timeout"), F("WifiServer"));
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
-				break;
-			}
-			
-			// Check if client is still connected
-			if (!_activeClient.client.connected())
-			{
-				sendDebug(F("Persistent client disconnected"), F("WifiServer"));
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
-				break;
-			}
-			
-			// Check for new data on the persistent connection
-			if (_activeClient.client.available())
-			{
-				sendDebug(F("New request on persistent connection"), F("WifiServer"));
-				_activeClient.request[0] = '\0';
-				_activeClient.startTime = now;
-				_activeClient.state = ClientHandlingState::ReadingRequest;
-			}
-			break;
+			// All slots full
+			sendDebug(F("All connection slots full"), F("WifiServer"));
+			newClient.println(F("HTTP/1.1 503 Service Unavailable"));
+			newClient.println(F("Content-Type: text/plain"));
+			newClient.println(F("Connection: close"));
+			newClient.println(F("Retry-After: 5"));
+			newClient.println();
+			newClient.println(F("Server at capacity"));
+			newClient.stop();
 		}
 	}
 }
 
-void WifiServer::processClientRequest()
+void WifiServer::handleClientState(uint8_t index, unsigned long now)
 {
-	if (_activeClient.request[0] == '\0')
+	ActiveClient& client = _activeClients[index];
+
+	switch (client.state)
+	{
+		case ClientHandlingState::ReadingRequest:
+		{
+			// Check for timeout
+			if (SystemFunctions::hasElapsed(now, client.startTime, ClientReadTimeoutMs))
+			{
+				sendDebug(F("Client read timeout"), F("WifiServer"));
+				cleanupClient(index);
+				break;
+			}
+
+			// Read available data (non-blocking)
+			// Don't check connected() here - it can be false during TCP handshake
+			// The timeout will catch truly dead connections
+			bool requestComplete = false;
+			size_t requestLen = strlen(client.request);
+
+			while (client.client.available())
+			{
+				char c = client.client.read();
+
+				// Append character to buffer
+				if (requestLen < MaximumRequestSize)
+				{
+					client.request[requestLen++] = c;
+					client.request[requestLen] = '\0';
+					client.lastActivity = now;
+				}
+
+				// Check for end of HTTP headers (\r\n\r\n)
+				if (requestLen >= 4 && 
+					client.request[requestLen - 4] == '\r' &&
+					client.request[requestLen - 3] == '\n' &&
+					client.request[requestLen - 2] == '\r' &&
+					client.request[requestLen - 1] == '\n')
+				{
+					requestComplete = true;
+					char msg[48];
+					snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
+					sendDebug(msg, F("WifiServer"));
+					break;
+				}
+
+				// Safety check for request size
+				if (requestLen >= MaximumRequestSize)
+				{
+					sendDebug(F("Request too large"), F("WifiServer"));
+					send400(client.client, false);
+					cleanupClient(index);
+					return;
+				}
+			}
+
+			// Transition to processing if request is complete
+			if (requestComplete)
+			{
+				client.state = ClientHandlingState::ProcessingRequest;
+			}
+
+			break;
+		}
+
+		case ClientHandlingState::ProcessingRequest:
+		{
+			processClientRequest(index);
+			break;
+		}
+
+		case ClientHandlingState::KeepAlive:
+		{
+			// Check for timeout
+			if (SystemFunctions::hasElapsed(now, client.lastActivity, PersistentTimeoutMs))
+			{
+				sendDebug(F("Persistent connection timeout"), F("WifiServer"));
+				cleanupClient(index);
+				break;
+			}
+
+			// Check if still connected
+			if (!client.client.connected())
+			{
+				sendDebug(F("Persistent client disconnected"), F("WifiServer"));
+				cleanupClient(index);
+				break;
+			}
+
+			// Check for new data on the persistent connection
+			if (client.client.available())
+			{
+				sendDebug(F("New request on persistent connection"), F("WifiServer"));
+				client.request[0] = '\0';
+				client.startTime = now;
+				client.state = ClientHandlingState::ReadingRequest;
+			}
+			break;
+		}
+
+		case ClientHandlingState::Idle:
+			// Nothing to do
+			break;
+	}
+}
+
+void WifiServer::processClientRequest(uint8_t index)
+{
+	ActiveClient& client = _activeClients[index];
+
+	if (client.request[0] == '\0')
 	{
 		return;
 	}
-	
+
 	// Check for persistent connection header
-	bool isPersistent = strstr(_activeClient.request, "X-Connection-Type: persistent") != nullptr;
-	_activeClient.isPersistent = isPersistent;
-	
-	// Parse the request line (GET /path?query HTTP/1.1)
-	// Find first space (after method)
-	char* firstSpace = strchr(_activeClient.request, ' ');
-	if (!firstSpace)
+	bool isPersistent = strstr(client.request, "X-Connection-Type: persistent") != nullptr;
+
+	// Only allow persistent connections for authorized User-Agent
+	if (isPersistent)
 	{
-		send404(_activeClient.client);
-		if (!isPersistent)
+		const char* userAgent = strstr(client.request, "User-Agent:");
+		if (userAgent != nullptr)
 		{
-			_activeClient.client.stop();
-			_activeClient.state = ClientHandlingState::Idle;
+			// Move past "User-Agent: "
+			userAgent += 12;
+
+			// Skip leading whitespace
+			while (*userAgent == ' ' || *userAgent == '\t')
+			{
+				userAgent++;
+			}
+
+			// Check if User-Agent matches "SmartFuseBox/1.0"
+			if (strncmp(userAgent, "SmartFuseBox/1.0", 16) != 0)
+			{
+				// Not authorized for persistent connection
+				isPersistent = false;
+				sendDebug(F("Persistent denied (invalid UA)"), F("WifiServer"));
+			}
+			else
+			{
+				// Check if we already have max persistent connections
+				if (getPersistentClientCount() >= MaxPersistentClients)
+				{
+					isPersistent = false;
+					sendDebug(F("Persistent denied (quota full)"), F("WifiServer"));
+				}
+				else
+				{
+					sendDebug(F("Persistent authorized"), F("WifiServer"));
+				}
+			}
 		}
 		else
 		{
-			_activeClient.state = ClientHandlingState::KeepAlive;
-			_activeClient.lastActivity = millis();
+			// No User-Agent header, deny persistent connection
+			isPersistent = false;
+			sendDebug(F("Persistent denied (no UA)"), F("WifiServer"));
+		}
+	}
+
+	client.isPersistent = isPersistent;
+
+	// Parse the request line (GET /path?query HTTP/1.1)
+	// Find first space (after method)
+	char* firstSpace = strchr(client.request, ' ');
+	if (!firstSpace)
+	{
+		send404(client.client, isPersistent);
+		if (!isPersistent)
+		{
+			cleanupClient(index);
+		}
+		else
+		{
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
 		}
 		return;
 	}
-	
+
 	// Extract method
-	size_t methodLen = firstSpace - _activeClient.request;
+	size_t methodLen = firstSpace - client.request;
 	char method[8];  // Enough for "DELETE" + null
 	if (methodLen >= sizeof(method))
 	{
-		send404(_activeClient.client);
+		send404(client.client, isPersistent);
 		if (!isPersistent)
 		{
-			_activeClient.client.stop();
-			_activeClient.state = ClientHandlingState::Idle;
+			cleanupClient(index);
 		}
 		else
 		{
-			_activeClient.state = ClientHandlingState::KeepAlive;
-			_activeClient.lastActivity = millis();
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
 		}
 		return;
 	}
-	strncpy(method, _activeClient.request, methodLen);
+	strncpy(method, client.request, methodLen);
 	method[methodLen] = '\0';
-	
+
 	// Find second space (before HTTP version)
 	char* secondSpace = strchr(firstSpace + 1, ' ');
 	if (!secondSpace)
 	{
-		send404(_activeClient.client);
+		send404(client.client, isPersistent);
 		if (!isPersistent)
 		{
-			_activeClient.client.stop();
-			_activeClient.state = ClientHandlingState::Idle;
+			cleanupClient(index);
 		}
 		else
 		{
-			_activeClient.state = ClientHandlingState::KeepAlive;
-			_activeClient.lastActivity = millis();
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
 		}
 		return;
 	}
-	
+
 	// Only support GET for now
 	if (strcmp(method, "GET") != 0)
 	{
-		send404(_activeClient.client);
+		send404(client.client, isPersistent);
 		if (!isPersistent)
 		{
-			_activeClient.client.stop();
-			_activeClient.state = ClientHandlingState::Idle;
+			cleanupClient(index);
 		}
 		else
 		{
-			_activeClient.state = ClientHandlingState::KeepAlive;
-			_activeClient.lastActivity = millis();
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
 		}
 		return;
 	}
-	
+
 	// Extract full path (between first and second space)
 	size_t fullPathLen = secondSpace - (firstSpace + 1);
 	char fullPath[128];  // Buffer for path+query
 	if (fullPathLen >= sizeof(fullPath))
 	{
-		send404(_activeClient.client);
+		send404(client.client, isPersistent);
 		if (!isPersistent)
 		{
-			_activeClient.client.stop();
-			_activeClient.state = ClientHandlingState::Idle;
+			cleanupClient(index);
 		}
 		else
 		{
-			_activeClient.state = ClientHandlingState::KeepAlive;
-			_activeClient.lastActivity = millis();
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
 		}
 		return;
 	}
 	strncpy(fullPath, firstSpace + 1, fullPathLen);
 	fullPath[fullPathLen] = '\0';
-	
+
 	// Split path and query string at '?'
 	char* queryStart = strchr(fullPath, '?');
 	char path[64];
 	char query[64];
-	
+
 	if (queryStart)
 	{
 		// Split into path and query
 		size_t pathLen = queryStart - fullPath;
 		if (pathLen >= sizeof(path))
 		{
-			send404(_activeClient.client);
+			send404(client.client, isPersistent);
 			if (!isPersistent)
 			{
-				_activeClient.client.stop();
-				_activeClient.state = ClientHandlingState::Idle;
+				cleanupClient(index);
 			}
 			else
 			{
-				_activeClient.state = ClientHandlingState::KeepAlive;
-				_activeClient.lastActivity = millis();
+				client.state = ClientHandlingState::KeepAlive;
+				client.lastActivity = millis();
 			}
 			return;
 		}
 		strncpy(path, fullPath, pathLen);
 		path[pathLen] = '\0';
-		
+
 		// Copy query (skip the '?')
 		strncpy(query, queryStart + 1, sizeof(query) - 1);
 		query[sizeof(query) - 1] = '\0';
@@ -515,20 +622,37 @@ void WifiServer::processClientRequest()
 		path[sizeof(path) - 1] = '\0';
 		query[0] = '\0';
 	}
-	
+
+	// Early rejection of static asset requests (CSS, JS, images, etc.)
+	if (isStaticAssetRequest(path))
+	{
+		sendDebug(F("Static asset request rejected"), F("WifiServer"));
+		send404(client.client, isPersistent);
+		if (!isPersistent)
+		{
+			cleanupClient(index);
+		}
+		else
+		{
+			client.state = ClientHandlingState::KeepAlive;
+			client.lastActivity = millis();
+		}
+		return;
+	}
+
 	if (_messageBus)
 	{
 		_messageBus->publish<WifiServerProcessingRequestChanged>(method, path, query, true);
 	}
 	sendDebug(F("Processing request"), F("WifiServer"));
 	bool handled = false;
-	
+
 	if (SystemFunctions::startsWith(path, F("/api/index")))
 	{
-		handleIndex(_activeClient.client, _activeClient.isPersistent, path);
+		handleIndex(client.client, client.isPersistent, path);
 		handled = true;
 	}
-	
+
 	if (!handled && _handlers && _handlerCount > 0)
 	{
 		// Loop through handlers and find matching route
@@ -536,29 +660,28 @@ void WifiServer::processClientRequest()
 		{
 			if (_handlers[i] && SystemFunctions::startsWith(path, _handlers[i]->getRoute()))
 			{
-				handled = dispatchToHandler(_activeClient.client, _handlers[i], path, method, query);
+				handled = dispatchToHandler(client.client, _handlers[i], path, method, query, isPersistent);
 				break;
 			}
 		}
 	}
-	
+
 	if (!handled)
 	{
-		send404(_activeClient.client);
+		send404(client.client, isPersistent);
 	}
-	
+
 	// Decide next state based on connection type
 	if (!isPersistent)
 	{
-		_activeClient.client.stop();
+		cleanupClient(index);
 		sendDebug(F("Client disconnected (transient)"), F("WifiServer"));
-		_activeClient.state = ClientHandlingState::Idle;
 	}
 	else
 	{
-		_activeClient.request[0] = '\0';  // Clear request buffer for next request
-		_activeClient.lastActivity = millis();
-		_activeClient.state = ClientHandlingState::KeepAlive;
+		client.request[0] = '\0';  // Clear request buffer for next request
+		client.lastActivity = millis();
+		client.state = ClientHandlingState::KeepAlive;
 		sendDebug(F("Client kept alive (persistent)"), F("WifiServer"));
 	}
 
@@ -568,17 +691,17 @@ void WifiServer::processClientRequest()
 	}
 }
 
-void WifiServer::send400(WiFiClient& client)
+void WifiServer::send400(WiFiClient& client, bool isPersistent)
 {
-	sendResponse(client, 400, "application/json", response400);
+	sendResponse(client, 400, "application/json", response400, isPersistent);
 }
 
-void WifiServer::send404(WiFiClient& client)
+void WifiServer::send404(WiFiClient& client, bool isPersistent)
 {
-	sendResponse(client, 404, "application/json", response404);
+	sendResponse(client, 404, "application/json", response404, isPersistent);
 }
 
-void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body)
+void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent)
 {
 	client.print(F("HTTP/1.1 "));
 	client.print(statusCode);
@@ -602,9 +725,9 @@ void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* co
 	
 	client.print(F("Content-Type: "));
 	client.println(contentType);
-	
+
 	// Conditionally set Connection header based on persistent flag
-	if (_activeClient.isPersistent)
+	if (isPersistent)
 	{
 		client.println(F("Connection: keep-alive"));
 		client.print(F("Keep-Alive: timeout="));
@@ -727,7 +850,7 @@ bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const char* 
 	return true;
 }
 
-bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query)
+bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent)
 {
 	if (!handler)
 	{
@@ -819,7 +942,7 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 	// Send response based on result
 	if (result.success)
 	{
-		sendResponse(client, 200, "application/json", responseBuffer);
+		sendResponse(client, 200, "application/json", responseBuffer, isPersistent);
 		sendDebug(F("Handler success: "), F("WifiServer"));
 		return true;
 	}
@@ -828,7 +951,7 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 		// Check if buffer has error message
 		if (responseBuffer[0] != '\0')
 		{
-			sendResponse(client, 400, "application/json", responseBuffer);
+			sendResponse(client, 400, "application/json", responseBuffer, isPersistent);
 			return true;
 		}
 
