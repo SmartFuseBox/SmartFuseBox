@@ -48,7 +48,7 @@
 
 #include "MicroSdDriver.h"
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 #include "MQTTHandler.h"
 #include "MQTTController.h"
 #include "MQTTConfigCommandHandler.h"
@@ -136,9 +136,9 @@ ConfigSyncManager configSyncManager(&commandMgrComputer, &commandMgrLink, &confi
 ConfigCommandHandler configHandler(&wifiController, &configController);
 
 // MQTT instances
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 MQTTController mqttController(&messageBus, ConfigManager::getConfigPtr());
-MQTTConfigCommandHandler mqttConfigHandler(&configController);
+MQTTConfigCommandHandler mqttConfigHandler(&configController, &mqttController);
 MQTTRelayHandler mqttRelayHandler(&mqttController, &messageBus, &relayController);
 #endif
 
@@ -200,9 +200,10 @@ void setup()
 	ackHandler.setConfigSyncManager(&configSyncManager, &configController);
 	configHandler.setConfigSyncManager(&configSyncManager);
 
-#if defined(MQQT_SUPPORT)
-	// Link MQTT config handler
+#if defined(MQTT_SUPPORT)
+	// Link MQTT config handler and controller
 	configHandler.setMqttConfigHandler(&mqttConfigHandler);
+	configHandler.setMqttController(&mqttController);
 #endif
 
 #if defined(CARD_CONFIG_LOADER)
@@ -214,14 +215,15 @@ void setup()
 	configureWifiSupport(config);
 	configureBluetoothSupport(config);
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 
 	// Initialize MQTT (after WiFi initialization)
-	if (mqttController.begin())
+	if (config->accessMode == AccessModeClient && mqttController.begin())
 	{
 		// MQTT enabled in config, initialize handlers
 		mqttRelayHandler.begin();
 	}
+
 #endif
 
 	systemCommandHandler.setSdCardLogger(&sdCardLogger);
@@ -230,7 +232,7 @@ void setup()
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 	systemCommandHandler.setMqttController(&mqttController);
 #endif
 
@@ -296,9 +298,10 @@ void loop()
 	SystemCpuMonitor::endTask();
 
 	// MQTT update (non-blocking, processes 1 packet per call)
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 	SystemCpuMonitor::startTask();
 	mqttController.update();
+	mqttRelayHandler.update(); // Process discovery messages non-blocking
 	SystemCpuMonitor::endTask();
 #endif
 

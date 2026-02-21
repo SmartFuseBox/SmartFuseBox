@@ -1,4 +1,6 @@
-#if defined(MQQT_SUPPORT)
+#include "Local.h"
+
+#if defined(MQTT_SUPPORT)
 
 #include "MQTTHandler.h"
 #include "ConfigManager.h"
@@ -14,24 +16,8 @@ MQTTHandler::MQTTHandler(MQTTController* mqttController, MessageBus* messageBus)
 
 MQTTHandler::~MQTTHandler()
 {
-    end();
-}
-
-void MQTTHandler::buildTopic(char* buffer, size_t bufferSize, const char* subtopic)
-{
-    if (buffer == nullptr || subtopic == nullptr || _mqttController == nullptr)
-    {
-        return;
-    }
-    
-    Config* config = ConfigManager::getConfigPtr();
-    if (config == nullptr)
-    {
-        return;
-    }
-    
-    snprintf(buffer, bufferSize, "smartfusebox/%s/%s", 
-        config->mqtt.deviceId, subtopic);
+    // Don't call pure virtual end() from destructor
+    // Derived classes must call end() in their own destructors
 }
 
 bool MQTTHandler::extractIndexFromTopic(const char* topic, const char* prefix, uint8_t* index)

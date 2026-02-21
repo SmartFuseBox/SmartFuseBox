@@ -136,7 +136,7 @@ void ConfigManager::resetToDefaults()
 #if defined(ARDUINO_UNO_R4)
 	_cfg.bluetoothEnabled = false;
 	_cfg.wifiEnabled = true;
-	_cfg.accessMode = 0; // 0 = AP, 1 = Client
+	_cfg.accessMode = AccessModeAP; // 0 = AP, 1 = Client
 	strncpy(_cfg.apSSID, "SmartFuseBox", sizeof(_cfg.apSSID) - 1);
 	_cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';
 	SystemFunctions::GenerateDefaultPassword(_cfg.apPassword, sizeof(_cfg.apPassword));
@@ -146,7 +146,7 @@ void ConfigManager::resetToDefaults()
 	_cfg.apIpAddress[sizeof(_cfg.apIpAddress) - 1] = '\0';
 #endif
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 	// MQTT defaults
 	_cfg.mqtt.enabled = false;
 	strncpy(_cfg.mqtt.broker, "192.168.1.100", ConfigMqttBrokerLength - 1);
@@ -158,6 +158,8 @@ void ConfigManager::resetToDefaults()
 	_cfg.mqtt.deviceId[ConfigMqttDeviceIdLength - 1] = '\0';
 	_cfg.mqtt.useHomeAssistantDiscovery = false;
 	_cfg.mqtt.keepAliveInterval = ConfigMqttKeepAliveDefault;
+	strncpy(_cfg.mqtt.discoveryPrefix, "homeassistant", ConfigMqttDiscoveryPrefixLength - 1);
+	_cfg.mqtt.discoveryPrefix[ConfigMqttDiscoveryPrefixLength - 1] = '\0';
 #endif
 
     _cfg.sdCardInitializeSpeed = 4;

@@ -20,7 +20,7 @@ private:
 #if defined(ARDUINO_UNO_R4)
     WifiController* _wifiController = nullptr;
     SdCardLogger* _sdCardLogger = nullptr;
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
     MQTTController* _mqttController = nullptr;
 #endif
 #endif
@@ -36,7 +36,7 @@ public:
     void setWifiController(WifiController* wifiController);
     void setSdCardLogger(SdCardLogger* sdCardLogger);
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
     void setMqttController(MQTTController* mqttController);
 #endif
 #endif

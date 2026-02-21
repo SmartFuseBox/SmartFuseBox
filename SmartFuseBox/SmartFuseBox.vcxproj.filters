@@ -199,6 +199,12 @@
     <ClCompile Include="MQTTRelayHandler.cpp">
       <Filter>Source Files\MQQT</Filter>
     </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
@@ -396,9 +402,6 @@
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\MessageBus.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MQTTRelayHandler.h">
       <Filter>Header Files\MQQT</Filter>
     </ClInclude>
@@ -420,6 +423,12 @@
     <ClInclude Include="MQTTHandler.h">
       <Filter>Header Files\MQQT</Filter>
     </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="C20-C27_IMPLEMENTATION.md" />
@@ -431,5 +440,6 @@
     <None Include="MQTT_README.md" />
     <None Include="MQTT_INTEGRATION_COMPLETE.md" />
     <None Include="MQTT_QUICK_REFERENCE.md" />
+    <None Include="Wifi.md" />
   </ItemGroup>
 </Project>

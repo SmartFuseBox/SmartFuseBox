@@ -239,11 +239,13 @@ void SystemCommandHandler::setWifiController(WifiController* wifiController)
 { 
     _wifiController = wifiController;
 }
+#endif
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
+
 void SystemCommandHandler::setMqttController(MQTTController* mqttController)
 {
     _mqttController = mqttController;
 }
-#if defined(MQQT_SUPPORT)
+
 #endif

@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 
 #include "MQTTController.h"
 #include "MessageBus.h"
@@ -12,9 +12,6 @@ protected:
     MQTTController* _mqttController;
     MessageBus* _messageBus;
     bool _isSubscribed;
-
-    // Helper for building topic paths
-    void buildTopic(char* buffer, size_t bufferSize, const char* subtopic);
 
     // Helper for extracting index from topic (e.g., "relay/3/set" -> 3)
     bool extractIndexFromTopic(const char* topic, const char* prefix, uint8_t* index);

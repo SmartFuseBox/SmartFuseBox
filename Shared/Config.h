@@ -45,14 +45,18 @@ struct SoundSignalConfig
 	uint32_t bad_repeatMs;
 } __attribute__((packed));
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 // MQTT Configuration
 constexpr uint8_t ConfigMqttBrokerLength = 64;
 constexpr uint8_t ConfigMqttUsernameLength = 32;
 constexpr uint8_t ConfigMqttPasswordLength = 32;
 constexpr uint8_t ConfigMqttDeviceIdLength = 32;
+constexpr uint8_t ConfigMqttDiscoveryPrefixLength = 32;
 constexpr uint16_t ConfigMqttDefaultPort = 1883;
 constexpr uint16_t ConfigMqttKeepAliveDefault = 60;
+
+constexpr uint8_t AccessModeAP = 0;
+constexpr uint8_t AccessModeClient = 1;
 
 struct MqttConfig
 {
@@ -64,8 +68,9 @@ struct MqttConfig
 	char deviceId[ConfigMqttDeviceIdLength];
 	bool useHomeAssistantDiscovery;
 	uint16_t keepAliveInterval;
+	char discoveryPrefix[ConfigMqttDiscoveryPrefixLength];
 } __attribute__((packed));
-#endif 
+#endif
 
 // Layout:
 // - version (uint8_t)
@@ -123,7 +128,7 @@ struct Config {
 	LedConfig ledConfig;
 	SoundSignalConfig soundConfig;
 
-#if defined(MQQT_SUPPORT)
+#if defined(MQTT_SUPPORT)
 	MqttConfig mqtt;
 #endif
 
