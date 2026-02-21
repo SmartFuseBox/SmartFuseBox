@@ -5,8 +5,9 @@
 #include "MQTTClient.h"
 #include "MessageBus.h"
 
-// Forward declaration
+// Forward declarations
 struct Config;
+class SerialCommandManager;
 
 class MQTTController
 {
@@ -20,6 +21,8 @@ private:
     unsigned long _lastRetryTime;
     bool _isEnabled;
     
+    SerialCommandManager* _commandMgr;
+
     // Statistics
     unsigned long _connectedSince;
     uint32_t _reconnectCount;
@@ -38,7 +41,7 @@ private:
     static MQTTController* _instance;
 
 public:
-    MQTTController(MessageBus* messageBus, Config* config);
+    MQTTController(MessageBus* messageBus, Config* config, SerialCommandManager* commandMgr = nullptr);
     ~MQTTController();
     
     // Lifecycle

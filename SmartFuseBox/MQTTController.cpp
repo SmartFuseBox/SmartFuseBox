@@ -4,19 +4,21 @@
 
 #include "MQTTController.h"
 #include "Config.h"
+#include <SerialCommandManager.h>
 #include <stdio.h>
 
 
 // Static instance pointer for callbacks
 MQTTController* MQTTController::_instance = nullptr;
 
-MQTTController::MQTTController(MessageBus* messageBus, Config* config)
+MQTTController::MQTTController(MessageBus* messageBus, Config* config, SerialCommandManager* commandMgr)
     : _mqttClient(nullptr)
     , _messageBus(messageBus)
     , _config(config)
     , _retryCount(0)
     , _lastRetryTime(0)
     , _isEnabled(false)
+    , _commandMgr(commandMgr)
     , _connectedSince(0)
     , _reconnectCount(0)
 {
@@ -33,7 +35,10 @@ bool MQTTController::begin()
 {
     if (_config == nullptr || _messageBus == nullptr)
     {
-        Serial.println(F("[MQTT Controller] Error: Config or MessageBus not available"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("Config or MessageBus not available"), F("MQTT Controller"));
+        }
         return false;
     }
 
@@ -62,6 +67,7 @@ bool MQTTController::begin()
     _mqttClient->setKeepAlive(_config->mqtt.keepAliveInterval);
 
     // Set callbacks
+    _mqttClient->setCommandManager(_commandMgr);
     _mqttClient->setConnectionCallback(connectionCallbackStatic);
     _mqttClient->setMessageCallback(messageCallbackStatic);
     _mqttClient->setEventCallback(eventCallbackStatic);
@@ -119,7 +125,28 @@ bool MQTTController::connect()
         return true;
     }
 
+    if (_commandMgr != nullptr)
+    {
+        _commandMgr->sendDebug(F("Attempting connect"), F("MQTT Controller"));
+    }
     bool result = _mqttClient->connect();
+
+    if (result)
+    {
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendDebug(F("CONNECT packet sent"), F("MQTT Controller"));
+        }
+    }
+    else
+    {
+        if (_commandMgr != nullptr)
+        {
+            char buf[40];
+            snprintf(buf, sizeof(buf), "connect() failed, error: %d", static_cast<int>(_mqttClient->getLastError()));
+            _commandMgr->sendError(buf, F("MQTT Controller"));
+        }
+    }
 
     return result;
 }
@@ -198,7 +225,10 @@ void MQTTController::onMqttConnected(bool connected)
 {
     if (connected)
     {
-        Serial.println(F("[MQTT] Connected"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendDebug(F("Connected"), F("MQTT Controller"));
+        }
         _retryCount = 0;
         _connectedSince = millis();
         _reconnectCount++;
@@ -211,7 +241,10 @@ void MQTTController::onMqttConnected(bool connected)
     }
     else
     {
-        Serial.println(F("[MQTT] Disconnected"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendDebug(F("Disconnected"), F("MQTT Controller"));
+        }
         _connectedSince = 0;
 
         // Increment retry count on disconnection (includes timeouts and connection failures)
@@ -241,40 +274,68 @@ void MQTTController::onMqttEvent(MqttEvent event, uint8_t errorCode)
     switch (event)
     {
         case MqttEvent::Connected:
-            Serial.println(F("[MQTT] Connected"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendDebug(F("Connected"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::Disconnected:
-            Serial.println(F("[MQTT] Disconnected"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendDebug(F("Disconnected"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::ConnectionRefused:
-            Serial.print(F("[MQTT] Error: Connection refused, code: "));
-            Serial.println(errorCode);
+            if (_commandMgr != nullptr)
+            {
+                char buf[40];
+                snprintf(buf, sizeof(buf), "Connection refused, code: %u", errorCode);
+                _commandMgr->sendError(buf, F("MQTT"));
+            }
             break;
 
         case MqttEvent::ConnectionTimeout:
-            Serial.println(F("[MQTT] Error: Connection timeout"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Connection timeout"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::BrokerNotConfigured:
-            Serial.println(F("[MQTT] Error: No broker configured"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("No broker configured"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::BufferOverflow:
-            Serial.println(F("[MQTT] Error: Buffer overflow"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Buffer overflow"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::InvalidPacket:
-            Serial.println(F("[MQTT] Error: Invalid packet"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Invalid packet"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::NetworkError:
-            Serial.println(F("[MQTT] Error: Network error"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Network error"), F("MQTT"));
+            }
             break;
 
         case MqttEvent::KeepAliveTimeout:
-            Serial.println(F("[MQTT] Error: Keep-alive timeout"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Keep-alive timeout"), F("MQTT"));
+            }
             break;
 
         default:
@@ -289,7 +350,10 @@ bool MQTTController::shouldRetry()
     {
         if (_retryCount == MqttMaxRetries)
         {
-            Serial.println(F("[MQTT] Error: Max retry attempts reached"));
+            if (_commandMgr != nullptr)
+            {
+                _commandMgr->sendError(F("Max retry attempts reached"), F("MQTT"));
+            }
             _retryCount++; // Increment to prevent this message from repeating
         }
         return false;

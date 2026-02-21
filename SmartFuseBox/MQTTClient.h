@@ -6,6 +6,9 @@
 #include <WiFiS3.h>
 #include "MQTTDefinitions.h"
 
+// Forward declaration
+class SerialCommandManager;
+
 class MQTTClient
 {
 private:
@@ -48,6 +51,9 @@ private:
     // Statistics
     uint32_t _packetsSent;
     uint32_t _packetsReceived;
+
+    // Debug output
+    SerialCommandManager* _commandMgr;
     
     // Internal helper methods
     uint16_t getNextPacketId();
@@ -87,6 +93,7 @@ public:
     void setCredentials(const char* username, const char* password);
     void setClientId(const char* clientId);
     void setKeepAlive(uint16_t seconds);
+    void setCommandManager(SerialCommandManager* commandMgr);
     void setMessageCallback(MqttMessageCallback callback);
     void setConnectionCallback(MqttConnectionCallback callback);
     void setEventCallback(MqttEventCallback callback);

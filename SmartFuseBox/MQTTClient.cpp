@@ -3,6 +3,7 @@
 #if defined(MQTT_SUPPORT)
 
 #include "MQTTClient.h"
+#include <SerialCommandManager.h>
 #include <string.h>
 
 MQTTClient::MQTTClient()
@@ -13,7 +14,7 @@ MQTTClient::MQTTClient()
     , _useCredentials(false)
     , _keepAlive(60)
     , _rxBufferPos(0)
-    , _rxPacketLength(0)
+    , _rxPacketLength(MqttRxLengthNotDecoded)
     , _packetId(MqttPacketIdMin)
     , _lastSendTime(0)
     , _lastReceiveTime(0)
@@ -23,6 +24,7 @@ MQTTClient::MQTTClient()
     , _eventCallback(nullptr)
     , _packetsSent(0)
     , _packetsReceived(0)
+    , _commandMgr(nullptr)
 {
     _broker[0] = '\0';
     _clientId[0] = '\0';
@@ -89,6 +91,11 @@ void MQTTClient::setConnectionCallback(MqttConnectionCallback callback)
 void MQTTClient::setEventCallback(MqttEventCallback callback)
 {
     _eventCallback = callback;
+}
+
+void MQTTClient::setCommandManager(SerialCommandManager* commandMgr)
+{
+    _commandMgr = commandMgr;
 }
 
 bool MQTTClient::connect()
@@ -195,60 +202,94 @@ bool MQTTClient::update()
     {
         return false;
     }
-    
+
     // Check TCP connection
     if (!_wifiClient->connected() && _state != MqttConnectionState::Disconnected)
     {
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("TCP connection lost unexpectedly"), F("MQTT Client"));
+        }
         disconnect();
         return false;
     }
-    
+
     // Handle connecting state timeout
     if (_state == MqttConnectionState::Connecting)
     {
-        if (millis() - _connectAttemptTime > MqttConnectTimeout)
+        unsigned long waitMs = millis() - _connectAttemptTime;
+        if (waitMs > MqttConnectTimeout)
         {
+            if (_commandMgr != nullptr)
+            {
+                char buf[48];
+                snprintf(buf, sizeof(buf), "Connection timeout: waited %lums", waitMs);
+                _commandMgr->sendError(buf, F("MQTT Client"));
+            }
             raiseEvent(MqttEvent::ConnectionTimeout);
             setError(MqttError::Timeout);
             disconnect();
             return false;
         }
     }
-    
+
     // Process incoming packets (non-blocking, one packet per update)
     if (_wifiClient->available() > 0)
     {
         if (!readPacket())
         {
+            // Not necessarily an error - may be a partial packet waiting for more data
             return false;
         }
     }
-    
+
     // Keep-alive management
     if (_state == MqttConnectionState::Connected)
     {
         unsigned long now = millis();
+        unsigned long timeSinceLastSend = now - _lastSendTime;
+        unsigned long timeSinceLastReceive = now - _lastReceiveTime;
+        unsigned long keepAliveMs = _keepAlive * 1000UL;
 
-        // Send PINGREQ if needed
-        if (now - _lastSendTime > (_keepAlive * 1000UL))
+        // Send PINGREQ if no packet sent within keep-alive interval
+        if (timeSinceLastSend > keepAliveMs)
         {
+            if (_commandMgr != nullptr)
+            {
+                char buf[48];
+                snprintf(buf, sizeof(buf), "Sending PINGREQ (no send for %lums)", timeSinceLastSend);
+                _commandMgr->sendDebug(buf, F("MQTT Client"));
+            }
             uint16_t packetLength = buildPingReqPacket(_txBuffer, sizeof(_txBuffer));
             if (packetLength > 0)
             {
-                writePacket(_txBuffer, packetLength);
+                if (!writePacket(_txBuffer, packetLength))
+                {
+                    if (_commandMgr != nullptr)
+                    {
+                        _commandMgr->sendError(F("PINGREQ write failed"), F("MQTT Client"));
+                    }
+                }
             }
         }
 
-        // Check for timeout
-        if (now - _lastReceiveTime > ((_keepAlive * 1000UL) + MqttPingTimeout))
+        // Keep-alive timeout: no packet received within keep-alive + ping timeout window
+        if (timeSinceLastReceive > (keepAliveMs + MqttPingTimeout))
         {
+            if (_commandMgr != nullptr)
+            {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "Keep-alive timeout: no packet for %lums (threshold=%lums)",
+                    timeSinceLastReceive, keepAliveMs + MqttPingTimeout);
+                _commandMgr->sendError(buf, F("MQTT Client"));
+            }
             raiseEvent(MqttEvent::KeepAliveTimeout);
             setError(MqttError::Timeout);
             disconnect();
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -286,7 +327,10 @@ bool MQTTClient::publish(const char* topic, const uint8_t* payload, uint16_t len
     if (strlen(topic) >= MqttMaxTopicLength)
     {
         setError(MqttError::BufferOverflow);
-        Serial.println(F("MQTT publish failed: topic length exceeds MqttMaxTopicLength."));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("publish failed: topic exceeds MqttMaxTopicLength"), F("MQTT Client"));
+        }
         return false;
     }
 
@@ -300,7 +344,10 @@ bool MQTTClient::publish(const char* topic, const uint8_t* payload, uint16_t len
     {
         raiseEvent(MqttEvent::BufferOverflow);
         setError(MqttError::BufferOverflow);
-        Serial.println(F("MQTT publish failed: buildPublishPacket returned 0 (buffer overflow or too large."));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("publish failed: buffer overflow"), F("MQTT Client"));
+        }
         return false;
     }
 
@@ -429,7 +476,10 @@ bool MQTTClient::writePacket(const uint8_t* buffer, uint16_t length)
     if (_wifiClient == nullptr || !_wifiClient->connected())
     {
         setError(MqttError::NetworkError);
-        Serial.println(F("MQTT writePacket failed: WiFi client not connected"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("writePacket failed: WiFi client not connected"), F("MQTT Client"));
+        }
         return false;
     }
     
@@ -437,10 +487,12 @@ bool MQTTClient::writePacket(const uint8_t* buffer, uint16_t length)
     if (written != length)
     {
         setError(MqttError::NetworkError);
-        Serial.print(F("MQTT writePacket failed: written bytes != length. written="));
-        Serial.print(written);
-        Serial.print(F(" expected="));
-        Serial.println(length);
+        if (_commandMgr != nullptr)
+        {
+            char buf[48];
+            snprintf(buf, sizeof(buf), "writePacket failed: wrote %u expected %u", (unsigned)written, length);
+            _commandMgr->sendError(buf, F("MQTT Client"));
+        }
         return false;
     }
     
@@ -464,8 +516,11 @@ bool MQTTClient::readPacket()
     }
     
     // Read remaining length
-    if (_rxPacketLength == 0)
+    // Uses MqttRxLengthNotDecoded (0xFFFF) as sentinel to distinguish
+    // "not decoded yet" from a legitimately decoded length of 0 (e.g. PINGRESP).
+    if (_rxPacketLength == MqttRxLengthNotDecoded)
     {
+        bool lengthDecoded = false;
         while (_wifiClient->available() > 0 && _rxBufferPos < 5)
         {
             int byte = _wifiClient->read();
@@ -474,19 +529,26 @@ bool MQTTClient::readPacket()
                 return false;
             }
             _rxBuffer[_rxBufferPos++] = (uint8_t)byte;
-            
-            // Check if this is the last length byte
+
+            // Check if this is the last length byte (MSB clear)
             if ((byte & 0x80) == 0)
             {
                 uint8_t lengthBytes;
                 _rxPacketLength = decodeRemainingLength(_rxBuffer + 1, &lengthBytes);
+                if (_commandMgr != nullptr)
+                {
+                    char buf[48];
+                    snprintf(buf, sizeof(buf), "Rx type: 0x%02X remaining: %u", _rxBuffer[0], _rxPacketLength);
+                    _commandMgr->sendDebug(buf, F("MQTT Client"));
+                }
+                lengthDecoded = true;
                 break;
             }
         }
-        
-        if (_rxPacketLength == 0)
+
+        if (!lengthDecoded)
         {
-            return false; // Need more data
+            return false; // Need more data to finish reading length field
         }
     }
     
@@ -516,7 +578,7 @@ bool MQTTClient::readPacket()
         
         // Reset for next packet
         _rxBufferPos = 0;
-        _rxPacketLength = 0;
+        _rxPacketLength = MqttRxLengthNotDecoded;
         
         _lastReceiveTime = millis();
         _packetsReceived++;
@@ -891,7 +953,10 @@ bool MQTTClient::processPingResp(const uint8_t* payload, uint16_t length)
 {
     (void)payload;
     (void)length;
-    // PINGRESP received, keep-alive acknowledged
+    if (_commandMgr != nullptr)
+    {
+        _commandMgr->sendDebug(F("PINGRESP received"), F("MQTT Client"));
+    }
     return true;
 }
 

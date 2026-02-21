@@ -6,13 +6,15 @@
 #include "MQTTController.h"
 #include "ConfigManager.h"
 #include "SystemFunctions.h"
+#include <SerialCommandManager.h>
 #include <string.h>
 #include <stdlib.h>
 
-MQTTConfigCommandHandler::MQTTConfigCommandHandler(ConfigController* configController, MQTTController* mqttController)
+MQTTConfigCommandHandler::MQTTConfigCommandHandler(ConfigController* configController, MQTTController* mqttController, SerialCommandManager* commandMgr)
     : _configController(configController)
     , _mqttController(mqttController)
     , _config(nullptr)
+    , _commandMgr(commandMgr)
 {
     if (_configController != nullptr)
     {
@@ -94,11 +96,7 @@ bool MQTTConfigCommandHandler::handleMqttEnable(const char* params)
     }
     
     // Parse value
-    bool enabled;
-    if (!parseBool(params, &enabled))
-    {
-        return false;
-    }
+	bool enabled = SystemFunctions::parseBooleanValue(params);
     
     _config->mqtt.enabled = enabled;
     return true;
@@ -216,11 +214,7 @@ bool MQTTConfigCommandHandler::handleMqttHADiscovery(const char* params)
     }
     
     // Parse value
-    bool enabled;
-    if (!parseBool(params, &enabled))
-    {
-        return false;
-    }
+    bool enabled = SystemFunctions::parseBooleanValue(params);
     
     _config->mqtt.useHomeAssistantDiscovery = enabled;
     return true;
@@ -290,30 +284,6 @@ bool MQTTConfigCommandHandler::handleMqttDiscoveryPrefix(const char* params)
 // ============================================================================
 // Private Helper Methods
 // ============================================================================
-
-bool MQTTConfigCommandHandler::parseBool(const char* value, bool* result)
-{
-    if (value == nullptr || result == nullptr || value[0] == '\0')
-    {
-        return false;
-    }
-
-    // Check for numeric 0/1 or boolean strings
-    // Value is already extracted by SerialCommandManager/WifiServer
-    if (strcmp(value, "0") == 0 || strcasecmp(value, "false") == 0)
-    {
-        *result = false;
-        return true;
-    }
-    else if (strcmp(value, "1") == 0 || strcasecmp(value, "true") == 0)
-    {
-        *result = true;
-        return true;
-    }
-
-    return false;
-}
-
 bool MQTTConfigCommandHandler::parseUint16(const char* value, uint16_t* result)
 {
     if (value == nullptr || result == nullptr || value[0] == '\0')

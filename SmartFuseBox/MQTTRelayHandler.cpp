@@ -4,13 +4,15 @@
 
 #include "MQTTRelayHandler.h"
 #include "SystemDefinitions.h"
+#include <SerialCommandManager.h>
 #include <string.h>
 #include <stdio.h>
 
-MQTTRelayHandler::MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController)
+MQTTRelayHandler::MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController, SerialCommandManager* commandMgr)
     : MQTTHandler(mqttController, messageBus)
     , _relayController(relayController)
     , _config(nullptr)
+    , _commandMgr(commandMgr)
     , _discoveryPending(false)
     , _discoveryIndex(0)
     , _lastDiscoveryPublish(0)
@@ -25,7 +27,10 @@ bool MQTTRelayHandler::begin()
 {
     if (_mqttController == nullptr || _messageBus == nullptr || _relayController == nullptr || _config == nullptr)
     {
-        Serial.println(F("[MQTT Relay] Error: Required components not available"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("Required components not available"), F("MQTT Relay"));
+        }
         return false;
     }
 
@@ -85,7 +90,10 @@ void MQTTRelayHandler::update()
                 // Check if discovery is complete
                 if (_discoveryIndex >= ConfigRelayCount)
                 {
-                    Serial.println(F("[MQTT] Home Assistant discovery complete"));
+                    if (_commandMgr != nullptr)
+                    {
+                        _commandMgr->sendDebug(F("Home Assistant discovery complete"), F("MQTT"));
+                    }
                     _discoveryPending = false;
                 }
             }
@@ -120,12 +128,6 @@ void MQTTRelayHandler::onMessage(const char* topic, const char* payload)
         return;
     }
 
-    // Debug: log incoming MQTT message for troubleshooting
-    Serial.print("MQTT message received: ");
-    Serial.println(topic);
-    Serial.print("MQTT payload: ");
-    Serial.println(payload);
-
     // Check if this is a relay command topic (e.g., "home/<device>/relay/3/set")
     uint8_t relayIndex;
     if (extractIndexFromTopic(topic, "relay/", &relayIndex))
@@ -142,7 +144,10 @@ bool MQTTRelayHandler::subscribe()
 {
     if (_mqttController == nullptr || _config == nullptr)
     {
-        Serial.println(F("[MQTT Relay] Error: Controller or config not available"));
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(F("Controller or config not available"), F("MQTT Relay"));
+        }
         return false;
     }
 
@@ -163,8 +168,10 @@ bool MQTTRelayHandler::subscribe()
     {
         _isSubscribed = true;
     }
-    Serial.print("Subscribe: ");
-    Serial.println(topic);
+    if (_commandMgr != nullptr)
+    {
+        _commandMgr->sendDebug(topic, F("MQTT Relay Subscribe"));
+    }
 
     return result;
 }
@@ -185,8 +192,10 @@ void MQTTRelayHandler::unsubscribe()
     // Unsubscribe from relay command topics
     char topic[MqttMaxTopicLength];
     snprintf(topic, sizeof(topic), "home/%s/relay/+/set", _config->mqtt.deviceId);
-    Serial.print("Unsubscribe: ");
-    Serial.println(topic);
+    if (_commandMgr != nullptr)
+    {
+        _commandMgr->sendDebug(topic, F("MQTT Relay Unsubscribe"));
+    }
 
     client->unsubscribe(topic);
     _isSubscribed = false;
@@ -204,16 +213,23 @@ void MQTTRelayHandler::handleRelayCommand(uint8_t relayIndex, const char* payloa
     }
 
     // Debug: log command handling entry
-    Serial.print("Handling relay command for index: ");
-    Serial.println(relayIndex);
-    Serial.print("Command payload: ");
-    Serial.println(payload);
+    if (_commandMgr != nullptr)
+    {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "relay index: %u", relayIndex);
+        _commandMgr->sendDebug(buf, F("MQTT Relay"));
+        _commandMgr->sendDebug(payload, F("MQTT Relay payload"));
+    }
 
     // Validate relay index
     if (relayIndex >= ConfigRelayCount)
     {
-        Serial.print(F("[MQTT Relay] Error: Invalid relay index: "));
-        Serial.println(relayIndex);
+        if (_commandMgr != nullptr)
+        {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "Invalid relay index: %u", relayIndex);
+            _commandMgr->sendError(buf, F("MQTT Relay"));
+        }
         return;
     }
     
@@ -245,8 +261,10 @@ void MQTTRelayHandler::handleRelayCommand(uint8_t relayIndex, const char* payloa
     else
     {
         // Unknown command
-        Serial.print(F("[MQTT Relay] Unknown command payload: "));
-        Serial.println(payload);
+        if (_commandMgr != nullptr)
+        {
+            _commandMgr->sendError(payload, F("MQTT Relay unknown payload"));
+        }
         return;
     }
 
@@ -254,10 +272,20 @@ void MQTTRelayHandler::handleRelayCommand(uint8_t relayIndex, const char* payloa
     _relayController->setRelayState(relayIndex, turnOn);
     // Log result of setting relay
     CommandResult res = _relayController->getRelayStatus(relayIndex);
-    Serial.print("Relay ");
-    Serial.print(relayIndex);
-    Serial.print(" set to ");
-    Serial.println(res.success ? (res.status == 1 ? "ON" : "OFF") : "ERROR");
+    if (_commandMgr != nullptr)
+    {
+        char buf[40];
+        if (res.success)
+        {
+            snprintf(buf, sizeof(buf), "Relay %u set to %s", relayIndex, res.status == 1 ? "ON" : "OFF");
+            _commandMgr->sendDebug(buf, F("MQTT Relay"));
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "Relay %u error code: %d", relayIndex, res.status);
+            _commandMgr->sendError(buf, F("MQTT Relay"));
+        }
+    }
 
     // Publish state will be handled by RelayStatusChanged event
 }
@@ -284,8 +312,10 @@ void MQTTRelayHandler::publishRelayState(uint8_t relayIndex, bool isOn)
     char topic[MqttMaxTopicLength];
     snprintf(topic, sizeof(topic), "home/%s/relay/%u/state", _config->mqtt.deviceId, relayIndex);
 
-    Serial.print("Relay State: ");
-	Serial.println(topic);
+	if (_commandMgr != nullptr)
+	{
+		_commandMgr->sendDebug(topic, F("MQTT Relay State"));
+	}
 
     // Publish state
     const char* payload = isOn ? "ON" : "OFF";
@@ -381,8 +411,6 @@ void MQTTRelayHandler::publishRelayDiscoveryConfig(uint8_t relayIndex)
     char topic[MqttMaxTopicLength];
     snprintf(topic, sizeof(topic), "%s/switch/%s/relay_%u/config",
         _config->mqtt.discoveryPrefix, _config->mqtt.deviceId, relayIndex);
-    Serial.print("Discovery Topic: ");
-    Serial.println(topic);
 
     // Build JSON payload
     // Note: Keep this simple to avoid buffer overflow - max ~512 bytes
@@ -408,8 +436,7 @@ void MQTTRelayHandler::publishRelayDiscoveryConfig(uint8_t relayIndex)
         _config->mqtt.deviceId, relayIndex,
         _config->mqtt.deviceId
     );
-    Serial.print("Payload: ");
-    Serial.println(payload);
+
     // Publish with retain flag so HA can discover even if it restarts
     client->publish(topic, payload, MqttQoS::AtMostOnce, true);
 }

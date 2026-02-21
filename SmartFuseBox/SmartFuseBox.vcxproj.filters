@@ -55,10 +55,10 @@
     <Filter Include="Header Files\SharedCode\Sensors">
       <UniqueIdentifier>{2b471eb6-d372-4efd-a2d0-48c9f6e5b8e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MQQT">
+    <Filter Include="Header Files\MQTT">
       <UniqueIdentifier>{5ae035a4-a7e2-4d8a-926d-cd93d7c54131}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\MQQT">
+    <Filter Include="Source Files\MQTT">
       <UniqueIdentifier>{7b0ba44e-6aba-401f-b60f-cd04a80a9099}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -182,28 +182,31 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MQTTClient.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTConfigCommandHandler.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTController.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTHandler.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTHandler.cpp">
       <Filter>Source Files\MQQT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTRelayHandler.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MQTTSensorHandler.cpp">
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,22 +406,22 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MQTTRelayHandler.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTClient.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTConfigCommandHandler.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTController.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTDefinitions.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTHandler.h">
-      <Filter>Header Files\MQQT</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTHandler.h">
       <Filter>Header Files\MQQT</Filter>
@@ -428,6 +431,9 @@
     </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MQTTSensorHandler.h">
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

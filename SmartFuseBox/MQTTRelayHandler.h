@@ -7,12 +7,15 @@
 #include "RelayController.h"
 #include "ConfigManager.h"
 
+// Forward declaration
+class SerialCommandManager;
 
 class MQTTRelayHandler : public MQTTHandler
 {
 private:
     RelayController* _relayController;
     Config* _config;
+    SerialCommandManager* _commandMgr;
 
     // Topic buffers
     char _commandTopic[MqttMaxTopicLength];
@@ -45,7 +48,7 @@ private:
     void onRelayStatusChanged(uint8_t relayBitmask);
 
 public:
-    MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController);
+    MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController, SerialCommandManager* commandMgr = nullptr);
 
     // Lifecycle (inherited from MQTTHandler)
     bool begin() override;

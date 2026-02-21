@@ -53,6 +53,7 @@
 #include "MQTTController.h"
 #include "MQTTConfigCommandHandler.h"
 #include "MQTTRelayHandler.h"
+#include "MQTTSensorHandler.h"
 #endif
 
 #if defined(ARDUINO_UNO_R4) && defined(LED_MANAGER)
@@ -137,9 +138,10 @@ ConfigCommandHandler configHandler(&wifiController, &configController);
 
 // MQTT instances
 #if defined(MQTT_SUPPORT)
-MQTTController mqttController(&messageBus, ConfigManager::getConfigPtr());
-MQTTConfigCommandHandler mqttConfigHandler(&configController, &mqttController);
-MQTTRelayHandler mqttRelayHandler(&mqttController, &messageBus, &relayController);
+MQTTController mqttController(&messageBus, ConfigManager::getConfigPtr(), &commandMgrComputer);
+MQTTConfigCommandHandler mqttConfigHandler(&configController, &mqttController, &commandMgrComputer);
+MQTTRelayHandler mqttRelayHandler(&mqttController, &messageBus, &relayController, &commandMgrComputer);
+MQTTSensorHandler mqttSensorHandler(&mqttController, &messageBus, &commandMgrComputer);
 #endif
 
 // middleware
@@ -222,6 +224,7 @@ void setup()
 	{
 		// MQTT enabled in config, initialize handlers
 		mqttRelayHandler.begin();
+		mqttSensorHandler.begin();
 	}
 
 #endif
@@ -301,7 +304,8 @@ void loop()
 #if defined(MQTT_SUPPORT)
 	SystemCpuMonitor::startTask();
 	mqttController.update();
-	mqttRelayHandler.update(); // Process discovery messages non-blocking
+	mqttRelayHandler.update(); 
+	mqttSensorHandler.update();
 	SystemCpuMonitor::endTask();
 #endif
 

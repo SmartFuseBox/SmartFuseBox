@@ -77,6 +77,10 @@ constexpr uint8_t MqttMaxTopicLength = 64;
 constexpr uint16_t MqttMaxPayloadLength = 512;
 constexpr uint8_t MqttClientIdLength = 32;
 
+// Sentinel value used to indicate the remaining-length field has not yet been decoded.
+// Must never equal a valid decoded remaining length (max supported payload is 512 so 0xFFFF is safe).
+constexpr uint16_t MqttRxLengthNotDecoded = 0xFFFF;
+
 // MQTT Timeouts (milliseconds)
 constexpr uint16_t MqttConnectTimeout = 5000;
 constexpr uint16_t MqttKeepAliveDefault = 60000;
