@@ -27,7 +27,6 @@ private:
 
     // Channel map (built during begin())
     MqttChannelMap _channelMap[MaxMqttSensorChannels];
-    bool _dirtyChannels[MaxMqttSensorChannels];
     uint8_t _totalChannels;
 
     // Channel indices for typed MessageBus events (-1 if not present)
@@ -41,16 +40,10 @@ private:
     uint8_t _discoveryIndex;
     unsigned long _lastDiscoveryPublish;
 
-    // Throttled state publishing
-    unsigned long _lastStatePublish;
     static constexpr uint16_t MinPublishInterval = 200;
-    static constexpr uint16_t MaxPublishInterval = 5000;
 
     // State publishing
     void publishSensorState(uint8_t channelIndex);
-    void publishDirtySensorStates();
-    void markChannelDirty(int8_t channelIndex);
-    void markAllChannelsDirty();
 
     // Home Assistant Discovery
     void publishDiscoveryConfig();

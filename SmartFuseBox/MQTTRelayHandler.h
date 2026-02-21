@@ -25,20 +25,13 @@ private:
     uint8_t _discoveryIndex;
     unsigned long _lastDiscoveryPublish;
 
-    // Throttled state publishing
-    uint8_t _dirtyRelayMask;
-    unsigned long _lastStatePublish;
-    static constexpr uint16_t MinPublishInterval = 200;   // Minimum time between publishes (ms)
-    static constexpr uint16_t MaxPublishInterval = 2000;  // Maximum time between publishes (ms)
+    static constexpr uint16_t MinPublishInterval = 200;
 
     // Message handlers
     void handleRelayCommand(uint8_t relayIndex, const char* payload);
 
     // State publishing
     void publishRelayState(uint8_t relayIndex, bool isOn);
-    void publishDirtyRelayStates();
-    void markRelayDirty(uint8_t relayIndex);
-    void markAllRelaysDirty();
 
     // Home Assistant Discovery
     void publishDiscoveryConfig();

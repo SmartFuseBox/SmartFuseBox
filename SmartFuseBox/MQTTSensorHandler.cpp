@@ -21,11 +21,9 @@ MQTTSensorHandler::MQTTSensorHandler(MQTTController* mqttController, MessageBus*
     , _discoveryPending(false)
     , _discoveryIndex(0)
     , _lastDiscoveryPublish(0)
-    , _lastStatePublish(0)
 {
     _config = ConfigManager::getConfigPtr();
     memset(_channelMap, 0, sizeof(_channelMap));
-    memset(_dirtyChannels, 0, sizeof(_dirtyChannels));
 }
 
 bool MQTTSensorHandler::begin()
@@ -107,7 +105,10 @@ bool MQTTSensorHandler::begin()
     _messageBus->subscribe<SystemMetricsUpdated>(
         [this]()
         {
-            this->markAllChannelsDirty();
+            for (uint8_t i = 0; i < _totalChannels; i++)
+            {
+                this->publishSensorState(i);
+            }
         }
     );
 
@@ -122,7 +123,10 @@ bool MQTTSensorHandler::begin()
                 _discoveryIndex = 0;
             }
 
-            this->markAllChannelsDirty();
+            for (uint8_t i = 0; i < _totalChannels; i++)
+            {
+                this->publishSensorState(i);
+            }
         }
     );
 
@@ -155,26 +159,7 @@ void MQTTSensorHandler::update()
         }
     }
 
-    bool anyDirty = false;
-    for (uint8_t i = 0; i < _totalChannels; i++)
-    {
-        if (_dirtyChannels[i])
-        {
-            anyDirty = true;
-            break;
-        }
     }
-
-    if (anyDirty)
-    {
-        unsigned long timeSinceLastPublish = now - _lastStatePublish;
-
-        if (timeSinceLastPublish >= MinPublishInterval || timeSinceLastPublish >= MaxPublishInterval)
-        {
-            publishDirtySensorStates();
-        }
-    }
-}
 
 void MQTTSensorHandler::end()
 {
@@ -208,26 +193,38 @@ void MQTTSensorHandler::unsubscribe()
 void MQTTSensorHandler::onTemperatureUpdated(float temperature)
 {
     (void)temperature;
-    markChannelDirty(_tempChannelIdx);
+    if (_tempChannelIdx >= 0)
+    {
+        publishSensorState(static_cast<uint8_t>(_tempChannelIdx));
+    }
 }
 
 void MQTTSensorHandler::onHumidityUpdated(uint8_t humidity)
 {
     (void)humidity;
-    markChannelDirty(_humidityChannelIdx);
+    if (_humidityChannelIdx >= 0)
+    {
+        publishSensorState(static_cast<uint8_t>(_humidityChannelIdx));
+    }
 }
 
 void MQTTSensorHandler::onLightSensorUpdated(bool isDaytime)
 {
     (void)isDaytime;
-    markChannelDirty(_lightChannelIdx);
+    if (_lightChannelIdx >= 0)
+    {
+        publishSensorState(static_cast<uint8_t>(_lightChannelIdx));
+    }
 }
 
 void MQTTSensorHandler::onWaterLevelUpdated(uint16_t waterLevel, uint16_t averageWaterLevel)
 {
     (void)waterLevel;
     (void)averageWaterLevel;
-    markChannelDirty(_waterChannelIdx);
+    if (_waterChannelIdx >= 0)
+    {
+        publishSensorState(static_cast<uint8_t>(_waterChannelIdx));
+    }
 }
 
 void MQTTSensorHandler::publishSensorState(uint8_t channelIndex)
@@ -262,46 +259,6 @@ void MQTTSensorHandler::publishSensorState(uint8_t channelIndex)
     }
 
     _mqttController->publishState(topic, payload);
-}
-
-void MQTTSensorHandler::publishDirtySensorStates()
-{
-    if (_mqttController == nullptr)
-    {
-        return;
-    }
-
-    if (!_mqttController->isConnected())
-    {
-        return;
-    }
-
-    for (uint8_t i = 0; i < _totalChannels; i++)
-    {
-        if (_dirtyChannels[i])
-        {
-            publishSensorState(i);
-        }
-    }
-
-    memset(_dirtyChannels, 0, sizeof(_dirtyChannels));
-    _lastStatePublish = millis();
-}
-
-void MQTTSensorHandler::markChannelDirty(int8_t channelIndex)
-{
-    if (channelIndex >= 0 && channelIndex < static_cast<int8_t>(MaxMqttSensorChannels))
-    {
-        _dirtyChannels[channelIndex] = true;
-    }
-}
-
-void MQTTSensorHandler::markAllChannelsDirty()
-{
-    for (uint8_t i = 0; i < _totalChannels; i++)
-    {
-        _dirtyChannels[i] = true;
-    }
 }
 
 void MQTTSensorHandler::publishDiscoveryConfig()

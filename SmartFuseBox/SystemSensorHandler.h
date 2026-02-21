@@ -18,8 +18,8 @@ constexpr unsigned long SystemSensorUpdateIntervalMs = 5000;
  * Publishes free memory, CPU usage, Bluetooth/WiFi enabled state, SD log file
  * size and active warning count to Home Assistant via the standard sensor pipeline.
  * Values are read lazily from their respective managers in getMqttValue() and a
- * SystemMetricsUpdated event is published on a 30-second interval so that
- * MQTTSensorHandler marks all channels dirty and republishes.
+ * SystemMetricsUpdated event is published on a timed interval so that
+ * MQTTSensorHandler republishes all sensor states.
  */
 class SystemSensorHandler : public BaseSensor
 {

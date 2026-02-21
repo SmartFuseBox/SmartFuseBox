@@ -16,8 +16,6 @@ MQTTRelayHandler::MQTTRelayHandler(MQTTController* mqttController, MessageBus* m
     , _discoveryPending(false)
     , _discoveryIndex(0)
     , _lastDiscoveryPublish(0)
-    , _dirtyRelayMask(0)
-    , _lastStatePublish(0)
 {
     _commandTopic[0] = '\0';
     _config = ConfigManager::getConfigPtr();
@@ -55,9 +53,14 @@ bool MQTTRelayHandler::begin()
                 _discoveryIndex = 0;
             }
 
-            // Mark all relays as dirty - they will be published by update() cycle
-            // This prevents spam on connect/reconnect
-            this->markAllRelaysDirty();
+            for (uint8_t i = 0; i < ConfigRelayCount; i++)
+            {
+                CommandResult statusResult = _relayController->getRelayStatus(i);
+                if (statusResult.success)
+                {
+                    this->publishRelayState(i, statusResult.status == 1);
+                }
+            }
         }
     );
 
@@ -100,20 +103,7 @@ void MQTTRelayHandler::update()
         }
     }
 
-    // Throttled state publishing
-    // Publish if: (dirty AND min interval passed) OR max interval passed
-    if (_dirtyRelayMask != 0)
-    {
-        unsigned long timeSinceLastPublish = now - _lastStatePublish;
-
-        // Publish immediately if dirty and min interval passed
-        // OR if max interval passed (periodic update)
-        if (timeSinceLastPublish >= MinPublishInterval || timeSinceLastPublish >= MaxPublishInterval)
-        {
-            publishDirtyRelayStates();
-        }
     }
-}
 
 void MQTTRelayHandler::end()
 {
@@ -322,57 +312,19 @@ void MQTTRelayHandler::publishRelayState(uint8_t relayIndex, bool isOn)
     _mqttController->publishState(topic, payload);
 }
 
-void MQTTRelayHandler::publishDirtyRelayStates()
+void MQTTRelayHandler::onRelayStatusChanged(uint8_t relayBitmask)
 {
-    if (_mqttController == nullptr || _relayController == nullptr)
-    {
-        return;
-    }
-
-    if (!_mqttController->isConnected())
-    {
-        return;
-    }
-
-    // Publish state for each dirty relay
     for (uint8_t i = 0; i < ConfigRelayCount; i++)
     {
-        if (_dirtyRelayMask & (1 << i))
+        if (relayBitmask & (1 << i))
         {
             CommandResult statusResult = _relayController->getRelayStatus(i);
             if (statusResult.success)
             {
-                bool isOn = (statusResult.status == 1);
-                publishRelayState(i, isOn);
+                publishRelayState(i, statusResult.status == 1);
             }
         }
     }
-
-    // Clear dirty mask and update last publish time
-    _dirtyRelayMask = 0;
-    _lastStatePublish = millis();
-}
-
-void MQTTRelayHandler::markRelayDirty(uint8_t relayIndex)
-{
-    if (relayIndex < ConfigRelayCount)
-    {
-        _dirtyRelayMask |= (1 << relayIndex);
-    }
-}
-
-void MQTTRelayHandler::markAllRelaysDirty()
-{
-    // Mark all relays as dirty (set all bits for ConfigRelayCount relays)
-    _dirtyRelayMask = (1 << ConfigRelayCount) - 1;
-}
-
-void MQTTRelayHandler::onRelayStatusChanged(uint8_t relayBitmask)
-{
-    // Mark all relays as dirty when status changes
-    // This ensures all relay states are published in the next update cycle
-    (void)relayBitmask;
-    markAllRelaysDirty();
 }
 
 void MQTTRelayHandler::publishDiscoveryConfig()
