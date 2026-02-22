@@ -178,9 +178,6 @@
     <ClCompile Include="MicroSdDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MQTTClient.cpp">
       <Filter>Source Files\MQTT</Filter>
     </ClCompile>
@@ -194,16 +191,10 @@
       <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTHandler.cpp">
-      <Filter>Source Files\MQQT</Filter>
+      <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="MQTTRelayHandler.cpp">
       <Filter>Source Files\MQTT</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SensorCommandHandler.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MQTTSensorHandler.cpp">
       <Filter>Source Files\MQTT</Filter>
@@ -357,55 +348,16 @@
     <ClInclude Include="DateTimeManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ToneManager.h">
       <Filter>Header Files\SharedCode</Filter>
     </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SensorDataRecord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SdCardLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MicroSdDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MQTTRelayHandler.h">
@@ -427,13 +379,7 @@
       <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTHandler.h">
-      <Filter>Header Files\MQQT</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\MQTT</Filter>
     </ClInclude>
     <ClInclude Include="MQTTSensorHandler.h">
       <Filter>Header Files\MQTT</Filter>

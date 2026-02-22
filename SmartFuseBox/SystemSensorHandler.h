@@ -105,7 +105,7 @@ public:
 		case 1: return { "CPU Usage",   "cpu_usage",     nullptr,        "%",   false };
 		case 2: return { "Bluetooth",   "bluetooth",     "connectivity", nullptr, true };
 		case 3: return { "WiFi",        "wifi",          "connectivity", nullptr, true };
-        case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "mB",   false };
+        case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "MB",   false };
 		case 5: return { "Warnings",    "warning_count", nullptr,        nullptr, false };
 		default: return { nullptr, nullptr, nullptr, nullptr, false };
 		}
