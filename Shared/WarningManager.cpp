@@ -244,14 +244,12 @@ void WarningManager::updateConnection(unsigned long now)
 			clearWarning(WarningType::ConnectionLost);
 
 #if defined(BOAT_CONTROL_PANEL)
-			Serial.println(F("Connection established - sending time sync if set"));
 			// Send time sync when connection is established
 			if (_commandMgr && DateTimeManager::isTimeSet())
 			{
 				char buffer[20];
 				snprintf_P(buffer, sizeof(buffer), PSTR("v=%lu"), DateTimeManager::getCurrentTime());
 				_commandMgr->sendCommand(SystemSetDateTime, buffer);
-				Serial.println(F("Time sync sent"));
 			}
 #endif
 		}

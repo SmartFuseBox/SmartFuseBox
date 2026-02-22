@@ -18,7 +18,7 @@ public:
 
     BaseSensor* sensorGet(uint8_t index)
     {
-        if (index > _sensorCount)
+        if (index >= _sensorCount)
             return nullptr;
 
         return _sensorHandlers[index];

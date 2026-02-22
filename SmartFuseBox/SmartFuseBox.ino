@@ -26,6 +26,7 @@
 #include "WaterSensorHandler.h"
 #include "Dht11SensorHandler.h"
 #include "LightSensorHandler.h"
+#include "SystemSensorHandler.h"
 #include <SensorManager.h>
 
 #include "BluetoothManager.h"
@@ -48,6 +49,14 @@
 
 #include "MicroSdDriver.h"
 
+#if defined(MQTT_SUPPORT)
+#include "MQTTHandler.h"
+#include "MQTTController.h"
+#include "MQTTConfigCommandHandler.h"
+#include "MQTTRelayHandler.h"
+#include "MQTTSensorHandler.h"
+#include "MQTTSystemHandler.h"
+#endif
 
 #if defined(ARDUINO_UNO_R4) && defined(LED_MANAGER)
 #include "LedMatrixManager.h"
@@ -112,12 +121,6 @@ WaterSensorHandler waterSensorHandler(&messageBus, &broadcastManager, &sensorCom
 Dht11SensorHandler dht11SensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, Dht11SensorPin);
 LightSensorHandler lightSensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, LightSensorPin, LightSensorAnalogPin);
 
-BaseSensorHandler* sensorHandlers[] = {
-	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler
-};
-uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
-SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
-
 // configure bluetooth support
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayController, &warningManager, &commandMgrComputer);
 
@@ -129,13 +132,31 @@ ConfigSyncManager configSyncManager(&commandMgrComputer, &commandMgrLink, &confi
 // computer command handlers
 ConfigCommandHandler configHandler(&wifiController, &configController);
 
+// system sensor (diagnostics exposed to HA via MQTT)
+SystemSensorHandler systemSensorHandler(&messageBus, &wifiController, &bluetoothController, &warningManager);
+
+// sensor manager
+BaseSensorHandler* sensorHandlers[] = {
+	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler
+};
+uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
+SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
+
 // middleware
 BaseSensor* baseSensors[] = {
-	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler
+	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler
 };
 uint8_t baseSensorCount = sizeof(baseSensors) / sizeof(baseSensors[0]);
-SensorController sensorController(baseSensors, sensorHandlerCount);
+SensorController sensorController(baseSensors, baseSensorCount);
 
+// MQTT instances
+#if defined(MQTT_SUPPORT)
+MQTTController mqttController(&messageBus, ConfigManager::getConfigPtr(), &commandMgrComputer);
+MQTTConfigCommandHandler mqttConfigHandler(&configController, &mqttController, &commandMgrComputer);
+MQTTRelayHandler mqttRelayHandler(&mqttController, &messageBus, &relayController, &commandMgrComputer);
+MQTTSensorHandler mqttSensorHandler(&mqttController, &messageBus, &sensorController, &commandMgrComputer);
+MQTTSystemHandler mqttSystemHandler(&mqttController, &messageBus, &commandMgrComputer);
+#endif
 
 // configure wifi support
 ConfigNetworkHandler configNetworkHandler(&configController, &wifiController);
@@ -187,6 +208,12 @@ void setup()
 	ackHandler.setConfigSyncManager(&configSyncManager, &configController);
 	configHandler.setConfigSyncManager(&configSyncManager);
 
+#if defined(MQTT_SUPPORT)
+	// Link MQTT config handler and controller
+	configHandler.setMqttConfigHandler(&mqttConfigHandler);
+	configHandler.setMqttController(&mqttController);
+#endif
+
 #if defined(CARD_CONFIG_LOADER)
 	configHandler.setSdCardConfigLoader(&sdCardConfigLoader);
 #endif
@@ -195,11 +222,30 @@ void setup()
 
 	configureWifiSupport(config);
 	configureBluetoothSupport(config);
+
+#if defined(MQTT_SUPPORT)
+
+	// Initialize MQTT (after WiFi initialization)
+	if (config->accessMode == AccessModeClient && mqttController.begin())
+	{
+		// MQTT enabled in config, initialize handlers
+		mqttRelayHandler.begin();
+		mqttSensorHandler.begin();
+		mqttSystemHandler.begin();
+	}
+
+#endif
+
 	systemCommandHandler.setSdCardLogger(&sdCardLogger);
 	systemNetworkHandler.setSdCardLogger(&sdCardLogger);
+	systemSensorHandler.setSdCardLogger(&sdCardLogger);
 	soundController.configUpdated(config);
 	relayHandler.configUpdated(config);
 	sensorManager.setup();
+
+#if defined(MQTT_SUPPORT)
+	systemCommandHandler.setMqttController(&mqttController);
+#endif
 
 	MicroSdDriver& microSdDriver = MicroSdDriver::getInstance();
 	microSdDriver.setWarningManager(&warningManager);
@@ -261,6 +307,25 @@ void loop()
 	SystemCpuMonitor::startTask();
 	wifiController.update(now);
 	SystemCpuMonitor::endTask();
+
+	// MQTT update (non-blocking, processes 1 packet per call)
+#if defined(MQTT_SUPPORT)
+	SystemCpuMonitor::startTask();
+	mqttController.update();
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	mqttRelayHandler.update();
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	mqttSensorHandler.update();
+	SystemCpuMonitor::endTask();
+
+	SystemCpuMonitor::startTask();
+	mqttSystemHandler.update();
+	SystemCpuMonitor::endTask();
+#endif
 
 	SystemCpuMonitor::startTask();
 	configSyncManager.update(now);

@@ -79,6 +79,21 @@ constexpr char ConfigReloadFromSd[] = "C29";
 constexpr char ConfigExportToSd[] = "C30";
 constexpr char ConfigSdCardSpeed[] = "C31";
 
+#if defined(MQTT_SUPPORT)
+
+constexpr char MqttConfigEnable[] = "M0";
+constexpr char MqttConfigBroker[] = "M1";
+constexpr char MqttConfigPort[] = "M2";
+constexpr char MqttConfigUsername[] = "M3";
+constexpr char MqttConfigPassword[] = "M4";
+constexpr char MqttConfigDeviceId[] = "M5";
+constexpr char MqttConfigHADiscovery[] = "M6";
+constexpr char MqttConfigKeepAlive[] = "M7";
+constexpr char MqttConfigState[] = "M8";
+constexpr char MqttConfigDiscoveryPrefix[] = "M9";
+
+#endif
+
 constexpr char WarningsActive[] = "W0";
 constexpr char WarningsList[] = "W1";
 constexpr char WarningStatus[] = "W2";
@@ -163,6 +178,7 @@ enum class SensorIdList : uint8_t
     Dht11Sensor = 0x1,
     LightSensor = 0x2,
     GpsSensor = 0x3,
+    SystemSensor = 0x4
 };
 
 struct CommandResult {

@@ -48,7 +48,7 @@ private:
             return false;
         }
 
-        if (cfg->accessMode == 0) // Access Point
+        if (cfg->accessMode == AccessModeAP)
         {
             // If apIpAddress is empty, allow using default IP (considered valid)
             if (cfg->apIpAddress[0] != '\0') {
@@ -158,7 +158,7 @@ public:
         if (enableInternal())
         {
             // Configure based on config settings
-            if (cfg->accessMode == 0) // Access Point
+            if (cfg->accessMode == AccessModeAP)
             {
                 _wifiServer->setAccessPointMode(cfg->apSSID, cfg->apPassword, cfg->apIpAddress);
             }

@@ -73,8 +73,51 @@ These are commands used to configure the system settings and can only be sent fr
 | `C30` — Export Config to SD (SFB) | `C30` | **Local only (Serial/USB)**. Export current in-memory configuration to SD card... |
 | `C31` — SD Card Initialize Speed (SFB) | `C31:v=4` | Set SD card SPI initialization speed in MHz. Param format: `v=<speed>`. Valid values: 4, 8, 12, 16, 20, 24. Default is 4 MHz. **Note:** Higher speeds (16+ MHz) should only be used with high-quality SD cards that explicitly support high-speed SPI mode. Using speeds that are too high for your SD card may result in initialization failures or data corruption. If experiencing SD card issues, try reducing the speed to 4 or 8 MHz. |
 
+### MQTT Configuration Commands (SFB)
+These commands configure MQTT connectivity for Home Assistant and other MQTT-based integrations.
 
-Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`, `Invalid type (0=day, 1=night)`, `Brightness must be 0-100`, `Invalid value (true/false or 0/1)`, `Missing params (t,r,g,b)`, `Missing params (t,b)`, `Missing params (g,w,s)`, `Invalid speed (4, 8, 12, 16, 20, or 24 MHz)`.
+| Command | Example | Purpose |
+|---|---|---|
+| `M0` — MQTT Enabled | `M0:v=1` | Enable/disable MQTT. Param format: `v=<value>`. `value` must be 0 (disabled) or 1 (enabled). Query without params returns current state. |
+| `M1` — MQTT Broker | `M1:192.168.1.100` | Set MQTT broker address. Param format: broker address directly (no v= prefix). Supports IP addresses or hostnames. Query without params returns current broker. |
+| `M2` — MQTT Port | `M2:v=1883` | Set MQTT broker port. Param format: `v=<port>`. Default is 1883. Query without params returns current port. |
+| `M3` — MQTT Username | `M3:myuser` | Set MQTT username for authentication. Param format: username directly (no v= prefix). Optional - leave empty for no authentication. Query returns "Username" or empty string if no username has been set. |
+| `M4` — MQTT Password | `M4:mypassword` | Set MQTT password for authentication. Param format: password directly (no v= prefix). Optional - leave empty for no authentication. Query returns "Password" or empty string if no password has been setM4. |
+| `M5` — MQTT Device ID | `M5:boat_seawolf_01` | Set unique MQTT device identifier. Param format: device ID directly (no v= prefix). Used in topic paths: `smartfusebox/<deviceId>/...`. Query without params returns current device ID. |
+| `M6` — HA Discovery | `M6:v=1` | Enable/disable Home Assistant auto-discovery. Param format: `v=<value>`. `value` must be 0 (disabled) or 1 (enabled). When enabled, publishes discovery messages for automatic entity configuration. Query without params returns current state. |
+| `M7` — Keep Alive Interval | `M7:v=60` | Set MQTT keep-alive interval in seconds. Param format: `v=<seconds>`. Default is 60 seconds. Controls PING frequency. Query without params returns current interval. |
+| `M8` — MQTT Connection State | `M8` | Query MQTT connection state. Returns `v=0` (disconnected/disabled) or `v=1` (connected). Read-only command, no parameters accepted. |
+| `M9` — Discovery Prefix | `M9:homeassistant` | Set Home Assistant discovery prefix. Also used as the base topic prefix for all MQTT messages. Param format: prefix directly (no v= prefix). Default is "homeassistant". This prefix is used in discovery topic paths: `<prefix>/switch/<deviceId>/relay<index>/config` and state/command topics: `<prefix>/<deviceId>/relay/<index>/state`. Query without params returns current prefix. |
+
+**MQTT Topic Structure:**
+- Relay control: `<discoveryPrefix>/<deviceId>/relay/<index>/set` (command), `<discoveryPrefix>/<deviceId>/relay/<index>/state` (state)
+- Sensor data: `<discoveryPrefix>/<deviceId>/sensor/<type>/state`
+- System info: `<discoveryPrefix>/<deviceId>/system/<metric>/state`
+- Warnings: `<discoveryPrefix>/<deviceId>/warning/active/state`
+- Discovery: `<discoveryPrefix>/switch/<deviceId>/relay<index>/config`
+
+**Example with default prefix (homeassistant):**
+- State topic: `homeassistant/smartfusebox_01/relay/0/state`
+- Command topic: `homeassistant/smartfusebox_01/relay/0/set`
+- Discovery topic: `homeassistant/switch/smartfusebox_01/relay0/config`
+
+**Example with custom prefix (myboat):**
+- State topic: `myboat/boat_seawolf/relay/0/state`
+- Command topic: `myboat/boat_seawolf/relay/0/set`
+- Discovery topic: `myboat/switch/boat_seawolf/relay0/config`
+
+**Setup Example:**
+```
+M0:v=1                          # Enable MQTT
+M1:192.168.1.100                # Set broker IP
+M5:boat_seawolf_01              # Set device ID
+C0                              # Save to EEPROM
+```
+
+Common MQTT error responses: `Config not available`, `Invalid port`, `Invalid keep-alive interval`, `Invalid value (true/false or 0/1)`.
+
+
+Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`, `Invalid type (0=day, 1=night)`, `Brightness must be 0-100`, `Invalid value (true/false or 0/1)`, `Missing params (t,r,g,b)`, `Missing params (t,b)`, `Missing params (g,w,s)`, `Invalid speed (4, 8, 12, 16, 20, or 24 MHz)`, `Config not available`, `Invalid port`, `Invalid keep-alive interval`.
 
 
 ### Wifi Configuration Commands (SFB)

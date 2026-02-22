@@ -52,6 +52,32 @@ struct GpsSpeedUpdated {
     using Callback = std::function<void(double speedKmh, double course)>;
 };
 
+struct SystemMetricsUpdated {
+    using Callback = std::function<void()>;
+};
+
+#if defined(MQTT_SUPPORT)
+
+struct MqttConnected {
+
+    using Callback = std::function<void()>;
+
+};
+
+struct MqttDisconnected {
+
+    using Callback = std::function<void()>;
+
+};
+
+struct MqttMessageReceived {
+
+    using Callback = std::function<void(const char* topic, const char* payload)>;
+
+};
+
+#endif
+
 class MessageBus {
 private:
     template<typename Event>

@@ -2,6 +2,10 @@
 #include "ConfigSyncManager.h"
 #include "SdCardConfigLoader.h"
 
+#if defined(MQTT_SUPPORT)
+#include "MQTTConfigCommandHandler.h"
+#endif
+
 #if defined(ARDUINO_UNO_R4)
 #include "BluetoothController.h"
 #include <Arduino.h>
@@ -12,7 +16,11 @@ ConfigCommandHandler::ConfigCommandHandler(WifiController* wifiController, Confi
 	: _wifiController(wifiController),
 	  _configController(configController),
 	  _configSyncManager(nullptr),
-      _sdCardConfigLoader(nullptr)
+	  _sdCardConfigLoader(nullptr)
+#if defined(MQTT_SUPPORT)
+	  , _mqttConfigHandler(nullptr)
+	  , _mqttController(nullptr)
+#endif
 {
 }
 
@@ -20,6 +28,18 @@ void ConfigCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager)
 {
 	_configSyncManager = syncManager;
 }
+
+#if defined(MQTT_SUPPORT)
+void ConfigCommandHandler::setMqttConfigHandler(MQTTConfigCommandHandler* mqttConfigHandler)
+{
+	_mqttConfigHandler = mqttConfigHandler;
+}
+
+void ConfigCommandHandler::setMqttController(MQTTController* mqttController)
+{
+	_mqttController = mqttController;
+}
+#endif
 
 bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
@@ -696,6 +716,145 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
     }
+#if defined(MQTT_SUPPORT)
+    else if (command[0] == 'M' && strlen(command) >= 2)
+    {
+        // MQTT configuration commands (M0-M8)
+        Config* config = _configController->getConfigPtr();
+
+        if (config == nullptr)
+        {
+            result = ConfigResult::InvalidConfig;
+        }
+        else if (paramCount == 0)
+        {
+            // Query operation - similar to C16 WiFi State
+            StringKeyValue param;
+
+            if (strcmp(command, MqttConfigEnable) == 0)
+            {
+                // M0 - MQTT Enabled
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                snprintf(param.value, sizeof(param.value), "%d", config->mqtt.enabled ? 1 : 0);
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigBroker) == 0)
+            {
+                // M1 - MQTT Broker
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                strncpy(param.value, config->mqtt.broker, sizeof(param.value));
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigPort) == 0)
+            {
+                // M2 - MQTT Port
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                snprintf(param.value, sizeof(param.value), "%u", config->mqtt.port);
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigUsername) == 0)
+            {
+                // M3 - MQTT Username
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                strncpy(param.value, config->mqtt.username, sizeof(param.value));
+                param.value[sizeof(param.value) - 1] = '\0';
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigPassword) == 0)
+            {
+                // M4 - MQTT Password
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                strncpy(param.value, config->mqtt.password, sizeof(param.value));
+                param.value[sizeof(param.value) - 1] = '\0';
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigDeviceId) == 0)
+            {
+                // M5 - MQTT Device ID
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                strncpy(param.value, config->mqtt.deviceId, sizeof(param.value));
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigHADiscovery) == 0)
+            {
+                // M6 - HA Discovery Enabled
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                snprintf(param.value, sizeof(param.value), "%d", config->mqtt.useHomeAssistantDiscovery ? 1 : 0);
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigKeepAlive) == 0)
+            {
+                // M7 - Keep Alive Interval
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                snprintf(param.value, sizeof(param.value), "%u", config->mqtt.keepAliveInterval);
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigState) == 0)
+            {
+                // M8 - MQTT Connection State
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+
+                // Get actual connection state from MQTTController if available
+                bool isConnected = false;
+                if (_mqttController != nullptr)
+                {
+                    isConnected = _mqttController->isConnected();
+                }
+                else
+                {
+                    // Fallback to config enabled state if controller not available
+                    isConnected = config->mqtt.enabled;
+                }
+
+                snprintf(param.value, sizeof(param.value), "%d", isConnected ? 1 : 0);
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else if (strcmp(command, MqttConfigDiscoveryPrefix) == 0)
+            {
+                // M9 - Discovery Prefix
+                strncpy(param.key, ValueParamName, sizeof(param.key));
+                strncpy(param.value, config->mqtt.discoveryPrefix, sizeof(param.value));
+                param.value[sizeof(param.value) - 1] = '\0';
+                sendAckOk(sender, command, &param);
+                return true;
+            }
+            else
+            {
+                result = ConfigResult::InvalidCommand;
+            }
+        }
+        else
+        {
+            // Set operation - delegate to MQTTConfigCommandHandler
+            if (_mqttConfigHandler != nullptr)
+            {
+                const char* paramStr = params[0].value;
+
+                if (_mqttConfigHandler->processCommand(command, paramStr))
+                {
+                    result = ConfigResult::Success;
+                }
+                else
+                {
+                    result = ConfigResult::InvalidParameter;
+                }
+            }
+            else
+            {
+                result = ConfigResult::InvalidCommand;
+            }
+        }
+    }
+#endif
     else
     {
         result = ConfigResult::InvalidCommand;
@@ -753,6 +912,11 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 #if defined(ARDUINO_UNO_R4)
         ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID, 
         ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
+#endif
+#if defined(MQTT_SUPPORT)
+        MqttConfigEnable, MqttConfigBroker, MqttConfigPort, MqttConfigUsername,
+        MqttConfigPassword, MqttConfigDeviceId, MqttConfigHADiscovery, MqttConfigKeepAlive,
+        MqttConfigState, MqttConfigDiscoveryPrefix,
 #endif
         ConfigDefaultRelayState, ConfigLinkRelays,
         ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort,
