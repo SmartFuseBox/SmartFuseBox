@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(MQTT_SUPPORT)
-
 #include <Arduino.h>
 #include <WiFiS3.h>
 #include "MQTTDefinitions.h"
@@ -123,4 +121,3 @@ public:
     void resetStatistics();
 };
 
-#endif

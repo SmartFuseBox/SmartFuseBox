@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTClient.h"
 #include <SerialCommandManager.h>
 #include <string.h>
@@ -980,5 +977,3 @@ void MQTTClient::raiseEvent(MqttEvent event, uint8_t errorCode)
         _eventCallback(event, errorCode);
     }
 }
-
-#endif

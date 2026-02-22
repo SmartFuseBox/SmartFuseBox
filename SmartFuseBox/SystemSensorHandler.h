@@ -10,7 +10,7 @@
 #include "SystemDefinitions.h"
 #include "SdCardLogger.h"
 
-constexpr unsigned long SystemSensorUpdateIntervalMs = 5000;
+constexpr unsigned long SystemSensorUpdateIntervalMs = 2500;
 
 /**
  * @brief Sensor handler that exposes device diagnostics as MQTT sensor channels.
@@ -29,7 +29,6 @@ private:
 	BluetoothController* _bluetoothController;
 	WarningManager* _warningManager;
 	SdCardLogger* _sdCardLogger;
-	unsigned long _nextPublishTime;
 
 	static uint8_t countActiveWarnings(uint32_t mask)
 	{
@@ -43,6 +42,11 @@ protected:
 
 	unsigned long update() override
 	{
+		if (_messageBus)
+		{
+			_messageBus->publish<SystemMetricsUpdated>();
+		}
+
 		return SystemSensorUpdateIntervalMs;
 	}
 
@@ -53,31 +57,13 @@ public:
 		  _wifiController(wifiController),
 		  _bluetoothController(bluetoothController),
 		  _warningManager(warningManager),
-		  _sdCardLogger(nullptr),
-		  _nextPublishTime(0)
+		  _sdCardLogger(nullptr)
 	{
 	}
 
 	void setSdCardLogger(SdCardLogger* sdCardLogger)
 	{
 		_sdCardLogger = sdCardLogger;
-	}
-
-	/**
-	 * @brief Call from loop() to publish SystemMetricsUpdated on the configured interval.
-	 * @param now Current time from millis().
-	 */
-	void loopUpdate(unsigned long now)
-	{
-		if (now >= _nextPublishTime)
-		{
-			if (_messageBus)
-			{
-				_messageBus->publish<SystemMetricsUpdated>();
-			}
-
-			_nextPublishTime = now + SystemSensorUpdateIntervalMs;
-		}
 	}
 
 	void formatStatusJson(char* buffer, size_t size) override
@@ -115,11 +101,11 @@ public:
 	{
 		switch (channelIndex)
 		{
-		case 0: return { "Free Memory", "free_memory",   nullptr,        "B",   false };
+		case 0: return { "Free Memory", "free_memory",   nullptr,        "b",   false };
 		case 1: return { "CPU Usage",   "cpu_usage",     nullptr,        "%",   false };
 		case 2: return { "Bluetooth",   "bluetooth",     "connectivity", nullptr, true };
 		case 3: return { "WiFi",        "wifi",          "connectivity", nullptr, true };
-		case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "B",   false };
+        case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "mB",   false };
 		case 5: return { "Warnings",    "warning_count", nullptr,        nullptr, false };
 		default: return { nullptr, nullptr, nullptr, nullptr, false };
 		}
@@ -144,9 +130,12 @@ public:
 				(_wifiController && _wifiController->isEnabled()) ? "ON" : "OFF");
 			break;
 		case 4:
-			snprintf(buffer, size, "%lu",
-				(unsigned long)(_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0));
+       {
+			unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
+			double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
+			snprintf(buffer, size, "%.1f", mb);
 			break;
+		}
 		case 5:
 			snprintf(buffer, size, "%u",
 				(_warningManager ? countActiveWarnings(_warningManager->getActiveWarningsMask()) : 0));

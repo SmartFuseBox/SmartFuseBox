@@ -1,8 +1,6 @@
 #pragma once
 #include "Local.h"
 
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTHandler.h"
 #include "RelayController.h"
 #include "ConfigManager.h"
@@ -41,7 +39,7 @@ private:
     void onRelayStatusChanged(uint8_t relayBitmask);
 
 public:
-    MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController, SerialCommandManager* commandMgr = nullptr);
+    MQTTRelayHandler(MQTTController* mqttController, MessageBus* messageBus, RelayController* relayController, SerialCommandManager* commandMgr);
 
     // Lifecycle (inherited from MQTTHandler)
     bool begin() override;
@@ -55,5 +53,3 @@ public:
     bool subscribe() override;
     void unsubscribe() override;
 };
-
-#endif

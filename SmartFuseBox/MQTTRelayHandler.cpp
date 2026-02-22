@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTRelayHandler.h"
 #include "SystemDefinitions.h"
 #include <SerialCommandManager.h>
@@ -392,5 +389,3 @@ void MQTTRelayHandler::publishRelayDiscoveryConfig(uint8_t relayIndex)
     // Publish with retain flag so HA can discover even if it restarts
     client->publish(topic, payload, MqttQoS::AtMostOnce, true);
 }
-
-#endif

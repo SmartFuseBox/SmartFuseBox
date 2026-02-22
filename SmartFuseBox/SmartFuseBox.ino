@@ -120,12 +120,6 @@ WaterSensorHandler waterSensorHandler(&messageBus, &broadcastManager, &sensorCom
 Dht11SensorHandler dht11SensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, Dht11SensorPin);
 LightSensorHandler lightSensorHandler(&messageBus, &broadcastManager, &sensorCommandHandler, &warningManager, LightSensorPin, LightSensorAnalogPin);
 
-BaseSensorHandler* sensorHandlers[] = {
-	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler
-};
-uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
-SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
-
 // configure bluetooth support
 BluetoothController bluetoothController(&systemCommandHandler, &sensorCommandHandler, &relayController, &warningManager, &commandMgrComputer);
 
@@ -139,6 +133,13 @@ ConfigCommandHandler configHandler(&wifiController, &configController);
 
 // system sensor (diagnostics exposed to HA via MQTT)
 SystemSensorHandler systemSensorHandler(&messageBus, &wifiController, &bluetoothController, &warningManager);
+
+// sensor manager
+BaseSensorHandler* sensorHandlers[] = {
+	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler
+};
+uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
+SensorManager sensorManager(sensorHandlers, sensorHandlerCount);
 
 // middleware
 BaseSensor* baseSensors[] = {
@@ -294,7 +295,6 @@ void loop()
 
 	SystemCpuMonitor::startTask();
 	sensorManager.update(now);
-	systemSensorHandler.loopUpdate(now);
 	SystemCpuMonitor::endTask();
 
 	SystemCpuMonitor::startTask();

@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTController.h"
 #include "Config.h"
 #include <SerialCommandManager.h>
@@ -403,5 +400,3 @@ void MQTTController::eventCallbackStatic(MqttEvent event, uint8_t errorCode)
         _instance->onMqttEvent(event, errorCode);
     }
 }
-
-#endif

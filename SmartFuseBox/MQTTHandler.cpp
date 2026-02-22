@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTHandler.h"
 #include "ConfigManager.h"
 #include <string.h>
@@ -55,5 +52,3 @@ bool MQTTHandler::extractIndexFromTopic(const char* topic, const char* prefix, u
     *index = (uint8_t)value;
     return true;
 }
-
-#endif

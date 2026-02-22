@@ -1,16 +1,12 @@
 #pragma once
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTHandler.h"
 #include "ConfigManager.h"
 #include "SensorController.h"
+#include <vector>
 
 // Forward declaration
 class SerialCommandManager;
-
-constexpr uint8_t MaxMqttSensorChannels = 8;
 
 struct MqttChannelMap
 {
@@ -26,8 +22,7 @@ private:
     SerialCommandManager* _commandMgr;
 
     // Channel map (built during begin())
-    MqttChannelMap _channelMap[MaxMqttSensorChannels];
-    uint8_t _totalChannels;
+    std::vector<MqttChannelMap> _channelMap;
 
     // Channel indices for typed MessageBus events (-1 if not present)
     int8_t _tempChannelIdx;
@@ -42,14 +37,9 @@ private:
 
     static constexpr uint16_t MinPublishInterval = 200;
 
-    // State publishing
     void publishSensorState(uint8_t channelIndex);
-
-    // Home Assistant Discovery
     void publishDiscoveryConfig();
     void publishSensorDiscoveryConfig(uint8_t index);
-
-    // MessageBus event handlers
     void onTemperatureUpdated(float temperature);
     void onHumidityUpdated(uint8_t humidity);
     void onLightSensorUpdated(bool isDaytime);
@@ -67,5 +57,3 @@ public:
     bool subscribe() override;
     void unsubscribe() override;
 };
-
-#endif

@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(MQTT_SUPPORT)
-
 #include <stdint.h>
 
 // MQTT Protocol Version
@@ -138,5 +136,3 @@ enum class MqttEvent : uint8_t
 
 // Event callback with optional error code parameter
 typedef void (*MqttEventCallback)(MqttEvent event, uint8_t errorCode);
-
-#endif

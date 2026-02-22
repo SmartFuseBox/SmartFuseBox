@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTSensorHandler.h"
 #include "SystemDefinitions.h"
 #include <SerialCommandManager.h>
@@ -13,7 +10,6 @@ MQTTSensorHandler::MQTTSensorHandler(MQTTController* mqttController, MessageBus*
     , _config(nullptr)
     , _sensorController(sensorController)
     , _commandMgr(commandMgr)
-    , _totalChannels(0)
     , _tempChannelIdx(-1)
     , _humidityChannelIdx(-1)
     , _lightChannelIdx(-1)
@@ -23,7 +19,6 @@ MQTTSensorHandler::MQTTSensorHandler(MQTTController* mqttController, MessageBus*
     , _lastDiscoveryPublish(0)
 {
     _config = ConfigManager::getConfigPtr();
-    memset(_channelMap, 0, sizeof(_channelMap));
 }
 
 bool MQTTSensorHandler::begin()
@@ -66,8 +61,8 @@ bool MQTTSensorHandler::begin()
     );
 
     // Build channel map from sensor controller
-    _totalChannels = 0;
-    for (uint8_t s = 0; s < _sensorController->sensorCount() && _totalChannels < MaxMqttSensorChannels; s++)
+    _channelMap.clear();
+    for (uint8_t s = 0; s < _sensorController->sensorCount(); s++)
     {
         BaseSensor* sensor = _sensorController->sensorGet(s);
         if (sensor == nullptr)
@@ -75,37 +70,35 @@ bool MQTTSensorHandler::begin()
             continue;
         }
 
-        for (uint8_t c = 0; c < sensor->getMqttChannelCount() && _totalChannels < MaxMqttSensorChannels; c++)
+        for (uint8_t c = 0; c < sensor->getMqttChannelCount(); c++)
         {
-            _channelMap[_totalChannels].sensor = sensor;
-            _channelMap[_totalChannels].channelIndex = c;
+            _channelMap.push_back({ sensor, c });
 
+            uint8_t newIdx = static_cast<uint8_t>(_channelMap.size() - 1);
             const char* slug = sensor->getMqttChannel(c).slug;
             if (strcmp(slug, "temperature") == 0)
             {
-                _tempChannelIdx = static_cast<int8_t>(_totalChannels);
+                _tempChannelIdx = static_cast<int8_t>(newIdx);
             }
             else if (strcmp(slug, "humidity") == 0)
             {
-                _humidityChannelIdx = static_cast<int8_t>(_totalChannels);
+                _humidityChannelIdx = static_cast<int8_t>(newIdx);
             }
             else if (strcmp(slug, "light") == 0)
             {
-                _lightChannelIdx = static_cast<int8_t>(_totalChannels);
+                _lightChannelIdx = static_cast<int8_t>(newIdx);
             }
             else if (strcmp(slug, "water_level") == 0)
             {
-                _waterChannelIdx = static_cast<int8_t>(_totalChannels);
+                _waterChannelIdx = static_cast<int8_t>(newIdx);
             }
-
-            _totalChannels++;
         }
     }
 
     _messageBus->subscribe<SystemMetricsUpdated>(
         [this]()
         {
-            for (uint8_t i = 0; i < _totalChannels; i++)
+            for (uint8_t i = 0; i < _channelMap.size(); i++)
             {
                 this->publishSensorState(i);
             }
@@ -123,7 +116,7 @@ bool MQTTSensorHandler::begin()
                 _discoveryIndex = 0;
             }
 
-            for (uint8_t i = 0; i < _totalChannels; i++)
+            for (uint8_t i = 0; i < _channelMap.size(); i++)
             {
                 this->publishSensorState(i);
             }
@@ -137,7 +130,7 @@ void MQTTSensorHandler::update()
 {
     unsigned long now = millis();
 
-    if (_discoveryPending && _discoveryIndex < _totalChannels)
+    if (_discoveryPending && _discoveryIndex < _channelMap.size())
     {
         if (_mqttController != nullptr && _mqttController->isConnected())
         {
@@ -147,7 +140,7 @@ void MQTTSensorHandler::update()
                 _lastDiscoveryPublish = now;
                 _discoveryIndex++;
 
-                if (_discoveryIndex >= _totalChannels)
+                if (_discoveryIndex >= _channelMap.size())
                 {
                     if (_commandMgr != nullptr)
                     {
@@ -239,7 +232,7 @@ void MQTTSensorHandler::publishSensorState(uint8_t channelIndex)
         return;
     }
 
-    if (channelIndex >= _totalChannels)
+    if (channelIndex >= _channelMap.size())
     {
         return;
     }
@@ -279,7 +272,7 @@ void MQTTSensorHandler::publishSensorDiscoveryConfig(uint8_t index)
         return;
     }
 
-    if (index >= _totalChannels)
+    if (index >= _channelMap.size())
     {
         return;
     }
@@ -364,6 +357,20 @@ void MQTTSensorHandler::publishSensorDiscoveryConfig(uint8_t index)
             _config->mqtt.deviceId, channel.slug,
             _config->mqtt.deviceId);
     }
+    else if (channel.unit != nullptr)
+    {
+        snprintf(payload, sizeof(payload),
+            "{\"name\":\"%s\","
+            "\"state_topic\":\"home/%s/sensor/%s/state\","
+            "\"unit_of_measurement\":\"%s\","
+            "\"unique_id\":\"%s_%s\","
+            "\"device\":{\"ids\":[\"%s\"],\"name\":\"Smart Fuse Box\",\"mf\":\"Simon Carter\",\"mdl\":\"SFB v1\"}}",
+            channel.name,
+            _config->mqtt.deviceId, channel.slug,
+            channel.unit,
+            _config->mqtt.deviceId, channel.slug,
+            _config->mqtt.deviceId);
+    }
     else
     {
         snprintf(payload, sizeof(payload),
@@ -379,5 +386,3 @@ void MQTTSensorHandler::publishSensorDiscoveryConfig(uint8_t index)
 
     client->publish(topic, payload, MqttQoS::AtMostOnce, true);
 }
-
-#endif

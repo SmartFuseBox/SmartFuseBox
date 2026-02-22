@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTClient.h"
 #include "MessageBus.h"
 
@@ -66,5 +64,3 @@ public:
     // Access to client for advanced usage
     MQTTClient* getClient();
 };
-
-#endif

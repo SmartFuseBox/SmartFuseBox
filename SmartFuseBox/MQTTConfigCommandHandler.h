@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(MQTT_SUPPORT)
-
 #include "ConfigController.h"
 #include "SystemDefinitions.h"
 
@@ -39,4 +37,3 @@ public:
     bool handleMqttState(const char* params);
     bool handleMqttDiscoveryPrefix(const char* params);
 };
-#endif

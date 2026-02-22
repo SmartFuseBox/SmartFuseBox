@@ -1,7 +1,4 @@
 #include "Local.h"
-
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTConfigCommandHandler.h"
 #include "MQTTController.h"
 #include "ConfigManager.h"
@@ -303,5 +300,3 @@ bool MQTTConfigCommandHandler::parseUint16(const char* value, uint16_t* result)
     *result = (uint16_t)parsed;
     return true;
 }
-
-#endif

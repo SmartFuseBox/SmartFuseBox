@@ -1,7 +1,5 @@
 #pragma once
 
-#if defined(MQTT_SUPPORT)
-
 #include "MQTTController.h"
 #include "MessageBus.h"
 
@@ -32,5 +30,3 @@ public:
     virtual bool subscribe() = 0;
     virtual void unsubscribe() = 0;
 };
-
-#endif
