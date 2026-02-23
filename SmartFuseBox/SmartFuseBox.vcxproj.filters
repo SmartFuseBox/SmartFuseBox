@@ -205,7 +205,7 @@
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SmartFuseBox.cpp">
+    <ClCompile Include="SmartFuseBoxApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -399,7 +399,7 @@
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SmartFuseBox.h">
+    <ClInclude Include="SmartFuseBoxApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

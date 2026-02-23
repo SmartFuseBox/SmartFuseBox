@@ -1,5 +1,6 @@
 #include "SoundController.h"
 #include "SmartFuseBoxConstants.h"
+#include "Local.h"
 
 // Define sound patterns according to COLREGS
 // Maneuvering Signals (COLREGS Rule 34 - one-shot, non-repeating)
@@ -187,7 +188,7 @@ void SoundController::stopPattern()
 
 void SoundController::startSound()
 {
-	if (_soundRelayIndex != DefaultValue && _soundRelayIndex < TotalRelays)
+	if (_soundRelayIndex != DefaultValue && _soundRelayIndex < ConfigRelayCount)
 	{
 		uint8_t relayPin = Relays[_soundRelayIndex];
 		digitalWrite(relayPin, LOW); // Activate relay
@@ -196,7 +197,7 @@ void SoundController::startSound()
 
 void SoundController::stopSound()
 {
-	if (_soundRelayIndex != DefaultValue && _soundRelayIndex < TotalRelays)
+	if (_soundRelayIndex != DefaultValue && _soundRelayIndex < ConfigRelayCount)
 	{
 		uint8_t relayPin = Relays[_soundRelayIndex];
 		digitalWrite(relayPin, HIGH); // Deactivate relay

@@ -86,7 +86,6 @@ struct MqttConfig
 // Keep struct packed and stable. Increase 'VERSION' when you change layout.
 // Packed POD for persistent configuration.
 constexpr uint8_t ConfigVersion = 1;
-constexpr uint8_t ConfigRelayCount = 8;
 constexpr uint8_t ConfigHomeButtons = 4;
 constexpr uint8_t ConfigMaxNameLength = 31; // max characters (inc null)
 constexpr uint8_t ConfigShortRelayNameLength = 6; // max characters (inc null) - for home page

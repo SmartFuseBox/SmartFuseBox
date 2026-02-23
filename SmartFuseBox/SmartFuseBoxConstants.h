@@ -1,40 +1,6 @@
 #pragma once 
 
-#include <Arduino.h>
 #include <stdint.h>
-
-constexpr int DefaultDelay = 5;
-constexpr unsigned long serialInitTimeoutMs = 300;
-
-
-constexpr uint8_t WaterSensorPin = A0;
-constexpr uint8_t LightSensorAnalogPin = A1;
-constexpr uint8_t LightSensorPin = D3;
-constexpr uint8_t WaterSensorActivePin = D8;
-constexpr uint8_t Dht11SensorPin = D9;
-constexpr uint8_t SdCardCsPin = D10;
-constexpr uint8_t SdCardMosiPin = D11;
-constexpr uint8_t SdCardMisoPin = D12;
-constexpr uint8_t SdCardSckPin = D13;
-
-// Digital pins for relays
-constexpr uint8_t Relay4 = D4;
-constexpr uint8_t Relay3 = D5;
-constexpr uint8_t Relay2 = D6;
-constexpr uint8_t Relay1 = D7;
-
-// Analog pins used as digital (A2–A5 → 16–19)
-constexpr uint8_t Relay8 = 16;
-constexpr uint8_t Relay7 = 17;
-constexpr uint8_t Relay6 = 18;
-constexpr uint8_t Relay5 = 19;
-
-constexpr uint8_t TotalRelays = 8;
-
-constexpr uint8_t Relays[TotalRelays] = { Relay1, Relay2, Relay3, Relay4, Relay5, Relay6, Relay7, Relay8 };
-
-
-
 
 constexpr uint16_t DefaultSoundStartDelayMs = 500;
 
