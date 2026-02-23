@@ -37,8 +37,7 @@ private:
 
 protected:
 	void initialize() override
-	{
-	}
+	{}
 
 	unsigned long update() override
 	{
@@ -54,12 +53,11 @@ public:
 	SystemSensorHandler(MessageBus* messageBus, WifiController* wifiController,
 		BluetoothController* bluetoothController, WarningManager* warningManager)
 		: _messageBus(messageBus),
-		  _wifiController(wifiController),
-		  _bluetoothController(bluetoothController),
-		  _warningManager(warningManager),
-		  _sdCardLogger(nullptr)
-	{
-	}
+		_wifiController(wifiController),
+		_bluetoothController(bluetoothController),
+		_warningManager(warningManager),
+		_sdCardLogger(nullptr)
+	{}
 
 	void setSdCardLogger(SdCardLogger* sdCardLogger)
 	{
@@ -94,7 +92,7 @@ public:
 
 	uint8_t getMqttChannelCount() const override
 	{
-		return 6;
+		return 7;
 	}
 
 	MqttSensorChannel getMqttChannel(uint8_t channelIndex) const override
@@ -105,8 +103,9 @@ public:
 		case 1: return { "CPU Usage",   "cpu_usage",     nullptr,        "%",   false };
 		case 2: return { "Bluetooth",   "bluetooth",     "connectivity", nullptr, true };
 		case 3: return { "WiFi",        "wifi",          "connectivity", nullptr, true };
-        case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "MB",   false };
+		case 4: return { "SD Log Size", "sd_log_size",   nullptr,        "MB",   false };
 		case 5: return { "Warnings",    "warning_count", nullptr,        nullptr, false };
+		case 6: return { "Uptime",      "uptime",        nullptr,        "s",   false };
 		default: return { nullptr, nullptr, nullptr, nullptr, false };
 		}
 	}
@@ -130,7 +129,7 @@ public:
 				(_wifiController && _wifiController->isEnabled()) ? "ON" : "OFF");
 			break;
 		case 4:
-       {
+		{
 			unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
 			double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
 			snprintf(buffer, size, "%.1f", mb);
@@ -140,6 +139,11 @@ public:
 			snprintf(buffer, size, "%u",
 				(_warningManager ? countActiveWarnings(_warningManager->getActiveWarningsMask()) : 0));
 			break;
+
+		case 6:
+			snprintf(buffer, size, "%lu", millis() / 1000);
+			break;
+
 		default:
 			snprintf(buffer, size, "0");
 			break;

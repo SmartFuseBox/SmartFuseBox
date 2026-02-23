@@ -300,7 +300,7 @@ void LedMatrixManager::setRelayStatus(uint8_t relayStatus)
 	_relayStates = relayStatus;
 
 	// Update the LED matrix for each relay
-	for (uint8_t relay = 0; relay < TotalRelays; ++relay)
+	for (uint8_t relay = 0; relay < ConfigRelayCount; ++relay)
 	{
 		uint8_t row = relay;
 		uint8_t col = relay < 4 ? 10 : 11;

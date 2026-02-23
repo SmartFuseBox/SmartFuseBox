@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SerialCommandManager.h>
+#include "BroadcastManager.h"
 
 class InterceptDebugHandler : public ISerialCommandHandler {
 private:
