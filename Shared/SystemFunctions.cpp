@@ -2,6 +2,10 @@
 #include "SystemDefinitions.h"
 #include "Local.h"
 
+#if defined(ESP32)
+#include "esp_timer.h"
+#endif
+
 #if defined(ARDUINO_UNO_R4)
 #include <WiFiS3.h>
 #endif
@@ -252,4 +256,49 @@ bool SystemFunctions::progmemToBuffer(const char* progmemStr, char* buffer, size
 	strncpy_P(buffer, progmemStr, bufferSize);
 	buffer[bufferSize - 1] = '\0';
 	return true;
+}
+
+TimeParts SystemFunctions::msToTimeParts(uint64_t ms)
+{
+    TimeParts t;
+    t.milliseconds = (uint16_t)(ms % 1000ULL);
+
+    uint64_t totalSeconds = ms / 1000ULL;
+    t.seconds = (uint8_t)(totalSeconds % 60ULL);
+
+    uint64_t totalMinutes = totalSeconds / 60ULL;
+    t.minutes = (uint8_t)(totalMinutes % 60ULL);
+
+    uint64_t totalHours = totalMinutes / 60ULL;
+    t.hours = (uint8_t)(totalHours % 24ULL);
+
+    t.days = (uint32_t)(totalHours / 24ULL);
+    return t;
+}
+
+uint64_t SystemFunctions::millis64()
+{
+#if defined(ESP32)
+    return (uint64_t)(esp_timer_get_time() / 1000ULL);
+#else
+    static uint32_t lastMillis32 = 0;
+    static uint64_t highMs = 0; 
+
+    uint32_t now = millis();
+    if (now < lastMillis32) {
+        // Wrapped around (32-bit overflow)
+        highMs += 0x100000000ULL; // add 2^32
+    }
+    lastMillis32 = now;
+    return highMs + now;
+#endif
+}
+
+void SystemFunctions::formatTimeParts(char* buffer, uint8_t bufferSize, const TimeParts& timeparts)
+{
+    snprintf(buffer, bufferSize, "%lud %02u:%02u:%02u",
+        (unsigned long)timeparts.days,
+        (unsigned)timeparts.hours,
+        (unsigned)timeparts.minutes,
+        (unsigned)timeparts.seconds);
 }

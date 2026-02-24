@@ -22,8 +22,42 @@
  *    (for example setting `SdCardLogger`) still apply correctly.
  */
 
-#define FUSE_BOX_CONTROLLER
+
+/*
+* Type of board you are using. This is used to conditionally compile features based on the board capabilities. For example, 
+* if you are using an Arduino Uno R4 or ESP32 that supports wifi, you can define ARDUINO_UNO_R4 to enable Bluetooth and WiFi support.
+*/
 #define ARDUINO_UNO_R4
+#define ARDUINO_R4_MINIMA_
+#define ESP32_NODE_32_
+
+
+/*
+* Sanity check only one board selected
+*/
+#if defined(ESP32_NODE_32) && !defined(ESP32)
+#define ESP32
+#endif
+
+#if defined(ARDUINO_UNO_R4) 
+#if defined(ESP32) || defined(ARDUINO_R4_MINIMA)
+#error "Multiple board types defined. Please only define the board you are using (e.g. ARDUINO_UNO_R4 or ESP32)."
+#endif
+#endif
+
+#if defined(ESP32)
+#if defined(ARDUINO_UNO_R4) || defined(ARDUINO_R4_MINIMA)
+#error "Multiple board types defined. Please only define the board you are using (e.g. ARDUINO_UNO_R4 or ESP32)."
+#endif
+#endif
+
+#if defined(ARDUINO_R4_MINIMA)
+#if defined(ARDUINO_UNO_R4) || defined(ESP32)
+#error "Multiple board types defined. Please only define the board you are using (e.g. ARDUINO_UNO_R4 or ESP32)."
+#endif
+#endif
+
+#define FUSE_BOX_CONTROLLER
 
 /*
 * If you have an SD Card reader you can load the configuration from the Sd card at startup, or when a card is inserted.

@@ -3,7 +3,6 @@
 
 #include "Local.h"
 #include "SmartFuseBoxApp.h"
-#include "SmartFuseBoxConstants.h"
 #include "SystemFunctions.h"
 
 #include "WaterSensorHandler.h"
