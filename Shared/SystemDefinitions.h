@@ -20,6 +20,7 @@ constexpr char SystemGetDateTime[] = "F7";
 constexpr char SystemSdCardPresent[] = "F8";
 constexpr char SystemSdCardLogFileSize[] = "F9";
 constexpr char SystemRtcDiagnostic[] = "F10";
+constexpr char SystemUptime[] = "F11";
 
 constexpr char RelayTurnAllOff[] = "R0";
 constexpr char RelayTurnAllOn[] = "R1";

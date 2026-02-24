@@ -21,7 +21,7 @@ const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
     static const char* cmds[] = { 
         SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
         SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
-        SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic
+        SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime
     };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
@@ -220,6 +220,14 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         }
 #endif
     }
+    else if (strcmp(command, SystemUptime) == 0)
+    {
+        StringKeyValue param;
+        strncpy(param.key, ValueParamName, sizeof(param.key));
+        TimeParts tp = SystemFunctions::msToTimeParts(SystemFunctions::millis64());
+        SystemFunctions::formatTimeParts(param.value, sizeof(param.value), tp);
+        sendAckOk(sender, command, &param);
+        }
     else
     {
         sendAckErr(sender, command, F("Unknown system command"));

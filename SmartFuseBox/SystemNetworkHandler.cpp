@@ -9,6 +9,8 @@
 #include "MicroSdDriver.h"
 #endif
 
+constexpr uint8_t UptimeBufferLength = 15;
+
 SystemNetworkHandler::SystemNetworkHandler(WifiController* wifiController)
 	: _wifiController(wifiController),
       _sdCardLogger(nullptr)
@@ -69,9 +71,14 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		logSize = _sdCardLogger->getCurrentLogFileSize();
 	}
 
+	char uptime[UptimeBufferLength];
+	TimeParts timeParts = SystemFunctions::msToTimeParts(SystemFunctions::millis64());
+	SystemFunctions::formatTimeParts(uptime, UptimeBufferLength, timeParts);
+
+
 	snprintf(buffer, size,
 		"\"system\":{\"mem\":%d,\"cpu\":%d,\"bluetooth\":%d,\"wifi\":%d,\"rssi\":%d,\"time\":\"%s\","
-		"\"sd\":{\"present\":%d,\"log\":%lu}}",
+		"\"sd\":{\"present\":%d,\"log\":%lu},\"Uptime\":\"%s\"}",
 		SystemFunctions::freeMemory(),
 		SystemCpuMonitor::getCpuUsage(),
 		bluetoothEnabled,
@@ -79,7 +86,8 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		rssi,
 		dateTimeStr,
 		sdPresent,
-		(unsigned long)logSize);
+		(unsigned long)logSize,
+		uptime);
 }
 
 void SystemNetworkHandler::formatWifiStatusJson(WiFiClient* client)
