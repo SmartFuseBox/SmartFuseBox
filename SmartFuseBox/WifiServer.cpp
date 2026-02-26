@@ -6,7 +6,7 @@ constexpr char response400[] = "\"error\":\"Bad Request\",\"message\":\"The requ
 constexpr char response404[] = "\"error\":\"Not Found\",\"message\":\"The requested resource was not found\"";
 
 WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
-	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
+	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount, IWifiRadio* radio)
 	:   SingleLoggerSupport(commandMgrComputer), 
 		_messageBus(messageBus),
 		_serverActive(false),
@@ -24,7 +24,8 @@ WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrC
 		_connectionStartTime(0),
 		_consecutiveFailures(0),
 		_lastRSSI(0),
-		_lastRSSICheck(0)
+		_lastRSSICheck(0),
+		_radio(radio)
 {
 	_ssid[0] = '\0';
 	_password[0] = '\0';
@@ -104,16 +105,7 @@ bool WifiServer::begin()
 		}
 
 		IPAddress subnet(255, 255, 255, 0);
-		WiFi.config(apIp, apIp, subnet);
-
-		if (strlen(_password) > 0)
-		{
-			success = WiFi.beginAP(_ssid, _password);
-		}
-		else
-		{
-			success = WiFi.beginAP(_ssid);
-		}
+		success = _radio->beginAP(_ssid, _password, apIp, subnet);
 		
 		if (success)
 		{
@@ -131,7 +123,7 @@ bool WifiServer::begin()
 	{
 		sendDebug(F("Starting WiFi client connection"), F("WifiServer"));
 		
-		WiFi.begin(_ssid, _password);
+		_radio->beginClient(_ssid, _password);
 		_connectionState = WifiConnectionState::Connecting;
 		_connectionStartTime = millis();
 		_lastConnectionAttempt = _connectionStartTime;
@@ -146,7 +138,7 @@ bool WifiServer::begin()
 
 void WifiServer::startServer()
 {
-	if (WiFi.status() == WL_NO_MODULE)
+	if (!_radio->hasModule())
 	{
 		sendError(F("WiFi module not detected"), F("WifiServer"));
 		_connectionState = WifiConnectionState::Failed;
@@ -167,7 +159,7 @@ void WifiServer::stopServer()
 {
 	if (_serverActive)
 	{
-		_server.end();
+		_radio.end();
 		_serverActive = false;
 		sendDebug(F("HTTP server stopped"), F("WifiServer"));
 	}
@@ -301,7 +293,7 @@ void WifiServer::updateClientHandling()
 	unsigned long now = millis();
 
 	// Process all active clients
-	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	{
 		if (_activeClients[i].state != ClientHandlingState::Idle)
 		{
@@ -799,7 +791,7 @@ int WifiServer::getSignalStrength() const
 		return 0;
 	}
 	
-	return WiFi.RSSI();
+	return _radio->rssi();
 }
 
 bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const char* path)
@@ -963,7 +955,7 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 
 void WifiServer::updateClientConnection()
 {
-	wl_status_t status = static_cast<wl_status_t>(WiFi.status());
+	int status = _radio->status();
 	unsigned long now = millis();
 	
 	switch (_connectionState)
@@ -978,8 +970,8 @@ void WifiServer::updateClientConnection()
 				{
 					_connectionState = WifiConnectionState::Connected;
 					_consecutiveFailures = 0;
-					_lastRSSI = WiFi.RSSI();
-					IPAddress ip = WiFi.localIP();
+					_lastRSSI = _radio->rssi();
+					IPAddress ip = _radio->localIP();
 					snprintf(_ipAddress, sizeof(_ipAddress), "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
 					sendDebug(F("WiFi connected!"), F("WifiServer"));
@@ -1012,7 +1004,7 @@ void WifiServer::updateClientConnection()
 			if (SystemFunctions::hasElapsed(now, _lastRSSICheck, RSSICheckIntervalMs))
 			{
 				_lastRSSICheck = now;
-				_lastRSSI = WiFi.RSSI();
+				_lastRSSI = _radio->rssi();
 				
 				if (_lastRSSI < WeakSignalWarningRSSI)
 				{
@@ -1053,10 +1045,9 @@ void WifiServer::updateClientConnection()
 				}
 				
 				// Ensure clean state before reconnection
-				WiFi.disconnect();
-				delay(100);  // Brief delay for hardware reset
-				
-				WiFi.begin(_ssid, _password);
+				_radio->disconnect();
+				delay(100);
+				_radio->beginClient(_ssid, _password);
 				_connectionState = WifiConnectionState::Connecting;
 				_connectionStartTime = now;
 				_lastConnectionAttempt = now;

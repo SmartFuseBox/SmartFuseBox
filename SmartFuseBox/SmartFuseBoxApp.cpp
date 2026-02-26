@@ -28,8 +28,12 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
       _warningCommandHandler(&_broadcastManager, &_warningManager),
       _ackHandler(&_broadcastManager, &_warningManager),
       _systemCommandHandler(&_broadcastManager, &_warningManager),
-      _bluetoothController(&_systemCommandHandler, &_sensorCommandHandler, &_relayController, &_warningManager, commandMgrComputer),
-      _wifiController(&_messageBus, commandMgrComputer, &_warningManager),
+
+#if defined(BLUETOOTH_SUPPORT)
+    _bluetoothController(&_systemCommandHandler, &_sensorCommandHandler, &_relayController, &_warningManager, commandMgrComputer),
+#endif
+
+    _wifiController(&_messageBus, commandMgrComputer, &_warningManager),
       _configController(&_soundController, &_bluetoothController, &_wifiController, &_relayController),
       _configSyncManager(commandMgrComputer, commandMgrLink, &_configController, &_warningManager),
       _configHandler(&_wifiController, &_configController),
@@ -132,7 +136,10 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     Config* config = ConfigManager::getConfigPtr();
 
     configureWifiSupport(config);
+
+#if defined(BLUETOOTH_SUPPORT)
     configureBluetoothSupport(config);
+#endif
 
 #if defined(MQTT_SUPPORT)
 
@@ -215,9 +222,11 @@ void SmartFuseBoxApp::loop()
     }
     SystemCpuMonitor::endTask();
 
+#if defined(BLUETOOTH_SUPPORT)
     SystemCpuMonitor::startTask();
     _bluetoothController.loop();
     SystemCpuMonitor::endTask();
+#endif
 
     SystemCpuMonitor::startTask();
     _wifiController.update(now);
@@ -287,11 +296,13 @@ void SmartFuseBoxApp::configureWifiSupport(Config* config)
     _systemCommandHandler.setWifiController(&_wifiController);
 }
 
+#if defined(BLUETOOTH_SUPPORT)
 void SmartFuseBoxApp::configureBluetoothSupport(Config* config)
 {
     // bluetooth
     _bluetoothController.applyConfig(config);
 }
+#endif
 
 #if defined(CARD_CONFIG_LOADER)
 void SmartFuseBoxApp::onSdCardReadyCallback(bool isNewCard)

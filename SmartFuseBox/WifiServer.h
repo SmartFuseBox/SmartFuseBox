@@ -1,6 +1,7 @@
 #pragma once
 
-#include <WiFiS3.h>
+#include "WifiRadioBridge.h"
+#include "IWifiRadio.h"
 #include "LoggingSupport.h"
 #include "SystemDefinitions.h"
 #include "INetworkCommandHandler.h"
@@ -43,6 +44,7 @@ private:
 	unsigned long _connectionStartTime;
 	uint8_t _consecutiveFailures;
 	int8_t _lastRSSI;
+	IWifiRadio* _radio;
 	static constexpr unsigned long ConnectionRetryIntervalMs = 10000;
 	static constexpr unsigned long ConnectionTimeoutMs = 10000;
 	static constexpr unsigned long ConnectionCheckIntervalMs = 500;
@@ -86,9 +88,11 @@ private:
 	bool isStaticAssetRequest(const char* path);
 	
 public:
-	WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
+	WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer,
+		WarningManager* warningManager, uint16_t port,
 		INetworkCommandHandler** handlers, uint8_t handlerCount,
-		NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
+		NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount,
+		IWifiRadio* radio);
 	~WifiServer();
 	
 	// Configuration methods

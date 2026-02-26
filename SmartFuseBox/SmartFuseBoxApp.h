@@ -19,7 +19,10 @@
 #include "SystemCommandHandler.h"
 #include "ConfigCommandHandler.h"
 
+#if defined(BLUETOOTH_SUPPORT)
 #include "BluetoothController.h"
+#endif
+
 #include "WifiController.h"
 #include "ConfigController.h"
 #include "ConfigSyncManager.h"
@@ -74,7 +77,10 @@ private:
     AckCommandHandler _ackHandler;
     SystemCommandHandler _systemCommandHandler;
 
+#if defined(BLUETOOTH_SUPPORT)
     BluetoothController _bluetoothController;
+#endif
+
     WifiController _wifiController;
     ConfigController _configController;
     ConfigSyncManager _configSyncManager;
@@ -112,7 +118,10 @@ private:
 #endif
 
     void configureWifiSupport(Config* config);
+
+#if defined(BLUETOOTH_SUPPORT)
     void configureBluetoothSupport(Config* config);
+#endif
 
 public:
     SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
@@ -128,7 +137,11 @@ public:
     WarningManager* warningManager() { return &_warningManager; }
     SensorCommandHandler* sensorCommandHandler() { return &_sensorCommandHandler; }
     WifiController* wifiController() { return &_wifiController; }
+
+#if defined(BLUETOOTH_SUPPORT)
     BluetoothController* bluetoothController() { return &_bluetoothController; }
+#endif
+
     SdCardLogger* sdCardLogger() { return &_sdCardLogger; }
 };
 

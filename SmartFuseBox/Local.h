@@ -24,9 +24,19 @@
 
 
 /*
-* Type of board you are using. This is used to conditionally compile features based on the board capabilities. For example, 
-* if you are using an Arduino Uno R4 or ESP32 that supports wifi, you can define ARDUINO_UNO_R4 to enable Bluetooth and WiFi support.
-*/
+ * Board selection. Exactly one of the defines below must be active (no trailing underscore).
+ *
+ * NAMING CONVENTION used throughout Local.h:
+ *   A define WITH a trailing underscore (e.g. `ARDUINO_R4_MINIMA_`) is INACTIVE.
+ *   Remove the trailing underscore to activate it (e.g. `ARDUINO_R4_MINIMA`).
+ *   This lets you keep all options visible without deleting them.
+ *
+ * ARDUINO_UNO_R4  – Arduino Uno R4 WiFi (u-blox NINA / ESP32-S3 radio module, BLE + WiFi).
+ * ARDUINO_R4_MINIMA – Arduino Uno R4 Minima (no radio; disables WIFI_SUPPORT / BLUETOOTH_SUPPORT).
+ * ESP32_NODE_32   – ESP32 NodeMCU-32 or compatible (WiFi + BLE via built-in radio).
+ *
+ * Sanity-check #error directives later in this file will catch multiple active selections.
+ */
 #define ARDUINO_UNO_R4
 #define ARDUINO_R4_MINIMA_
 #define ESP32_NODE_32_
@@ -44,14 +54,11 @@
 #define WIFI_SUPPORT
 
 /*
-* If you have an SD Card reader you can load the configuration from the Sd card at startup, or when a card is inserted. 
-* Please note this is not working correctly just yet, so it's disabled by default. If you enable it, 
-* the system will look for a file named `config.txt` on the SD card and attempt to load configuration from it. 
-* This allows you to update settings without needing to reprogram the device, which can be useful for users who
-* are not comfortable with flashing firmware. If you enable this, make sure to also connect the SD card reader to the correct 
-* SPI pins defined in Local.h.
-*/
-#define CARD_CONFIG_LOADER_
+ * SD card config loader. Remove the trailing underscore to enable.
+ * When enabled the system reads `config.txt` from the SD card at boot (and on card-insert)
+ * so settings can be changed without reflashing. Requires SD card SPI pins wired correctly
+ * (see SdCard* constants below). This feature is experimental and disabled by default.
+ */#define CARD_CONFIG_LOADER_
 
 #if defined(WIFI_SUPPORT)
 
@@ -100,19 +107,39 @@ constexpr uint8_t Relay3 = D5;
 constexpr uint8_t Relay2 = D6;
 constexpr uint8_t Relay1 = D7;
 
-// Analog pins used as digital (A2–A5 → 16–19)
+/* Relay pins mapped to analog-header pins used in digital mode.
+*  On Arduino Uno R4 / R4 Minima, A2–A5 are exposed as integer indices 16–19.
+*  If you are using a different board, replace these with the correct digital pin numbers.
+* */
 constexpr uint8_t Relay8 = 16;
 constexpr uint8_t Relay7 = 17;
 constexpr uint8_t Relay6 = 18;
 constexpr uint8_t Relay5 = 19;
 
 // Relay pin mapping. Must contain exactly ConfigRelayCount entries.
+// Array index 0 is relay 1, index 1 is relay 2, and so on — the command layer
+// uses this order when addressing relays by number. Keep Relay1 first.
 constexpr uint8_t Relays[ConfigRelayCount] = { Relay1, Relay2, Relay3, Relay4, Relay5, Relay6, Relay7, Relay8 };
 
-
 /*
-* Sanity check only one board selected
-*/
+ * Bluetooth BLE support. Remove the trailing underscore to enable.
+ *
+ * Only available on boards with a BLE radio (e.g. Arduino Uno R4 WiFi, ESP32).
+ * NOTE: On Arduino Uno R4 WiFi, BLUETOOTH_SUPPORT and WIFI_SUPPORT are mutually exclusive —
+ * the ANNA-B112 (BLE) and ESP32-S3 (WiFi) modules share the same RF path and cannot
+ * run simultaneously. The #error guard below will catch this if both are active.
+ */
+#define BLUETOOTH_SUPPORT_
+
+
+#if defined(ARDUINO_UNO_R4) && defined(WIFI_SUPPORT) && defined(BLUETOOTH_SUPPORT)
+#error "WIFI_SUPPORT and BLUETOOTH_SUPPORT cannot both be enabled on Arduino Uno R4. Disable one in Local.h."
+#endif
+
+// Normalise ESP32_NODE_32 board selection: the ESP32 Arduino core defines the
+// symbol `ESP32` internally, but only when compiled with that toolchain. If a
+// developer activates ESP32_NODE_32 here without the matching toolchain, this
+// block ensures the broader `ESP32` guard used elsewhere in the codebase is set.
 #if defined(ESP32_NODE_32) && !defined(ESP32)
 #define ESP32
 #endif

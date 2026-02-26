@@ -11,7 +11,10 @@ constexpr uint8_t ImageButtonColorYellow = 7;
 
 
 ConfigController::ConfigController(SoundController* soundController,
-	BluetoothController* bluetoothController, WifiController* wifiController,
+#if defined(BLUETOOTH_SUPPORT)
+	BluetoothController* bluetoothController, 
+#endif
+	WifiController* wifiController,
 	RelayController* relayController)
 	: _soundController(soundController),
 	  _bluetoothController(bluetoothController),
@@ -171,6 +174,7 @@ ConfigResult ConfigController::setsoundDelayStart(const uint16_t delayMilliSecon
 	return ConfigResult::Success;
 }
 
+#if defined(BLUETOOTH_SUPPORT)
 ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 {
 	if (_config == nullptr)
@@ -191,6 +195,7 @@ ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 
 	return ConfigResult::Success;
 }
+#endif
 
 ConfigResult ConfigController::setWifiEnabled(const bool enabled)
 {

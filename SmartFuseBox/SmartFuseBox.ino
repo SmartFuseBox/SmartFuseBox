@@ -12,10 +12,17 @@
 
 #include "RemoteSensor.h"
 
+// BaseSensor.h is required here because the localSensors[] array below is typed
+// as BaseSensorHandler*. When MQTT_SUPPORT is active, RemoteSensor inherits from
+// a different base that is not pulled in by the sensor-specific headers above.
 #if defined(MQTT_SUPPORT)
 #include "BaseSensor.h"
 #endif
 
+// Hardware UART selection. Change these two defines if your board routes its
+// serial ports differently (e.g. swap Serial1 for Serial2 on a Mega-class board).
+// COMPUTER_SERIAL – connected to the host PC / debug monitor.
+// LINK_SERIAL     – connected to a secondary controller or companion board.
 #define COMPUTER_SERIAL Serial
 #define LINK_SERIAL Serial1
 
@@ -64,7 +71,9 @@ RemoteSensor* remoteSensors[] = {
 constexpr uint8_t remoteSensorCount = sizeof(remoteSensors) / sizeof(remoteSensors[0]);
 
 
-// sensor manager include all internal and remote sensors
+// All sensors polled by the main loop — both board-local and remote.
+// Note: gpsLatLonSensor appears in remoteSensors[] (for the remote-sync pipeline)
+// AND here (so it is also ticked by the local poll loop for status reporting).
 BaseSensorHandler* localSensors[] = {
 	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler, &gpsLatLonSensor
 };
@@ -89,12 +98,18 @@ void loop()
 	app.loop();
 }
 
+// Called when a command arrives on COMPUTER_SERIAL that no registered handler
+// claimed. Reports the unrecognised message back to the sender as an error and
+// resets the serial buffer to discard any partial frame that may follow.
 void onComputerCommandReceived(SerialCommandManager* mgr)
 {
 	commandMgrComputer.sendError(mgr->getRawMessage(), F("STATCMD"));
 	SystemFunctions::resetSerial(COMPUTER_SERIAL);
 }
 
+// Called when a command arrives on LINK_SERIAL that no registered handler
+// claimed. Forwards the error notification to the computer-side monitor
+// (not the link serial) so the host can log it, then resets the link buffer.
 void onLinkCommandReceived(SerialCommandManager* mgr)
 {
 	commandMgrComputer.sendError(mgr->getRawMessage(), F("STATLNK"));

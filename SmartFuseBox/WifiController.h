@@ -5,6 +5,7 @@
 
 #include "INetworkCommandHandler.h"
 #include "WifiServer.h"
+#include "WifiRadioBridge.h"
 #include "Config.h"
 #include "WarningManager.h"
 #include "MessageBus.h"
@@ -70,7 +71,8 @@ private:
             return true; // Already enabled
         }
 
-        _wifiServer = new WifiServer(_messageBus, _commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
+        _wifiServer = new WifiServer(_messageBus, _commandMgrComputer, _warningManager,
+            _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount, &_radio);
 
         if (_wifiServer == nullptr)
         {
@@ -223,4 +225,5 @@ public:
         _jsonVisitors = jsonVisitors;
     }
 
+	PlatformWifiRadio _radio;
 };

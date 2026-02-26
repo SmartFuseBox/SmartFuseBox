@@ -205,6 +205,9 @@
     <ClCompile Include="SmartFuseBoxApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
@@ -399,17 +402,24 @@
     <ClInclude Include="RemoteSensor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WifiRadioBridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Esp32WifiRadio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="R4WifiRadio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IWifiRadio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="C20-C27_IMPLEMENTATION.md" />
-    <None Include="SD_CARD_CALLBACK_IMPLEMENTATION.md" />
-    <None Include="MQTT_IMPLEMENTATION.md" />
-    <None Include="MQTT_PHASE1_SUMMARY.md" />
-    <None Include="MQTT_PHASE2_SUMMARY.md" />
-    <None Include="MQTT_INTEGRATION_GUIDE.md" />
-    <None Include="MQTT_README.md" />
-    <None Include="MQTT_INTEGRATION_COMPLETE.md" />
-    <None Include="MQTT_QUICK_REFERENCE.md" />
     <None Include="Wifi.md" />
+    <None Include="Docs\Sensors.md" />
   </ItemGroup>
 </Project>

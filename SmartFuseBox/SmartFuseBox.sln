@@ -12,14 +12,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SymLinks", "SymLinks", "{6B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{B2F18220-A117-4398-ABED-D0C31F1F5844}"
 	ProjectSection(SolutionItems) = preProject
+		..\Docs\BluetoothBle.md = ..\Docs\BluetoothBle.md
 		..\BOM.md = ..\BOM.md
 		..\Commands.md = ..\Commands.md
-		..\CONFIG_SYNC_DIAGRAM.md = ..\CONFIG_SYNC_DIAGRAM.md
-		..\CONFIG_SYNC_README.md = ..\CONFIG_SYNC_README.md
+		..\Docs\DateTime.md = ..\Docs\DateTime.md
 		..\ExternalUpdatePattern.md = ..\ExternalUpdatePattern.md
+		..\Docs\LedManager.md = ..\Docs\LedManager.md
 		..\LICENSE = ..\LICENSE
+		..\Docs\Local.md = ..\Docs\Local.md
+		..\Docs\MessageBus.md = ..\Docs\MessageBus.md
 		..\README.md = ..\README.md
+		..\Docs\RestApi.md = ..\Docs\RestApi.md
+		..\Docs\Sensors.md = ..\Docs\Sensors.md
 		..\SETUP.md = ..\SETUP.md
+		..\Docs\Warnings.md = ..\Docs\Warnings.md
 		..\Wifi.md = ..\Wifi.md
 	EndProjectSection
 EndProject
