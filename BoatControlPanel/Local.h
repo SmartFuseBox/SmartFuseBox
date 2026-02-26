@@ -4,3 +4,4 @@
 //#define ARDUINO_R4_MINIMA
 
 
+constexpr uint8_t ConfigRelayCount = 8;

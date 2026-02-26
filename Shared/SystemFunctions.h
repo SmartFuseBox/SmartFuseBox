@@ -2,6 +2,15 @@
 #include <Arduino.h>
 
 
+struct TimeParts
+{
+    uint32_t days;
+    uint8_t  hours;
+    uint8_t  minutes;
+    uint8_t  seconds;
+    uint16_t milliseconds;
+};
+
 class SystemFunctions {
 public:
 	/**
@@ -211,6 +220,12 @@ public:
     static void wrapTextAtWordBoundary(const char* input, char* output, size_t outputSize, size_t maxLineLength);
 
 	static bool progmemToBuffer(const char* progmemStr, char* buffer, size_t bufferSize);
+
+	static TimeParts msToTimeParts(uint64_t ms);
+
+    static uint64_t millis64();
+
+    static void formatTimeParts(char* buffer, uint8_t bufferSize, const TimeParts& timeparts);
 private:
     // Helper: Append a single string to buffer
     static size_t appendString(char* dest, size_t destSize, size_t offset, const char* src);

@@ -3,7 +3,6 @@
 
 #include "Local.h"
 #include "SmartFuseBoxApp.h"
-#include "SmartFuseBoxConstants.h"
 #include "SystemFunctions.h"
 
 #include "WaterSensorHandler.h"
@@ -11,10 +10,20 @@
 #include "LightSensorHandler.h"
 #include "SystemSensorHandler.h"
 
+#include "RemoteSensor.h"
+
+#if defined(MQTT_SUPPORT)
+#include "BaseSensor.h"
+#endif
+
 #define COMPUTER_SERIAL Serial
 #define LINK_SERIAL Serial1
 
 // forward declares
+void onComputerCommandReceived(SerialCommandManager* mgr);
+void onLinkCommandReceived(SerialCommandManager* mgr);
+
+
 // Consumer note:
 // - `commandMgrComputer` and `commandMgrLink` are local to your .ino so you can
 //   select the hardware Serial instances (Serial, Serial1, etc.) and baud rates
@@ -25,9 +34,6 @@
 //   accessors from `app` (e.g. `app.messageBus()`, `app.broadcastManager()`,
 //   `app.sensorCommandHandler()`). Finally call `app.setup(...)` with your
 //   sensor arrays from `setup()` and call `app.loop()` from `loop()`.
-void onComputerCommandReceived(SerialCommandManager* mgr);
-void onLinkCommandReceived(SerialCommandManager* mgr);
-
 
 SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
 SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', ':', ';', '=', 500, 64);
@@ -40,17 +46,29 @@ Dht11SensorHandler dht11SensorHandler(app.messageBus(), app.broadcastManager(), 
 LightSensorHandler lightSensorHandler(app.messageBus(), app.broadcastManager(), app.sensorCommandHandler(), app.warningManager(), LightSensorPin, LightSensorAnalogPin);
 SystemSensorHandler systemSensorHandler(app.messageBus(), app.wifiController(), app.bluetoothController(), app.warningManager());
 
-// sensor manager
-BaseSensorHandler* sensorHandlers[] = {
-	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler
-};
-constexpr uint8_t sensorHandlerCount = sizeof(sensorHandlers) / sizeof(sensorHandlers[0]);
 
-// middleware
-BaseSensor* baseSensors[] = {
-	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler
+// Project specific remote sensors
+#if defined(MQTT_SUPPORT)
+MqttSensorChannel gpsMqttChannels[] = {
+	{ "Latitude", "latitude", nullptr, "°", false },
+	{ "Longitude", "longitude", nullptr, "°", false }
 };
-constexpr uint8_t baseSensorCount = sizeof(baseSensors) / sizeof(baseSensors[0]);
+RemoteSensor gpsLatLonSensor(SensorIdList::GpsSensor, "Gps", SensorGpsLatLong, "Gps", gpsMqttChannels, 2);
+#else
+RemoteSensor gpsLatLonSensor(SensorIdList::GpsSensor, "Gps", SensorGpsLatLong, 2);
+#endif
+
+RemoteSensor* remoteSensors[] = {
+	&gpsLatLonSensor
+};
+constexpr uint8_t remoteSensorCount = sizeof(remoteSensors) / sizeof(remoteSensors[0]);
+
+
+// sensor manager include all internal and remote sensors
+BaseSensorHandler* localSensors[] = {
+	&waterSensorHandler, &dht11SensorHandler, &lightSensorHandler, &systemSensorHandler, &gpsLatLonSensor
+};
+constexpr uint8_t sensorHandlerCount = sizeof(localSensors) / sizeof(localSensors[0]);
 
 void setup()
 {
@@ -62,7 +80,8 @@ void setup()
 	// Wire late-binding sensor dependencies
 	systemSensorHandler.setSdCardLogger(app.sdCardLogger());
 
-	app.setup(sensorHandlers, sensorHandlerCount, baseSensors, baseSensorCount);
+	// configure app
+	app.setup(localSensors, sensorHandlerCount, remoteSensors, remoteSensorCount);
 }
 
 void loop()
