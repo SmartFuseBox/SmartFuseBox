@@ -52,7 +52,7 @@
 * Wifi is only available on certain boards (e.g. Arduino Uno R4). Define WIFI_SUPPORT to enable related code, but only if your board supports it.
 */
 #if defined(ARDUINO_UNO_R4) || defined(ESP32)
-#define WIFI_SUPPORT
+#define WIFI_SUPPORT_
 #endif
 
 
@@ -84,6 +84,16 @@
 #define MQTT_SUPPORT_
 
 #endif
+
+/*
+ * Bluetooth BLE support. Remove the trailing underscore to enable.
+ *
+ * Only available on boards with a BLE radio (e.g. Arduino Uno R4 WiFi, ESP32).
+ * NOTE: On Arduino Uno R4 WiFi, BLUETOOTH_SUPPORT and WIFI_SUPPORT are mutually exclusive —
+ * the ANNA-B112 (BLE) and ESP32-S3 (WiFi) modules share the same RF path and cannot
+ * run simultaneously. The #error guard below will catch this if both are active.
+ */
+#define BLUETOOTH_SUPPORT_
 
 // Serial initialization timeout. If `waitForConnection` is true when initializing serial, the system will wait up 
 // to this many milliseconds for the serial connection to be established before proceeding with setup. This can help 
@@ -138,16 +148,6 @@ constexpr uint8_t Relay5 = 19;
 // Array index 0 is relay 1, index 1 is relay 2, and so on — the command layer
 // uses this order when addressing relays by number. Keep Relay1 first.
 constexpr uint8_t Relays[ConfigRelayCount] = { Relay1, Relay2, Relay3, Relay4, Relay5, Relay6, Relay7, Relay8 };
-
-/*
- * Bluetooth BLE support. Remove the trailing underscore to enable.
- *
- * Only available on boards with a BLE radio (e.g. Arduino Uno R4 WiFi, ESP32).
- * NOTE: On Arduino Uno R4 WiFi, BLUETOOTH_SUPPORT and WIFI_SUPPORT are mutually exclusive —
- * the ANNA-B112 (BLE) and ESP32-S3 (WiFi) modules share the same RF path and cannot
- * run simultaneously. The #error guard below will catch this if both are active.
- */
-#define BLUETOOTH_SUPPORT_
 
 
 #if defined(ARDUINO_UNO_R4) && defined(WIFI_SUPPORT) && defined(BLUETOOTH_SUPPORT)

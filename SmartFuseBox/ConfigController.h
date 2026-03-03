@@ -2,10 +2,12 @@
 
 #include "Local.h"
 #include "ConfigManager.h"
-#include "BluetoothController.h"
 #include "SoundController.h"
 #include "RelayCommandHandler.h"
-#include "WifiController.h"
+
+// Forward declarations
+class IBluetoothRadio;
+class IWifiController;
 
 enum class ConfigResult : uint8_t
 {
@@ -25,8 +27,8 @@ class ConfigController
 {
 private:
 	SoundController* _soundController;
-	BluetoothController* _bluetoothController;
-	WifiController* _wifiController;
+	IBluetoothRadio* _bluetoothRadio;
+	IWifiController* _wifiController;
 	RelayController* _relayController;
 	Config* _config;
 
@@ -34,10 +36,8 @@ private:
 public:
 
 	ConfigController(SoundController* soundController,
-#if defined(BLUETOOTH_SUPPORT)
-		BluetoothController* bluetoothController, 
-#endif
-		WifiController* wifiController,
+		IBluetoothRadio* bluetoothRadio,
+		IWifiController* wifiController,
 		RelayController* relayController);
 
 	Config* getConfigPtr();
@@ -50,11 +50,7 @@ public:
 	ConfigResult setVesselType(const uint8_t vesselType);
 	ConfigResult setSoundRelayButton(const uint8_t relayIndex);
 	ConfigResult setsoundDelayStart(const uint16_t delayMilliSeconds);
-
-#if defined(BLUETOOTH_SUPPORT)
 	ConfigResult setBluetoothEnabled(const bool enabled);
-#endif
-
 	ConfigResult setWifiEnabled(const bool enabled);
 	ConfigResult setWifiAccessMode(const uint8_t accessMode);
 	ConfigResult setWifiSsid(const char* ssid);

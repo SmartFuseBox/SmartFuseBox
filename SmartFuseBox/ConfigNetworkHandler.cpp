@@ -3,7 +3,7 @@
 #include "ConfigManager.h"
 #include "DateTimeManager.h"
 #include "SystemDefinitions.h"
-
+#include "SystemFunctions.h"
 
 ConfigNetworkHandler::ConfigNetworkHandler(ConfigController* configController, WifiController* wifiController)
 	: _configController(configController), _wifiController(wifiController)
@@ -122,7 +122,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
             result = ConfigResult::InvalidParameter;
         }
     }
-#if defined(BLUETOOTH_SUPPORT)
     else if (strcmp(command, ConfigBluetoothEnable) == 0)
     {
         // Expect "C10:v=<0|1>"
@@ -224,7 +223,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
             result = ConfigResult::InvalidParameter;
         }
     }
-#endif
     else if (strcmp(command, ConfigDefaultRelayState) == 0)
     {
         if (paramCount == 1)
@@ -512,13 +510,10 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 	client->print(static_cast<uint16_t>(config->soundStartDelayMs));
 	client->print(",");
 
-#if defined(BLUETOOTH_SUPPORT)
-
 	// Bluetooth, WiFi, SSID, Password, Port, AccessMode
 	client->print("\"bluetoothEnabled\":");
 	client->print(config->bluetoothEnabled ? "true" : "false");
 	client->print(",");
-#endif
 
 	client->print("\"wifiEnabled\":");
 	client->print(config->wifiEnabled ? "true" : "false");

@@ -1,6 +1,9 @@
 #include "ConfigController.h"
 #include "SystemDefinitions.h"
 #include "RelayController.h"
+#include "IBluetoothRadio.h"
+#include "IWifiController.h"
+#include "SystemFunctions.h"
 
 #if defined(FUSE_BOX_CONTROLLER)
 // from NextionIds.h
@@ -11,18 +14,11 @@ constexpr uint8_t ImageButtonColorYellow = 7;
 
 
 ConfigController::ConfigController(SoundController* soundController, 
-#if defined(BLUETOOTH_SUPPORT)
-	BluetoothController* bluetoothController,
-#endif
-	WifiController* wifiController,
+	IBluetoothRadio* bluetoothRadio,
+	IWifiController* wifiController,
 	RelayController* relayController)
 	: _soundController(soundController),
-#if defined(BLUETOOTH_SUPPORT)
-	_bluetoothController(bluetoothController),
-#else
-	_bluetoothController(nullptr),
-#endif
-
+	_bluetoothRadio(bluetoothRadio),
 	_wifiController(wifiController),
 	_relayController(relayController),
 	_config(nullptr)
@@ -179,7 +175,6 @@ ConfigResult ConfigController::setsoundDelayStart(const uint16_t delayMilliSecon
 	return ConfigResult::Success;
 }
 
-#if defined(BLUETOOTH_SUPPORT)
 ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 {
 	if (_config == nullptr)
@@ -190,9 +185,9 @@ ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 	// do not apply live, only on next restart, otherwise too many enabled/disable cycles will 
 	// eventually force the board to run out of memory, the only exception to this is if 
 	// it starts disabled and is being enabled now, i.e. once on it needs rebooting to turn off again
-	if (_bluetoothController && !_bluetoothController->isEnabled())
+	if (_bluetoothRadio && !_bluetoothRadio->isEnabled())
 	{
-		if (!_bluetoothController->setEnabled(enabled))
+		if (!_bluetoothRadio->setEnabled(enabled))
 		{
 			return ConfigResult::BluetoothInitFailed;
 		}
@@ -200,7 +195,6 @@ ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 
 	return ConfigResult::Success;
 }
-#endif
 
 ConfigResult ConfigController::setWifiEnabled(const bool enabled)
 {

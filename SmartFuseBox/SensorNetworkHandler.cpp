@@ -1,3 +1,4 @@
+#include "Local.h"
 #include "SensorNetworkHandler.h"
 #include "SystemDefinitions.h"
 

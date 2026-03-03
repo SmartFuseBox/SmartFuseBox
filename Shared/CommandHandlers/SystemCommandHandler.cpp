@@ -71,8 +71,6 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemCpuMonitor::getCpuUsage());
         sendAckOk(sender, command, &param);
     }
-
-#if defined(BLUETOOTH_SUPPORT)
 	else if (strcmp(command, SystemBluetoothStatus) == 0)
     {
 		Config* config = ConfigManager::getConfigPtr();
@@ -89,8 +87,6 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             sendAckOk(sender, command, &param);
         }
     }
-#endif
-
     else if (strcmp(command, SystemWifiStatus) == 0)
     {
         Config* config = ConfigManager::getConfigPtr();

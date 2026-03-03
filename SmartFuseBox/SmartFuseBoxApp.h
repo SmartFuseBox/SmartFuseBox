@@ -19,12 +19,10 @@
 #include "AckCommandHandler.h"
 #include "SystemCommandHandler.h"
 #include "ConfigCommandHandler.h"
-
-#if defined(BLUETOOTH_SUPPORT)
-#include "BluetoothController.h"
-#endif
-
+#include "BluetoothRadioBridge.h"
+#include "IBluetoothRadio.h"
 #include "WifiController.h"
+#include "IWifiController.h"
 #include "ConfigController.h"
 #include "ConfigSyncManager.h"
 #include "SensorController.h"
@@ -76,20 +74,18 @@ private:
     AckCommandHandler _ackHandler;
     SystemCommandHandler _systemCommandHandler;
 
-#if defined(BLUETOOTH_SUPPORT)
-    BluetoothController _bluetoothController;
-#endif
-
+    PlatformBluetoothRadio _bluetoothController;
     WifiController _wifiController;
-    ConfigController _configController;
-    ConfigSyncManager _configSyncManager;
-    ConfigCommandHandler _configHandler;
-
     ConfigNetworkHandler _configNetworkHandler;
     RelayNetworkHandler _relayNetworkHandler;
     SoundNetworkHandler _soundNetworkHandler;
     WarningNetworkHandler _warningNetworkHandler;
     SystemNetworkHandler _systemNetworkHandler;
+    SensorNetworkHandler* _sensorNetworkHandler;
+
+    ConfigController _configController;
+    ConfigSyncManager _configSyncManager;
+    ConfigCommandHandler _configHandler;
 
 #if defined(SD_CARD_SUPPORT)
     SdCardLogger _sdCardLogger;
@@ -97,8 +93,6 @@ private:
 
     SensorManager* _sensorManager;
     SensorController* _sensorController;
-
-    SensorNetworkHandler* _sensorNetworkHandler;
 
 #if defined(MQTT_SUPPORT)
     MQTTController _mqttController;
@@ -120,10 +114,7 @@ private:
 #endif
 
     void configureWifiSupport(Config* config);
-
-#if defined(BLUETOOTH_SUPPORT)
     void configureBluetoothSupport(Config* config);
-#endif
 
 public:
     SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
@@ -139,11 +130,15 @@ public:
     WarningManager* warningManager() { return &_warningManager; }
     SensorCommandHandler* sensorCommandHandler() { return &_sensorCommandHandler; }
 
-    WifiController* wifiController() { return &_wifiController; }
+    IWifiController* wifiController() 
+    {
+        return &_wifiController;
+    }
 
-#if defined(BLUETOOTH_SUPPORT)
-    BluetoothController* bluetoothController() { return &_bluetoothController; }
-#endif
+    IBluetoothRadio* bluetoothController()
+    {
+        return &_bluetoothController;
+    }
 
 #if defined(SD_CARD_SUPPORT)
     SdCardLogger* sdCardLogger() { return &_sdCardLogger; }

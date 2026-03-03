@@ -6,7 +6,7 @@ This document covers the Bluetooth BLE subsystem: component responsibilities, se
 
 ## Availability
 
-BLE is available on boards that define `BLUETOOTH_SUPPORT` in `Local.h`.
+BLE is available on boards that define `BLUETOOTH_SUPPORT` in `Local.h`. The compile-time guard is only required at the composition layer where the concrete `BluetoothController` is instantiated — all other code uses the platform-agnostic `IBluetoothRadio` interface.
 
 > **⚠️ Arduino Uno R4 WiFi constraint:** The ANNA-B112 (BLE) and ESP32-S3 (WiFi) modules share the same RF path. `BLUETOOTH_SUPPORT` and `WIFI_SUPPORT` **cannot both be active** on this board — a compile-time `#error` enforces this. On ESP32, both can run simultaneously.
 
@@ -15,6 +15,10 @@ BLE is available on boards that define `BLUETOOTH_SUPPORT` in `Local.h`.
 ## Architecture
 
 ```
+IBluetoothRadio (interface)
+       ↑
+       │ implements
+       │
 BluetoothController
 └── BluetoothManager
     ├── BluetoothSystemService    (system diagnostics)
@@ -22,18 +26,37 @@ BluetoothController
     └── BluetoothRelayService     (relay state + control)
 ```
 
-### `BluetoothController`
+### Interface Pattern
 
-Top-level lifecycle owner. Constructed inside `SmartFuseBoxApp` and driven by configuration.
+The Bluetooth subsystem uses a lightweight interface (`IBluetoothRadio`) to decouple higher-level application code from platform-specific BLE driver code. This pattern:
+
+- **Minimizes preprocessor usage** — `#if defined(BLUETOOTH_SUPPORT)` is only required where the concrete `BluetoothController` is constructed (`SmartFuseBoxApp`).
+- **Enables runtime control** — higher-level controllers (`ConfigController`, `SystemSensorHandler`, etc.) accept nullable `IBluetoothRadio*` pointers and use runtime null-checks instead of compile-time guards.
+- **Simplifies testing** — test doubles can implement `IBluetoothRadio` without requiring Arduino/BLE libraries.
+- **Mirrors Wi-Fi pattern** — follows the same architecture as `IWifiRadio` for consistency.
+
+### `IBluetoothRadio`
+
+Platform-agnostic interface header. Always compiled; contains no Arduino or BLE-specific includes.
 
 Key methods:
 
 | Method | Description |
 |---|---|
-| `setEnabled(bool)` | Enables or disables BLE; tears down cleanly on disable |
-| `applyConfig(const Config*)` | Reads `config.bluetoothEnabled` and calls `setEnabled()` |
-| `isEnabled()` | Returns current enabled state |
-| `loop()` | Must be called from the main loop; delegates to `BluetoothManager::loop()` |
+| `bool isEnabled() const` | Returns whether the radio is currently enabled |
+| `bool setEnabled(bool)` | Enables or disables BLE; returns true on success |
+| `void applyConfig(const Config*)` | Applies runtime configuration (typically reads `config.bluetoothEnabled`) |
+| `void loop()` | Per-loop processing; must be called from main loop |
+
+### `BluetoothController`
+
+Concrete implementation of `IBluetoothRadio`. Top-level lifecycle owner that manages the ArduinoBLE stack and all services. Constructed inside `SmartFuseBoxApp` only when `BLUETOOTH_SUPPORT` is defined.
+
+**Composition:** `SmartFuseBoxApp` exposes a `bluetoothController()` accessor that returns `IBluetoothRadio*`:
+- Returns `&_bluetoothController` when `BLUETOOTH_SUPPORT` is defined.
+- Returns `nullptr` otherwise.
+
+Higher-level code always works with the interface pointer and checks for null before calling methods.
 
 On enable, `BluetoothController`:
 1. Initialises the ArduinoBLE stack (`BLE.begin()`).
@@ -139,6 +162,53 @@ Relay States notifies automatically after the change is applied so clients see t
 // #define WIFI_SUPPORT_   ← disabled
 ```
 
+### Integration in Application Code
+
+When using `IBluetoothRadio` in your components:
+
+**Header (e.g., `SystemSensorHandler.h`):**
+```cpp
+#include "IBluetoothRadio.h"
+
+class SystemSensorHandler
+{
+private:
+    IBluetoothRadio* _bluetoothController;  // nullable interface pointer
+
+public:
+    SystemSensorHandler(MessageBus* bus, 
+                       WifiController* wifi,
+                       IBluetoothRadio* bluetooth,  // accept interface
+                       WarningManager* warnings)
+        : _bluetoothController(bluetooth) {}
+
+    void updateStatus()
+    {
+        // Runtime null-check instead of #if
+        if (_bluetoothController && _bluetoothController->isEnabled())
+        {
+            // ... use bluetooth ...
+        }
+    }
+};
+```
+
+**Wiring (e.g., `SmartFuseBox.ino`):**
+```cpp
+SmartFuseBoxApp app(&commandMgrComputer, &commandMgrLink, Relays, ConfigRelayCount);
+
+// Fetch interface pointer (returns nullptr if not compiled in)
+IBluetoothRadio* bluetooth = app.bluetoothController();
+
+// Pass to components unconditionally
+SystemSensorHandler systemSensor(app.messageBus(), 
+                                app.wifiController(),
+                                bluetooth,  // nullptr if BLUETOOTH_SUPPORT not defined
+                                app.warningManager());
+```
+
+This pattern eliminates most `#if defined(BLUETOOTH_SUPPORT)` scattering while preserving compile-time control over driver inclusion and binary size.
+
 ---
 
 ## Configuration
@@ -224,6 +294,24 @@ _services[0] = _systemService;
 _services[1] = _sensorService;
 _services[2] = _relayService;
 _services[3] = _myService;   // <-- add here
+
+// In disable(), clean up:
+if (_myService)
+{
+    delete _myService;
+    _myService = nullptr;
+}
 ```
 
 `BluetoothManager` will automatically call `begin()` and `loop()` on it without any further changes.
+
+---
+
+## Design Notes
+
+- **Separation of concerns:** Platform/driver code (`BluetoothController`, ArduinoBLE headers) is compiled only when `BLUETOOTH_SUPPORT` is defined. Application logic (`ConfigController`, sensor handlers) depends only on `IBluetoothRadio` and compiles everywhere.
+- **Minimal #if usage:** The only places requiring `#if defined(BLUETOOTH_SUPPORT)` are:
+  1. `SmartFuseBoxApp.h` — around the concrete `BluetoothController` member declaration.
+  2. `SmartFuseBoxApp.cpp` — around construction and initialization of `BluetoothController`.
+  3. `SmartFuseBoxApp::bluetoothController()` — to return `nullptr` when not compiled in.
+- **Testability:** Mock implementations of `IBluetoothRadio` can be injected into components for unit testing without requiring BLE hardware or libraries.

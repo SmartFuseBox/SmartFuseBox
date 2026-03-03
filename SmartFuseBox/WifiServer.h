@@ -26,7 +26,6 @@ class WifiServer : public SingleLoggerSupport
 private:
 	MessageBus* _messageBus;
 	bool _serverActive;
-	WiFiServer _server;
 	WifiMode _mode;
 	WifiConnectionState _connectionState;
 	uint16_t _port;

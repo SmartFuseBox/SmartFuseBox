@@ -4,11 +4,8 @@
 #include "BaseSensor.h"
 #include "MessageBus.h"
 
-#include "WifiController.h"
-
-#if defined(BLUETOOTH_SUPPORT)
-#include "BluetoothController.h"
-#endif
+#include "IWifiController.h"
+#include "IBluetoothRadio.h"
 
 #include "WarningManager.h"
 #include "SystemFunctions.h"
@@ -35,11 +32,8 @@ class SystemSensorHandler : public BaseSensor
 private:
 	MessageBus* _messageBus;
 
-	WifiController* _wifiController;
-
-#if defined(BLUETOOTH_SUPPORT)
-	BluetoothController* _bluetoothController;
-#endif
+	IWifiController* _wifiController;
+	IBluetoothRadio* _bluetoothRadio;
 
 	WarningManager* _warningManager;
 
@@ -68,19 +62,12 @@ protected:
 
 public:
 	SystemSensorHandler(MessageBus* messageBus, 
-		WifiController* wifiController,
-
-#if defined(BLUETOOTH_SUPPORT)
-		BluetoothController* bluetoothController,
-#endif
+		IWifiController* wifiController,
+		IBluetoothRadio* bluetoothController,
 		WarningManager* warningManager)
 		: _messageBus(messageBus),
 		_wifiController(wifiController),
-
-#if defined(BLUETOOTH_SUPPORT)
-		_bluetoothController(bluetoothController),
-#endif
-
+		_bluetoothRadio(bluetoothController),
 		_warningManager(warningManager)
 
 #if defined(SD_CARD_SUPPORT)
@@ -155,10 +142,8 @@ public:
 				break;
 
 			case 2:
-#if defined(BLUETOOTH_SUPPORT)
 				snprintf(buffer, size, "%s",
-					(_bluetoothController && _bluetoothController->isEnabled()) ? "ON" : "OFF");
-#endif
+					(_bluetoothRadio && _bluetoothRadio->isEnabled()) ? "ON" : "OFF");
 				break;
 
 			case 3:
@@ -168,9 +153,12 @@ public:
 
 			case 4:
 			{
+#if defined(SD_CARD_SUPPORT)
 				unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
 				double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
 				snprintf(buffer, size, "%.1f", mb);
+#endif
+
 				break;
 			}
 

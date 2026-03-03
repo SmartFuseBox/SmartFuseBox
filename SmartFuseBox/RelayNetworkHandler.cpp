@@ -1,3 +1,4 @@
+#include "Local.h"
 #include "RelayNetworkHandler.h"
 
 RelayNetworkHandler::RelayNetworkHandler(RelayController* relayController)

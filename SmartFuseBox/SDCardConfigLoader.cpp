@@ -156,13 +156,11 @@ bool SdCardConfigLoader::applyConfigCommand(const char* line)
         uint16_t delay = atoi(params[0].value);
         result = _configController->setsoundDelayStart(delay);
     }
-#if defined(BLUETOOTH_SUPPORT)
     else if (strcmp(command, "C10") == 0 && paramCount >= 1)
     {
         bool enabled = (atoi(params[0].value) != 0);
         result = _configController->setBluetoothEnabled(enabled);
     }
-#endif
     else if (strcmp(command, "C11") == 0 && paramCount >= 1)
     {
         bool enabled = (atoi(params[0].value) != 0);

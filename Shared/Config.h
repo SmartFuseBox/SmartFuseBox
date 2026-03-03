@@ -114,6 +114,7 @@ struct Config {
 	int8_t timezoneOffset; // hours from UTC
 
     bool bluetoothEnabled;
+
 	bool wifiEnabled;
 	uint8_t accessMode; // 0 = AP, 1 = Client
     char apSSID[MaxSSIDLength];

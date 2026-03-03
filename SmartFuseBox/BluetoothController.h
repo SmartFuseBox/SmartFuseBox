@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 #include <ArduinoBLE.h>
+
+#include "IBluetoothRadio.h"
 #include "BluetoothManager.h"
 #include "BluetoothSystemService.h"
 #include "BluetoothSensorService.h"
@@ -13,7 +15,7 @@ class WarningManager;
 class SystemCommandHandler;
 class SensorCommandHandler;
 
-class BluetoothController
+class BluetoothController : public IBluetoothRadio
 {
 public:
     BluetoothController(SystemCommandHandler* systemHandler,
@@ -40,7 +42,7 @@ public:
         disable();
     }
 
-    bool setEnabled(bool enable)
+    bool setEnabled(bool enable) override
     {
         if (enable == _enabled)
             return true;
@@ -48,17 +50,17 @@ public:
         return enable ? enableInternal() : (disable(), true);
     }
 
-    bool isEnabled() const
+    bool isEnabled() const override
     {
         return _enabled;
     }
 
-    void applyConfig(const Config* cfg)
+    void applyConfig(const Config* cfg) override
     {
         setEnabled(cfg && cfg->bluetoothEnabled);
     }
 
-    void loop()
+    void loop() override
     {
         if (_enabled && _manager)
         {

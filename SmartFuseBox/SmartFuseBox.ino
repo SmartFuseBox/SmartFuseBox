@@ -1,3 +1,4 @@
+//#include "IBluetoothRadio.h"
 #include <Arduino.h>
 #include <SerialCommandManager.h>
 
@@ -47,22 +48,13 @@ SerialCommandManager commandMgrLink(&LINK_SERIAL, onLinkCommandReceived, '\n', '
 
 SmartFuseBoxApp app(&commandMgrComputer, &commandMgrLink, Relays, ConfigRelayCount);
 
-BluetoothController* blueToothController = nullptr;
-
-#if defined(BLUETOOTH_SUPPORT)
-blueToothController = app.bluetoothController()
-#endif
-
 // Project-specific sensors
 WaterSensorHandler waterSensorHandler(app.messageBus(), app.broadcastManager(), app.sensorCommandHandler(), WaterSensorPin, WaterSensorActivePin);
 Dht11SensorHandler dht11SensorHandler(app.messageBus(), app.broadcastManager(), app.sensorCommandHandler(), app.warningManager(), Dht11SensorPin);
 LightSensorHandler lightSensorHandler(app.messageBus(), app.broadcastManager(), app.sensorCommandHandler(), app.warningManager(), LightSensorPin, LightSensorAnalogPin);
 SystemSensorHandler systemSensorHandler(app.messageBus(), 
-app.wifiController(),
-
-#if defined(BLUETOOTH_SUPPORT)
-	blueToothController, 
-#endif
+	app.wifiController(),
+	app.bluetoothController(),
 	app.warningManager());
 
 

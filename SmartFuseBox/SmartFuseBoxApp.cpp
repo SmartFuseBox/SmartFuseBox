@@ -27,32 +27,21 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
     _warningCommandHandler(&_broadcastManager, &_warningManager),
     _ackHandler(&_broadcastManager, &_warningManager),
     _systemCommandHandler(&_broadcastManager, &_warningManager),
-
-#if defined(BLUETOOTH_SUPPORT)
     _bluetoothController(&_systemCommandHandler, &_sensorCommandHandler, &_relayController, &_warningManager, commandMgrComputer),
-#endif
-
     _wifiController(&_messageBus, commandMgrComputer, &_warningManager),
-
-#if defined(WIFI_SUPPORT) && !defined(BLUETOOTH_SUPPORT)
-    _configController(&_soundController, &_wifiController, &_relayController),
-#elif !defined(WIFI_SUPPORT) && defined(BLUETOOTH_SUPPORT)
-    _configController(&_soundController, &_bluetoothController, &_relayController),
-#elif defined(WIFI_SUPPORT) && defined(BLUETHOOTH_SUPPORT)
-    _configController(&_soundController, &_bluetoothController, &_wifiController, &_relayController),
-#elif !defined(WIFI_SUPPORT) && !defined(BLUETOOTH_SUPPORT)
-    _configController(&_soundController, &_relayController),
-#endif
+    _configController(&_soundController, 
+        &_bluetoothController,
+        &_wifiController, 
+        &_relayController),
     _configSyncManager(commandMgrComputer, commandMgrLink, &_configController, &_warningManager),
-    _configHandler(
-          &_wifiController, 
-          &_configController)
+    _configHandler(&_wifiController, &_configController)
 
       ,_configNetworkHandler(&_configController, &_wifiController)
       ,_relayNetworkHandler(&_relayController)
       ,_soundNetworkHandler(&_soundController)
       ,_warningNetworkHandler(&_warningManager)
       ,_systemNetworkHandler(&_wifiController)
+      ,_sensorNetworkHandler(nullptr)
 
 #if defined(SD_CARD_SUPPORT)
       , _sdCardLogger(&_sensorCommandHandler, &_warningManager)
@@ -60,8 +49,6 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 
       , _sensorManager(nullptr)
       , _sensorController(nullptr)
-
-      , _sensorNetworkHandler(nullptr)
 
 #if defined(MQTT_SUPPORT)
       , _mqttController(&_messageBus, ConfigManager::getConfigPtr(), commandMgrComputer)
@@ -153,10 +140,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     Config* config = ConfigManager::getConfigPtr();
 
     configureWifiSupport(config);
-
-#if defined(BLUETOOTH_SUPPORT)
     configureBluetoothSupport(config);
-#endif
 
 #if defined(MQTT_SUPPORT)
 
@@ -227,7 +211,7 @@ void SmartFuseBoxApp::loop()
     _commandMgrLink->readCommands();
     SystemCpuMonitor::endTask();
 
-#if defined(ARDUINO_UNO_R4) && defined(LED_MANAGER)
+#if defined(LED_MANAGER)
     SystemCpuMonitor::startTask();
     _ledManager.ProcessLedMatrix(now);
     SystemCpuMonitor::endTask();
@@ -244,17 +228,13 @@ void SmartFuseBoxApp::loop()
     }
     SystemCpuMonitor::endTask();
 
-#if defined(BLUETOOTH_SUPPORT)
     SystemCpuMonitor::startTask();
     _bluetoothController.loop();
     SystemCpuMonitor::endTask();
-#endif
 
-#if defined(WIFI_SUPPORT)
     SystemCpuMonitor::startTask();
     _wifiController.update(now);
     SystemCpuMonitor::endTask();
-#endif
 
     // MQTT update (non-blocking, processes 1 packet per call)
 #if defined(MQTT_SUPPORT)
@@ -322,13 +302,10 @@ void SmartFuseBoxApp::configureWifiSupport(Config* config)
     _systemCommandHandler.setWifiController(&_wifiController);
 }
 
-#if defined(BLUETOOTH_SUPPORT)
 void SmartFuseBoxApp::configureBluetoothSupport(Config* config)
 {
-    // bluetooth
     _bluetoothController.applyConfig(config);
 }
-#endif
 
 #if defined(CARD_CONFIG_LOADER)
 void SmartFuseBoxApp::onSdCardReadyCallback(bool isNewCard)
