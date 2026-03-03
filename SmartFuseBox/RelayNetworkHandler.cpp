@@ -106,7 +106,7 @@ void RelayNetworkHandler::formatStatusJson(char* buffer, size_t size)
 	snprintf(buffer + written, size - written, "]");
 }
 
-void RelayNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void RelayNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
 	char buffer[MaximumJsonResponseBufferSize];
 	buffer[0] = '\0';

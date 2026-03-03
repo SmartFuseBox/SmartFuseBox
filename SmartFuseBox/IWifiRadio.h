@@ -1,6 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
+#include "SystemDefinitions.h"
+
+class IWifiClient;
 
 class IWifiRadio
 {
@@ -19,8 +22,11 @@ public:
 
     virtual void disconnect() = 0;
     virtual void end() = 0;
-    virtual int status() = 0;
+    virtual WifiConnectionState status() = 0;
     virtual int32_t rssi() = 0;
     virtual IPAddress localIP() = 0;
     virtual bool hasModule() = 0;
+
+    virtual void beginServer(uint16_t port) = 0;
+    virtual IWifiClient* available() = 0;
 };

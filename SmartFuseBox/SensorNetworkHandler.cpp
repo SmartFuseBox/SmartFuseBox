@@ -93,7 +93,7 @@ void SensorNetworkHandler::formatStatusJson(char* buffer, size_t size)
     }
 }
 
-void SensorNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void SensorNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
     char buffer[MaximumJsonResponseBufferSize];
     buffer[0] = '\0';

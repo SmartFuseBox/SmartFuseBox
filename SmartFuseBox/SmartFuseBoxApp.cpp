@@ -34,14 +34,13 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
         &_wifiController, 
         &_relayController),
     _configSyncManager(commandMgrComputer, commandMgrLink, &_configController, &_warningManager),
-    _configHandler(&_wifiController, &_configController)
-
-      ,_configNetworkHandler(&_configController, &_wifiController)
-      ,_relayNetworkHandler(&_relayController)
-      ,_soundNetworkHandler(&_soundController)
-      ,_warningNetworkHandler(&_warningManager)
-      ,_systemNetworkHandler(&_wifiController)
-      ,_sensorNetworkHandler(nullptr)
+    _configHandler(&_wifiController, &_configController),
+    _configNetworkHandler(&_configController, &_wifiController),
+    _relayNetworkHandler(&_relayController),
+    _soundNetworkHandler(&_soundController),
+    _warningNetworkHandler(&_warningManager),
+    _systemNetworkHandler(&_wifiController),
+    _sensorNetworkHandler(nullptr)
 
 #if defined(SD_CARD_SUPPORT)
       , _sdCardLogger(&_sensorCommandHandler, &_warningManager)

@@ -2,6 +2,7 @@
 
 #include "WifiRadioBridge.h"
 #include "IWifiRadio.h"
+#include "IWifiClient.h"
 #include "LoggingSupport.h"
 #include "SystemDefinitions.h"
 #include "INetworkCommandHandler.h"
@@ -58,7 +59,7 @@ private:
 
 	struct ActiveClient
 	{
-		WiFiClient client;
+		IWifiClient* client;
 		char request[MaximumRequestSize + 1];
 		unsigned long startTime;
 		unsigned long lastActivity;
@@ -67,17 +68,17 @@ private:
 	};
 
 	ActiveClient _activeClients[MaxConcurrentClients];
-	
-	void sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent);
-	void send400(WiFiClient& client, bool isPersistent);
-	void send404(WiFiClient& client, bool isPersistent);
+
+	void sendResponse(IWifiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent);
+	void send400(IWifiClient& client, bool isPersistent);
+	void send404(IWifiClient& client, bool isPersistent);
 	void updateClientConnection();
 	void updateClientHandling();
 	void processClientRequest(uint8_t index);
 	void startServer();
 	void stopServer();
-	bool handleIndex(WiFiClient& client, bool isPersistent, const char* path);
-	bool dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent);
+	bool handleIndex(IWifiClient& client, bool isPersistent, const char* path);
+	bool dispatchToHandler(IWifiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent);
 	void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 
 	// Multi-client helper functions
@@ -85,7 +86,7 @@ private:
 	uint8_t getPersistentClientCount();
 	void cleanupClient(uint8_t index);
 	void handleClientState(uint8_t index, unsigned long now);
-	bool acceptNewClient(WiFiClient& client, unsigned long now);
+	bool acceptNewClient(IWifiClient* client, unsigned long now);
 	bool isStaticAssetRequest(const char* path);
 	
 public:

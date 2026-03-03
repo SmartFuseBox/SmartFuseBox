@@ -2,6 +2,14 @@
 // 
 // 
 
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include "BluetoothSensorService.h"
 #include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
@@ -188,8 +196,12 @@ void BluetoothSensorService::updateWaterPumpActive()
 {
     if (_charWaterPumpActive)
     {
-        bool isActive = _commandHandler->getWaterPumpActive();
-        _charWaterPumpActive->writeValue((uint8_t)(isActive ? 1 : 0));
+		bool isActive = _commandHandler->getWaterPumpActive();
+		_charWaterPumpActive->writeValue((uint8_t)(isActive ? 1 : 0));
 	}
 }
+
+#endif
+
+#endif
 

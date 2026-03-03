@@ -3,7 +3,6 @@
 #include <vector>
 #include <stdint.h>
 
-#include "Local.h"
 #include "SystemDefinitions.h"
 
 struct WarningChanged {
@@ -26,7 +25,6 @@ struct WaterLevelUpdated {
     using Callback = std::function<void(uint16_t newWaterLevel, uint16_t averageWaterLevel)>;
 };
 
-#if defined(WIFI_SUPPORT)
 struct WifiConnectionStateChanged {
     using Callback = std::function<void(WifiConnectionState status)>;
 };
@@ -38,7 +36,6 @@ struct WifiSignalStrengthChanged {
 struct WifiServerProcessingRequestChanged {
     using Callback = std::function<void(const char* method, const char* path, const char* query, bool isProcessing)>;
 };
-#endif
 
 struct RelayStatusChanged {
     using Callback = std::function<void(uint8_t status)>;
@@ -60,8 +57,6 @@ struct SystemMetricsUpdated {
     using Callback = std::function<void()>;
 };
 
-#if defined(MQTT_SUPPORT)
-
 struct MqttConnected {
 
     using Callback = std::function<void()>;
@@ -79,8 +74,6 @@ struct MqttMessageReceived {
     using Callback = std::function<void(const char* topic, const char* payload)>;
 
 };
-
-#endif
 
 class MessageBus {
 private:

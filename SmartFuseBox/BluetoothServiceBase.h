@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include <Arduino.h>
 
 /**
@@ -78,3 +82,5 @@ public:
      */
     virtual void* getBLEService() = 0;
 };
+
+#endif

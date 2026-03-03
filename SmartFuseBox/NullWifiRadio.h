@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IWifiRadio.h"
+#include "NullWifiClient.h"
 
 // Null implementation of IWifiRadio for boards without WiFi hardware.
 // All methods return safe defaults or failure states.
@@ -38,9 +39,9 @@ public:
     {
     }
 
-    int status() override
+    WifiConnectionState status() override
     {
-        return 255;
+        return WifiConnectionState::Disconnected;
     }
 
     int32_t rssi() override
@@ -56,5 +57,15 @@ public:
     bool hasModule() override
     {
         return false;
+    }
+
+    void beginServer(uint16_t port) override
+    {
+        (void)port;
+    }
+
+    IWifiClient* available() override
+    {
+        return nullptr;
     }
 };

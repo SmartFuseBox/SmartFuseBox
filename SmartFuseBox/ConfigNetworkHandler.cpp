@@ -452,7 +452,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	return CommandResult::error(static_cast<uint8_t>(result));
 }
 
-void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
+void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 {
 	Config* config = ConfigManager::getConfigPtr();
 	if (!config) {
@@ -682,7 +682,7 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 	client->print("}");
 }
 
-void ConfigNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void ConfigNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
 	formatStatusJson(client);
 }

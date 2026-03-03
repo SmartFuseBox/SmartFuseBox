@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include <Arduino.h>
 #include <SerialCommandManager.h>
 #include "BluetoothServiceBase.h"
@@ -134,3 +138,5 @@ private:
      */
     bool initializeServices();
 };
+
+#endif

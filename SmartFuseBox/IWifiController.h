@@ -1,13 +1,12 @@
 #pragma once
 
+#include "SystemDefinitions.h"
+
 // Forward declarations to avoid heavy includes
 struct Config;
 class WifiServer;
 class INetworkCommandHandler;
 class NetworkJsonVisitor;
-
-// Include only what's needed for the interface
-#include "SystemDefinitions.h"
 
 // Lightweight, platform-agnostic WiFi controller interface.
 // Keep this header free of Arduino or platform headers so it compiles everywhere.

@@ -2,12 +2,31 @@
 
 #include "IBluetoothRadio.h"
 
+class SystemCommandHandler;
+class SensorCommandHandler;
+class RelayController;
+class WarningManager;
+class SerialCommandManager;
+
 // Null implementation of IBluetoothRadio for boards without Bluetooth hardware.
 // All methods return safe defaults or failure states.
 // Allows Bluetooth subsystem code to compile and gracefully handle missing hardware at runtime.
 class NullBluetoothRadio : public IBluetoothRadio
 {
 public:
+    NullBluetoothRadio(SystemCommandHandler* systemHandler = nullptr,
+                       SensorCommandHandler* sensorHandler = nullptr,
+                       RelayController* relayController = nullptr,
+                       WarningManager* warningManager = nullptr,
+                       SerialCommandManager* commandMgrComputer = nullptr)
+    {
+        (void)systemHandler;
+        (void)sensorHandler;
+        (void)relayController;
+        (void)warningManager;
+        (void)commandMgrComputer;
+    }
+
     bool isEnabled() const override
     {
         return false;

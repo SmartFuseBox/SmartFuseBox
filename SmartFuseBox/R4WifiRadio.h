@@ -2,10 +2,28 @@
 
 #include <WiFiS3.h>
 #include "IWifiRadio.h"
+#include "R4WifiClient.h"
 
 class R4WifiRadio : public IWifiRadio
 {
+private:
+    WiFiServer _server;
+    R4WifiClient* _lastClient;
+
 public:
+    R4WifiRadio() : _server(80), _lastClient(nullptr)
+    {
+    }
+
+    ~R4WifiRadio()
+    {
+        if (_lastClient)
+        {
+            delete _lastClient;
+            _lastClient = nullptr;
+        }
+    }
+
     bool beginAP(
         const char* ssid,
         const char* password,
@@ -38,9 +56,25 @@ public:
         WiFi.end();
     }
 
-    int status() override
+    WifiConnectionState status() override
     {
-        return WiFi.status();
+        int wifiStatus = WiFi.status();
+        switch (wifiStatus)
+        {
+            case WL_CONNECTED:
+                return WifiConnectionState::Connected;
+            case WL_IDLE_STATUS:
+            case WL_SCAN_COMPLETED:
+                return WifiConnectionState::Connecting;
+            case WL_NO_SHIELD:
+            case WL_NO_MODULE:
+            case WL_CONNECT_FAILED:
+            case WL_CONNECTION_LOST:
+                return WifiConnectionState::Failed;
+            case WL_DISCONNECTED:
+            default:
+                return WifiConnectionState::Disconnected;
+        }
     }
 
     int32_t rssi() override
@@ -56,5 +90,26 @@ public:
     bool hasModule() override
     {
         return WiFi.status() != WL_NO_MODULE;
+    }
+
+    void beginServer(uint16_t port) override
+    {
+        _server = WiFiServer(port);
+        _server.begin();
+    }
+
+    IWifiClient* available() override
+    {
+        WiFiClient client = _server.available();
+        if (client)
+        {
+            if (_lastClient)
+            {
+                delete _lastClient;
+            }
+            _lastClient = new R4WifiClient(client);
+            return _lastClient;
+        }
+        return nullptr;
     }
 };

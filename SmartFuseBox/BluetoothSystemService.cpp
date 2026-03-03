@@ -1,3 +1,11 @@
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include "BluetoothSystemService.h"
 #include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
@@ -139,3 +147,7 @@ void BluetoothSystemService::sendHeartbeat()
         _charHeartbeat->writeValue(heartbeatCount);
     }
 }
+
+#endif
+
+#endif

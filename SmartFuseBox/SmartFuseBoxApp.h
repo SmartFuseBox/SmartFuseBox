@@ -76,16 +76,17 @@ private:
 
     PlatformBluetoothRadio _bluetoothController;
     WifiController _wifiController;
+
+    ConfigController _configController;
+    ConfigSyncManager _configSyncManager;
+    ConfigCommandHandler _configHandler;
+
     ConfigNetworkHandler _configNetworkHandler;
     RelayNetworkHandler _relayNetworkHandler;
     SoundNetworkHandler _soundNetworkHandler;
     WarningNetworkHandler _warningNetworkHandler;
     SystemNetworkHandler _systemNetworkHandler;
     SensorNetworkHandler* _sensorNetworkHandler;
-
-    ConfigController _configController;
-    ConfigSyncManager _configSyncManager;
-    ConfigCommandHandler _configHandler;
 
 #if defined(SD_CARD_SUPPORT)
     SdCardLogger _sdCardLogger;

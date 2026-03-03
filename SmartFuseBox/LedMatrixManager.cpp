@@ -1,5 +1,6 @@
 #include "LedMatrixManager.h"
 #include "SmartFuseBoxConstants.h"
+#include "MessageBus.h"
 
 LedMatrixManager::LedMatrixManager(MessageBus* messageBus)
 	: _messageBus(messageBus),

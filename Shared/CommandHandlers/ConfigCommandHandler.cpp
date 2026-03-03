@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "ConfigCommandHandler.h"
+#include "ConfigController.h"
 #include "ConfigSyncManager.h"
 #include "SdCardConfigLoader.h"
-#include "BluetoothController.h"
 
 #if defined(MQTT_SUPPORT)
 #include "MQTTConfigCommandHandler.h"
@@ -10,7 +10,7 @@
 
 
 ConfigCommandHandler::ConfigCommandHandler(
-    WifiController* wifiController, 
+    IWifiController* wifiController, 
     ConfigController* configController)
 	:
     _wifiController(wifiController),
@@ -128,22 +128,22 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 		// C15 WiFi Port
         snprintf(buffer, sizeof(buffer), "v=%d", config->wifiPort);
-        sender->sendCommand(ConfigWifiPort, buffer);
+		sender->sendCommand(ConfigWifiPort, buffer);
 
 		// C16 WiFi State
-        if (_wifiController && _wifiController->getServer())
-        {
-            snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int>(_wifiController->getServer()->getConnectionState()));
-            sender->sendCommand(ConfigWifiState, buffer);
-        }
+		if (_wifiController)
+		{
+			snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int>(_wifiController->getConnectionState()));
+			sender->sendCommand(ConfigWifiState, buffer);
+		}
 
 		// C17 WiFi AP IP Address
-        if (_wifiController && _wifiController->getServer())
-        {
+		if (_wifiController)
+		{
 			char ipBuffer[MaxIpAddressLength];
-            _wifiController->getServer()->getIpAddress(ipBuffer, sizeof(ipBuffer));
-            snprintf(buffer, sizeof(buffer), "v=%s", ipBuffer);
-            sender->sendCommand(ConfigWifiApIpAddress, buffer);
+			_wifiController->getIpAddress(ipBuffer, sizeof(ipBuffer));
+			snprintf(buffer, sizeof(buffer), "v=%s", ipBuffer);
+			sender->sendCommand(ConfigWifiApIpAddress, buffer);
 		}
 
 		// C18 Default relay states
@@ -414,20 +414,20 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
 	}
-    else if (strcmp(command, ConfigWifiState) == 0)
-    {
-        // C16 WiFi State
-        uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
+	else if (strcmp(command, ConfigWifiState) == 0)
+	{
+		// C16 WiFi State
+		uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
 
-        if (_wifiController)
-        {
-            state = static_cast<uint8_t>(_wifiController->getServer()->getConnectionState());
-        }
+		if (_wifiController)
+		{
+			state = static_cast<uint8_t>(_wifiController->getConnectionState());
+		}
 
-        char cmd[10];
+		char cmd[10];
 		snprintf(cmd, sizeof(cmd), "v=%d", state);
-        sender->sendCommand(ConfigWifiState, cmd);
-       result = ConfigResult::Success;
+		sender->sendCommand(ConfigWifiState, cmd);
+	   result = ConfigResult::Success;
 	}
     else if (strcmp(command, ConfigWifiApIpAddress) == 0)
     {
