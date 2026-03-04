@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(WIFI_SUPPORT)
+
 #include <WiFiS3.h>
 #include "IWifiRadio.h"
 #include "R4WifiClient.h"
@@ -8,20 +12,10 @@ class R4WifiRadio : public IWifiRadio
 {
 private:
     WiFiServer _server;
-    R4WifiClient* _lastClient;
 
 public:
-    R4WifiRadio() : _server(80), _lastClient(nullptr)
+    R4WifiRadio() : _server(80)
     {
-    }
-
-    ~R4WifiRadio()
-    {
-        if (_lastClient)
-        {
-            delete _lastClient;
-            _lastClient = nullptr;
-        }
     }
 
     bool beginAP(
@@ -98,18 +92,20 @@ public:
         _server.begin();
     }
 
+    void endServer() override
+    {
+        _server.end();
+    }
+
     IWifiClient* available() override
     {
         WiFiClient client = _server.available();
         if (client)
         {
-            if (_lastClient)
-            {
-                delete _lastClient;
-            }
-            _lastClient = new R4WifiClient(client);
-            return _lastClient;
+            return new R4WifiClient(client);
         }
         return nullptr;
     }
 };
+
+#endif

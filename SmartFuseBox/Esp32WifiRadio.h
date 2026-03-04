@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(WIFI_SUPPORT) && defined(ESP32)
+
 #include <WiFi.h>
 #include "IWifiRadio.h"
 #include "Esp32WifiClient.h"
@@ -8,20 +12,10 @@ class Esp32WifiRadio : public IWifiRadio
 {
 private:
     WiFiServer _server;
-    Esp32WifiClient* _lastClient;
 
 public:
-    Esp32WifiRadio() : _server(80), _lastClient(nullptr)
+    Esp32WifiRadio() : _server(80)
     {
-    }
-
-    ~Esp32WifiRadio()
-    {
-        if (_lastClient)
-        {
-            delete _lastClient;
-            _lastClient = nullptr;
-        }
     }
 
     bool beginAP(
@@ -100,8 +94,20 @@ public:
         _server.begin();
     }
 
-    WiFiClient available() override
+    void endServer() override
     {
-        return _server.available();
+        _server.end();
+    }
+
+    IWifiClient* available() override
+    {
+        WiFiClient client = _server.available();
+        if (client)
+        {
+            return new Esp32WifiClient(client);
+        }
+        return nullptr;
     }
 };
+
+#endif

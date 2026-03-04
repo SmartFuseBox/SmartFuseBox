@@ -64,6 +64,10 @@ public:
         (void)port;
     }
 
+    void endServer() override
+    {
+    }
+
     IWifiClient* available() override
     {
         return nullptr;

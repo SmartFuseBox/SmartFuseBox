@@ -169,7 +169,7 @@ void WifiServer::stopServer()
 {
 	if (_serverActive)
 	{
-		_radio->end();
+		_radio->endServer();
 		_serverActive = false;
 		sendDebug(F("HTTP server stopped"), F("WifiServer"));
 	}
