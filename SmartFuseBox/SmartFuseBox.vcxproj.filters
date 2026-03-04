@@ -61,6 +61,9 @@
     <Filter Include="Source Files\MQTT">
       <UniqueIdentifier>{7b0ba44e-6aba-401f-b60f-cd04a80a9099}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Abstractions">
+      <UniqueIdentifier>{5dee2cac-51d8-47ae-aa48-8d1c8c895b82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SmartFuseBox.ino" />
@@ -130,15 +133,6 @@
     <ClCompile Include="SystemNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files\SerialCommandHandlers</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigManager.cpp">
       <Filter>Source Files\SharedCode</Filter>
     </ClCompile>
@@ -203,6 +197,9 @@
       <Filter>Source Files\MQTT</Filter>
     </ClCompile>
     <ClCompile Include="SmartFuseBoxApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SensorCommandHandler.cpp">
@@ -426,9 +423,6 @@
     <ClInclude Include="R4WifiRadio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IWifiRadio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -436,12 +430,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IBluetoothRadio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IWifiController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NullWifiRadio.h">
@@ -451,9 +439,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BluetoothRadioBridge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IWifiClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="R4WifiClient.h">
@@ -467,6 +452,21 @@
     </ClInclude>
     <ClInclude Include="Dht11SensorHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dht11SensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IWifiRadio.h">
+      <Filter>Header Files\Abstractions</Filter>
+    </ClInclude>
+    <ClInclude Include="IWifiController.h">
+      <Filter>Header Files\Abstractions</Filter>
+    </ClInclude>
+    <ClInclude Include="IWifiClient.h">
+      <Filter>Header Files\Abstractions</Filter>
+    </ClInclude>
+    <ClInclude Include="IBluetoothRadio.h">
+      <Filter>Header Files\Abstractions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
