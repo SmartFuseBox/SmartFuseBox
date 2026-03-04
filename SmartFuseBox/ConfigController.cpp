@@ -1,8 +1,11 @@
 #include "ConfigController.h"
 #include "SystemDefinitions.h"
 #include "RelayController.h"
+#include "IBluetoothRadio.h"
+#include "IWifiController.h"
+#include "SystemFunctions.h"
 
-#if defined(ARDUINO_UNO_R4)
+#if defined(FUSE_BOX_CONTROLLER)
 // from NextionIds.h
 constexpr uint8_t ImageButtonColorBlue = 2;
 constexpr uint8_t ImageButtonColorYellow = 7;
@@ -10,14 +13,15 @@ constexpr uint8_t ImageButtonColorYellow = 7;
 #endif
 
 
-ConfigController::ConfigController(SoundController* soundController,
-	BluetoothController* bluetoothController, WifiController* wifiController,
+ConfigController::ConfigController(SoundController* soundController, 
+	IBluetoothRadio* bluetoothRadio,
+	IWifiController* wifiController,
 	RelayController* relayController)
 	: _soundController(soundController),
-	  _bluetoothController(bluetoothController),
-	  _wifiController(wifiController),
-	  _relayController(relayController),
-	  _config(nullptr)
+	_bluetoothRadio(bluetoothRadio),
+	_wifiController(wifiController),
+	_relayController(relayController),
+	_config(nullptr)
 {
 	_config = ConfigManager::getConfigPtr();
 }
@@ -181,9 +185,9 @@ ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 	// do not apply live, only on next restart, otherwise too many enabled/disable cycles will 
 	// eventually force the board to run out of memory, the only exception to this is if 
 	// it starts disabled and is being enabled now, i.e. once on it needs rebooting to turn off again
-	if (_bluetoothController && !_bluetoothController->isEnabled())
+	if (_bluetoothRadio && !_bluetoothRadio->isEnabled())
 	{
-		if (!_bluetoothController->setEnabled(enabled))
+		if (!_bluetoothRadio->setEnabled(enabled))
 		{
 			return ConfigResult::BluetoothInitFailed;
 		}

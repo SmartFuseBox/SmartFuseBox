@@ -2,6 +2,7 @@
 #include <functional>
 #include <vector>
 #include <stdint.h>
+
 #include "SystemDefinitions.h"
 
 struct WarningChanged {
@@ -32,12 +33,12 @@ struct WifiSignalStrengthChanged {
     using Callback = std::function<void(uint16_t strength)>;
 };
 
-struct RelayStatusChanged {
-    using Callback = std::function<void(uint8_t status)>;
-};
-
 struct WifiServerProcessingRequestChanged {
     using Callback = std::function<void(const char* method, const char* path, const char* query, bool isProcessing)>;
+};
+
+struct RelayStatusChanged {
+    using Callback = std::function<void(uint8_t status)>;
 };
 
 struct GpsLocationUpdated {
@@ -56,8 +57,6 @@ struct SystemMetricsUpdated {
     using Callback = std::function<void()>;
 };
 
-#if defined(MQTT_SUPPORT)
-
 struct MqttConnected {
 
     using Callback = std::function<void()>;
@@ -75,8 +74,6 @@ struct MqttMessageReceived {
     using Callback = std::function<void(const char* topic, const char* payload)>;
 
 };
-
-#endif
 
 class MessageBus {
 private:

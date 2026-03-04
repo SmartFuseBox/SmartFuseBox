@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "BluetoothServiceBase.h"
@@ -47,3 +51,5 @@ private:
     void updateCpuUsage();
     void sendHeartbeat();
 };
+
+#endif

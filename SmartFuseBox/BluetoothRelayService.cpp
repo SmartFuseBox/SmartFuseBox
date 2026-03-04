@@ -1,3 +1,7 @@
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include "BluetoothRelayService.h"
 
 BluetoothRelayService* BluetoothRelayService::_serviceInstance = nullptr;
@@ -178,3 +182,5 @@ void BluetoothRelayService::onRelaySetWritten(BLEDevice /*central*/, BLECharacte
         _serviceInstance->onWriteSet();
     }
 }
+
+#endif

@@ -1,3 +1,7 @@
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include <ArduinoBLE.h>
 #include "BluetoothManager.h"
 
@@ -205,3 +209,5 @@ bool BluetoothManager::isAdvertising()
 {
 	return _isAdvertising;
 }
+
+#endif

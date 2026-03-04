@@ -3,14 +3,17 @@
 #include <Arduino.h>
 #include <SerialCommandManager.h>
 
+#include "Local.h"
+#include "IWifiController.h"
 #include "INetworkCommandHandler.h"
 #include "WifiServer.h"
+#include "WifiRadioBridge.h"
 #include "Config.h"
 #include "WarningManager.h"
 #include "MessageBus.h"
 
 constexpr unsigned long LedUpdateIntevalMs = 300;
-class WifiController
+class WifiController : public IWifiController
 {
 private:
 	MessageBus* _messageBus;
@@ -70,7 +73,8 @@ private:
             return true; // Already enabled
         }
 
-        _wifiServer = new WifiServer(_messageBus, _commandMgrComputer, _warningManager, _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount);
+        _wifiServer = new WifiServer(_messageBus, _commandMgrComputer, _warningManager,
+            _port, _handlerObjects, _handlerCount, _jsonVisitors, _jsonVisitorCount, &_radio);
 
         if (_wifiServer == nullptr)
         {
@@ -117,7 +121,7 @@ public:
         disable();
     }
 
-    bool setEnabled(bool enable)
+    bool setEnabled(bool enable) override
     {
         if (enable == _enabled)
             return true;
@@ -125,12 +129,12 @@ public:
         return enable ? enableInternal() : (disable(), true);
     }
 
-    bool isEnabled() const
+    bool isEnabled() const override
     {
         return _enabled;
     }
 
-    void applyConfig(const Config* cfg)
+    void applyConfig(const Config* cfg) override
     {
         if (!cfg)
         {
@@ -178,22 +182,22 @@ public:
         }
     }
 
-    void update(unsigned long now)
-    {
-        if (_enabled && _wifiServer)
-        {
-            _wifiServer->update();
+	void update(unsigned long now) override
+	{
+		if (_enabled && _wifiServer)
+		{
+			_wifiServer->update();
 
-            if (now - _lastUpdateTime >= LedUpdateIntevalMs)
-            {
-                _lastUpdateTime = now;
+			if (now - _lastUpdateTime >= LedUpdateIntevalMs)
+			{
+				_lastUpdateTime = now;
 				_messageBus->publish<WifiConnectionStateChanged>(_wifiServer->getConnectionState());
 				_messageBus->publish<WifiSignalStrengthChanged>(_wifiServer->getSignalStrength());
-            }
-        }
-    }
+			}
+		}
+	}
 
-    void registerHandlers(INetworkCommandHandler** handlers, size_t handlerCount)
+	void registerHandlers(INetworkCommandHandler** handlers, size_t handlerCount) override
     {
         if (_handlerObjects)
         {
@@ -211,16 +215,43 @@ public:
         }
     }
 
-    WifiServer* getServer()
-    {
-        return _wifiServer;
-    }
+	WifiServer* getServer() override
+	{
+		return _wifiServer;
+	}
 
-    void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
-    {
-        // owned by caller so no need to clean up
-        _jsonVisitorCount = jsonVisitorCount;
-        _jsonVisitors = jsonVisitors;
-    }
+	IWifiRadio* getRadio()
+	{
+		return &_radio;
+	}
 
+	void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount) override
+	{
+		// owned by caller so no need to clean up
+		_jsonVisitorCount = jsonVisitorCount;
+		_jsonVisitors = jsonVisitors;
+	}
+
+	WifiConnectionState getConnectionState() const override
+	{
+		if (_wifiServer)
+		{
+			return _wifiServer->getConnectionState();
+		}
+		return WifiConnectionState::Disconnected;
+	}
+
+	void getIpAddress(char* buffer, size_t bufferSize) const override
+	{
+		if (_wifiServer && buffer && bufferSize > 0)
+		{
+			_wifiServer->getIpAddress(buffer, bufferSize);
+		}
+		else if (buffer && bufferSize > 0)
+		{
+			buffer[0] = '\0';
+		}
+	}
+
+	PlatformWifiRadio _radio;
 };

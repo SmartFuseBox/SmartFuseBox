@@ -1,10 +1,10 @@
 #pragma once
 
-#include <WiFiClient.h>
+#include "IWifiClient.h"
 
 class NetworkJsonVisitor
 {
 public:
-	virtual void formatWifiStatusJson(WiFiClient* client) = 0;
+	virtual void formatWifiStatusJson(IWifiClient* client) = 0;
 	virtual ~NetworkJsonVisitor() = default;
 };

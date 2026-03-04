@@ -2,6 +2,7 @@
 // 
 // 
 
+#include "Local.h"
 #include "WarningNetworkHandler.h"
 
 
@@ -48,7 +49,7 @@ void WarningNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		static_cast<unsigned int>(_warningManager->getActiveWarningsMask()));
 }
 
-void WarningNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void WarningNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
 	char buffer[MaximumJsonResponseBufferSize];
 	buffer[0] = '\0';

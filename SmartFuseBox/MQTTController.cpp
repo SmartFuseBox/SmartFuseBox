@@ -8,10 +8,11 @@
 // Static instance pointer for callbacks
 MQTTController* MQTTController::_instance = nullptr;
 
-MQTTController::MQTTController(MessageBus* messageBus, Config* config, SerialCommandManager* commandMgr)
+MQTTController::MQTTController(MessageBus* messageBus, Config* config, IWifiRadio* wifiRadio, SerialCommandManager* commandMgr)
     : _mqttClient(nullptr)
     , _messageBus(messageBus)
     , _config(config)
+    , _wifiRadio(wifiRadio)
     , _retryCount(0)
     , _lastRetryTime(0)
     , _isEnabled(false)
@@ -49,7 +50,7 @@ bool MQTTController::begin()
     // Create MQTT client
     if (_mqttClient == nullptr)
     {
-        _mqttClient = new MQTTClient();
+        _mqttClient = new MQTTClient(_wifiRadio);
     }
 
     // Configure client from config
@@ -230,11 +231,13 @@ void MQTTController::onMqttConnected(bool connected)
         _connectedSince = millis();
         _reconnectCount++;
 
+#if defined(MQTT_SUPPORT)
         // Publish to MessageBus
         if (_messageBus != nullptr)
         {
             _messageBus->publish<MqttConnected>();
         }
+#endif
     }
     else
     {
@@ -250,7 +253,9 @@ void MQTTController::onMqttConnected(bool connected)
         // Publish to MessageBus
         if (_messageBus != nullptr)
         {
+#if defined(MQTT_SUPPORT)
             _messageBus->publish<MqttDisconnected>();
+#endif
         }
     }
 }
@@ -261,7 +266,12 @@ void MQTTController::onMqttMessage(const char* topic, const char* payload, uint1
     // Publish to MessageBus for routing
     if (_messageBus != nullptr)
     {
+#if defined(MQTT_SUPPORT)
         _messageBus->publish<MqttMessageReceived>(topic, payload);
+#else
+        (void)topic;
+        (void)payload;
+#endif
     }
 }
 

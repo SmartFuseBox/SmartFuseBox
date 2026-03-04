@@ -1,8 +1,9 @@
+#include "Local.h"
 #include "ConfigNetworkHandler.h"
 #include "ConfigManager.h"
 #include "DateTimeManager.h"
 #include "SystemDefinitions.h"
-
+#include "SystemFunctions.h"
 
 ConfigNetworkHandler::ConfigNetworkHandler(ConfigController* configController, WifiController* wifiController)
 	: _configController(configController), _wifiController(wifiController)
@@ -18,6 +19,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 {
 	(void)method;
 	(void)bufferSize;
+	(void)responseBuffer;
 	ConfigResult result;
 	if (strcmp(command, ConfigSaveSettings) == 0)
 	{
@@ -120,7 +122,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
             result = ConfigResult::InvalidParameter;
         }
     }
-#if defined(ARDUINO_UNO_R4)
     else if (strcmp(command, ConfigBluetoothEnable) == 0)
     {
         // Expect "C10:v=<0|1>"
@@ -222,7 +223,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
             result = ConfigResult::InvalidParameter;
         }
     }
-#endif
     else if (strcmp(command, ConfigDefaultRelayState) == 0)
     {
         if (paramCount == 1)
@@ -452,7 +452,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	return CommandResult::error(static_cast<uint8_t>(result));
 }
 
-void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
+void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 {
 	Config* config = ConfigManager::getConfigPtr();
 	if (!config) {
@@ -510,7 +510,6 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 	client->print(static_cast<uint16_t>(config->soundStartDelayMs));
 	client->print(",");
 
-#if defined(ARDUINO_UNO_R4)
 	// Bluetooth, WiFi, SSID, Password, Port, AccessMode
 	client->print("\"bluetoothEnabled\":");
 	client->print(config->bluetoothEnabled ? "true" : "false");
@@ -555,7 +554,6 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 		client->print(config->apIpAddress);
 	}
 	client->print("\",");
-#endif
 
 	// Default relay states
 	client->print("\"defaultRelayStates\":[");
@@ -684,7 +682,7 @@ void ConfigNetworkHandler::formatStatusJson(WiFiClient* client)
 	client->print("}");
 }
 
-void ConfigNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void ConfigNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
 	formatStatusJson(client);
 }

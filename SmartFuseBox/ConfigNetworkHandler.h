@@ -14,9 +14,9 @@ public:
 
 	const char* getRoute() const override { return "/api/config"; }
 
-	void formatWifiStatusJson(WiFiClient* client) override;
+	void formatWifiStatusJson(IWifiClient* client) override;
 
-	void formatStatusJson(WiFiClient* client);
+	void formatStatusJson(IWifiClient* client);
 
 	CommandResult handleRequest(const char* method,
 		const char* cmd,

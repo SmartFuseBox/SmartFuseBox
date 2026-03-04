@@ -1,16 +1,17 @@
+#include "Local.h"
 #include "WifiServer.h"
 #include "SystemFunctions.h"
 
 
 constexpr char response400[] = "\"error\":\"Bad Request\",\"message\":\"The request will not process due to client error\"";
 constexpr char response404[] = "\"error\":\"Not Found\",\"message\":\"The requested resource was not found\"";
+constexpr uint8_t RestartDelay = 100;
 
 WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
-	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount)
+	INetworkCommandHandler** handlers, uint8_t handlerCount, NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount, IWifiRadio* radio)
 	:   SingleLoggerSupport(commandMgrComputer), 
 		_messageBus(messageBus),
 		_serverActive(false),
-		_server(port),
 		_mode(WifiMode::AccessPoint),
 		_connectionState(WifiConnectionState::Disconnected),
 		_port(port),
@@ -24,13 +25,15 @@ WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrC
 		_connectionStartTime(0),
 		_consecutiveFailures(0),
 		_lastRSSI(0),
-		_lastRSSICheck(0)
+		_lastRSSICheck(0),
+		_radio(radio)
 {
 	_ssid[0] = '\0';
 	_password[0] = '\0';
 
 	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	{
+		_activeClients[i].client = nullptr;
 		_activeClients[i].state = ClientHandlingState::Idle;
 		_activeClients[i].lastActivity = 0;
 		_activeClients[i].isPersistent = false;
@@ -42,6 +45,14 @@ WifiServer::WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrC
 
 WifiServer::~WifiServer()
 {
+	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+	{
+		if (_activeClients[i].client)
+		{
+			delete _activeClients[i].client;
+			_activeClients[i].client = nullptr;
+		}
+	}
 	end();
 }
 
@@ -104,16 +115,7 @@ bool WifiServer::begin()
 		}
 
 		IPAddress subnet(255, 255, 255, 0);
-		WiFi.config(apIp, apIp, subnet);
-
-		if (strlen(_password) > 0)
-		{
-			success = WiFi.beginAP(_ssid, _password);
-		}
-		else
-		{
-			success = WiFi.beginAP(_ssid);
-		}
+		success = _radio->beginAP(_ssid, _password, apIp, subnet);
 		
 		if (success)
 		{
@@ -131,7 +133,7 @@ bool WifiServer::begin()
 	{
 		sendDebug(F("Starting WiFi client connection"), F("WifiServer"));
 		
-		WiFi.begin(_ssid, _password);
+		_radio->beginClient(_ssid, _password);
 		_connectionState = WifiConnectionState::Connecting;
 		_connectionStartTime = millis();
 		_lastConnectionAttempt = _connectionStartTime;
@@ -146,7 +148,7 @@ bool WifiServer::begin()
 
 void WifiServer::startServer()
 {
-	if (WiFi.status() == WL_NO_MODULE)
+	if (!_radio->hasModule())
 	{
 		sendError(F("WiFi module not detected"), F("WifiServer"));
 		_connectionState = WifiConnectionState::Failed;
@@ -155,10 +157,10 @@ void WifiServer::startServer()
 
 	if (!_serverActive)
 	{
-		_server.begin();
+		_radio->beginServer(_port);
 		_serverActive = true;
 		_initialized = true;
-		
+
 		sendDebug(F("HTTP server started"), F("WifiServer"));
 	}
 }
@@ -167,7 +169,7 @@ void WifiServer::stopServer()
 {
 	if (_serverActive)
 	{
-		_server.end();
+		_radio->endServer();
 		_serverActive = false;
 		sendDebug(F("HTTP server stopped"), F("WifiServer"));
 	}
@@ -176,10 +178,10 @@ void WifiServer::stopServer()
 void WifiServer::end()
 {
 	stopServer();
-	
+
 	if (_initialized)
 	{
-		WiFi.end();
+		_radio->end();
 		_initialized = false;
 		_connectionState = WifiConnectionState::Disconnected;
 	}
@@ -237,8 +239,12 @@ void WifiServer::cleanupClient(uint8_t index)
 	snprintf(msg, sizeof(msg), "Cleanup client [slot %d]", index);
 	sendDebug(msg, F("WifiServer"));
 
-	// Stop immediately - don't flush as it can block on slow/dead connections
-	_activeClients[index].client.stop();
+	if (_activeClients[index].client)
+	{
+		_activeClients[index].client->stop();
+		delete _activeClients[index].client;
+		_activeClients[index].client = nullptr;
+	}
 	_activeClients[index].state = ClientHandlingState::Idle;
 	_activeClients[index].isPersistent = false;
 	_activeClients[index].request[0] = '\0';
@@ -274,7 +280,7 @@ bool WifiServer::isStaticAssetRequest(const char* path)
 			strcmp(ext, "ttf") == 0);
 }
 
-bool WifiServer::acceptNewClient(WiFiClient& client, unsigned long now)
+bool WifiServer::acceptNewClient(IWifiClient* client, unsigned long now)
 {
 	int8_t slot = findFreeClientSlot();
 	if (slot < 0)
@@ -301,7 +307,7 @@ void WifiServer::updateClientHandling()
 	unsigned long now = millis();
 
 	// Process all active clients
-	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
+for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	{
 		if (_activeClients[i].state != ClientHandlingState::Idle)
 		{
@@ -310,20 +316,21 @@ void WifiServer::updateClientHandling()
 	}
 
 	// Check for new client connection
-	WiFiClient newClient = _server.available();
+	IWifiClient* newClient = _radio->available();
 	if (newClient)
 	{
 		if (!acceptNewClient(newClient, now))
 		{
 			// All slots full
 			sendDebug(F("All connection slots full"), F("WifiServer"));
-			newClient.println(F("HTTP/1.1 503 Service Unavailable"));
-			newClient.println(F("Content-Type: text/plain"));
-			newClient.println(F("Connection: close"));
-			newClient.println(F("Retry-After: 5"));
-			newClient.println();
-			newClient.println(F("Server at capacity"));
-			newClient.stop();
+			newClient->println(F("HTTP/1.1 503 Service Unavailable"));
+			newClient->println(F("Content-Type: text/plain"));
+			newClient->println(F("Connection: close"));
+			newClient->println(F("Retry-After: 5"));
+			newClient->println();
+			newClient->println(F("Server at capacity"));
+			newClient->stop();
+			delete newClient;
 		}
 	}
 }
@@ -350,9 +357,9 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			bool requestComplete = false;
 			size_t requestLen = strlen(client.request);
 
-			while (client.client.available())
+			while (client.client->available())
 			{
-				char c = client.client.read();
+				char c = client.client->read();
 
 				// Append character to buffer
 				if (requestLen < MaximumRequestSize)
@@ -380,7 +387,7 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 				if (requestLen >= MaximumRequestSize)
 				{
 					sendDebug(F("Request too large"), F("WifiServer"));
-					send400(client.client, false);
+					send400(*client.client, false);
 					cleanupClient(index);
 					return;
 				}
@@ -412,7 +419,7 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			}
 
 			// Check if still connected
-			if (!client.client.connected())
+			if (!client.client->connected())
 			{
 				sendDebug(F("Persistent client disconnected"), F("WifiServer"));
 				cleanupClient(index);
@@ -420,7 +427,7 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			}
 
 			// Check for new data on the persistent connection
-			if (client.client.available())
+			if (client.client->available())
 			{
 				sendDebug(F("New request on persistent connection"), F("WifiServer"));
 				client.request[0] = '\0';
@@ -499,7 +506,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	char* firstSpace = strchr(client.request, ' ');
 	if (!firstSpace)
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -517,7 +524,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	char method[8];  // Enough for "DELETE" + null
 	if (methodLen >= sizeof(method))
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -536,7 +543,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	char* secondSpace = strchr(firstSpace + 1, ' ');
 	if (!secondSpace)
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -552,7 +559,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	// Only support GET for now
 	if (strcmp(method, "GET") != 0)
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -570,7 +577,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	char fullPath[128];  // Buffer for path+query
 	if (fullPathLen >= sizeof(fullPath))
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -596,7 +603,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		size_t pathLen = queryStart - fullPath;
 		if (pathLen >= sizeof(path))
 		{
-			send404(client.client, isPersistent);
+			send404(*client.client, isPersistent);
 			if (!isPersistent)
 			{
 				cleanupClient(index);
@@ -627,7 +634,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	if (isStaticAssetRequest(path))
 	{
 		sendDebug(F("Static asset request rejected"), F("WifiServer"));
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 		if (!isPersistent)
 		{
 			cleanupClient(index);
@@ -649,7 +656,7 @@ void WifiServer::processClientRequest(uint8_t index)
 
 	if (SystemFunctions::startsWith(path, F("/api/index")))
 	{
-		handleIndex(client.client, client.isPersistent, path);
+		handleIndex(*client.client, client.isPersistent, path);
 		handled = true;
 	}
 
@@ -660,7 +667,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		{
 			if (_handlers[i] && SystemFunctions::startsWith(path, _handlers[i]->getRoute()))
 			{
-				handled = dispatchToHandler(client.client, _handlers[i], path, method, query, isPersistent);
+				handled = dispatchToHandler(*client.client, _handlers[i], path, method, query, isPersistent);
 				break;
 			}
 		}
@@ -668,7 +675,7 @@ void WifiServer::processClientRequest(uint8_t index)
 
 	if (!handled)
 	{
-		send404(client.client, isPersistent);
+		send404(*client.client, isPersistent);
 	}
 
 	// Decide next state based on connection type
@@ -691,17 +698,17 @@ void WifiServer::processClientRequest(uint8_t index)
 	}
 }
 
-void WifiServer::send400(WiFiClient& client, bool isPersistent)
+void WifiServer::send400(IWifiClient& client, bool isPersistent)
 {
 	sendResponse(client, 400, "application/json", response400, isPersistent);
 }
 
-void WifiServer::send404(WiFiClient& client, bool isPersistent)
+void WifiServer::send404(IWifiClient& client, bool isPersistent)
 {
 	sendResponse(client, 404, "application/json", response404, isPersistent);
 }
 
-void WifiServer::sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent)
+void WifiServer::sendResponse(IWifiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent)
 {
 	client.print(F("HTTP/1.1 "));
 	client.print(statusCode);
@@ -799,10 +806,10 @@ int WifiServer::getSignalStrength() const
 		return 0;
 	}
 	
-	return WiFi.RSSI();
+	return _radio->rssi();
 }
 
-bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const char* path)
+bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char* path)
 {
 	sendDebug(path, F("WifiServer"));
 
@@ -850,7 +857,7 @@ bool WifiServer::handleIndex(WiFiClient& client, bool isPersistent, const char* 
 	return true;
 }
 
-bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent)
+bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent)
 {
 	if (!handler)
 	{
@@ -963,9 +970,9 @@ bool WifiServer::dispatchToHandler(WiFiClient& client, INetworkCommandHandler* h
 
 void WifiServer::updateClientConnection()
 {
-	wl_status_t status = static_cast<wl_status_t>(WiFi.status());
+	WifiConnectionState status = _radio->status();
 	unsigned long now = millis();
-	
+
 	switch (_connectionState)
 	{
 		case WifiConnectionState::Connecting:
@@ -973,13 +980,13 @@ void WifiServer::updateClientConnection()
 			if (SystemFunctions::hasElapsed(now, _lastConnectionAttempt, ConnectionCheckIntervalMs))
 			{
 				_lastConnectionAttempt = now;
-				
-				if (status == WL_CONNECTED)
+
+				if (status == WifiConnectionState::Connected)
 				{
 					_connectionState = WifiConnectionState::Connected;
 					_consecutiveFailures = 0;
-					_lastRSSI = WiFi.RSSI();
-					IPAddress ip = WiFi.localIP();
+					_lastRSSI = _radio->rssi();
+					IPAddress ip = _radio->localIP();
 					snprintf(_ipAddress, sizeof(_ipAddress), "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
 					sendDebug(F("WiFi connected!"), F("WifiServer"));
@@ -1000,7 +1007,7 @@ void WifiServer::updateClientConnection()
 		case WifiConnectionState::Connected:
 		{
 			// Monitor for disconnection
-			if (status != WL_CONNECTED)
+			if (status != WifiConnectionState::Connected)
 			{
 				_connectionState = WifiConnectionState::Disconnected;
 				sendDebug(F("WiFi connection lost"), F("WifiServer"));
@@ -1012,7 +1019,7 @@ void WifiServer::updateClientConnection()
 			if (SystemFunctions::hasElapsed(now, _lastRSSICheck, RSSICheckIntervalMs))
 			{
 				_lastRSSICheck = now;
-				_lastRSSI = WiFi.RSSI();
+				_lastRSSI = _radio->rssi();
 				
 				if (_lastRSSI < WeakSignalWarningRSSI)
 				{
@@ -1053,16 +1060,22 @@ void WifiServer::updateClientConnection()
 				}
 				
 				// Ensure clean state before reconnection
-				WiFi.disconnect();
-				delay(100);  // Brief delay for hardware reset
-				
-				WiFi.begin(_ssid, _password);
+				_radio->disconnect();
+				_restartTime = now + RestartDelay;
+				_connectionState = WifiConnectionState::Restarting;
+			}
+			break;
+		}
+		case WifiConnectionState::Restarting:
+			if (now > _restartTime)
+			{
+				_radio->beginClient(_ssid, _password);
 				_connectionState = WifiConnectionState::Connecting;
 				_connectionStartTime = now;
 				_lastConnectionAttempt = now;
 			}
+
 			break;
-		}
 	}
 }
 

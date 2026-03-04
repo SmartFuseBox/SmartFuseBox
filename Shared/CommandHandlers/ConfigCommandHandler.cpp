@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #include "ConfigCommandHandler.h"
+#include "ConfigController.h"
 #include "ConfigSyncManager.h"
 #include "SdCardConfigLoader.h"
 
@@ -6,14 +8,12 @@
 #include "MQTTConfigCommandHandler.h"
 #endif
 
-#if defined(ARDUINO_UNO_R4)
-#include "BluetoothController.h"
-#include <Arduino.h>
-#endif
 
-
-ConfigCommandHandler::ConfigCommandHandler(WifiController* wifiController, ConfigController* configController)
-	: _wifiController(wifiController),
+ConfigCommandHandler::ConfigCommandHandler(
+    IWifiController* wifiController, 
+    ConfigController* configController)
+	:
+    _wifiController(wifiController),
 	  _configController(configController),
 	  _configSyncManager(nullptr),
 	  _sdCardConfigLoader(nullptr)
@@ -106,7 +106,6 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         snprintf(buffer, sizeof(buffer), "v=%d", static_cast<uint8_t>(config->soundStartDelayMs));
         sender->sendCommand(ConfigSoundStartDelay, buffer);
 
-#if defined(ARDUINO_UNO_R4)
 		// C10 Bluetooth enable
         snprintf(buffer, sizeof(buffer), "v=%s", (config->bluetoothEnabled ? "1" : "0"));
         sender->sendCommand(ConfigBluetoothEnable, buffer);
@@ -129,24 +128,23 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 		// C15 WiFi Port
         snprintf(buffer, sizeof(buffer), "v=%d", config->wifiPort);
-        sender->sendCommand(ConfigWifiPort, buffer);
+		sender->sendCommand(ConfigWifiPort, buffer);
 
 		// C16 WiFi State
-        if (_wifiController && _wifiController->getServer())
-        {
-            snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int>(_wifiController->getServer()->getConnectionState()));
-            sender->sendCommand(ConfigWifiState, buffer);
-        }
+		if (_wifiController)
+		{
+			snprintf(buffer, sizeof(buffer), "v=%d", static_cast<int>(_wifiController->getConnectionState()));
+			sender->sendCommand(ConfigWifiState, buffer);
+		}
 
 		// C17 WiFi AP IP Address
-        if (_wifiController && _wifiController->getServer())
-        {
+		if (_wifiController)
+		{
 			char ipBuffer[MaxIpAddressLength];
-            _wifiController->getServer()->getIpAddress(ipBuffer, sizeof(ipBuffer));
-            snprintf(buffer, sizeof(buffer), "v=%s", ipBuffer);
-            sender->sendCommand(ConfigWifiApIpAddress, buffer);
+			_wifiController->getIpAddress(ipBuffer, sizeof(ipBuffer));
+			snprintf(buffer, sizeof(buffer), "v=%s", ipBuffer);
+			sender->sendCommand(ConfigWifiApIpAddress, buffer);
 		}
-#endif
 
 		// C18 Default relay states
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
@@ -340,7 +338,6 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
     }
-#if defined(ARDUINO_UNO_R4)
 	else if (strcmp(command, ConfigBluetoothEnable) == 0)
     {
         // Expect "C10:v=<0|1>"
@@ -417,20 +414,20 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
 	}
-    else if (strcmp(command, ConfigWifiState) == 0)
-    {
-        // C16 WiFi State
-        uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
+	else if (strcmp(command, ConfigWifiState) == 0)
+	{
+		// C16 WiFi State
+		uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
 
-        if (_wifiController)
-        {
-            state = static_cast<uint8_t>(_wifiController->getServer()->getConnectionState());
-        }
+		if (_wifiController)
+		{
+			state = static_cast<uint8_t>(_wifiController->getConnectionState());
+		}
 
-        char cmd[10];
+		char cmd[10];
 		snprintf(cmd, sizeof(cmd), "v=%d", state);
-        sender->sendCommand(ConfigWifiState, cmd);
-       result = ConfigResult::Success;
+		sender->sendCommand(ConfigWifiState, cmd);
+	   result = ConfigResult::Success;
 	}
     else if (strcmp(command, ConfigWifiApIpAddress) == 0)
     {
@@ -444,7 +441,6 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             result = ConfigResult::InvalidParameter;
         }
 	}
-#endif
     else if (strcmp(command, ConfigDefaultRelayState) == 0)
     {
         if (paramCount == 1)
@@ -909,10 +905,8 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
         ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings, 
         ConfigRename, ConfigRenameRelay, ConfigMapHomeButton, ConfigSetButtonColor,
         ConfigBoatType, ConfigSoundRelayId, ConfigSoundStartDelay,
-#if defined(ARDUINO_UNO_R4)
         ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID, 
         ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
-#endif
 #if defined(MQTT_SUPPORT)
         MqttConfigEnable, MqttConfigBroker, MqttConfigPort, MqttConfigUsername,
         MqttConfigPassword, MqttConfigDeviceId, MqttConfigHADiscovery, MqttConfigKeepAlive,

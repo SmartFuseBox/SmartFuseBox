@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Local.h"
+
+#if defined(BLUETOOTH_SUPPORT)
+
 #include <Arduino.h>
 #include <ArduinoBLE.h>
 #include "BluetoothServiceBase.h"
@@ -45,3 +49,5 @@ private:
     static BluetoothRelayService* _serviceInstance;
     static void onRelaySetWritten(BLEDevice central, BLECharacteristic characteristic);
 };
+
+#endif

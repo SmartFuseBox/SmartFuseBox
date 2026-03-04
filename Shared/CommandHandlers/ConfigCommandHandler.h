@@ -1,14 +1,12 @@
 #pragma once
 
 #include <Arduino.h>
+
 #include "BaseCommandHandler.h"
-#include "ConfigController.h"
-#include "WifiController.h"
-#include "ConfigSyncManager.h"
-#include "SDCardConfigLoader.h"
+#include "IWifiController.h"
 
 // Forward declarations
-class BluetoothController;
+class ConfigController;
 class ConfigSyncManager;
 class SdCardConfigLoader;
 
@@ -20,7 +18,7 @@ class MQTTController;
 class ConfigCommandHandler : public BaseCommandHandler
 {
 private:
-	WifiController* _wifiController;
+	IWifiController* _wifiController;
 	ConfigController* _configController;
 	ConfigSyncManager* _configSyncManager;
 	SdCardConfigLoader* _sdCardConfigLoader;
@@ -31,7 +29,9 @@ private:
 #endif
 
 public:
-	explicit ConfigCommandHandler(WifiController* wifiController, ConfigController* configController);
+	explicit ConfigCommandHandler(
+		IWifiController* wifiController, 
+		ConfigController* configController);
 
 	void setConfigSyncManager(ConfigSyncManager* syncManager);
 	void setSdCardConfigLoader(SdCardConfigLoader* sdCardConfigLoader);

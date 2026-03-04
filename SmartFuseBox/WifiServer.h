@@ -1,6 +1,8 @@
 #pragma once
 
-#include <WiFiS3.h>
+#include "WifiRadioBridge.h"
+#include "IWifiRadio.h"
+#include "IWifiClient.h"
 #include "LoggingSupport.h"
 #include "SystemDefinitions.h"
 #include "INetworkCommandHandler.h"
@@ -12,23 +14,24 @@ constexpr uint8_t MaximumPathLength = 128;
 constexpr uint8_t MaxConcurrentClients = 2;
 constexpr uint8_t MaxPersistentClients = 1;
 
+static constexpr unsigned long ConnectionRetryIntervalMs = 10000;
+static constexpr unsigned long ConnectionTimeoutMs = 10000;
+static constexpr unsigned long ConnectionCheckIntervalMs = 500;
+static constexpr unsigned long ClientReadTimeoutMs = 2500;
+static constexpr unsigned long RSSICheckIntervalMs = 5000;
+static constexpr unsigned long BackoffIntervalMs = 60000;
+static constexpr uint8_t MaxConsecutiveFailures = 3;
+
 class WifiServer : public SingleLoggerSupport
 {
 private:
 	MessageBus* _messageBus;
 	bool _serverActive;
-	WiFiServer _server;
 	WifiMode _mode;
 	WifiConnectionState _connectionState;
 	uint16_t _port;
 	bool _initialized;
 	WarningManager* _warningManager;
-	
-	// AP mode settings
-	char _ssid[MaxSSIDLength];
-	char _password[MaxWiFiPasswordLength];
-	char _ipAddress[MaxIpAddressLength];
-
 
 	// Network command handlers
 	INetworkCommandHandler** _handlers;
@@ -43,19 +46,20 @@ private:
 	unsigned long _connectionStartTime;
 	uint8_t _consecutiveFailures;
 	int8_t _lastRSSI;
-	static constexpr unsigned long ConnectionRetryIntervalMs = 10000;
-	static constexpr unsigned long ConnectionTimeoutMs = 10000;
-	static constexpr unsigned long ConnectionCheckIntervalMs = 500;
-	static constexpr unsigned long ClientReadTimeoutMs = 2500;
-	static constexpr unsigned long RSSICheckIntervalMs = 5000;
-	static constexpr unsigned long BackoffIntervalMs = 60000;
-	static constexpr uint8_t MaxConsecutiveFailures = 3;
 	unsigned long _lastRSSICheck;
+	IWifiRadio* _radio;
+	unsigned long _restartTime;
+	// AP mode settings
+	char _ssid[MaxSSIDLength];
+	char _password[MaxWiFiPasswordLength];
+	char _ipAddress[MaxIpAddressLength];
+
+
 	static constexpr unsigned long PersistentTimeoutMs = 30000;
 
 	struct ActiveClient
 	{
-		WiFiClient client;
+		IWifiClient* client;
 		char request[MaximumRequestSize + 1];
 		unsigned long startTime;
 		unsigned long lastActivity;
@@ -64,17 +68,17 @@ private:
 	};
 
 	ActiveClient _activeClients[MaxConcurrentClients];
-	
-	void sendResponse(WiFiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent);
-	void send400(WiFiClient& client, bool isPersistent);
-	void send404(WiFiClient& client, bool isPersistent);
+
+	void sendResponse(IWifiClient& client, int statusCode, const char* contentType, const char* body, bool isPersistent);
+	void send400(IWifiClient& client, bool isPersistent);
+	void send404(IWifiClient& client, bool isPersistent);
 	void updateClientConnection();
 	void updateClientHandling();
 	void processClientRequest(uint8_t index);
 	void startServer();
 	void stopServer();
-	bool handleIndex(WiFiClient& client, bool isPersistent, const char* path);
-	bool dispatchToHandler(WiFiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent);
+	bool handleIndex(IWifiClient& client, bool isPersistent, const char* path);
+	bool dispatchToHandler(IWifiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent);
 	void registerJsonVisitors(NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
 
 	// Multi-client helper functions
@@ -82,13 +86,15 @@ private:
 	uint8_t getPersistentClientCount();
 	void cleanupClient(uint8_t index);
 	void handleClientState(uint8_t index, unsigned long now);
-	bool acceptNewClient(WiFiClient& client, unsigned long now);
+	bool acceptNewClient(IWifiClient* client, unsigned long now);
 	bool isStaticAssetRequest(const char* path);
 	
 public:
-	WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer, WarningManager* warningManager, uint16_t port,
+	WifiServer(MessageBus* messageBus, SerialCommandManager* commandMgrComputer,
+		WarningManager* warningManager, uint16_t port,
 		INetworkCommandHandler** handlers, uint8_t handlerCount,
-		NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount);
+		NetworkJsonVisitor** jsonVisitors, uint8_t jsonVisitorCount,
+		IWifiRadio* radio);
 	~WifiServer();
 	
 	// Configuration methods

@@ -1,14 +1,20 @@
 #pragma once
 
+#include "Local.h"
 #include "BaseSensor.h"
 #include "MessageBus.h"
-#include "WifiController.h"
-#include "BluetoothController.h"
+
+#include "IWifiController.h"
+#include "IBluetoothRadio.h"
+
 #include "WarningManager.h"
 #include "SystemFunctions.h"
 #include "SystemCpuMonitor.h"
 #include "SystemDefinitions.h"
+
+#if defined(SD_CARD_SUPPORT)
 #include "SdCardLogger.h"
+#endif
 
 constexpr unsigned long SystemSensorUpdateIntervalMs = 2500;
 
@@ -25,10 +31,15 @@ class SystemSensorHandler : public BaseSensor
 {
 private:
 	MessageBus* _messageBus;
-	WifiController* _wifiController;
-	BluetoothController* _bluetoothController;
+
+	IWifiController* _wifiController;
+	IBluetoothRadio* _bluetoothRadio;
+
 	WarningManager* _warningManager;
+
+#if defined(SD_CARD_SUPPORT)
 	SdCardLogger* _sdCardLogger;
+#endif
 
 	static uint8_t countActiveWarnings(uint32_t mask)
 	{
@@ -50,19 +61,26 @@ protected:
 	}
 
 public:
-	SystemSensorHandler(MessageBus* messageBus, WifiController* wifiController,
-		BluetoothController* bluetoothController, WarningManager* warningManager)
+	SystemSensorHandler(MessageBus* messageBus, 
+		IWifiController* wifiController,
+		IBluetoothRadio* bluetoothController,
+		WarningManager* warningManager)
 		: _messageBus(messageBus),
 		_wifiController(wifiController),
-		_bluetoothController(bluetoothController),
-		_warningManager(warningManager),
-		_sdCardLogger(nullptr)
+		_bluetoothRadio(bluetoothController),
+		_warningManager(warningManager)
+
+#if defined(SD_CARD_SUPPORT)
+		, _sdCardLogger(nullptr)
+#endif
 	{}
 
+#if defined(SD_CARD_SUPPORT)
 	void setSdCardLogger(SdCardLogger* sdCardLogger)
 	{
 		_sdCardLogger = sdCardLogger;
 	}
+#endif
 
 	void formatStatusJson(char* buffer, size_t size) override
 	{
@@ -90,6 +108,7 @@ public:
 		return "system";
 	}
 
+#if defined(MQTT_SUPPORT)
 	uint8_t getMqttChannelCount() const override
 	{
 		return 7;
@@ -124,7 +143,7 @@ public:
 
 			case 2:
 				snprintf(buffer, size, "%s",
-					(_bluetoothController && _bluetoothController->isEnabled()) ? "ON" : "OFF");
+					(_bluetoothRadio && _bluetoothRadio->isEnabled()) ? "ON" : "OFF");
 				break;
 
 			case 3:
@@ -132,13 +151,17 @@ public:
 					(_wifiController && _wifiController->isEnabled()) ? "ON" : "OFF");
 				break;
 
-			case 4:
-			{
-				unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
-				double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
-				snprintf(buffer, size, "%.1f", mb);
-				break;
-			}
+					case 4:
+					{
+			#if defined(SD_CARD_SUPPORT)
+						unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
+						double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
+						snprintf(buffer, size, "%.1f", mb);
+			#else
+						snprintf(buffer, size, "0.0");
+			#endif
+						break;
+					}
 
 			case 5:
 				snprintf(buffer, size, "%u",
@@ -157,4 +180,5 @@ public:
 				break;
 		}
 	}
+#endif
 };

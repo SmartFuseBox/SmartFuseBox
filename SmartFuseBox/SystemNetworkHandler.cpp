@@ -90,7 +90,7 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		uptime);
 }
 
-void SystemNetworkHandler::formatWifiStatusJson(WiFiClient* client)
+void SystemNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
 	char buffer[MaximumJsonResponseBufferSize];
 	buffer[0] = '\0';

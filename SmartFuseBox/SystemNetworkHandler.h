@@ -22,7 +22,7 @@ public:
 
 	const char* getRoute() const override { return "/api/system"; }
 
-	void formatWifiStatusJson(WiFiClient* client) override;
+	void formatWifiStatusJson(IWifiClient* client) override;
 
 	void formatStatusJson(char* buffer, size_t size);
 

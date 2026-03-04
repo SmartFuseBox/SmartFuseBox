@@ -1,11 +1,13 @@
 #pragma once
 
-
+#include "Local.h"
 #include "ConfigManager.h"
-#include "BluetoothController.h"
 #include "SoundController.h"
 #include "RelayCommandHandler.h"
-#include "WifiController.h"
+
+// Forward declarations
+class IBluetoothRadio;
+class IWifiController;
 
 enum class ConfigResult : uint8_t
 {
@@ -25,16 +27,19 @@ class ConfigController
 {
 private:
 	SoundController* _soundController;
-	BluetoothController* _bluetoothController;
-	WifiController* _wifiController;
+	IBluetoothRadio* _bluetoothRadio;
+	IWifiController* _wifiController;
 	RelayController* _relayController;
 	Config* _config;
 
 	void updateSoundControllerConfig(); 
 public:
+
 	ConfigController(SoundController* soundController,
-		BluetoothController* bluetoothController, WifiController* wifiController,
+		IBluetoothRadio* bluetoothRadio,
+		IWifiController* wifiController,
 		RelayController* relayController);
+
 	Config* getConfigPtr();
 	ConfigResult save();
 	ConfigResult reset();
