@@ -42,6 +42,27 @@
 #define ESP32_
 
 /*
+ * EEPROM capacity in bytes for the selected board.
+ * Add new board entries above the #else fallback when adding new board support.
+ */
+#if defined(ARDUINO_UNO_R4) || defined(ARDUINO_R4_MINIMA)
+#define EEPROM_CAPACITY_BYTES 8192
+#elif defined(ESP32)
+#define EEPROM_CAPACITY_BYTES 16384
+#else
+#define EEPROM_CAPACITY_BYTES 1024   // conservative default (e.g. Uno R3) — add new boards above this line
+#endif
+
+/*
+ * Scheduler support. Automatically enabled when EEPROM is large enough to hold
+ * the base config (~681 bytes) plus scheduler storage (~491 bytes for 20 events).
+ * Do not define or undefine manually.
+ */
+#if EEPROM_CAPACITY_BYTES >= 2048
+#define SCHEDULER_SUPPORT
+#endif
+
+/*
 * Determines whether to include code related to the smart fuse box controller functionality. If you are using this code as a
 * library for a different type of project, you can undefine this to exclude the controller-specific code and just use the 
 * underlying components (e.g. WifiController, MQTTClient) in your own application.
