@@ -241,7 +241,7 @@ Returns JSON formatted response with sound status and active sound if any.
 
 
 ## Timer / Scheduler Commands (SFB)
-These commands manage scheduled events stored in EEPROM. Only available on boards with `SCHEDULER_SUPPORT` enabled (requires ≥ 2KB EEPROM). Up to 20 events can be stored. Each event has a **trigger** (what fires it), an optional **condition** (a guard that must be true), and an **action** (what happens).
+These commands manage scheduled events stored in EEPROM. Only available on boards with `SCHEDULER_SUPPORT` enabled (requires ≥ 1KB EEPROM). Up to 20 events can be stored, if EEPROM is < 1KB only 6 events can be stored. Each event has a **trigger** (what fires it), an optional **condition** (a guard that must be true), and an **action** (what happens).
 
 | Command | Example | Purpose |
 |---|---|---|

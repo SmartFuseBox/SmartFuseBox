@@ -19,7 +19,6 @@
 #include "AckCommandHandler.h"
 #include "SystemCommandHandler.h"
 #include "ConfigCommandHandler.h"
-#include "SchedulerCommandHandler.h"
 #include "BluetoothRadioBridge.h"
 #include "IBluetoothRadio.h"
 #include "WifiController.h"
@@ -115,7 +114,7 @@ private:
 #if defined(SCHEDULER_SUPPORT)
 	SchedulerCommandHandler _schedulerCommandHandler;
 	SchedulerNetworkHandler _schedulerNetworkHandler;
-	ScheduleController      _scheduleController;
+	ScheduleController _scheduleController;
 #endif
 
 #if defined(LED_MANAGER)

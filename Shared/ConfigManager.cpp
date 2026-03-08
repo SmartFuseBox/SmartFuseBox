@@ -44,12 +44,14 @@ bool ConfigManager::load()
     bool migrated = false;
     while (_cfg.version < ConfigVersion)
     {
+#if defined(SCHEDULER_SUPPORT)
         if (_cfg.version == 1)
         {
             migrateV1toV2();
             migrated = true;
         }
         else
+#endif
         {
             // Version is below the oldest known migration (e.g. 0x00 on some blank boards).
             // Cannot migrate safely — reset and persist clean defaults.

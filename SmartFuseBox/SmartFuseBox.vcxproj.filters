@@ -214,14 +214,14 @@
     <ClCompile Include="SensorCommandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SchedulerCommandHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SchedulerNetworkHandler.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="SchedulerCommandHandler.cpp">
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
     <ClCompile Include="ScheduleController.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -453,14 +453,14 @@
     <ClInclude Include="IBluetoothRadio.h">
       <Filter>Header Files\Abstractions</Filter>
     </ClInclude>
+    <ClInclude Include="ScheduleController.h">
+      <Filter>Header Files\Scheduler</Filter>
+    </ClInclude>
     <ClInclude Include="SchedulerCommandHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
     <ClInclude Include="SchedulerNetworkHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ScheduleController.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

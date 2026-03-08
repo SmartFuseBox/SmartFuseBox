@@ -122,12 +122,20 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
 
     // serial command handlers
     ISerialCommandHandler* linkHandlers[] = { &_relayHandler, &_soundHandler, &_configHandler, &_ackHandler,
-        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler, &_schedulerCommandHandler };
+        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler
+#if defined(SCHEDULER_SUPPORT)
+        , &_schedulerCommandHandler
+#endif
+        };
     size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
     _commandMgrLink->registerHandlers(linkHandlers, linkHandlerCount);
 
     ISerialCommandHandler* computerHandlers[] = { &_relayHandler, &_soundHandler, &_configHandler, &_ackHandler,
-        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler, &_schedulerCommandHandler };
+        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler
+#if defined(SCHEDULER_SUPPORT)
+        , &_schedulerCommandHandler 
+#endif
+        };
     size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
     _commandMgrComputer->registerHandlers(computerHandlers, computerHandlerCount);
 
