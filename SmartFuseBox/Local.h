@@ -62,8 +62,10 @@
 
 /*
  * Scheduler support. Automatically enabled when EEPROM is large enough to hold
- * the base config (~681 bytes) plus scheduler storage (~491 bytes for 20 events).
- * Do not define or undefine manually.
+ * the base config (~681 bytes) plus scheduler storage (for example, ~491 bytes
+ * when MAXIMUM_EVENTS is 20). The exact EEPROM required scales with MAXIMUM_EVENTS,
+ * so smaller values allow the scheduler to fit on smaller EEPROM targets. Do not
+ * define or undefine this flag manually.
  */
 #if EEPROM_CAPACITY_BYTES >= 1024
 #define SCHEDULER_SUPPORT
