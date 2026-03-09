@@ -88,12 +88,14 @@ bool BluetoothManager::begin(const char* deviceName)
     }
 
     // Set event handlers
-    BLE.setEventHandler(BLEConnected, [](BLEDevice central) {
+    BLE.setEventHandler(BLEConnected, [](BLEDevice central)
+    {
         (void)central;
         // Connection handled in loop()
     });
 
-    BLE.setEventHandler(BLEDisconnected, [](BLEDevice central) {
+    BLE.setEventHandler(BLEDisconnected, [](BLEDevice central)
+    {
         (void)central;
         // Disconnection handled in loop()
     });

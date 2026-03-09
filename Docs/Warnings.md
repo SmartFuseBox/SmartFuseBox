@@ -77,10 +77,14 @@ warningManager.clearWarning(WarningType::WifiInvalidConfig);
 warningManager.clearAllWarnings();
 
 // Check if any warnings are active (local or remote)
-if (warningManager.hasWarnings()) { }
+if (warningManager.hasWarnings())
+{
+}
 
 // Check a specific warning (checks local AND remote)
-if (warningManager.isWarningActive(WarningType::ConnectionLost)) { }
+if (warningManager.isWarningActive(WarningType::ConnectionLost))
+{
+}
 
 // Get the full combined bitmask (local | remote)
 uint32_t mask = warningManager.getActiveWarningsMask();

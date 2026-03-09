@@ -497,7 +497,8 @@ public:
 	const char* getDirection() const { return compassDirections[static_cast<int>((_courseDeg + 11.25) / 22.5) % 16]; }
 	double getTotalDistance() const { return _totalDistanceKm; }
     
-    void resetTotalDistance() { 
+    void resetTotalDistance()
+	{ 
         _totalDistanceKm = 0.0; 
         _firstFix = true;
     }

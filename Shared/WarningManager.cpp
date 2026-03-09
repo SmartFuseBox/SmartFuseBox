@@ -137,7 +137,8 @@ void WarningManager::raiseWarning(WarningType type)
 	}
 
 	// Auto-raise SensorFailure for any sensor-related warning (bit 20+)
-	if (warningBit & SENSOR_WARNING_MASK) {
+	if (warningBit & SENSOR_WARNING_MASK)
+	{
 		uint32_t sensorFailureBit = static_cast<uint32_t>(WarningType::SensorFailure);
 		bool sensorFailureWasActive = (_localWarnings & sensorFailureBit) != 0;
 		_localWarnings |= sensorFailureBit;
@@ -170,10 +171,13 @@ void WarningManager::clearWarning(WarningType type)
 	}
 
 	// Auto-clear SensorFailure only if no sensor warnings remain (check bits 20+)
-	if (warningBit & SENSOR_WARNING_MASK) {
+	if (warningBit & SENSOR_WARNING_MASK)
+	{
 		// Check if any other sensor warnings are still active (excluding SensorFailure itself)
 		uint32_t otherSensorWarnings = _localWarnings & SENSOR_WARNING_MASK & ~static_cast<uint32_t>(WarningType::SensorFailure);
-		if (otherSensorWarnings == 0) {
+		
+		if (otherSensorWarnings == 0)
+		{
 			uint32_t sensorFailureBit = static_cast<uint32_t>(WarningType::SensorFailure);
 			bool sensorFailureWasActive = (_localWarnings & sensorFailureBit) != 0;
 			_localWarnings &= ~sensorFailureBit;

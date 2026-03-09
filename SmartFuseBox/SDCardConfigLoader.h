@@ -54,9 +54,11 @@ constexpr uint16_t SD_CONFIG_MAX_LINE_LENGTH = 128;
  * SdCardConfigLoader loader(&commandMgrComputer, &commandMgrLink, 
  *                           &configController, &configSyncManager);
  * 
- * void setup() {
+ * void setup()
+ * {
  *     bool sdConfigLoaded = loader.loadConfigFromSd();
- *     if (sdConfigLoaded) {
+ *     if (sdConfigLoaded)
+ *     {
  *         // SD config was applied, ConfigSyncManager will be disabled
  *     }
  * }

@@ -167,7 +167,8 @@ void WarningPage::refresh(unsigned long now)
 void WarningPage::handleTouch(uint8_t compId, uint8_t eventType)
 {
     // Only handle release events
-    if (eventType != EventRelease) {
+    if (eventType != EventRelease)
+    {
         return;
     }
 

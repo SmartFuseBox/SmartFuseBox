@@ -22,92 +22,105 @@
 
 #include "SystemDefinitions.h"
 
-struct WarningChanged {
+struct WarningChanged
+{
     using Callback = std::function<void(uint32_t mask)>;
 };
 
-struct TemperatureUpdated {
+struct TemperatureUpdated
+{
     using Callback = std::function<void(float newTemp)>;
 };
 
-struct HumidityUpdated {
+struct HumidityUpdated
+{
     using Callback = std::function<void(uint8_t newHumidity)>;
 };
 
-struct LightSensorUpdated {
+struct LightSensorUpdated
+{
     using Callback = std::function<void(bool isDayTime)>;
 };
 
-struct WaterLevelUpdated {
+struct WaterLevelUpdated
+{
     using Callback = std::function<void(uint16_t newWaterLevel, uint16_t averageWaterLevel)>;
 };
 
-struct WifiConnectionStateChanged {
+struct WifiConnectionStateChanged
+{
     using Callback = std::function<void(WifiConnectionState status)>;
 };
 
-struct WifiSignalStrengthChanged {
+struct WifiSignalStrengthChanged
+{
     using Callback = std::function<void(uint16_t strength)>;
 };
 
-struct WifiServerProcessingRequestChanged {
+struct WifiServerProcessingRequestChanged
+{
     using Callback = std::function<void(const char* method, const char* path, const char* query, bool isProcessing)>;
 };
 
-struct RelayStatusChanged {
+struct RelayStatusChanged
+{
     using Callback = std::function<void(uint8_t status)>;
 };
 
-struct GpsLocationUpdated {
+struct GpsLocationUpdated
+{
     using Callback = std::function<void(double latitude, double longitude)>;
 };
 
-struct GpsAltitudeUpdated {
+struct GpsAltitudeUpdated
+{
     using Callback = std::function<void(double altitude)>;
 };
 
-struct GpsSpeedUpdated {
+struct GpsSpeedUpdated
+{
     using Callback = std::function<void(double speedKmh, double course)>;
 };
 
-struct SystemMetricsUpdated {
+struct SystemMetricsUpdated
+{
     using Callback = std::function<void()>;
 };
 
-struct MqttConnected {
-
+struct MqttConnected
+{
     using Callback = std::function<void()>;
-
 };
 
-struct MqttDisconnected {
-
+struct MqttDisconnected
+{
     using Callback = std::function<void()>;
-
 };
 
-struct MqttMessageReceived {
-
+struct MqttMessageReceived
+{
     using Callback = std::function<void(const char* topic, const char* payload)>;
-
 };
 
 class MessageBus {
 private:
     template<typename Event>
-    std::vector<typename Event::Callback>& getVector() {
+    std::vector<typename Event::Callback>& getVector()
+    {
         static std::vector<typename Event::Callback> vec;
         return vec;
     }
 public:
     template<typename Event, typename Callback>
-    void subscribe(Callback cb) {
+    void subscribe(Callback cb)
+    {
         auto& vec = getVector<Event>();
         vec.push_back(cb);
     }
 
     template<typename Event, typename... Args>
-    void publish(Args&&... args) {
+    void publish(Args&&... args)
+    {
         auto& vec = getVector<Event>();
         for (auto& cb : vec)
             cb(std::forward<Args>(args)...);

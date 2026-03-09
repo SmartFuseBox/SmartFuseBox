@@ -58,12 +58,14 @@ class ToneManager;
  * warningMgr.raiseWarning(WarningType::HighCompassTemperature);
  * 
  * // Check warnings:
- * if (warningMgr.hasWarnings()) {
+ * if (warningMgr.hasWarnings())
+ * {
  *     // Show warning indicator
  * }
  * @endcode
  */
-class WarningManager {
+class WarningManager
+{
 private:
 	SerialCommandManager* _commandMgr;      // For sending heartbeat commands
 #if defined(BOAT_CONTROL_PANEL)

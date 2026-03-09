@@ -172,7 +172,10 @@ public:
     }
 
 #if defined(SD_CARD_SUPPORT)
-    SdCardLogger* sdCardLogger() { return &_sdCardLogger; }
+    SdCardLogger* sdCardLogger()
+    {
+        return &_sdCardLogger;
+    }
 #endif
 };
 

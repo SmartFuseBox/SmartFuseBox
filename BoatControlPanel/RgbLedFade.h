@@ -149,11 +149,13 @@ public:
         lastUpdate = now;
 
         level += direction * fadeStep;
-        if (level >= 1.0f) {
+        if (level >= 1.0f)
+        {
             level = 1.0f;
             direction = -1;
         }
-        else if (level <= 0.0f) {
+        else if (level <= 0.0f)
+        {
             level = 0.0f;
             direction = 1;
         }
@@ -161,7 +163,8 @@ public:
         float gamma = pow(level, 2.2f);
         float brightnessFactor = gamma * (_maxBrightness / 255.0f);
 
-        if (brightnessFactor < (_minBrightness / 255.0f)) {
+        if (brightnessFactor < (_minBrightness / 255.0f))
+        {
             brightnessFactor = _minBrightness / 255.0f;
         }
 

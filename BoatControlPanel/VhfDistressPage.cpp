@@ -92,7 +92,7 @@ void VhfDistressPage::updateDisplay()
     char phoneticCallSign[85];
     phoneticize(callSign, phoneticCallSign, sizeof(phoneticCallSign), ", ");
 
-    char tempBuffer[140];
+    char tempBuffer[160];
     snprintf_P(tempBuffer, sizeof(tempBuffer), DistressCallSign, name, phoneticCallSign, mmsi);
     SystemFunctions::wrapTextAtWordBoundary(tempBuffer, buffer, sizeof(buffer), MaxLineLength);
 

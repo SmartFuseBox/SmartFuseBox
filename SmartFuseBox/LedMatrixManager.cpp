@@ -36,18 +36,24 @@ LedMatrixManager::LedMatrixManager(MessageBus* messageBus)
 {
 	if (messageBus)
 	{
-		messageBus->subscribe<WarningChanged>([this](uint32_t mask) {
+		messageBus->subscribe<WarningChanged>([this](uint32_t mask)
+		{
 			this->UpdateWarningIndicators(mask);
 		});
 
 #if defined(WIFI_SUPPORT)		
-		messageBus->subscribe<WifiConnectionStateChanged>([this](WifiConnectionState status) {
+		messageBus->subscribe<WifiConnectionStateChanged>([this](WifiConnectionState status)
+		{
 			this->UpdateConnectedState(status);
 		});
-		messageBus->subscribe<WifiSignalStrengthChanged>([this](uint16_t strength) {
+
+		messageBus->subscribe<WifiSignalStrengthChanged>([this](uint16_t strength)
+		{
 			this->UpdateSignalStrength(strength);
 		});
-		messageBus->subscribe<WifiServerProcessingRequestChanged>([this](const char* method, const char* path, const char* query, bool isProcessing) {
+
+		messageBus->subscribe<WifiServerProcessingRequestChanged>([this](const char* method, const char* path, const char* query, bool isProcessing)
+		{
 			(void)method;
 			(void)path;
 			(void)query;
@@ -56,13 +62,18 @@ LedMatrixManager::LedMatrixManager(MessageBus* messageBus)
 		});
 #endif
 
-		messageBus->subscribe<RelayStatusChanged>([this](uint8_t status) {
+		messageBus->subscribe<RelayStatusChanged>([this](uint8_t status)
+		{
 			this->setRelayStatus(status);
 		});
-		messageBus->subscribe<TemperatureUpdated>([this](float newTemp) {
+
+		messageBus->subscribe<TemperatureUpdated>([this](float newTemp)
+		{
 			this->SetTemperature(newTemp);
 		});
-		messageBus->subscribe<HumidityUpdated>([this](float newHumidity) {
+
+		messageBus->subscribe<HumidityUpdated>([this](float newHumidity)
+		{
 			this->SetHumidity(newHumidity);
 		});
 	}
@@ -223,13 +234,17 @@ void LedMatrixManager::ShutdownSequence()
 
 void LedMatrixManager::processShutdownSequence(unsigned long currMillis)
 {
-    if (_sequenceStep == 0) {
+    if (_sequenceStep == 0)
+	{
         UpdateLedFrame(LedOff);
         updateLed();
         _sequenceLastStepTime = currMillis;
         _sequenceStep++;
-    } else if (_sequenceStep <= 5) {
-        if (currMillis - _sequenceLastStepTime >= _sequenceDelay) {
+    }
+	else if (_sequenceStep <= 5)
+	{
+        if (currMillis - _sequenceLastStepTime >= _sequenceDelay)
+		{
             UpdateRow(_shutdownTopRow, LedOn);
             UpdateRow(_shutdownBottomRow, LedOn);
             UpdateColumn(_shutdownLeftColumn, LedOn);
@@ -240,15 +255,21 @@ void LedMatrixManager::processShutdownSequence(unsigned long currMillis)
             _sequenceStep++;
             _sequenceLastStepTime = currMillis;
         }
-    } else if (_sequenceStep == 6) {
-        if (currMillis - _sequenceLastStepTime >= 500) {
+    }
+	else if (_sequenceStep == 6)
+	{
+        if (currMillis - _sequenceLastStepTime >= 500)
+		{
             UpdateLedFrame(LedOff);
             updateLed();
             _sequenceStep++;
             _sequenceLastStepTime = currMillis;
         }
-    } else if (_sequenceStep == 7) {
-        if (currMillis - _sequenceLastStepTime >= 800) {
+    }
+	else if (_sequenceStep == 7)
+	{
+        if (currMillis - _sequenceLastStepTime >= 800)
+		{
             _ledFrame[2][3] = LedOn;
             _ledFrame[2][4] = LedOn;
             _ledFrame[2][7] = LedOn;
@@ -257,7 +278,9 @@ void LedMatrixManager::processShutdownSequence(unsigned long currMillis)
             _sequenceStep++;
             _sequenceLastStepTime = currMillis;
         }
-    } else {
+    }
+	else
+	{
         _activeSequence = LedSequenceType::None;
     }
 }

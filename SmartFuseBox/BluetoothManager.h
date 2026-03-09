@@ -49,7 +49,8 @@
  * 
  * btManager.begin("SmartFuseBox");
  * 
- * void loop() {
+ * void loop()
+ * {
  *     btManager.loop();
  * }
  * @endcode

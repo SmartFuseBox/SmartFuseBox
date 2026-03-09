@@ -71,7 +71,8 @@ private:
         if (cfg->accessMode == AccessModeAP)
         {
             // If apIpAddress is empty, allow using default IP (considered valid)
-            if (cfg->apIpAddress[0] != '\0') {
+            if (cfg->apIpAddress[0] != '\0')
+            {
                 IPAddress testIp;
                 if (!testIp.fromString(cfg->apIpAddress))
                 {

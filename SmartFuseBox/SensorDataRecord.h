@@ -45,8 +45,12 @@ struct SensorDataRecord {
     float value2;                   // Secondary value (e.g., humidity, average water level)
     
     SensorDataRecord() 
-        : timestamp(0), sensorType(SensorDataType::Temperature), value1(0.0f), value2(0.0f) {}
+        : timestamp(0), sensorType(SensorDataType::Temperature), value1(0.0f), value2(0.0f)
+    {
+    }
     
     SensorDataRecord(unsigned long ts, SensorDataType type, float val1, float val2 = 0.0f)
-        : timestamp(ts), sensorType(type), value1(val1), value2(val2) {}
+        : timestamp(ts), sensorType(type), value1(val1), value2(val2)
+    {
+    }
 };
