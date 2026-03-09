@@ -324,30 +324,77 @@ void MQTTSensorHandler::publishSensorDiscoveryConfig(uint8_t index)
     snprintf_P(topic, sizeof(topic), DiscoveryTopicFormat,
         _config->mqtt.discoveryPrefix, entityType, _config->mqtt.deviceId, channel.slug);
 
-    int offset = snprintf_P(payload, sizeof(payload), JsonBase,
+    // payload[512]
+    size_t offset = 0;
+    size_t remaining = sizeof(payload);
+
+    int ret = snprintf_P(payload, remaining, JsonBase,
         channel.name,
         _config->mqtt.deviceId, channel.slug);
 
-    if (channel.isBinary)
+    if (ret > 0 && static_cast<size_t>(ret) < remaining)
     {
-        offset += snprintf_P(payload + offset, sizeof(payload) - offset, JsonBinaryPayload);
+        offset += static_cast<size_t>(ret);
+        remaining -= static_cast<size_t>(ret);
+    }
+    else
+    {
+        remaining = 0;
     }
 
-    if (channel.deviceClass != nullptr)
+    if (channel.isBinary && remaining > 0)
     {
-        offset += snprintf_P(payload + offset, sizeof(payload) - offset, JsonDeviceClass,
+        ret = snprintf_P(payload + offset, remaining, JsonBinaryPayload);
+
+        if (ret > 0 && static_cast<size_t>(ret) < remaining)
+        {
+            offset += static_cast<size_t>(ret);
+            remaining -= static_cast<size_t>(ret);
+        }
+        else
+        {
+            remaining = 0;
+        }
+    }
+
+    if (channel.deviceClass != nullptr && remaining > 0)
+    {
+        ret = snprintf_P(payload + offset, remaining, JsonDeviceClass,
             channel.deviceClass);
+
+        if (ret > 0 && static_cast<size_t>(ret) < remaining)
+        {
+            offset += static_cast<size_t>(ret);
+            remaining -= static_cast<size_t>(ret);
+        }
+        else
+        {
+            remaining = 0;
+        }
     }
 
-    if (channel.unit != nullptr)
+    if (channel.unit != nullptr && remaining > 0)
     {
-        offset += snprintf_P(payload + offset, sizeof(payload) - offset, JsonUnit,
+        ret = snprintf_P(payload + offset, remaining, JsonUnit,
             channel.unit);
+
+        if (ret > 0 && static_cast<size_t>(ret) < remaining)
+        {
+            offset += static_cast<size_t>(ret);
+            remaining -= static_cast<size_t>(ret);
+        }
+        else
+        {
+            remaining = 0;
+        }
     }
 
-    snprintf_P(payload + offset, sizeof(payload) - offset, JsonFooter,
-        _config->mqtt.deviceId, channel.slug,
-        _config->mqtt.deviceId);
+    if (remaining > 0)
+    {
+        snprintf_P(payload + offset, remaining, JsonFooter,
+            _config->mqtt.deviceId, channel.slug,
+            _config->mqtt.deviceId);
+    }
 
     client->publish(topic, payload, MqttQoS::AtMostOnce, true);
 }

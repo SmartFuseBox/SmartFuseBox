@@ -25,11 +25,14 @@ struct QItem
 	T data;
 	QItem* next;
 	
-	QItem(T d) : data(d), next(nullptr) {}
+	QItem(T d) : data(d), next(nullptr)
+	{
+	}
 };
 
 template<typename T>
-class Queue {
+class Queue
+{
 private:
 	uint8_t _capacity;
 	uint8_t _size;

@@ -787,11 +787,13 @@ bool WifiServer::isConnected() const
 
 bool WifiServer::getIpAddress(char* buffer, const uint8_t bufferLength) const
 {
-	if (!buffer || bufferLength == 0) {
+	if (!buffer || bufferLength == 0)
+	{
 		return false;
 	}
 
-	if (!isConnected()) {
+	if (!isConnected())
+	{
 		return false;
 	}
 
@@ -803,11 +805,13 @@ bool WifiServer::getIpAddress(char* buffer, const uint8_t bufferLength) const
 
 bool WifiServer::getSSID(char* buffer, const uint8_t bufferLength) const
 {
-	if (!buffer || bufferLength == 0) {
+	if (!buffer || bufferLength == 0)
+	{
 		return false;
 	}
 
-	if (!isConnected()) {
+	if (!isConnected())
+	{
 		return false;
 	}
 

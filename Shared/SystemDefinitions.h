@@ -154,6 +154,7 @@ constexpr uint8_t ConfigMaxLinkedRelays = 2;
 
 constexpr uint8_t MaxUint8Value = 0xFF;
 constexpr uint16_t MaxUint16Value = 0xFFFF;
+constexpr uint32_t MaxUint32Value = 0xFFFFFFFF;
 
 
 constexpr char PercentSuffix[] = "%";
@@ -164,6 +165,9 @@ constexpr char CelsiusSuffix[] = "C";
 
 
 constexpr unsigned long SerialInitTimeoutMs = 300;
+constexpr uint16_t SerialPollingDelayMs = 10;
+constexpr uint16_t SerialStabilizationDelayMs = 100;
+
 
 constexpr uint8_t RelayControllerNotInitialised = 1;
 constexpr uint8_t SoundControllerNotInitialised = 2;
@@ -217,11 +221,13 @@ struct CommandResult {
         return CommandResult{ true, 0 };
     }
 
-    static CommandResult okStatus(uint8_t statusValue) {
+    static CommandResult okStatus(uint8_t statusValue)
+    {
         return CommandResult{ true, statusValue };
     }
 
-    static CommandResult error(uint8_t errorCode) {
+    static CommandResult error(uint8_t errorCode)
+    {
         return CommandResult{ false, errorCode };
     }
 };
@@ -250,4 +256,15 @@ enum class ClientHandlingState : uint8_t
     ProcessingRequest,
     KeepAlive
 };
+
+constexpr uint16_t MillisecondsPerSecond = 1000;
+constexpr uint8_t  SecondsPerMinute = 60;
+constexpr uint8_t  MinutesPerHour = 60;
+constexpr uint8_t  HoursPerDay = 24;
+constexpr uint64_t Millis32BitOverflow = 0x100000000ULL;
+
+constexpr uint8_t  GeneratedPasswordMinBufferSize = 15;
+constexpr uint32_t PasswordRandomMin = 0x10000000;
+
+constexpr uint8_t  LineBreakLength = 2;  // \r\n
 

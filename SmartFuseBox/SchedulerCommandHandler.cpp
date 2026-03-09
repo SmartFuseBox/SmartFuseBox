@@ -262,8 +262,16 @@ bool SchedulerCommandHandler::handleCommand(SerialCommandManager* sender, const 
 
         for (uint8_t i = 0; i < paramCount; ++i)
         {
-            if (strcmp(params[i].key, "i") == 0) { idx = static_cast<uint8_t>(atoi(params[i].value)); hasI = true; }
-            else if (strcmp(params[i].key, "v") == 0) { enabled = static_cast<uint8_t>(atoi(params[i].value)); hasV = true; }
+            if (strcmp(params[i].key, "i") == 0)
+            {
+                idx = static_cast<uint8_t>(atoi(params[i].value));
+                hasI = true;
+            }
+            else if (strcmp(params[i].key, "v") == 0)
+            {
+                enabled = static_cast<uint8_t>(atoi(params[i].value));
+                hasV = true;
+            }
         }
 
         if (!hasI || !hasV)

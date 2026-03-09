@@ -42,216 +42,216 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	{
 		result = _configController->save();
 	}
-    else if (strcmp(command, ConfigResetSettings) == 0)
-    {
-        // Reset to defaults
-        result = _configController->reset();
-    }
-    else if (strcmp(command, ConfigRename) == 0)
-    {
-        if (paramCount >= 1)
-        {
-            result = _configController->rename(params[0].value);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigRenameRelay) == 0)
-    {
-        // Expect "C4:<idx>=<shortName>" or "C4:<idx>=<shortName|longName>" where idx 0..7
-        if (paramCount >= 1)
-        {
-            uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
-            result = _configController->renameRelay(idx, params[0].value);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigMapHomeButton) == 0)
-    {
-        // Expect "MAP <button>=<relay>" where button 0..3, relay 0..7 (or 255 to unmap)
-        if (paramCount >= 1)
-        {
-            uint8_t button = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
-            uint8_t relay = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+	else if (strcmp(command, ConfigResetSettings) == 0)
+	{
+		// Reset to defaults
+		result = _configController->reset();
+	}
+	else if (strcmp(command, ConfigRename) == 0)
+	{
+		if (paramCount >= 1)
+		{
+			result = _configController->rename(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigRenameRelay) == 0)
+	{
+		// Expect "C4:<idx>=<shortName>" or "C4:<idx>=<shortName|longName>" where idx 0..7
+		if (paramCount >= 1)
+		{
+			uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			result = _configController->renameRelay(idx, params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigMapHomeButton) == 0)
+	{
+		// Expect "MAP <button>=<relay>" where button 0..3, relay 0..7 (or 255 to unmap)
+		if (paramCount >= 1)
+		{
+			uint8_t button = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t relay = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
 
-            result = _configController->mapHomeButton(button, relay);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigSetButtonColor) == 0)
-    {
-        // Expect "MAP <button>=<color>" where button 0..3, image 0..5 (or 255 to unmap)
-        if (paramCount >= 1)
-        {
-            uint8_t button = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
-            uint8_t buttonColor = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+			result = _configController->mapHomeButton(button, relay);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigSetButtonColor) == 0)
+	{
+		// Expect "MAP <button>=<color>" where button 0..3, image 0..5 (or 255 to unmap)
+		if (paramCount >= 1)
+		{
+			uint8_t button = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t buttonColor = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
 
-            result = _configController->mapHomeButtonColor(button, buttonColor);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigBoatType) == 0)
-    {
-        // Expect "C7:type=<value>" where value is 0..3
-        if (paramCount >= 1)
-        {
-            uint8_t type = atoi(params[0].value);
-            result = _configController->setVesselType(type);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigSoundRelayId) == 0)
-    {
-        // Expect "MAP <value>=<relay>" where relay 0..7 (or 255 to unmap)
-        if (paramCount == 1 && strlen(params[0].value) > 0)
-        {
-            uint8_t relay = atoi(params[0].value);
-            result = _configController->setSoundRelayButton(relay);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigSoundStartDelay) == 0)
-    {
-        if (paramCount == 1)
-        {
-            uint16_t soundStartDelay = atoi(params[0].value);
-            result = _configController->setsoundDelayStart(soundStartDelay);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigBluetoothEnable) == 0)
-    {
-        // Expect "C10:v=<0|1>"
-        if (paramCount >= 1)
-        {
-            bool enable = SystemFunctions::parseBooleanValue(params[0].value);
-            result = _configController->setBluetoothEnabled(enable);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiEnable) == 0)
-    {
-        // Expect "C11:v=<0|1>"
-        if (paramCount >= 1)
-        {
-            bool enable = SystemFunctions::parseBooleanValue(params[0].value);
-            result = _configController->setWifiEnabled(enable);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiMode) == 0)
-    {
-        // Expect "C12:v=<0|1>"
-        if (paramCount >= 1)
-        {
-            uint8_t mode = static_cast<uint8_t>(atoi(params[0].value));
-            result = _configController->setWifiAccessMode(mode);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiSSID) == 0)
-    {
-        // Expect "C13:v=<value>"
-        if (paramCount >= 1)
-        {
-            result = _configController->setWifiSsid(params[0].value);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiPassword) == 0)
-    {
-        // Expect "C14:v=<value>"
-        if (paramCount >= 1)
-        {
-            result = _configController->setWifiPassword(params[0].value);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiPort) == 0)
-    {
-        // Expect "C15:v=<value>"
-        if (paramCount >= 1)
-        {
-            uint16_t port = static_cast<uint16_t>(atoi(params[0].value));
-            result = _configController->setWifiPort(port);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigWifiState) == 0)
-    {
-        // C16 WiFi State
-        uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
+			result = _configController->mapHomeButtonColor(button, buttonColor);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigBoatType) == 0)
+	{
+		// Expect "C7:type=<value>" where value is 0..3
+		if (paramCount >= 1)
+		{
+			uint8_t type = atoi(params[0].value);
+			result = _configController->setVesselType(type);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigSoundRelayId) == 0)
+	{
+		// Expect "MAP <value>=<relay>" where relay 0..7 (or 255 to unmap)
+		if (paramCount == 1 && strlen(params[0].value) > 0)
+		{
+			uint8_t relay = atoi(params[0].value);
+			result = _configController->setSoundRelayButton(relay);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigSoundStartDelay) == 0)
+	{
+		if (paramCount == 1)
+		{
+			uint16_t soundStartDelay = atoi(params[0].value);
+			result = _configController->setsoundDelayStart(soundStartDelay);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigBluetoothEnable) == 0)
+	{
+		// Expect "C10:v=<0|1>"
+		if (paramCount >= 1)
+		{
+			bool enable = SystemFunctions::parseBooleanValue(params[0].value);
+			result = _configController->setBluetoothEnabled(enable);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiEnable) == 0)
+	{
+		// Expect "C11:v=<0|1>"
+		if (paramCount >= 1)
+		{
+			bool enable = SystemFunctions::parseBooleanValue(params[0].value);
+			result = _configController->setWifiEnabled(enable);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiMode) == 0)
+	{
+		// Expect "C12:v=<0|1>"
+		if (paramCount >= 1)
+		{
+			uint8_t mode = static_cast<uint8_t>(atoi(params[0].value));
+			result = _configController->setWifiAccessMode(mode);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiSSID) == 0)
+	{
+		// Expect "C13:v=<value>"
+		if (paramCount >= 1)
+		{
+			result = _configController->setWifiSsid(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiPassword) == 0)
+	{
+		// Expect "C14:v=<value>"
+		if (paramCount >= 1)
+		{
+			result = _configController->setWifiPassword(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiPort) == 0)
+	{
+		// Expect "C15:v=<value>"
+		if (paramCount >= 1)
+		{
+			uint16_t port = static_cast<uint16_t>(atoi(params[0].value));
+			result = _configController->setWifiPort(port);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigWifiState) == 0)
+	{
+		// C16 WiFi State
+		uint8_t state = static_cast<uint8_t>(WifiConnectionState::Disconnected);
 
-        if (_wifiController)
-        {
-            state = static_cast<uint8_t>(_wifiController->getServer()->getConnectionState());
-        }
+		if (_wifiController)
+		{
+			state = static_cast<uint8_t>(_wifiController->getServer()->getConnectionState());
+		}
 
-        snprintf(responseBuffer, sizeof(responseBuffer), "v=%d", state);
-        result = ConfigResult::Success;
-    }
-    else if (strcmp(command, ConfigWifiApIpAddress) == 0)
-    {
-        // Expect "C17:v=<value>"
-        if (paramCount >= 1)
-        {
-            result = _configController->setWifiIpAddress(params[0].value);
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
-    else if (strcmp(command, ConfigDefaultRelayState) == 0)
-    {
-        if (paramCount == 1)
-        {
-            uint8_t relayIndex = static_cast<uint8_t>(atoi(params[0].key));
-            result = _configController->setRelayDefaultState(relayIndex, SystemFunctions::parseBooleanValue(params[0].value));
-        }
-        else
-        {
-            result = ConfigResult::InvalidParameter;
-        }
-    }
+		snprintf(responseBuffer, sizeof(responseBuffer), "v=%d", state);
+		result = ConfigResult::Success;
+	}
+	else if (strcmp(command, ConfigWifiApIpAddress) == 0)
+	{
+		// Expect "C17:v=<value>"
+		if (paramCount >= 1)
+		{
+			result = _configController->setWifiIpAddress(params[0].value);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigDefaultRelayState) == 0)
+	{
+		if (paramCount == 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(atoi(params[0].key));
+			result = _configController->setRelayDefaultState(relayIndex, SystemFunctions::parseBooleanValue(params[0].value));
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
 	else if (strcmp(command, ConfigLinkRelays) == 0)
 	{
 		// Expect "C19:<relay1>=<relay2>" to link relay1 to relay2
@@ -263,7 +263,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 
 			if (relay2 < MaxUint8Value)
 			{
-
 				result = _configController->linkRelays(relay1, relay2);
 			}
 			else
@@ -435,36 +434,36 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 					repeatMs = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
 			}
 
-					result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
-				}
-				else
-				{
-					result = ConfigResult::InvalidParameter;
-				}
-			}
-			else if (strcmp(command, ConfigSdCardSpeed) == 0)
-			{
-				// C31 - Set SD card initialize speed
-				// Format: C31:v=4 (or 8, 12, 16, 20, 24)
-				if (paramCount >= 1)
-				{
-					uint8_t speedMhz = static_cast<uint8_t>(atoi(params[0].value));
-					result = _configController->setSdCardInitializeSpeed(speedMhz);
-				}
-				else
-				{
-					result = ConfigResult::InvalidParameter;
-				}
-			}
-			else
-			{
-				result = ConfigResult::InvalidCommand;
-			}
+			result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (strcmp(command, ConfigSdCardSpeed) == 0)
+	{
+		// C31 - Set SD card initialize speed
+		// Format: C31:v=4 (or 8, 12, 16, 20, 24)
+		if (paramCount >= 1)
+		{
+			uint8_t speedMhz = static_cast<uint8_t>(atoi(params[0].value));
+			result = _configController->setSdCardInitializeSpeed(speedMhz);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else
+	{
+		result = ConfigResult::InvalidCommand;
+	}
 
 	if (result == ConfigResult::Success)
-    {
-        return CommandResult::ok();
-    }
+	{
+		return CommandResult::ok();
+	}
 
 	return CommandResult::error(static_cast<uint8_t>(result));
 }
@@ -472,7 +471,9 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 {
 	Config* config = ConfigManager::getConfigPtr();
-	if (!config) {
+
+	if (!config)
+	{
 		client->print("{\"error\":\"Config not available\"}");
 		return;
 	}
@@ -486,7 +487,9 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// Relays: short and long names
 	client->print("\"relays\":[");
-	for (uint8_t i = 0; i < ConfigRelayCount; ++i) {
+
+	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+	{
 		if (i > 0) client->print(",");
 		client->print("{\"shortName\":\"");
 		client->print(config->relayShortNames[i]);
@@ -494,22 +497,29 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 		client->print(config->relayLongNames[i]);
 		client->print("\"}");
 	}
+
 	client->print("],");
 
 	// Home button mappings
 	client->print("\"homeButtonMapping\":[");
-	for (uint8_t i = 0; i < ConfigHomeButtons; ++i) {
+
+	for (uint8_t i = 0; i < ConfigHomeButtons; ++i)
+	{
 		if (i > 0) client->print(",");
 		client->print(config->homePageMapping[i]);
 	}
+
 	client->print("],");
 
 	// Button colors
 	client->print("\"buttonColors\":[");
-	for (uint8_t i = 0; i < ConfigRelayCount; ++i) {
+
+	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+	{
 		if (i > 0) client->print(",");
 		client->print(config->buttonImage[i]);
 	}
+
 	client->print("],");
 
 	// Vessel type
@@ -554,34 +564,43 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// WiFi State
 	uint8_t wifiState = 0;
-	if (_wifiController && _wifiController->getServer()) {
+	if (_wifiController && _wifiController->getServer())
+	{
 		wifiState = static_cast<uint8_t>(_wifiController->getServer()->getConnectionState());
 	}
+
 	client->print("\"wifiState\":");
 	client->print(wifiState);
 	client->print(",");
 
 	// WiFi AP IP Address
 	client->print("\"apIpAddress\":\"");
-	if (_wifiController && _wifiController->getServer()) {
+
+	if (_wifiController && _wifiController->getServer())
+	{
 		char ipBuffer[MaxIpAddressLength];
 		_wifiController->getServer()->getIpAddress(ipBuffer, sizeof(ipBuffer));
 		client->print(ipBuffer);
-	} else {
+	}
+	else
+	{
 		client->print(config->apIpAddress);
 	}
+
 	client->print("\",");
 
 	// Default relay states
 	client->print("\"defaultRelayStates\":[");
-	for (uint8_t i = 0; i < ConfigRelayCount; ++i) {
+
+	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+	{
 		if (i > 0) client->print(",");
 		client->print(config->defaulRelayState[i] ? "true" : "false");
 	}
 
 	client->print("],");
-
 	client->print("\"linkedRelays\":[");
+
 	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
 	{
 		if (i > 0)

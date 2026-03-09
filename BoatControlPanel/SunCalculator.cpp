@@ -97,11 +97,14 @@ SunTimes SunCalculator::calculateSunTimes(float lat, float lon, uint16_t year, u
         (cosDec_set * cos(lat * PI / 180));
 
     // Check if sun is always up or always down
-    if (cosH_rise > 1 || cosH_set > 1) {
+    if (cosH_rise > 1 || cosH_set > 1)
+    {
         // Sun never rises (polar night)
         return { -1, -1, false };
     }
-    if (cosH_rise < -1 || cosH_set < -1) {
+
+    if (cosH_rise < -1 || cosH_set < -1)
+    {
         // Sun never sets (midnight sun)
         return { 0, 24, false };
     }

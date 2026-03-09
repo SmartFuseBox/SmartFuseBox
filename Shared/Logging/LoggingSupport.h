@@ -51,7 +51,8 @@ protected:
         }
     }
     
-    static void sendCommand(SerialCommandManager* mgr, const char* command, const char* params = "") {
+    static void sendCommand(SerialCommandManager* mgr, const char* command, const char* params = "")
+    {
         if (mgr)
         {
             mgr->sendCommand(command, params);
@@ -77,7 +78,9 @@ private:
     
 protected:
     explicit SingleLoggerSupport(SerialCommandManager* logger = nullptr) 
-        : _logger(logger) {}
+        : _logger(logger)
+    {
+    }
     
     void sendDebug(const char* message, const char* source = "")
     {
@@ -138,7 +141,9 @@ private:
     
 protected:
     explicit BroadcastLoggerSupport(BroadcastManager* broadcaster = nullptr)
-        : _broadcaster(broadcaster) {}
+        : _broadcaster(broadcaster)
+    {
+    }
     
     void sendDebug(const char* message, const char* source = "")
     {

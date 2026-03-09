@@ -212,9 +212,10 @@ void setup()
 #endif
 
 #if defined(NEXTION_DEBUG)
-    nextion.setDebugCallback([](const String& msg) {
+    nextion.setDebugCallback([](const String& msg)
+    {
         commandMgrComputer.sendCommand(msg.c_str(), "NEXTION");
-        });
+    });
 #endif
 
     // retrieve config settings

@@ -54,7 +54,7 @@ uint16_t SystemFunctions::freeMemory()
 
 uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize)
 {
-    if (bufferSize < 15)
+    if (!buffer || bufferSize < GeneratedPasswordMinBufferSize)
         return BufferInvalid;
 
 #if defined(WIFI_SUPPORT)
@@ -63,13 +63,10 @@ uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize
 
     snprintf_P(buffer, bufferSize, PSTR("sfb-%02X%02X%02X"), mac[3], mac[4], mac[5]);
 #else
-    // Use analog noise as seed
     randomSeed(analogRead(A0) + analogRead(A1) + millis());
-    uint32_t storedID = random(0x10000000, 0xFFFFFFFF);
+    uint32_t storedID = random(PasswordRandomMin, MaxUint32Value);
 
-    // Format: SFB12A1B2C3
-    snprintf_P(buffer, bufferSize, PSTR("sfb-%08X"), static_cast<int>(storedID));
-
+    snprintf_P(buffer, bufferSize, PSTR("sfb-%08lX"), (unsigned long)storedID);
 #endif
 
     buffer[bufferSize - 1] = '\0';
@@ -86,15 +83,18 @@ void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long
 		unsigned long leave = millis() + SerialInitTimeoutMs;
 
 		while (!serialPort && millis() < leave)
-			delay(10);
+			delay(SerialPollingDelayMs);
 
 		if (serialPort)
-			delay(100);
+			delay(SerialStabilizationDelayMs);
 	}
 }
 
 bool SystemFunctions::parseBooleanValue(const char* value)
 {
+    if (!value)
+        return false;
+
     return (strcmp(value, "1") == 0 ||
         strcmp(value, "on") == 0 ||
         strcmp(value, "true") == 0);
@@ -125,23 +125,25 @@ bool SystemFunctions::hasElapsed(unsigned long now, unsigned long previous, unsi
 }
 
 // Implementation
-size_t SystemFunctions::appendString(char* dest, size_t destSize, size_t offset, const char* src) {
-    if (!dest || !src || offset >= destSize - 1) return 0;
-    
-    size_t available = destSize - offset - 1; // Reserve space for null terminator
+size_t SystemFunctions::appendString(char* dest, size_t destSize, size_t offset, const char* src)
+{
+    if (!dest || !src || destSize == 0 || offset >= destSize - 1) return 0;
+
+    size_t available = destSize - offset - 1;
     size_t written = 0;
-    
+
     while (available > 0 && *src != '\0')
     {
         dest[offset + written++] = *src++;
         available--;
     }
-    
+
     dest[offset + written] = '\0';
     return written;
 }
 
-size_t SystemFunctions::calculateLength(const char* str) {
+size_t SystemFunctions::calculateLength(const char* str)
+{
     if (!str)
         return 0;
     
@@ -150,7 +152,7 @@ size_t SystemFunctions::calculateLength(const char* str) {
 
 bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start, size_t length)
 {
-    if (destSize == 0)
+    if (!dest || destSize == 0)
         return false;
 
     size_t srcLen = calculateLength(src);
@@ -179,7 +181,12 @@ bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_
 
 bool SystemFunctions::substr(char* dest, size_t destSize, const char* src, size_t start)
 {
-	return substr(dest, destSize, src, start, calculateLength(src) - start);
+    size_t srcLen = calculateLength(src);
+
+    if (start >= srcLen)
+        return substr(dest, destSize, src, start, 0);
+
+    return substr(dest, destSize, src, start, srcLen - start);
 }
 
 int32_t SystemFunctions::indexOf(const char* str, char ch, size_t start = 0)
@@ -200,6 +207,9 @@ int32_t SystemFunctions::indexOf(const char* str, char ch, size_t start = 0)
 
 void SystemFunctions::wrapTextAtWordBoundary(const char* input, char* output, size_t outputSize, size_t maxLineLength)
 {
+    if (!input || !output || outputSize == 0)
+        return;
+
     size_t outPos = 0;
     size_t currentLineLength = 0;
     size_t i = 0;
@@ -239,7 +249,7 @@ void SystemFunctions::wrapTextAtWordBoundary(const char* input, char* output, si
         // Don't wrap if we're at the start of a line or if word itself exceeds max length
         if (currentLineLength > 0 && currentLineLength + wordLength > maxLineLength)
         {
-            if (outPos < outputSize - 3)
+            if (outPos < outputSize - (LineBreakLength + 1))
             {
                 output[outPos++] = '\r';
                 output[outPos++] = '\n';
@@ -278,18 +288,18 @@ bool SystemFunctions::progmemToBuffer(const char* progmemStr, char* buffer, size
 TimeParts SystemFunctions::msToTimeParts(uint64_t ms)
 {
     TimeParts t;
-    t.milliseconds = (uint16_t)(ms % 1000ULL);
+    t.milliseconds = (uint16_t)(ms % MillisecondsPerSecond);
 
-    uint64_t totalSeconds = ms / 1000ULL;
-    t.seconds = (uint8_t)(totalSeconds % 60ULL);
+    uint64_t totalSeconds = ms / MillisecondsPerSecond;
+    t.seconds = (uint8_t)(totalSeconds % SecondsPerMinute);
 
-    uint64_t totalMinutes = totalSeconds / 60ULL;
-    t.minutes = (uint8_t)(totalMinutes % 60ULL);
+    uint64_t totalMinutes = totalSeconds / SecondsPerMinute;
+    t.minutes = (uint8_t)(totalMinutes % MinutesPerHour);
 
-    uint64_t totalHours = totalMinutes / 60ULL;
-    t.hours = (uint8_t)(totalHours % 24ULL);
+    uint64_t totalHours = totalMinutes / MinutesPerHour;
+    t.hours = (uint8_t)(totalHours % HoursPerDay);
 
-    t.days = (uint32_t)(totalHours / 24ULL);
+    t.days = (uint32_t)(totalHours / HoursPerDay);
     return t;
 }
 
@@ -302,17 +312,23 @@ uint64_t SystemFunctions::millis64()
     static uint64_t highMs = 0; 
 
     uint32_t now = millis();
-    if (now < lastMillis32) {
+    
+    if (now < lastMillis32)
+    {
         // Wrapped around (32-bit overflow)
-        highMs += 0x100000000ULL; // add 2^32
+        highMs += Millis32BitOverflow;
     }
+
     lastMillis32 = now;
     return highMs + now;
 #endif
 }
 
-void SystemFunctions::formatTimeParts(char* buffer, uint8_t bufferSize, const TimeParts& timeparts)
+void SystemFunctions::formatTimeParts(char* buffer, size_t bufferSize, const TimeParts& timeparts)
 {
+    if (!buffer || bufferSize == 0)
+        return;
+
     snprintf(buffer, bufferSize, "%lud %02u:%02u:%02u",
         (unsigned long)timeparts.days,
         (unsigned)timeparts.hours,

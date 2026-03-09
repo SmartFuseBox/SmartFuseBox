@@ -29,7 +29,6 @@ constexpr int16_t       SunTimeUnknown         = -1;
 constexpr unsigned long ScheduleCheckIntervalMs = 1000UL;
 
 constexpr uint16_t      MinutesPerDay    = 1440u;
-constexpr uint16_t      MinutesPerHour   = 60u;
 constexpr unsigned long MsPerMinute      = 60000UL;
 constexpr unsigned long MsPerSecond      = 1000UL;
 constexpr uint16_t      NeverFiredMinute = 0xFFFFu;

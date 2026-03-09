@@ -144,7 +144,8 @@ public:
      * @return Number of characters written (excluding null terminator), or 0 if buffer too small
      */
     template<typename... Args>
-    static size_t concatStrings(char* dest, size_t destSize, const char* first, Args... args) {
+    static size_t concatStrings(char* dest, size_t destSize, const char* first, Args... args)
+    {
         if (destSize == 0) return 0;
         
         size_t written = 0;
@@ -163,7 +164,8 @@ public:
 	* @param prefix The prefix to look for
 	* @return true if str starts with prefix, false otherwise
     */
-    static bool startsWith(const char* str, const char* prefix) {
+    static bool startsWith(const char* str, const char* prefix)
+    {
         return strncmp(str, prefix, strlen(prefix)) == 0;
     }
 
@@ -174,19 +176,26 @@ public:
     * @param prefix The prefix to look for (in PROGMEM via F() macro)
     * @return true if str starts with prefix, false otherwise
     */
-    static bool startsWith(const char* str, const __FlashStringHelper* prefix) {
-        if (!str || !prefix) return false;
+    static bool startsWith(const char* str, const __FlashStringHelper* prefix)
+    {
+        if (!str || !prefix)
+            return false;
 
         const char* p = reinterpret_cast<const char*>(prefix);
         size_t i = 0;
 
         // Compare character by character, reading from PROGMEM
-        while (true) {
+        while (true)
+        {
             char prefixChar = pgm_read_byte(p + i);
-            if (prefixChar == '\0') {
+
+            if (prefixChar == '\0')
+            {
                 return true; // Reached end of prefix, it's a match
             }
-            if (str[i] == '\0' || str[i] != prefixChar) {
+
+            if (str[i] == '\0' || str[i] != prefixChar)
+            {
                 return false; // String ended or mismatch
             }
             i++;
@@ -242,13 +251,14 @@ public:
 
     static uint64_t millis64();
 
-    static void formatTimeParts(char* buffer, uint8_t bufferSize, const TimeParts& timeparts);
+    static void formatTimeParts(char* buffer, size_t bufferSize, const TimeParts& timeparts);
 private:
     // Helper: Append a single string to buffer
     static size_t appendString(char* dest, size_t destSize, size_t offset, const char* src);
     
     // Variadic recursion base case
-    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset) {
+    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset)
+    {
         (void)dest;
 		(void)destSize;
 		(void)offset;
@@ -257,7 +267,8 @@ private:
     
     // Variadic recursion
     template<typename... Args>
-    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset, const char* first, Args... args) {
+    static size_t concatStringsImpl(char* dest, size_t destSize, size_t offset, const char* first, Args... args)
+    {
         size_t written = appendString(dest, destSize, offset, first);
         return written + concatStringsImpl(dest, destSize, offset + written, args...);
     }
@@ -265,11 +276,13 @@ private:
     // Calculate total length needed
     
     template<typename... Args>
-    static size_t calculateTotalLength(const char* first, Args... args) {
+    static size_t calculateTotalLength(const char* first, Args... args)
+    {
         return calculateLength(first) + calculateTotalLength(args...);
     }
     
-    static size_t calculateTotalLength() {
+    static size_t calculateTotalLength()
+    {
         return 0;
     }
 };

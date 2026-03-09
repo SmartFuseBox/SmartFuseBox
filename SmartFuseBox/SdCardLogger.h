@@ -59,7 +59,9 @@ struct SensorSnapshot {
         : temperature(NAN), humidity(0), bearing(NAN), compassTemp(NAN), 
           speed(0), waterLevel(0), waterPumpActive(false),
           gpsLat(NAN), gpsLon(NAN), altitude(NAN), gpsCourse(NAN),
-          gpsSats(0), gpsDistance(NAN), warnings(0), hornActive(false) {}
+          gpsSats(0), gpsDistance(NAN), warnings(0), hornActive(false)
+    {
+    }
 };
 
 /**
@@ -82,14 +84,17 @@ struct SensorSnapshot {
  * @code
  * SdCardLogger logger(&messageBus, &warningManager);
  * 
- * void setup() {
+ * void setup()
+ * {
  *     Config* config = ConfigManager::getConfigPtr();
- *     if (!logger.initialize(config)) {
+ *     if (!logger.initialize(config))
+ *     {
  *         // Handle initialization failure
  *     }
  * }
  * 
- * void loop() {
+ * void loop()
+ * {
  *     unsigned long now = millis();
  *     logger.update(now);
  * }

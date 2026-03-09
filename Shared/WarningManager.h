@@ -58,7 +58,8 @@ class ToneManager;
  * warningMgr.raiseWarning(WarningType::HighCompassTemperature);
  * 
  * // Check warnings:
- * if (warningMgr.hasWarnings()) {
+ * if (warningMgr.hasWarnings())
+ * {
  *     // Show warning indicator
  * }
  * @endcode

@@ -93,7 +93,8 @@ public:
      * @param unixTimestamp Seconds since epoch (UTC)
      * @return Age in days (floating)
      */
-    static float getMoonAgeDays(unsigned long unixTimestamp) {
+    static float getMoonAgeDays(unsigned long unixTimestamp)
+    {
         // Convert Unix time to Julian Day (JD)
         // JD for unix epoch: 2440587.5
         double jd = unixTimestamp / 86400.0 + 2440587.5;
@@ -111,25 +112,29 @@ public:
      * @param unixTimestamp Seconds since epoch (UTC)
      * @return MoonPhase enum value
      */
-    static MoonPhase getMoonPhaseFromUnix(unsigned long unixTimestamp) {
+    static MoonPhase getMoonPhaseFromUnix(unsigned long unixTimestamp)
+    {
         float age = getMoonAgeDays(unixTimestamp);
         // Map age into 8 equal sectors
         double phaseFraction = age / SYNODIC_MONTH; // 0..1
         int index = (int)(phaseFraction * 8.0 + 0.5) % 8;
-        switch (index) {
-        case 0: return MoonPhase::NewMoon;
-        case 1: return MoonPhase::WaxingCrescent;
-        case 2: return MoonPhase::FirstQuarter;
-        case 3: return MoonPhase::WaxingGibbous;
-        case 4: return MoonPhase::FullMoon;
-        case 5: return MoonPhase::WaningGibbous;
-        case 6: return MoonPhase::LastQuarter;
-        default: return MoonPhase::WaningCrescent;
+
+        switch (index)
+        {
+            case 0: return MoonPhase::NewMoon;
+            case 1: return MoonPhase::WaxingCrescent;
+            case 2: return MoonPhase::FirstQuarter;
+            case 3: return MoonPhase::WaxingGibbous;
+            case 4: return MoonPhase::FullMoon;
+            case 5: return MoonPhase::WaningGibbous;
+            case 6: return MoonPhase::LastQuarter;
+            default: return MoonPhase::WaningCrescent;
         }
     }
 
     // Copy the name from PROGMEM into a RAM buffer (safe copy)
-    static size_t getMoonPhaseName(MoonPhase phase, char* buffer, size_t bufferSize) {
+    static size_t getMoonPhaseName(MoonPhase phase, char* buffer, size_t bufferSize)
+    {
         if (!buffer || bufferSize == 0) return 0;
         uint8_t idx = static_cast<uint8_t>(phase);
         PGM_P p = reinterpret_cast<PGM_P>(pgm_read_ptr(&MoonPhaseNames[idx]));
@@ -138,7 +143,8 @@ public:
         return strlen(buffer);
     }
 
-    static size_t getMoonPhaseDescription(MoonPhase phase, char* buffer, size_t bufferSize) {
+    static size_t getMoonPhaseDescription(MoonPhase phase, char* buffer, size_t bufferSize)
+    {
         if (!buffer || bufferSize == 0) return 0;
         uint8_t idx = static_cast<uint8_t>(phase);
         PGM_P p = reinterpret_cast<PGM_P>(pgm_read_ptr(&MoonPhaseDescriptions[idx]));
@@ -147,7 +153,8 @@ public:
         return strlen(buffer);
     }
 
-    static size_t getMoonPhaseSeaDescription(MoonPhase phase, char* buffer, size_t bufferSize) {
+    static size_t getMoonPhaseSeaDescription(MoonPhase phase, char* buffer, size_t bufferSize)
+    {
         if (!buffer || bufferSize == 0) return 0;
         uint8_t idx = static_cast<uint8_t>(phase);
         PGM_P p = reinterpret_cast<PGM_P>(pgm_read_ptr(&MoonPhaseSeaDescriptions[idx]));

@@ -100,34 +100,45 @@ static const char* const WARNING_TYPE_STRINGS_PROGMEM[32] PROGMEM = {
     WT_24, WT_25, WT_26, WT_27, WT_28, WT_29, WT_30, WT_31
 };
 // Helper function to get warning string from bit position
-inline const char* getWarningString(uint8_t bitPosition) {
-    static char buf[64]; // ensure this is large enough for the longest warning string
-    if (bitPosition < 32) {
+inline const char* getWarningString(uint8_t bitPosition)
+{
+    static char buf[64];
+
+    if (bitPosition < 32)
+    {
         const char* progPtr = reinterpret_cast<const char*>(pgm_read_ptr(&WARNING_TYPE_STRINGS_PROGMEM[bitPosition]));
-        if (progPtr == nullptr) {
+
+        if (progPtr == nullptr)
+        {
             buf[0] = '\0';
             return buf;
         }
+
         // copy from PROGMEM into RAM buffer
         strncpy_P(buf, progPtr, sizeof(buf) - 1);
         buf[sizeof(buf) - 1] = '\0';
         return buf;
     }
+
     buf[0] = '\0';
     return buf;
 }
 
 // Helper function to get warning string from WarningType
-inline const char* getWarningString(WarningType type) {
-    if (type == WarningType::None) {
+inline const char* getWarningString(WarningType type)
+{
+    if (type == WarningType::None)
+    {
         return "No Warning";
     }
 
     uint32_t typeValue = static_cast<uint32_t>(type);
 
     // Find which bit is set (should only be one for valid WarningType)
-    for (uint8_t bit = 0; bit < 32; bit++) {
-        if (typeValue & (1UL << bit)) {
+    for (uint8_t bit = 0; bit < 32; bit++)
+    {
+        if (typeValue & (1UL << bit))
+        {
             return getWarningString(bit);
         }
     }
@@ -136,14 +147,17 @@ inline const char* getWarningString(WarningType type) {
 }
 
 // Bitwise operators for WarningType flags
-inline WarningType operator|(WarningType a, WarningType b) {
+inline WarningType operator|(WarningType a, WarningType b)
+{
     return static_cast<WarningType>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 }
 
-inline WarningType operator&(WarningType a, WarningType b) {
+inline WarningType operator&(WarningType a, WarningType b)
+{
     return static_cast<WarningType>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
 }
 
-inline WarningType& operator|=(WarningType& a, WarningType b) {
+inline WarningType& operator|=(WarningType& a, WarningType b)
+{
     return a = a | b;
 }

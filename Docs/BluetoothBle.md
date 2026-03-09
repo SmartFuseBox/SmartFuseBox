@@ -180,7 +180,9 @@ public:
                        WifiController* wifi,
                        IBluetoothRadio* bluetooth,  // accept interface
                        WarningManager* warnings)
-        : _bluetoothController(bluetooth) {}
+        : _bluetoothController(bluetooth)
+        {
+        }
 
     void updateStatus()
     {

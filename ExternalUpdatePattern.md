@@ -42,8 +42,10 @@ struct RelayStateUpdate {
 
 Override the handler in your page class:
 ```cpp
-void HomePage::handleExternalUpdate(uint8_t updateType, const void* data) {
-    if (updateType == static_cast<uint8_t>(HomePageUpdateType::RelayState) && data != nullptr) {
+void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
+{
+    if (updateType == static_cast<uint8_t>(HomePageUpdateType::RelayState) && data != nullptr)
+    {
         const RelayStateUpdate* update = static_cast<const RelayStateUpdate*>(data);
         // Update UI based on relay state
     }
@@ -57,7 +59,9 @@ Command handlers notify the current page:
 ```cpp
 RelayStateUpdate update = { relayIndex, isOn };
 BaseDisplayPage* currentPage = _nextionControl->getCurrentPage();
-if (currentPage) {
+
+if (currentPage)
+{
     currentPage->handleExternalUpdate(
         static_cast<uint8_t>(HomePageUpdateType::RelayState), 
         &update
@@ -144,8 +148,10 @@ struct GPSUpdate {
 
 3. **Handle it in your page** (HomePage.cpp):
 ```cpp
-void HomePage::handleExternalUpdate(uint8_t updateType, const void* data) {
-    if (updateType == static_cast<uint8_t>(HomePageUpdateType::GPSUpdate) && data != nullptr) {
+void HomePage::handleExternalUpdate(uint8_t updateType, const void* data)
+{
+    if (updateType == static_cast<uint8_t>(HomePageUpdateType::GPSUpdate) && data != nullptr)
+    {
         const GPSUpdate* gps = static_cast<const GPSUpdate*>(data);
         updateGPSDisplay(gps->latitude, gps->longitude);
     }
