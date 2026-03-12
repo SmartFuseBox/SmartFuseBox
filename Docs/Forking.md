@@ -12,7 +12,7 @@ overwriting your configuration.
 
 | File | Purpose |
 |---|---|
-| `SmartFuseBox/SmartFuseBox/Local.h` | Board selection, pins, feature flags, relay config |
+| `SmartFuseBox/Local.h` | Board selection, pins, feature flags, relay config |
 | `SmartFuseBox/SmartFuseBox/SmartFuseBox.ino` | Sensor wiring, UART selection, baud rates |
 
 These files are protected by `merge=ours` in `.gitattributes` and will never be overwritten
