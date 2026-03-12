@@ -131,6 +131,7 @@
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
     <ClInclude Include="BluetoothRadioBridge.h" />
+    <ClInclude Include="BoardConfig.h" />
     <ClInclude Include="Esp32WifiClient.h" />
     <ClInclude Include="Esp32WifiRadio.h" />
     <ClInclude Include="IBluetoothRadio.h" />
