@@ -107,7 +107,6 @@ bool MQTTConfigCommandHandler::processCommand(const char* command, const char* p
 bool MQTTConfigCommandHandler::handleMqttEnable(const char* params)
 {
 #if defined(MQTT_SUPPORT)
-    return false;
     if (_config == nullptr)
     {
         return false;
