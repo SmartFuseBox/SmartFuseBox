@@ -27,6 +27,7 @@
 
 #if defined(MQTT_SUPPORT)
 #include "MQTTConfigCommandHandler.h"
+#include "MQTTController.h"
 #endif
 
 
