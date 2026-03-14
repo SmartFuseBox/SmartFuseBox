@@ -41,6 +41,7 @@ private:
     uint8_t _pendingDaytimeCount;
     Queue<uint16_t> _lightQueue;
     uint16_t _currentLightLevel;
+    bool _isDigital;
 
     void syncNightRelay(Config* config)
     {
@@ -58,18 +59,43 @@ protected:
     void initialize() override
     {
         pinMode(_sensorPin, INPUT);
-        pinMode(_analogPin, INPUT);
+
+        if (!_isDigital)
+            pinMode(_analogPin, INPUT);
+
+        sendDebug(_isDigital ? "Mode: digital" : "Mode: analog", "LightSensor");
         syncNightRelay(ConfigManager::getConfigPtr());
     }
 
     unsigned long update() override
     {
-        _currentLightLevel = static_cast<uint16_t>(analogRead(_analogPin));
-        _lightQueue.enqueue(_currentLightLevel);
-
         Config* config = ConfigManager::getConfigPtr();
-        uint16_t threshold = (config != nullptr) ? config->lightSensor.daytimeThreshold : 512;
-        bool reading = _lightQueue.average() > threshold;
+        bool reading;
+
+        if (_isDigital)
+        {
+            reading = digitalRead(_sensorPin) == HIGH;
+            _currentLightLevel = reading ? 1023 : 0;
+            _lightQueue.enqueue(_currentLightLevel);
+
+            char buf[32];
+            snprintf(buf, sizeof(buf), "pin=%d state=%s day=%d",
+                _sensorPin, reading ? "HIGH" : "LOW", _isDaytime ? 1 : 0);
+            sendDebug(buf, "LightSensor");
+        }
+        else
+        {
+            _currentLightLevel = static_cast<uint16_t>(analogRead(_analogPin));
+            _lightQueue.enqueue(_currentLightLevel);
+
+            uint16_t threshold = (config != nullptr) ? config->lightSensor.daytimeThreshold : 512;
+            reading = _lightQueue.average() > threshold;
+
+            char buf[48];
+            snprintf(buf, sizeof(buf), "level=%u avg=%u threshold=%u day=%d",
+                _currentLightLevel, _lightQueue.average(), threshold, _isDaytime ? 1 : 0);
+            sendDebug(buf, "LightSensor");
+        }
 
         if (reading == _pendingDaytime)
         {
@@ -78,6 +104,9 @@ protected:
         }
         else
         {
+            char buf[40];
+            snprintf(buf, sizeof(buf), "Pending flip: %s count reset", reading ? "day" : "night");
+            sendDebug(buf, "LightSensor");
             _pendingDaytime = reading;
             _pendingDaytimeCount = 1;
         }
@@ -85,6 +114,10 @@ protected:
         if (_pendingDaytimeCount >= DaytimeConfirmReadings && _isDaytime != _pendingDaytime)
         {
             _isDaytime = _pendingDaytime;
+
+            char buf[24];
+            snprintf(buf, sizeof(buf), "State -> %s", _isDaytime ? "day" : "night");
+            sendDebug(buf, "LightSensor");
             syncNightRelay(config);
         }
 
@@ -105,13 +138,15 @@ protected:
 
         return LightCheckMs;
     }
+
 public:
     LightSensorHandler(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
-        WarningManager* warningManager, uint8_t sensorPin, uint8_t analogPin, RelayController* relayController = nullptr)
+        WarningManager* warningManager, uint8_t sensorPin, uint8_t analogPin, RelayController* relayController = nullptr,
+        bool isDigital = false)
         : BroadcastLoggerSupport(broadcastManager), _messageBus(messageBus), _sensorCommandHandler(sensorCommandHandler),
         _warningManager(warningManager), _relayController(relayController), _sensorPin(sensorPin), _analogPin(analogPin),
         _isPinActive(false), _isDaytime(true), _pendingDaytime(true), _pendingDaytimeCount(DaytimeConfirmReadings),
-        _lightQueue(LightQueueCapacity), _currentLightLevel(0)
+        _lightQueue(LightQueueCapacity), _currentLightLevel(0), _isDigital(isDigital)
     {
     }
 

@@ -222,7 +222,7 @@ struct Config {
 
 	LightSensorConfig lightSensor;
 
-	#if defined(SCHEDULER_SUPPORT)
+#if defined(SCHEDULER_SUPPORT)
 	SchedulerSettings scheduler;
 #endif
 

@@ -73,6 +73,8 @@ These are commands used to configure the system settings and can only be sent fr
 | `C29` — Reload Config from SD (SFB) | `C29` | **Local only (Serial/USB)**. Reload configuration from SD card config.txt file... |
 | `C30` — Export Config to SD (SFB) | `C30` | **Local only (Serial/USB)**. Export current in-memory configuration to SD card... |
 | `C31` — SD Card Initialize Speed (SFB) | `C31:v=4` | Set SD card SPI initialization speed in MHz. Param format: `v=<speed>`. Valid values: 4, 8, 12, 16, 20, 24. Default is 4 MHz. **Note:** Higher speeds (16+ MHz) should only be used with high-quality SD cards that explicitly support high-speed SPI mode. Using speeds that are too high for your SD card may result in initialization failures or data corruption. If experiencing SD card issues, try reducing the speed to 4 or 8 MHz. |
+| `C32` — Light Sensor Night Relay (SFB) | `C32:v=255` | Set the relay index to activate at night (when light sensor reports night-time). Param format: `v=<relay>`. Valid values: 0–(relay count-1). Use 255 to disable night relay switching. Query without params returns current relay index. |
+| `C33` — Light Sensor Daytime Threshold (SFB) | `C33:v=512` | Set the analogue light level threshold above which daytime is detected. Param format: `v=<threshold>`. Valid range: 0–1023. Default is 512. Readings from the rolling average of the last 10 samples are compared against this value; 3 consecutive consistent readings are required before the day/night state changes (see S9). |
 
 ### MQTT Configuration Commands (SFB)
 These commands configure MQTT connectivity for Home Assistant and other MQTT-based integrations.
