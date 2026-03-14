@@ -462,6 +462,9 @@
     <ClInclude Include="SchedulerNetworkHandler.h">
       <Filter>Header Files\Scheduler</Filter>
     </ClInclude>
+    <ClInclude Include="BoardConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Wifi.md" />
