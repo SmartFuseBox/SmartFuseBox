@@ -97,7 +97,7 @@ protected:
 
             uint16_t avgLevel = _lightQueue.average();
             uint16_t threshold = (config != nullptr) ? config->lightSensor.daytimeThreshold : 512;
-            uint16_t hysteresis = threshold / AnalogHysteresisPct;
+            uint16_t hysteresis = (threshold * AnalogHysteresisPct) / 100;
             if (hysteresis == 0) hysteresis = 1;
             uint16_t lower = (threshold > hysteresis) ? threshold - hysteresis : 0;
             uint16_t upper = (threshold + hysteresis > 1023) ? 1023 : threshold + hysteresis;
