@@ -164,17 +164,17 @@ public:
 					(_wifiController && _wifiController->isEnabled()) ? "ON" : "OFF");
 				break;
 
-					case 4:
-					{
-			#if defined(SD_CARD_SUPPORT)
-						unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
-						double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
-						snprintf(buffer, size, "%.1f", mb);
-			#else
-						snprintf(buffer, size, "0.0");
-			#endif
-						break;
-					}
+				case 4:
+				{
+		#if defined(SD_CARD_SUPPORT)
+					unsigned long bytes = (_sdCardLogger ? _sdCardLogger->getCurrentLogFileSize() : 0);
+					double mb = static_cast<double>(bytes) / 1024.0 / 1024.0;
+					snprintf(buffer, size, "%.1f", mb);
+		#else
+					snprintf(buffer, size, "0.0");
+		#endif
+					break;
+				}
 
 			case 5:
 				snprintf(buffer, size, "%u",
@@ -192,6 +192,12 @@ public:
 				snprintf(buffer, size, "0");
 				break;
 		}
+	}
+
+	unsigned long getMqttPublishIntervalMs(uint8_t channelIndex) const override
+	{
+		(void)channelIndex;
+		return 3000; // System metrics publish every 3 seconds
 	}
 #endif
 };

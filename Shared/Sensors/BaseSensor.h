@@ -21,9 +21,6 @@
 #include "LoggingSupport.h"
 #include "Local.h"
 
-#if defined(SMART_FUSE_BOX_APP_FWD)
-#endif
-
 // Forward declaration to allow SmartFuseBoxApp to be declared friend below
 class SmartFuseBoxApp;
 
@@ -121,5 +118,11 @@ public:
 	virtual MqttSensorChannel getMqttChannel(uint8_t channelIndex) const = 0;
 
 	virtual void getMqttValue(uint8_t channelIndex, char* buffer, size_t size) const = 0;
+
+	virtual unsigned long getMqttPublishIntervalMs(uint8_t channelIndex) const
+	{
+		(void)channelIndex;
+		return 1000; // Default: publish every 1 second
+	}
 #endif
 };

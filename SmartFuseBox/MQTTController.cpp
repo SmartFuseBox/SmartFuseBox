@@ -152,10 +152,6 @@ bool MQTTController::connect()
         return true;
     }
 
-    if (_commandMgr != nullptr)
-    {
-        _commandMgr->sendDebug(F("Attempting connect"), F("MQTT Controller"));
-    }
     // Ensure WiFi is connected before attempting TCP connect
     if (_wifiRadio != nullptr && _wifiRadio->status() != WifiConnectionState::Connected)
     {
@@ -163,7 +159,13 @@ bool MQTTController::connect()
         {
             _commandMgr->sendDebug(F("WiFi not connected, skipping connect"), F("MQTT Controller"));
         }
+
         return false;
+    }
+
+    if (_commandMgr != nullptr)
+    {
+        _commandMgr->sendDebug(F("Attempting connect"), F("MQTT Controller"));
     }
 
     bool result = _mqttClient->connect();
