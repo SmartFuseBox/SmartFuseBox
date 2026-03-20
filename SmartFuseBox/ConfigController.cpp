@@ -76,8 +76,8 @@ ConfigResult ConfigController::rename(const char* name)
 	if (strlen(name) > ConfigMaxNameLength)
 		return ConfigResult::TooLong;
 
-	strncpy(_config->name, name, sizeof(_config->name) - 1);
-	_config->name[sizeof(_config->name) - 1] = '\0';
+	strncpy(_config->vessel.name, name, sizeof(_config->vessel.name) - 1);
+	_config->vessel.name[sizeof(_config->vessel.name) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -109,14 +109,14 @@ ConfigResult ConfigController::renameRelay(const uint8_t relayIndex, const char*
 	}
 
 	// Copy short name with truncation to relay short name length
-	size_t maxShortLen = sizeof(_config->relayShortNames[relayIndex]) - 1;
-	strncpy(_config->relayShortNames[relayIndex], shortName, maxShortLen);
-	_config->relayShortNames[relayIndex][maxShortLen] = '\0';
+	size_t maxShortLen = sizeof(_config->relay.shortNames[relayIndex]) - 1;
+	strncpy(_config->relay.shortNames[relayIndex], shortName, maxShortLen);
+	_config->relay.shortNames[relayIndex][maxShortLen] = '\0';
 
 	// Copy long name with truncation to relay long name length
-	size_t maxLongLen = sizeof(_config->relayLongNames[relayIndex]) - 1;
-	strncpy(_config->relayLongNames[relayIndex], longName, maxLongLen);
-	_config->relayLongNames[relayIndex][maxLongLen] = '\0';
+	size_t maxLongLen = sizeof(_config->relay.longNames[relayIndex]) - 1;
+	strncpy(_config->relay.longNames[relayIndex], longName, maxLongLen);
+	_config->relay.longNames[relayIndex][maxLongLen] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -131,7 +131,7 @@ ConfigResult ConfigController::mapHomeButton(const uint8_t homeButtonIndex, cons
 	if (relayIndex >= ConfigRelayCount)
 		return ConfigResult::InvalidRelay;
 
-	_config->homePageMapping[homeButtonIndex] = relayIndex;
+	_config->relay.homePageMapping[homeButtonIndex] = relayIndex;
 	return ConfigResult::Success;
 }
 
@@ -152,7 +152,7 @@ ConfigResult ConfigController::mapHomeButtonColor(const uint8_t homeButtonIndex,
 	if ((color < ImageButtonColorBlue || color > ImageButtonColorYellow) && color != DefaultValue)
 		return ConfigResult::InvalidParameter;
 
-	_config->buttonImage[homeButtonIndex] = color;
+	_config->relay.buttonImage[homeButtonIndex] = color;
 	return ConfigResult::Success;
 }
 
@@ -164,7 +164,7 @@ ConfigResult ConfigController::setVesselType(const uint8_t vesselType)
 	if (vesselType > static_cast<uint8_t>(VesselType::Yacht))
 		return ConfigResult::InvalidParameter;
 
-	_config->vesselType = static_cast<VesselType>(vesselType);
+	_config->vessel.vesselType = static_cast<VesselType>(vesselType);
 	updateSoundControllerConfig();
 	return ConfigResult::Success;
 }
@@ -177,7 +177,7 @@ ConfigResult ConfigController::setSoundRelayButton(const uint8_t relayIndex)
 	if (relayIndex >= ConfigRelayCount && relayIndex != DefaultValue)
 		return ConfigResult::InvalidRelay;
 
-	_config->hornRelayIndex = relayIndex;
+	_config->sound.hornRelayIndex = relayIndex;
 	updateSoundControllerConfig();
 	return ConfigResult::Success;
 }
@@ -187,7 +187,7 @@ ConfigResult ConfigController::setsoundDelayStart(const uint16_t delayMilliSecon
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_config->soundStartDelayMs = delayMilliSeconds;
+	_config->sound.startDelayMs = delayMilliSeconds;
 	updateSoundControllerConfig();
 	return ConfigResult::Success;
 }
@@ -197,7 +197,7 @@ ConfigResult ConfigController::setBluetoothEnabled(const bool enabled)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_config->bluetoothEnabled = enabled;
+	_config->network.bluetoothEnabled = enabled;
 
 	// do not apply live, only on next restart, otherwise too many enabled/disable cycles will 
 	// eventually force the board to run out of memory, the only exception to this is if 
@@ -218,7 +218,7 @@ ConfigResult ConfigController::setWifiEnabled(const bool enabled)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_config->wifiEnabled = enabled;
+	_config->network.wifiEnabled = enabled;
 
 	// do not apply live, only on next restart, otherwise too many enabled/disable cycles will 
 	// eventually force the board to run out of memory, the only exception to this is if 
@@ -234,17 +234,15 @@ ConfigResult ConfigController::setWifiEnabled(const bool enabled)
 	return ConfigResult::Success;
 }
 
-ConfigResult ConfigController::setWifiAccessMode(const uint8_t accessMode)
+ConfigResult ConfigController::setWifiAccessMode(const WifiMode accessMode)
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	if (accessMode > 1)
-	{
+	// only accept supported WiFi modes to avoid persisting invalid values from user input
+	if (accessMode != WifiMode::AccessPoint && accessMode != WifiMode::Client)
 		return ConfigResult::InvalidParameter;
-	}
-
-	_config->accessMode = accessMode;
+	_config->network.accessMode = accessMode;
 	return ConfigResult::Success;
 }
 
@@ -256,8 +254,8 @@ ConfigResult ConfigController::setWifiSsid(const char* ssid)
 	if (strlen(ssid) > MaxSSIDLength - 1)
 		return ConfigResult::TooLong;
 
-	strncpy(_config->apSSID, ssid, sizeof(_config->apSSID) - 1);
-	_config->apSSID[sizeof(_config->apSSID) - 1] = '\0';
+	strncpy(_config->network.ssid, ssid, sizeof(_config->network.ssid) - 1);
+	_config->network.ssid[sizeof(_config->network.ssid) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -272,8 +270,8 @@ ConfigResult ConfigController::setWifiPassword(const char* password)
 	if (strlen(password) > MaxWiFiPasswordLength - 1)
 		return ConfigResult::InvalidParameter;
 
-	strncpy(_config->apPassword, password, sizeof(_config->apPassword) - 1);
-	_config->apPassword[sizeof(_config->apPassword) - 1] = '\0';
+	strncpy(_config->network.password, password, sizeof(_config->network.password) - 1);
+	_config->network.password[sizeof(_config->network.password) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -287,7 +285,7 @@ ConfigResult ConfigController::setWifiPort(const uint16_t port)
 		return ConfigResult::InvalidParameter;
 	}
 
-	_config->wifiPort = port;
+	_config->network.port = port;
 	return ConfigResult::Success;
 }
 
@@ -308,8 +306,8 @@ ConfigResult ConfigController::setWifiIpAddress(const char* ipAddress)
 		return ConfigResult::InvalidParameter;
 	}
 
-	strncpy(_config->apIpAddress, ipAddress, sizeof(_config->apIpAddress) - 1);
-	_config->apIpAddress[sizeof(_config->apIpAddress) - 1] = '\0';
+	strncpy(_config->network.apIpAddress, ipAddress, sizeof(_config->network.apIpAddress) - 1);
+	_config->network.apIpAddress[sizeof(_config->network.apIpAddress) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -321,7 +319,7 @@ ConfigResult ConfigController::setRelayDefaultState(const uint8_t relayIndex, co
 	if (relayIndex >= ConfigRelayCount)
 		return ConfigResult::InvalidRelay;
 
-	_config->defaulRelayState[relayIndex] = isOpen;
+	_config->relay.defaultState[relayIndex] = isOpen;
 	return ConfigResult::Success;
 }
 
@@ -359,7 +357,7 @@ ConfigResult ConfigController::linkRelays(uint8_t relayIndex, uint8_t linkedRela
 	// is the relay already linked?
 	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 	{
-		if (_config->linkedRelays[i][0] == relayIndex || _config->linkedRelays[i][1] == relayIndex)
+		if (_config->relay.linkedRelays[i][0] == relayIndex || _config->relay.linkedRelays[i][1] == relayIndex)
 		{
 			return ConfigResult::Failed;
 		}
@@ -368,7 +366,7 @@ ConfigResult ConfigController::linkRelays(uint8_t relayIndex, uint8_t linkedRela
 	// find next linked relay space
 	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 	{
-		if (_config->linkedRelays[i][0] == MaxUint8Value)
+		if (_config->relay.linkedRelays[i][0] == MaxUint8Value)
 		{
 			availableIndex = i;
 			break;
@@ -378,8 +376,8 @@ ConfigResult ConfigController::linkRelays(uint8_t relayIndex, uint8_t linkedRela
 	if (availableIndex == MaxUint8Value)
 		return ConfigResult::Failed;
 
-	_config->linkedRelays[availableIndex][0] = relayIndex;
-	_config->linkedRelays[availableIndex][1] = linkedRelay;
+	_config->relay.linkedRelays[availableIndex][0] = relayIndex;
+	_config->relay.linkedRelays[availableIndex][1] = linkedRelay;
 	return ConfigResult::Success;
 }
 
@@ -396,10 +394,10 @@ ConfigResult ConfigController::unlinkRelay(uint8_t relayIndex)
 	bool found = false;
 	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 	{
-		if (_config->linkedRelays[i][0] == relayIndex || _config->linkedRelays[i][1] == relayIndex)
+		if (_config->relay.linkedRelays[i][0] == relayIndex || _config->relay.linkedRelays[i][1] == relayIndex)
 		{
-			_config->linkedRelays[i][0] = MaxUint8Value;
-			_config->linkedRelays[i][1] = MaxUint8Value;
+			_config->relay.linkedRelays[i][0] = MaxUint8Value;
+			_config->relay.linkedRelays[i][1] = MaxUint8Value;
 			found = true;
 		}
 	}
@@ -417,7 +415,7 @@ ConfigResult ConfigController::setTimezoneOffset(const int8_t offset)
 	if (offset < -12 || offset > 14)
 		return ConfigResult::InvalidParameter;
 
-	_config->timezoneOffset = offset;
+	_config->system.timezoneOffset = offset;
 	return ConfigResult::Success;
 }
 
@@ -441,8 +439,8 @@ ConfigResult ConfigController::setMmsi(const char* mmsi)
 			return ConfigResult::InvalidParameter;
 	}
 
-	strncpy(_config->mMSI, mmsi, sizeof(_config->mMSI) - 1);
-	_config->mMSI[sizeof(_config->mMSI) - 1] = '\0';
+	strncpy(_config->vessel.mmsi, mmsi, sizeof(_config->vessel.mmsi) - 1);
+	_config->vessel.mmsi[sizeof(_config->vessel.mmsi) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -455,8 +453,8 @@ ConfigResult ConfigController::setCallSign(const char* callSign)
 	if (callSign == nullptr)
 		return ConfigResult::InvalidParameter;
 
-	strncpy(_config->callSign, callSign, sizeof(_config->callSign) - 1);
-	_config->callSign[sizeof(_config->callSign) - 1] = '\0';
+	strncpy(_config->vessel.callSign, callSign, sizeof(_config->vessel.callSign) - 1);
+	_config->vessel.callSign[sizeof(_config->vessel.callSign) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -469,8 +467,8 @@ ConfigResult ConfigController::setHomePort(const char* homePort)
 	if (homePort == nullptr)
 		return ConfigResult::InvalidParameter;
 
-	strncpy(_config->homePort, homePort, sizeof(_config->homePort) - 1);
-	_config->homePort[sizeof(_config->homePort) - 1] = '\0';
+	strncpy(_config->vessel.homePort, homePort, sizeof(_config->vessel.homePort) - 1);
+	_config->vessel.homePort[sizeof(_config->vessel.homePort) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -490,30 +488,30 @@ ConfigResult ConfigController::setLedColor(const uint8_t type, const uint8_t col
 	{
 		if (colorSet == 0) // Good color
 		{
-			_config->ledConfig.dayGoodColor[0] = r;
-			_config->ledConfig.dayGoodColor[1] = g;
-			_config->ledConfig.dayGoodColor[2] = b;
+			_config->led.dayGoodColor[0] = r;
+			_config->led.dayGoodColor[1] = g;
+			_config->led.dayGoodColor[2] = b;
 		}
 		else // Bad color
 		{
-			_config->ledConfig.dayBadColor[0] = r;
-			_config->ledConfig.dayBadColor[1] = g;
-			_config->ledConfig.dayBadColor[2] = b;
+			_config->led.dayBadColor[0] = r;
+			_config->led.dayBadColor[1] = g;
+			_config->led.dayBadColor[2] = b;
 		}
 	}
 	else // Night mode
 	{
 		if (colorSet == 0) // Good color
 		{
-			_config->ledConfig.nightGoodColor[0] = r;
-			_config->ledConfig.nightGoodColor[1] = g;
-			_config->ledConfig.nightGoodColor[2] = b;
+			_config->led.nightGoodColor[0] = r;
+			_config->led.nightGoodColor[1] = g;
+			_config->led.nightGoodColor[2] = b;
 		}
 		else // Bad color
 		{
-			_config->ledConfig.nightBadColor[0] = r;
-			_config->ledConfig.nightBadColor[1] = g;
-			_config->ledConfig.nightBadColor[2] = b;
+			_config->led.nightBadColor[0] = r;
+			_config->led.nightBadColor[1] = g;
+			_config->led.nightBadColor[2] = b;
 		}
 	}
 
@@ -532,9 +530,9 @@ ConfigResult ConfigController::setLedBrightness(const uint8_t type, const uint8_
 		return ConfigResult::InvalidParameter;
 
 	if (type == 0)
-		_config->ledConfig.dayBrightness = brightness;
+		_config->led.dayBrightness = brightness;
 	else
-		_config->ledConfig.nightBrightness = brightness;
+		_config->led.nightBrightness = brightness;
 
 	return ConfigResult::Success;
 }
@@ -545,7 +543,7 @@ ConfigResult ConfigController::setLedAutoSwitch(const bool enabled)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_config->ledConfig.autoSwitch = enabled;
+	_config->led.autoSwitch = enabled;
 	return ConfigResult::Success;
 }
 
@@ -555,9 +553,9 @@ ConfigResult ConfigController::setLedEnableStates(const bool gps, const bool war
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	_config->ledConfig.gpsEnabled = gps;
-	_config->ledConfig.warningEnabled = warning;
-	_config->ledConfig.systemEnabled = system;
+	_config->led.gpsEnabled = gps;
+	_config->led.warningEnabled = warning;
+	_config->led.systemEnabled = system;
 
 	return ConfigResult::Success;
 }
@@ -582,17 +580,17 @@ ConfigResult ConfigController::setControlPanelTones(const uint8_t type, const ui
 
 	if (type == 0) // Good tone
 	{
-		_config->soundConfig.goodPreset = preset;
-		_config->soundConfig.good_toneHz = toneHz;
-		_config->soundConfig.good_durationMs = durationMs;
+		_config->sound.goodPreset = preset;
+		_config->sound.goodToneHz = toneHz;
+		_config->sound.goodDurationMs = durationMs;
 		// repeat is only for bad sounds, ignore for good
 	}
 	else // Bad tone
 	{
-		_config->soundConfig.badPreset = preset;
-		_config->soundConfig.bad_toneHz = toneHz;
-		_config->soundConfig.bad_durationMs = durationMs;
-		_config->soundConfig.bad_repeatMs = repeatMs;
+		_config->sound.badPreset = preset;
+		_config->sound.badToneHz = toneHz;
+		_config->sound.badDurationMs = durationMs;
+		_config->sound.badRepeatMs = repeatMs;
 	}
 
 	return ConfigResult::Success;
@@ -609,7 +607,7 @@ ConfigResult ConfigController::setSdCardInitializeSpeed(const uint8_t speedMhz)
 		speedMhz != 16 && speedMhz != 20 && speedMhz != 24)
 		return ConfigResult::InvalidParameter;
 
-	_config->sdCardInitializeSpeed = speedMhz;
+	_config->sdCard.initializeSpeed = speedMhz;
 	return ConfigResult::Success;
 }
 

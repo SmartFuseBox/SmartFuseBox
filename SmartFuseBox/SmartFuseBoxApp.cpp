@@ -77,10 +77,8 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 	  , _nextRunMqttMs(0)
 #endif
 
-#if defined(SCHEDULER_SUPPORT)
       , _schedulerCommandHandler(&_relayController)
       , _scheduleController(&_relayController, &_messageBus)
-#endif
 
 #if defined(LED_MANAGER)
       , _ledManager(&_messageBus)
@@ -140,19 +138,13 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
 
     // serial command handlers
     ISerialCommandHandler* linkHandlers[] = { &_relayHandler, &_soundHandler, &_configHandler, &_ackHandler,
-        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler
-#if defined(SCHEDULER_SUPPORT)
-        , &_schedulerCommandHandler
-#endif
+        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler, &_schedulerCommandHandler
         };
     size_t linkHandlerCount = sizeof(linkHandlers) / sizeof(linkHandlers[0]);
     _commandMgrLink->registerHandlers(linkHandlers, linkHandlerCount);
 
     ISerialCommandHandler* computerHandlers[] = { &_relayHandler, &_soundHandler, &_configHandler, &_ackHandler,
-        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler
-#if defined(SCHEDULER_SUPPORT)
-        , &_schedulerCommandHandler 
-#endif
+        &_systemCommandHandler, &_warningCommandHandler, &_sensorCommandHandler, &_schedulerCommandHandler 
         };
     size_t computerHandlerCount = sizeof(computerHandlers) / sizeof(computerHandlers[0]);
     _commandMgrComputer->registerHandlers(computerHandlers, computerHandlerCount);
@@ -181,7 +173,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     // Initialize MQTT (after WiFi initialization)
     _mqttSensorHandler = new MQTTSensorHandler(&_mqttController, &_messageBus, _sensorController, _commandMgrComputer);
 
-    if (config->accessMode == AccessModeClient && _mqttController.begin())
+    if (config->network.accessMode == WifiMode::Client && _mqttController.begin())
     {
         // MQTT enabled in config, initialize handlers
         _mqttRelayHandler.begin();
@@ -213,7 +205,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     microSdDriver.setOnCardReadyCallback(onSdCardReadyCallback);
 #endif
 
-    microSdDriver.beginInitialize(SdCardCsPin, config->sdCardInitializeSpeed);
+    microSdDriver.beginInitialize(SdCardCsPin, config->sdCard.initializeSpeed);
 
     // Initialize SD card logger
     _sdCardLogger.initialize();
@@ -226,7 +218,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     // open any relays that are default open
     for (uint8_t i = 0; i < ConfigRelayCount; i++)
     {
-        if (config->defaulRelayState[i])
+        if (config->relay.defaultState[i])
         {
             _relayController.setRelayState(i, true);
         }
@@ -234,10 +226,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
 
     // indicate system initialized
     _commandMgrComputer->sendCommand(SystemInitialized, "");
-
-#if defined(SCHEDULER_SUPPORT)
     _scheduleController.begin();
-#endif
 }
 
 void SmartFuseBoxApp::loop()
@@ -300,11 +289,9 @@ void SmartFuseBoxApp::loop()
     _configSyncManager.update(now);
     SystemCpuMonitor::endTask();
 
-#if defined(SCHEDULER_SUPPORT)
     SystemCpuMonitor::startTask();
     _scheduleController.update(now);
     SystemCpuMonitor::endTask();
-#endif
 
 #if defined(SD_CARD_SUPPORT)
     SystemCpuMonitor::startTask();
@@ -326,10 +313,7 @@ void SmartFuseBoxApp::configureWifiSupport(Config* config)
 {
     // network command handlers
     INetworkCommandHandler* networkHandlers[] = { &_relayNetworkHandler, &_soundNetworkHandler, &_warningNetworkHandler,
-        &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler,
-#if defined(SCHEDULER_SUPPORT)
-        &_schedulerNetworkHandler,
-#endif
+        &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler, &_schedulerNetworkHandler
     };
     size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
     _wifiController.registerHandlers(networkHandlers, networkHandlerCount);
@@ -342,9 +326,7 @@ void SmartFuseBoxApp::configureWifiSupport(Config* config)
         &_soundNetworkHandler,
         &_warningNetworkHandler,
         _sensorNetworkHandler,
-#if defined(SCHEDULER_SUPPORT)
         &_schedulerNetworkHandler,
-#endif
     };
     uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);
     _wifiController.registerJsonVisitors(jsonVisitors, jsonVisitorCount);

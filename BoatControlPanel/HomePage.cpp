@@ -175,8 +175,8 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
             buttonIndex = compId - ButtonIdOffset;  // Get slot index (0-3)
             
             // Check if THIS button's mapped relay is the horn
-            if (config->hornRelayIndex < DefaultValue &&
-                _slotToRelay[buttonIndex] == config->hornRelayIndex)
+            if (config->sound.hornRelayIndex < DefaultValue &&
+                _slotToRelay[buttonIndex] == config->sound.hornRelayIndex)
             {
                 // This button controls the horn, go to sound page
                 setPage(PageSoundSignals);
@@ -232,7 +232,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
 		if (commandMgrComputer)
 		{
 			char debugMsg[64];
-			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s pressed"), config->relayShortNames[relayIndex]);
+			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s pressed"), config->relay.shortNames[relayIndex]);
 			commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
 		}
     }
@@ -241,7 +241,7 @@ void HomePage::handleTouch(uint8_t compId, uint8_t eventType)
 		if (commandMgrComputer)
 		{
 			char debugMsg[64];
-			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s released"), config->relayShortNames[relayIndex]);
+			snprintf_P(debugMsg, sizeof(debugMsg), PSTR("%s released"), config->relay.shortNames[relayIndex]);
 			commandMgrComputer->sendDebug(debugMsg, F("HomePage"));
 		}
 
@@ -651,7 +651,7 @@ void HomePage::configUpdated()
         char buffer[15];
         snprintf_P(buffer, sizeof(buffer), PSTR("%sHomeRelay%d"), HomeButtonPrefix, button + 1);
 
-        uint8_t relayIndex = config->homePageMapping[button];
+        uint8_t relayIndex = config->relay.homePageMapping[button];
         if (relayIndex <= 7)
         {
             _slotToRelay[button] = relayIndex;
@@ -660,7 +660,7 @@ void HomePage::configUpdated()
             setPicture(buffer, _buttonImage[button]);
 
             // Use short name for home page display
-            sendText(buffer, config->relayShortNames[relayIndex]);
+            sendText(buffer, config->relay.shortNames[relayIndex]);
         }
         else
         {
@@ -673,5 +673,5 @@ void HomePage::configUpdated()
     }
 
     // Update the boat name
-    sendText(ControlBoatName, config->name);
+    sendText(ControlBoatName, config->vessel.name);
 }

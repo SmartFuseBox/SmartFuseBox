@@ -19,8 +19,6 @@
 
 #include "Config.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "BaseCommandHandler.h"
 #include "ConfigManager.h"
 #include "RelayController.h"
@@ -49,5 +47,3 @@ public:
     bool handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount) override;
     const char* const* supportedCommands(size_t& count) const override;
 };
-
-#endif

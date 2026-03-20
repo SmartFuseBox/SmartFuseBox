@@ -53,7 +53,7 @@ private:
         }
 
         // Check if SSID is provided and not empty
-        if (cfg->apSSID[0] == '\0')
+        if (cfg->network.ssid[0] == '\0')
         {
             return false;
         }
@@ -63,18 +63,18 @@ private:
         // You can add additional validation here if needed
 
         // Validate port number (optional)
-        if (cfg->wifiPort == 0)
+        if (cfg->network.port == 0)
         {
             return false;
         }
 
-        if (cfg->accessMode == AccessModeAP)
+        if (cfg->network.accessMode == WifiMode::AccessPoint)
         {
             // If apIpAddress is empty, allow using default IP (considered valid)
-            if (cfg->apIpAddress[0] != '\0')
+            if (cfg->network.apIpAddress[0] != '\0')
             {
                 IPAddress testIp;
-                if (!testIp.fromString(cfg->apIpAddress))
+                if (!testIp.fromString(cfg->network.apIpAddress))
                 {
                     return false;
                 }
@@ -160,7 +160,7 @@ public:
             return;
         }
 
-        if (!cfg->wifiEnabled)
+        if (!cfg->network.wifiEnabled)
         {
             disable();
             return;
@@ -180,13 +180,13 @@ public:
         if (enableInternal())
         {
             // Configure based on config settings
-            if (cfg->accessMode == AccessModeAP)
+            if (cfg->network.accessMode == WifiMode::AccessPoint)
             {
-                _wifiServer->setAccessPointMode(cfg->apSSID, cfg->apPassword, cfg->apIpAddress);
+                _wifiServer->setAccessPointMode(cfg->network.ssid, cfg->network.password, cfg->network.apIpAddress);
             }
             else // Client
             {
-                _wifiServer->setClientMode(cfg->apSSID, cfg->apPassword);
+                _wifiServer->setClientMode(cfg->network.ssid, cfg->network.password);
             }
 
             if (!_wifiServer->begin())

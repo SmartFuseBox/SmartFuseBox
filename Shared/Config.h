@@ -23,52 +23,10 @@
 #include "Local.h"
 
 
-enum class VesselType : uint8_t
-{
-    Motor = 0x00,                   // Power boat
-    Sail = 0x01,                    // Sailing boat
-    Fishing = 0x02,                 // Fishing boat
-    Yacht = 0x03,                   // Yacht
-};
-
-struct LedConfig {
-    // Day Mode
-    uint8_t dayBrightness;
-    uint8_t dayGoodColor[3];
-    uint8_t dayBadColor[3];
-
-    // Night Mode
-    uint8_t nightBrightness;
-    uint8_t nightGoodColor[3];
-    uint8_t nightBadColor[3];
-
-    // Auto-switching
-    bool autoSwitch;            // Enable/disable auto day/night
-
-    // Per-LED enable
-    bool gpsEnabled;
-    bool warningEnabled;
-    bool systemEnabled;
-} __attribute__((packed));
-
-struct SoundSignalConfig
-{
-	uint8_t goodPreset;
-	uint16_t good_toneHz;
-	uint16_t good_durationMs;
-	uint8_t badPreset;
-	uint16_t bad_toneHz;
-	uint16_t bad_durationMs;
-	uint32_t bad_repeatMs;
-} __attribute__((packed));
-
-
-struct LightSensorConfig
-{
-	uint8_t nightRelayIndex;    // 0..7 or 0xFF = none
-	uint16_t daytimeThreshold;  // 0..1023 ADC threshold
-} __attribute__((packed));
-
+constexpr uint8_t ConfigMaxScheduledEvents = MAXIMUM_EVENTS;
+constexpr uint8_t ConfigSchedulerPayloadSize = 4;
+constexpr uint8_t ConfigScheduleEventReserved = 8;
+constexpr uint8_t ConfigSchedulerReservedSize = 10;
 
 // MQTT Configuration
 constexpr uint8_t ConfigMqttBrokerLength = 64;
@@ -79,24 +37,18 @@ constexpr uint8_t ConfigMqttDiscoveryPrefixLength = 32;
 constexpr uint16_t ConfigMqttDefaultPort = 1883;
 constexpr uint16_t ConfigMqttKeepAliveDefault = 60;
 
-struct MqttConfig
+// sensors
+constexpr uint8_t ConfigMaxSensors = 8;
+constexpr uint8_t ConfigMaxSensorNameLength = 21;
+constexpr uint8_t ConfigMaxSensorPins = 4;
+
+enum class VesselType : uint8_t
 {
-	bool enabled;
-	char broker[ConfigMqttBrokerLength];
-	uint16_t port;
-	char username[ConfigMqttUsernameLength];
-	char password[ConfigMqttPasswordLength];
-	char deviceId[ConfigMqttDeviceIdLength];
-	bool useHomeAssistantDiscovery;
-	uint16_t keepAliveInterval;
-	char discoveryPrefix[ConfigMqttDiscoveryPrefixLength];
-} __attribute__((packed));
-
-
-constexpr uint8_t AccessModeAP = 0;
-constexpr uint8_t AccessModeClient = 1;
-
-#if defined(SCHEDULER_SUPPORT)
+    Motor = 0x00,                   // Power boat
+    Sail = 0x01,                    // Sailing boat
+    Fishing = 0x02,                 // Fishing boat
+    Yacht = 0x03,                   // Yacht
+};
 
 enum class TriggerType : uint8_t
 {
@@ -131,52 +83,13 @@ enum class SchedulerActionType : uint8_t
 	AllRelaysOff = 0x06,
 };
 
-constexpr uint8_t ConfigMaxScheduledEvents = MAXIMUM_EVENTS;
-constexpr uint8_t ConfigSchedulerPayloadSize = 4;
-constexpr uint8_t ConfigScheduleEventReserved = 8;
-constexpr uint8_t ConfigSchedulerReservedSize = 10;
 
-struct ScheduledEvent
-{
-	bool enabled;
-	TriggerType triggerType;
-	uint8_t triggerPayload[ConfigSchedulerPayloadSize];
-	ConditionType conditionType;
-	uint8_t conditionPayload[ConfigSchedulerPayloadSize];
-	SchedulerActionType actionType;
-	uint8_t actionPayload[ConfigSchedulerPayloadSize];
-	uint8_t reserved[ConfigScheduleEventReserved];
-} __attribute__((packed));
-
-struct SchedulerSettings
-{
-	bool isEnabled;
-	uint8_t eventCount;
-	ScheduledEvent events[ConfigMaxScheduledEvents];
-	uint8_t reserved[ConfigSchedulerReservedSize];  // reserved for future scheduler-level settings
-} __attribute__((packed));
-
-#endif // SCHEDULER_SUPPORT
-
-
-// Layout:
-// - version (uint8_t)
-// - boatName (30 chars + null)
-// - relayShortNames[8][6] (5 chars + null each)
-// - relayLongNames[8][21] (20 chars + null each)
-// - homePageMapping[4] (values 0..7 or 0xFF for empty)
-// - homePageButtonImage[4] (button color image IDs)
-// - vesselType (VesselType)
-// - hornRelayIndex (uint8_t) 0..7 or 0xFF = none
-// - checksum (uint16_t)
-//
 // Keep struct packed and stable. Increase 'VERSION' when you change layout.
 // Packed POD for persistent configuration.
-#if defined(SCHEDULER_SUPPORT)
-constexpr uint8_t ConfigVersion = 2;
-#else
-constexpr uint8_t ConfigVersion = 1;
-#endif
+constexpr uint8_t ConfigVersion1 = 1;
+constexpr uint8_t ConfigVersion2 = 2;
+constexpr uint8_t ConfigVersion3 = 3;
+constexpr uint8_t ConfigVersion = ConfigVersion3;
 
 constexpr uint8_t ConfigHomeButtons = 4;
 constexpr uint8_t ConfigMaxNameLength = 31; // max characters (inc null)
@@ -185,48 +98,151 @@ constexpr uint8_t ConfigLongRelayNameLength = 21; // max characters (inc null) -
 constexpr uint8_t ConfigMmsiLength = 10; // 9 chars + null
 constexpr uint8_t ConfigHomePortLength = 31; // 30 chars + null
 constexpr uint8_t ConfigCallSignLength = 10; // 9 chars + null
-constexpr uint8_t ConfigLinkededRelayCount = 2;
+constexpr uint8_t ConfigLinkedRelayCount = 2;
+
+
+struct SystemConfig {
+    int8_t  timezoneOffset;
+    uint8_t reserved[16];
+} __attribute__((packed));
+
+struct VesselConfig {
+    char     name[ConfigMaxNameLength];
+    VesselType vesselType;
+    char     mmsi[ConfigMmsiLength];
+    char     callSign[ConfigCallSignLength];
+    char     homePort[ConfigHomePortLength];
+    uint8_t  reserved[8];
+} __attribute__((packed));
+
+struct RelayConfig {
+    char    shortNames[ConfigRelayCount][ConfigShortRelayNameLength];
+    char    longNames[ConfigRelayCount][ConfigLongRelayNameLength];
+    uint8_t homePageMapping[ConfigHomeButtons];
+    uint8_t buttonImage[ConfigRelayCount];
+    bool    defaultState[ConfigRelayCount];
+    uint8_t linkedRelays[ConfigMaxLinkedRelays][ConfigLinkedRelayCount];
+    uint8_t reserved[8];
+} __attribute__((packed));
+
+struct NetworkConfig {
+    bool     wifiEnabled;
+    WifiMode accessMode;                      // enum, not raw uint8_t
+    char     ssid[MaxSSIDLength];
+    char     password[MaxWiFiPasswordLength];
+    uint16_t port;
+    char     apIpAddress[MaxIpAddressLength];
+    bool     bluetoothEnabled;
+    uint8_t  reserved[8];
+} __attribute__((packed));
+
+struct SoundConfig {
+    uint8_t  hornRelayIndex;                  // merged from top-level
+    uint16_t startDelayMs;                    // merged from top-level
+    uint8_t  goodPreset;
+    uint16_t goodToneHz;
+    uint16_t goodDurationMs;
+    uint8_t  badPreset;
+    uint16_t badToneHz;
+    uint16_t badDurationMs;
+    uint32_t badRepeatMs;
+    uint8_t  reserved[4];
+} __attribute__((packed));
+
+struct SdCardConfig {
+    uint8_t initializeSpeed;
+    uint8_t reserved[4];
+} __attribute__((packed));
+
+struct LedConfig {
+    // Day Mode
+    uint8_t dayBrightness;
+    uint8_t dayGoodColor[3];
+    uint8_t dayBadColor[3];
+
+    // Night Mode
+    uint8_t nightBrightness;
+    uint8_t nightGoodColor[3];
+    uint8_t nightBadColor[3];
+
+    // Auto-switching
+    bool autoSwitch;            // Enable/disable auto day/night
+
+    // Per-LED enable
+    bool gpsEnabled;
+    bool warningEnabled;
+    bool systemEnabled;
+} __attribute__((packed));
+
+struct LightSensorConfig
+{
+    uint8_t nightRelayIndex;    // 0..7 or 0xFF = none
+    uint16_t daytimeThreshold;  // 0..1023 ADC threshold
+} __attribute__((packed));
+
+struct MqttConfig
+{
+    bool enabled;
+    char broker[ConfigMqttBrokerLength];
+    uint16_t port;
+    char username[ConfigMqttUsernameLength];
+    char password[ConfigMqttPasswordLength];
+    char deviceId[ConfigMqttDeviceIdLength];
+    bool useHomeAssistantDiscovery;
+    uint16_t keepAliveInterval;
+    char discoveryPrefix[ConfigMqttDiscoveryPrefixLength];
+} __attribute__((packed));
+
+struct ScheduledEvent
+{
+    bool enabled;
+    TriggerType triggerType;
+    uint8_t triggerPayload[ConfigSchedulerPayloadSize];
+    ConditionType conditionType;
+    uint8_t conditionPayload[ConfigSchedulerPayloadSize];
+    SchedulerActionType actionType;
+    uint8_t actionPayload[ConfigSchedulerPayloadSize];
+    uint8_t reserved[ConfigScheduleEventReserved];
+} __attribute__((packed));
+
+struct SchedulerSettings
+{
+    bool isEnabled;
+    uint8_t eventCount;
+    ScheduledEvent events[ConfigMaxScheduledEvents];
+    uint8_t reserved[ConfigSchedulerReservedSize];
+} __attribute__((packed));
+
+struct SensorEntry {
+    bool         enabled;                          // 1 byte
+    SensorIdList sensorType;                       // 1 byte (uint8_t)
+    uint8_t      pins[ConfigMaxSensorPins];        // 4 bytes, 0xFF = unused
+    char         name[ConfigMaxSensorNameLength];  // 21 bytes (20 + null)
+    uint8_t      options[4];                       // 4 bytes type-specific options
+    uint8_t      reserved[2];                      // 2 bytes
+} __attribute__((packed));                         // = 33 bytes per entry
+
+struct SensorsConfig {
+    uint8_t     count;                             // active entry count
+    SensorEntry sensors[ConfigMaxSensors];         // 8 × 33 = 264 bytes
+    uint8_t     reserved[4];                       // 4 bytes 
+} __attribute__((packed));                         // = 269 bytes total
 
 struct Config {
     uint8_t version;
-    char name[ConfigMaxNameLength];
-    char relayShortNames[ConfigRelayCount][ConfigShortRelayNameLength];
-    char relayLongNames[ConfigRelayCount][ConfigLongRelayNameLength];
-    uint8_t homePageMapping[ConfigHomeButtons]; // 0..7 or 0xFF = empty
-    uint8_t buttonImage[ConfigRelayCount]; // 0..7 or 0xFF = empty
-    VesselType vesselType;
-	uint8_t hornRelayIndex; // 0..7 or 0xFF = none
-	uint16_t soundStartDelayMs; // 500ms default
-    bool defaulRelayState[ConfigRelayCount]; // default on (relay open) states
-    uint8_t linkedRelays[ConfigMaxLinkedRelays][ConfigLinkededRelayCount];
-	char mMSI[ConfigMmsiLength]; // 9 chars + null
-	char callSign[ConfigCallSignLength]; // 9 chars + null
-	char homePort[ConfigHomePortLength]; // 30 chars + null
-	int8_t timezoneOffset; // hours from UTC
-
-    bool bluetoothEnabled;
-
-	bool wifiEnabled;
-	uint8_t accessMode; // 0 = AP, 1 = Client
-    char apSSID[MaxSSIDLength];
-    char apPassword[MaxWiFiPasswordLength];
-    uint16_t wifiPort;
-	char apIpAddress[MaxIpAddressLength]; // xxx.xxx.xxx.xxx + null
-
-	uint8_t sdCardInitializeSpeed;
-
-	LedConfig ledConfig;
-	SoundSignalConfig soundConfig;
-
-	MqttConfig mqtt;
-
-	LightSensorConfig lightSensor;
-
-#if defined(SCHEDULER_SUPPORT)
-	SchedulerSettings scheduler;
-#endif
-
-	uint16_t checksum;
+    SystemConfig system;
+    VesselConfig vessel;
+    RelayConfig relay;
+    NetworkConfig network;
+    SoundConfig sound;
+    LedConfig led;
+    MqttConfig mqtt;
+    LightSensorConfig lightSensor;
+    SdCardConfig sdCard;
+    SchedulerSettings scheduler;
+    SensorsConfig sensors;
+    uint8_t  reserved[8];       // top-level future growth
+    uint16_t checksum;          // always last
 } __attribute__((packed));
 
 static_assert(sizeof(Config) <= EEPROM_CAPACITY_BYTES, "Config struct exceeds EEPROM capacity for this board. Reduce features or increase EEPROM capacity.");

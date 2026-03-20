@@ -8,13 +8,6 @@ The scheduler allows automated relay control based on time, date, GPS-derived su
 
 Scheduler support is enabled automatically when the board has at least 1 KB of EEPROM:
 
-```cpp
-#if EEPROM_CAPACITY_BYTES >= 1024
-#define SCHEDULER_SUPPORT
-#endif
-```
-
-All scheduler code — config storage, command handling, network API, and runtime processing — is compiled only when `SCHEDULER_SUPPORT` is defined.
 
 ---
 
@@ -278,7 +271,6 @@ State is held in stack-allocated arrays indexed by event slot. It is **not persi
 
 | Requirement | Impact if missing |
 |---|---|
-| `SCHEDULER_SUPPORT` defined | No scheduler code compiled |
 | `cfg->scheduler.isEnabled == true` | Events evaluated but none fire |
 | `DateTimeManager::isTimeSet()` | `update()` returns early — no events fire |
 | GPS fix (`GpsLocationUpdated`) | `Sunrise`/`Sunset` triggers will not fire; `IsDark`/`IsDaylight` conditions fall back to the light sensor |
@@ -331,7 +323,6 @@ T6:v=0
 
 | Message | Cause |
 |---|---|
-| `Scheduler not supported` | `SCHEDULER_SUPPORT` not defined on this board |
 | `Config not available` | `ConfigManager::getConfigPtr()` returned null |
 | `Index out of range` | Event index ≥ `ConfigMaxScheduledEvents` |
 | `Slot is empty` | `T1` requested detail for an unconfigured slot |

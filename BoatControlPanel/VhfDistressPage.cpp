@@ -83,9 +83,9 @@ void VhfDistressPage::updateDisplay()
         return;
     }
 
-    const char* name = (config->name && config->name[0]) ? config->name : "UNKNOWN";
-    const char* callSign = (config->callSign && config->callSign[0]) ? config->callSign : "N/A";
-    const char* mmsi = (config->mMSI && config->mMSI[0]) ? config->mMSI : "N/A";
+    const char* name = config->vessel.name[0] ? config->vessel.name : "UNKNOWN";
+    const char* callSign = config->vessel.callSign[0] ? config->vessel.callSign : "N/A";
+    const char* mmsi = config->vessel.mmsi[0] ? config->vessel.mmsi : "N/A";
 
     char buffer[170];  // Large enough for both operations
 

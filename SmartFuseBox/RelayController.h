@@ -68,9 +68,9 @@ private:
 			// Check for linked relays and update only if their state changes
 			for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 			{
-				if (config->linkedRelays[i][0] == relayIndex)
+				if (config->relay.linkedRelays[i][0] == relayIndex)
 				{
-					uint8_t linkedRelay = config->linkedRelays[i][1];
+					uint8_t linkedRelay = config->relay.linkedRelays[i][1];
 					if (linkedRelay < _relayCount)
 					{
 						if (_relayStatus[linkedRelay] != isOn)

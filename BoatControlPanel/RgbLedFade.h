@@ -50,7 +50,7 @@ private:
     {
         if (!_config) return;
 
-        const LedConfig& led = _config->ledConfig;
+        const LedConfig& led = _config->led;
         
         // Select color based on day/night and warning state
         const uint8_t* color;

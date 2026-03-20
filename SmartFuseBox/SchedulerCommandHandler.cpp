@@ -18,8 +18,6 @@
 
 #include "Local.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "SchedulerCommandHandler.h"
 //#include "SystemDefinitions.h"
 
@@ -409,6 +407,3 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
             return false;
     }
 }
-
-#endif
-

@@ -68,8 +68,8 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 
 	if (config)
 	{
-		bluetoothEnabled = config->bluetoothEnabled;
-		wifiEnabled = config->wifiEnabled;
+		bluetoothEnabled = config->network.bluetoothEnabled;
+		wifiEnabled = config->network.wifiEnabled;
 	}
 
 	if (_wifiController && wifiEnabled && _wifiController->isEnabled())

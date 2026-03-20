@@ -98,7 +98,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         bool enabled = false;
         
         if (config)
-			enabled = config->bluetoothEnabled;
+			enabled = config->network.bluetoothEnabled;
             
         if (_broadcaster)
         {
@@ -118,7 +118,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         int rssi = 0;
 
         if (config)
-            enabled = config->wifiEnabled;
+            enabled = config->network.wifiEnabled;
 
         // Get IP address from WifiController if available
         if (_wifiController && enabled && _wifiController->isEnabled())

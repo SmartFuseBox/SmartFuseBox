@@ -193,7 +193,7 @@ bool SdCardConfigLoader::applyConfigCommand(const char* line)
     }
     else if (strcmp(command, "C12") == 0 && paramCount >= 1)
     {
-        uint8_t mode = atoi(params[0].value);
+        WifiMode mode = static_cast<WifiMode>(atoi(params[0].value));
         result = _configController->setWifiAccessMode(mode);
     }
     else if (strcmp(command, "C13") == 0 && colonPos != nullptr)
@@ -546,10 +546,10 @@ bool SdCardConfigLoader::exportConfigToSd()
     configFile->println();
 
     // C3 - Boat name
-    if (strlen(config->name) > 0)
+    if (strlen(config->vessel.name) > 0)
     {
         configFile->print("C3:");
-        configFile->println(config->name);
+        configFile->println(config->vessel.name);
     }
 
     // C4 - Relay names
@@ -558,9 +558,9 @@ bool SdCardConfigLoader::exportConfigToSd()
         configFile->print("C4:");
         configFile->print(i);
         configFile->print("=");
-        configFile->print(config->relayShortNames[i]);
+        configFile->print(config->relay.shortNames[i]);
         configFile->print("|");
-        configFile->println(config->relayLongNames[i]);
+        configFile->println(config->relay.longNames[i]);
     }
 
     // C5 - Home button mappings
@@ -569,7 +569,7 @@ bool SdCardConfigLoader::exportConfigToSd()
         configFile->print("C5:");
         configFile->print(i);
         configFile->print("=");
-        configFile->println(config->homePageMapping[i]);
+        configFile->println(config->relay.homePageMapping[i]);
     }
 
     // C6 - Button colors
@@ -578,48 +578,48 @@ bool SdCardConfigLoader::exportConfigToSd()
         configFile->print("C6:");
         configFile->print(i);
         configFile->print("=");
-        configFile->println(config->buttonImage[i]);
+        configFile->println(config->relay.buttonImage[i]);
     }
 
     // C7 - Vessel type
     configFile->print("C7:v=");
-    configFile->println(static_cast<uint8_t>(config->vesselType));
+    configFile->println(static_cast<uint8_t>(config->vessel.vesselType));
 
     // C8 - Sound relay
     configFile->print("C8:v=");
-    configFile->println(config->hornRelayIndex);
+    configFile->println(config->sound.hornRelayIndex);
 
     // C9 - Sound delay
     configFile->print("C9:v=");
-    configFile->println(config->soundStartDelayMs);
+    configFile->println(config->sound.startDelayMs);
 
     // C10 - Bluetooth enabled
     configFile->print("C10:v=");
-    configFile->println(config->bluetoothEnabled ? "1" : "0");
+    configFile->println(config->network.bluetoothEnabled ? "1" : "0");
 
     // C11 - WiFi enabled
     configFile->print("C11:v=");
-    configFile->println(config->wifiEnabled ? "1" : "0");
+    configFile->println(config->network.wifiEnabled ? "1" : "0");
 
     // C12 - WiFi mode
     configFile->print("C12:v=");
-    configFile->println(config->accessMode);
+    configFile->println(static_cast<uint8_t>(config->network.accessMode));
 
     // C13 - WiFi SSID
     configFile->print("C13:");
-    configFile->println(config->apSSID);
+    configFile->println(config->network.ssid);
 
     // C14 - WiFi password
     configFile->print("C14:");
-    configFile->println(config->apPassword);
+    configFile->println(config->network.password);
 
     // C15 - WiFi port
     configFile->print("C15:v=");
-    configFile->println(config->wifiPort);
+    configFile->println(config->network.port);
 
     // C17 - WiFi AP IP
     configFile->print("C17:");
-    configFile->println(config->apIpAddress);
+    configFile->println(config->network.apIpAddress);
 
     // C18 - Default relay states
     for (uint8_t i = 0; i < ConfigRelayCount; i++)
@@ -627,99 +627,99 @@ bool SdCardConfigLoader::exportConfigToSd()
         configFile->print("C18:");
         configFile->print(i);
         configFile->print("=");
-        configFile->println(config->defaulRelayState[i] ? "1" : "0");
+        configFile->println(config->relay.defaultState[i] ? "1" : "0");
     }
 
     // C19 - Linked relays
     for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
     {
         configFile->print("C19:");
-        configFile->print(config->linkedRelays[i][0]);
+        configFile->print(config->relay.linkedRelays[i][0]);
         configFile->print("=");
-        configFile->println(config->linkedRelays[i][1]);
+        configFile->println(config->relay.linkedRelays[i][1]);
     }
 
     // C20 - Timezone offset
     configFile->print("C20:v=");
-    configFile->println(config->timezoneOffset);
+    configFile->println(config->system.timezoneOffset);
 
     // C21 - MMSI
     configFile->print("C21:");
-    configFile->println(config->mMSI);
+    configFile->println(config->vessel.mmsi);
 
     // C22 - Call sign
     configFile->print("C22:");
-    configFile->println(config->callSign);
+    configFile->println(config->vessel.callSign);
 
     // C23 - Home port
     configFile->print("C23:");
-    configFile->println(config->homePort);
+    configFile->println(config->vessel.homePort);
 
     // C24 - LED colors
     configFile->print("C24:t=0;c=0;r=");
-    configFile->print(config->ledConfig.dayGoodColor[0]);
+    configFile->print(config->led.dayGoodColor[0]);
     configFile->print(";g=");
-    configFile->print(config->ledConfig.dayGoodColor[1]);
+    configFile->print(config->led.dayGoodColor[1]);
     configFile->print(";b=");
-    configFile->println(config->ledConfig.dayGoodColor[2]);
+    configFile->println(config->led.dayGoodColor[2]);
 
     configFile->print("C24:t=0;c=1;r=");
-    configFile->print(config->ledConfig.dayBadColor[0]);
+    configFile->print(config->led.dayBadColor[0]);
     configFile->print(";g=");
-    configFile->print(config->ledConfig.dayBadColor[1]);
+    configFile->print(config->led.dayBadColor[1]);
     configFile->print(";b=");
-    configFile->println(config->ledConfig.dayBadColor[2]);
+    configFile->println(config->led.dayBadColor[2]);
 
     configFile->print("C24:t=1;c=0;r=");
-    configFile->print(config->ledConfig.nightGoodColor[0]);
+    configFile->print(config->led.nightGoodColor[0]);
     configFile->print(";g=");
-    configFile->print(config->ledConfig.nightGoodColor[1]);
+    configFile->print(config->led.nightGoodColor[1]);
     configFile->print(";b=");
-    configFile->println(config->ledConfig.nightGoodColor[2]);
+    configFile->println(config->led.nightGoodColor[2]);
 
     configFile->print("C24:t=1;c=1;r=");
-    configFile->print(config->ledConfig.nightBadColor[0]);
+    configFile->print(config->led.nightBadColor[0]);
     configFile->print(";g=");
-    configFile->print(config->ledConfig.nightBadColor[1]);
+    configFile->print(config->led.nightBadColor[1]);
     configFile->print(";b=");
-    configFile->println(config->ledConfig.nightBadColor[2]);
+    configFile->println(config->led.nightBadColor[2]);
 
     // C25 - LED brightness
     configFile->print("C25:t=0;b=");
-    configFile->println(config->ledConfig.dayBrightness);
+    configFile->println(config->led.dayBrightness);
 
     configFile->print("C25:t=1;b=");
-    configFile->println(config->ledConfig.nightBrightness);
+    configFile->println(config->led.nightBrightness);
 
     // C26 - LED auto switch
     configFile->print("C26:v=");
-    configFile->println(config->ledConfig.autoSwitch ? "1" : "0");
+    configFile->println(config->led.autoSwitch ? "1" : "0");
 
     // C27 - LED enable states
     configFile->print("C27:g=");
-    configFile->print(config->ledConfig.gpsEnabled ? "1" : "0");
+    configFile->print(config->led.gpsEnabled ? "1" : "0");
     configFile->print(";w=");
-    configFile->print(config->ledConfig.warningEnabled ? "1" : "0");
+    configFile->print(config->led.warningEnabled ? "1" : "0");
     configFile->print(";s=");
-    configFile->println(config->ledConfig.systemEnabled ? "1" : "0");
+    configFile->println(config->led.systemEnabled ? "1" : "0");
 
     // C28 - Control panel tones
     configFile->print("C28:t=0;h=");
-    configFile->print(config->soundConfig.good_toneHz);
+    configFile->print(config->sound.goodToneHz);
     configFile->print(";d=");
-    configFile->print(config->soundConfig.good_durationMs);
+    configFile->print(config->sound.goodDurationMs);
     configFile->print(";p=");
-    configFile->print(config->soundConfig.goodPreset);
+    configFile->print(config->sound.goodPreset);
     configFile->println(";r=0");
 
     configFile->print("C28:t=1;h=");
-    configFile->print(config->soundConfig.bad_toneHz);
+    configFile->print(config->sound.badToneHz);
     configFile->print(";d=");
-    configFile->print(config->soundConfig.bad_durationMs);
+    configFile->print(config->sound.badDurationMs);
     configFile->print(";p=");
-    configFile->print(config->soundConfig.badPreset);
+    configFile->print(config->sound.badPreset);
     configFile->print(";r=");
-    configFile->println(config->soundConfig.bad_repeatMs);
+    configFile->println(config->sound.badRepeatMs);
 
     sdDriver.closeFile(MicroSdFileHandle::ConfigLoader);
     sdDriver.releaseExclusiveAccess();

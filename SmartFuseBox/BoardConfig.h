@@ -69,12 +69,6 @@
 #endif
 
 
-// ─── Derived: Scheduler Support ───────────────────────────────────────────────
-#if EEPROM_CAPACITY_BYTES >= 1024
-  #define SCHEDULER_SUPPORT
-#endif
-
-
 // ─── Derived: WiFi Support ────────────────────────────────────────────────────
 #if defined(ARDUINO_UNO_R4) || defined(ESP32)
   #define WIFI_SUPPORT

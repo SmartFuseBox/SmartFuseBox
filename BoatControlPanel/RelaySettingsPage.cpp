@@ -88,7 +88,7 @@ void RelaySettingsPage::onEnterPage()
 	for (uint8_t i = 0; i < ConfigRelayCount; i++)
     {
         const char* buttonName = reinterpret_cast<const char*>(pgm_read_ptr(&SettingRelayButtons[i]));
-        sendText(reinterpret_cast<const __FlashStringHelper*>(buttonName), config->relayShortNames[i]);
+        sendText(reinterpret_cast<const __FlashStringHelper*>(buttonName), config->relay.shortNames[i]);
     }
 
     _currentSettingsIndex = relayHomePageSetupId;
@@ -152,7 +152,7 @@ void RelaySettingsPage::loadConfigPage()
             // Load the 4 selected relay indices and set their button colors
             for (uint8_t i = 0; i < ConfigHomeButtons; i++)
             {
-                uint8_t relayIndex = config->homePageMapping[i];
+                uint8_t relayIndex = config->relay.homePageMapping[i];
                 
                 if (relayIndex < ConfigRelayCount)
                 {
@@ -177,7 +177,7 @@ void RelaySettingsPage::loadConfigPage()
 
             for (uint8_t i = 0; i < ConfigRelayCount; i++)
             {
-                bool selButton = config->defaulRelayState[i];
+                bool selButton = config->relay.defaultState[i];
                 uint16_t buttonColor = selButton ? ButtonSelected : ButtonNotSelected;
                 const char* buttonName = reinterpret_cast<const char*>(pgm_read_ptr(&SettingRelayButtons[i]));
 
@@ -201,7 +201,7 @@ void RelaySettingsPage::loadConfigPage()
         {
             sendValue(FPSTR(SettingsRelaySetupId), relayHornRelay);
 
-            uint8_t hornIndex = config->hornRelayIndex;
+            uint8_t hornIndex = config->sound.hornRelayIndex;
             
             for (uint8_t i = 0; i < ConfigRelayCount; i++)
             {
@@ -239,9 +239,9 @@ void RelaySettingsPage::loadConfigPage()
                 bool isSelected = false;
                 
                 // Check if this relay is in the linked pair
-                for (uint8_t j = 0; j < ConfigLinkededRelayCount; j++)
+                for (uint8_t j = 0; j < ConfigLinkedRelayCount; j++)
                 {
-                    if (config->linkedRelays[0][j] == i && config->linkedRelays[0][j] < ConfigRelayCount)
+                    if (config->relay.linkedRelays[0][j] == i && config->relay.linkedRelays[0][j] < ConfigRelayCount)
                     {
                         isSelected = true;
                         _externalData[selectionCount] = '0' + i;
@@ -274,9 +274,9 @@ void RelaySettingsPage::loadConfigPage()
                 bool isSelected = false;
                 
                 // Check if this relay is in the linked pair
-                for (uint8_t j = 0; j < ConfigLinkededRelayCount; j++)
+                for (uint8_t j = 0; j < ConfigLinkedRelayCount; j++)
                 {
-                    if (config->linkedRelays[1][j] == i && config->linkedRelays[1][j] < ConfigRelayCount)
+                    if (config->relay.linkedRelays[1][j] == i && config->relay.linkedRelays[1][j] < ConfigRelayCount)
                     {
                         isSelected = true;
                         _externalData[selectionCount] = '0' + i;
@@ -304,7 +304,7 @@ void RelaySettingsPage::loadConfigPage()
             // Load current button image selections and set button colors
             for (uint8_t i = 0; i < ConfigRelayCount; i++)
             {
-                uint8_t imageId = config->buttonImage[i];
+                uint8_t imageId = config->relay.buttonImage[i];
                 
                 // Map image ID to character (1-5, default to white)
                 char colorChar;
@@ -440,7 +440,7 @@ bool RelaySettingsPage::validateExternalData()
             // Convert ASCII characters to numeric values and store
             for (uint8_t i = 0; i < ConfigHomeButtons; i++)
             {
-                config->homePageMapping[i] = _externalData[i] - '0';
+                config->relay.homePageMapping[i] = _externalData[i] - '0';
             }
 
             result = true;
@@ -481,14 +481,14 @@ bool RelaySettingsPage::validateExternalData()
             // Clear all default states first
             for (uint8_t i = 0; i < ConfigRelayCount; i++)
             {
-                config->defaulRelayState[i] = false;
+                config->relay.defaultState[i] = false;
             }
 
             // Set selected relays to ON by default
             for (uint8_t i = 0; i < len; i++)
             {
                 uint8_t relayIndex = _externalData[i] - '0';
-                config->defaulRelayState[relayIndex] = true;
+                config->relay.defaultState[relayIndex] = true;
             }
 
             result = true;
@@ -500,7 +500,7 @@ bool RelaySettingsPage::validateExternalData()
             // Allow empty selection (no horn relay)
             if (strlen(_externalData) == 0)
             {
-                config->hornRelayIndex = 0xFF; // none
+                config->sound.hornRelayIndex = 0xFF; // none
                 result = true;
                 break;
             }
@@ -513,7 +513,7 @@ bool RelaySettingsPage::validateExternalData()
                 return false;
             }
 
-            config->hornRelayIndex = _externalData[0] - '0';
+            config->sound.hornRelayIndex = _externalData[0] - '0';
             result = true;
             break;
         }
@@ -523,7 +523,7 @@ bool RelaySettingsPage::validateExternalData()
             size_t len = strlen(_externalData);
 
             // Allow 0 or exactly 2 selections
-            if (len != 0 && len != ConfigLinkededRelayCount)
+            if (len != 0 && len != ConfigLinkedRelayCount)
             {
                 sendText(FPSTR(SettingsError), F("Select 0 or 2 relays"));
                 return false;
@@ -552,16 +552,16 @@ bool RelaySettingsPage::validateExternalData()
             if (len == 0)
             {
                 // Clear linked relays
-                for (uint8_t i = 0; i < ConfigLinkededRelayCount; i++)
+                for (uint8_t i = 0; i < ConfigLinkedRelayCount; i++)
                 {
-                    config->linkedRelays[0][i] = 0xFF;
+                    config->relay.linkedRelays[0][i] = 0xFF;
                 }
             }
             else
             {
-                for (uint8_t i = 0; i < ConfigLinkededRelayCount; i++)
+                for (uint8_t i = 0; i < ConfigLinkedRelayCount; i++)
                 {
-                    config->linkedRelays[0][i] = _externalData[i] - '0';
+                    config->relay.linkedRelays[0][i] = _externalData[i] - '0';
                 }
             }
 
@@ -574,7 +574,7 @@ bool RelaySettingsPage::validateExternalData()
             size_t len = strlen(_externalData);
 
             // Allow 0 or exactly 2 selections
-            if (len != 0 && len != ConfigLinkededRelayCount)
+            if (len != 0 && len != ConfigLinkedRelayCount)
             {
                 sendText(FPSTR(SettingsError), F("Select 0 or 2 relays"));
                 return false;
@@ -603,16 +603,16 @@ bool RelaySettingsPage::validateExternalData()
             if (len == 0)
             {
                 // Clear linked relays
-                for (uint8_t i = 0; i < ConfigLinkededRelayCount; i++)
+                for (uint8_t i = 0; i < ConfigLinkedRelayCount; i++)
                 {
-                    config->linkedRelays[1][i] = 0xFF;
+                    config->relay.linkedRelays[1][i] = 0xFF;
                 }
             }
             else
             {
-                for (uint8_t i = 0; i < ConfigLinkededRelayCount; i++)
+                for (uint8_t i = 0; i < ConfigLinkedRelayCount; i++)
                 {
-                    config->linkedRelays[1][i] = _externalData[i] - '0';
+                    config->relay.linkedRelays[1][i] = _externalData[i] - '0';
                 }
             }
 
@@ -644,7 +644,7 @@ bool RelaySettingsPage::validateExternalData()
                     default:  imageId = ImageButtonColorGrey;   break;
                 }
                 
-                config->buttonImage[i] = imageId;
+                config->relay.buttonImage[i] = imageId;
             }
 
             result = true;

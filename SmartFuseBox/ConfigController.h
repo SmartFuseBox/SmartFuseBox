@@ -69,7 +69,7 @@ public:
 	ConfigResult setsoundDelayStart(const uint16_t delayMilliSeconds);
 	ConfigResult setBluetoothEnabled(const bool enabled);
 	ConfigResult setWifiEnabled(const bool enabled);
-	ConfigResult setWifiAccessMode(const uint8_t accessMode);
+	ConfigResult setWifiAccessMode(const WifiMode accessMode);
 	ConfigResult setWifiSsid(const char* ssid);
 	ConfigResult setWifiPassword(const char* password);
 	ConfigResult setWifiPort(const uint16_t port);

@@ -102,8 +102,8 @@ void RelayPage::handleTouch(uint8_t compId, uint8_t eventType)
         return;
     }
 
-    if (config->hornRelayIndex < DefaultValue &&
-        compId - 4 == config->hornRelayIndex)
+    if (config->sound.hornRelayIndex < DefaultValue &&
+        compId - 4 == config->sound.hornRelayIndex)
     {
         // relay button is configured to sound system (horn) and will be
         // controlled via own command methods from sound pages
@@ -246,6 +246,6 @@ void RelayPage::configUpdated()
         setPicture(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);
         setPicture2(relayPrefix, ImageButtonColorGrey + ImageButtonColorOffset);
 
-        sendText(relayPrefix, config->relayLongNames[button]);
+        sendText(relayPrefix, config->relay.longNames[button]);
     }
 }

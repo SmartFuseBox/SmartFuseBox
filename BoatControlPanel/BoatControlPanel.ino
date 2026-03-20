@@ -227,7 +227,7 @@ void setup()
     }
 
     Config* config = ConfigManager::getConfigPtr();
-    DateTimeManager::setTimezoneOffset(config->timezoneOffset);
+    DateTimeManager::setTimezoneOffset(config->system.timezoneOffset);
     homePage.configSet(config);
     warningPage.configSet(config);
 	relayPage.configSet(config);
@@ -237,7 +237,7 @@ void setup()
 	relaySettingsPage.configSet(config);
 	environmentPage.configSet(config);
 	systemLedStatus.configSet(config);
-	toneManager.configSet(&config->soundConfig);
+	toneManager.configSet(&config->sound);
 
 	systemLedStatus.setDayTime(true);
 
@@ -246,9 +246,9 @@ void setup()
 	sensorManager.setup();
 
 	char buffer[20];
-	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->hornRelayIndex);
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), config->sound.hornRelayIndex);
 	broadcastManager.sendCommand(ConfigSoundRelayId, buffer);
-	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vesselType));
+	snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<uint8_t>(config->vessel.vesselType));
 	broadcastManager.sendCommand(ConfigBoatType, buffer);
 
 	if (DateTimeManager::isTimeSet())

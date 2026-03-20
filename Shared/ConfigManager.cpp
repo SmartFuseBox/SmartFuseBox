@@ -61,14 +61,17 @@ bool ConfigManager::load()
     bool migrated = false;
     while (_cfg.version < ConfigVersion)
     {
-#if defined(SCHEDULER_SUPPORT)
-        if (_cfg.version == 1)
+        if (_cfg.version == ConfigVersion1)
         {
             migrateV1toV2();
             migrated = true;
         }
+        else if (_cfg.version == ConfigVersion2)
+        {
+            migrateV2toV3();
+            migrated = true;
+		}
         else
-#endif
         {
             // Version is below the oldest known migration (e.g. 0x00 on some blank boards).
             // Cannot migrate safely — reset and persist clean defaults.
@@ -106,7 +109,6 @@ bool ConfigManager::load()
     return true;
 }
 
-#if defined(SCHEDULER_SUPPORT)
 void ConfigManager::migrateV1toV2()
 {
     // V1 -> V2: SchedulerSettings was appended immediately before checksum.
@@ -116,9 +118,25 @@ void ConfigManager::migrateV1toV2()
     // Zero the entire scheduler section so all events start disabled and the
     // reserved bytes are clean before the new checksum is calculated by save().
     memset(&_cfg.scheduler, 0x00, sizeof(_cfg.scheduler));
+    _cfg.version = ConfigVersion2;
+}
+
+void ConfigManager::migrateV2toV3()
+{
+    // V2 -> V3: SensorsConfig block appended before the top-level reserved bytes.
+    // All existing V2 fields occupy the same byte positions, so no data moves are needed.
+    // Zero the new sensors section so all entries start disabled and pins are cleared
+    // before the new checksum is calculated by save().
+    
+    memset(&_cfg.sensors, 0x00, sizeof(_cfg.sensors));
+
+    for (uint8_t i = 0; i < ConfigMaxSensors; ++i)
+    {
+        memset(_cfg.sensors.sensors[i].pins, 0xFF, ConfigMaxSensorPins);
+    }
+
     _cfg.version = ConfigVersion;
 }
-#endif // SCHEDULER_SUPPORT
 
 bool ConfigManager::save()
 {
@@ -145,8 +163,8 @@ void ConfigManager::resetToDefaults()
     _cfg.version = ConfigVersion;
 
     // Default boat name
-    strncpy_P(_cfg.name, DefaultBoatName, ConfigMaxNameLength - 1);
-    _cfg.name[ConfigMaxNameLength - 1] = '\0';  // Ensure null termination
+    strncpy_P(_cfg.vessel.name, DefaultBoatName, ConfigMaxNameLength - 1);
+    _cfg.vessel.name[ConfigMaxNameLength - 1] = '\0';  // Ensure null termination
 
     // Default relay names (both short and long)
     for (uint8_t i = 0; i < ConfigRelayCount; ++i)
@@ -154,66 +172,66 @@ void ConfigManager::resetToDefaults()
         // Default short name: "R0", "R1", etc.
         char shortBuf[ConfigShortRelayNameLength]{ 0 };
         snprintf_P(shortBuf, sizeof(shortBuf), RelayNameShort, (unsigned)i);
-        strncpy(_cfg.relayShortNames[i], shortBuf, ConfigShortRelayNameLength - 1);
-        _cfg.relayShortNames[i][ConfigShortRelayNameLength - 1] = '\0';
+        strncpy(_cfg.relay.shortNames[i], shortBuf, ConfigShortRelayNameLength - 1);
+        _cfg.relay.shortNames[i][ConfigShortRelayNameLength - 1] = '\0';
 
         // Default long name: "Relay 0", "Relay 1", etc.
         char longBuf[ConfigLongRelayNameLength]{ 0 };
         snprintf_P(longBuf, sizeof(longBuf), RelayNameLong, (unsigned)i);
-        strncpy(_cfg.relayLongNames[i], longBuf, ConfigLongRelayNameLength - 1);
-        _cfg.relayLongNames[i][ConfigLongRelayNameLength - 1] = '\0';
+        strncpy(_cfg.relay.longNames[i], longBuf, ConfigLongRelayNameLength - 1);
+        _cfg.relay.longNames[i][ConfigLongRelayNameLength - 1] = '\0';
     }
 
     // Default home page mapping: first four relays visible in order
     for (uint8_t i = 0; i < ConfigHomeButtons; ++i)
     {
-        _cfg.homePageMapping[i] = i; // map slot i -> relay i
+        _cfg.relay.homePageMapping[i] = i; // map slot i -> relay i
     }
 
     // Default home page mapping: first four relays visible in order
     for (uint8_t i = 0; i < ConfigRelayCount; ++i)
     {
-        _cfg.buttonImage[i] = 0x02; // default color blue
+        _cfg.relay.buttonImage[i] = 0x02; // default color blue
     }
 
-	_cfg.vesselType = VesselType::Motor;
-	_cfg.hornRelayIndex = 0xFF; // none
+	_cfg.vessel.vesselType = VesselType::Motor;
+	_cfg.sound.hornRelayIndex = 0xFF; // none
     _cfg.lightSensor.nightRelayIndex = 0xFF; // none
     _cfg.lightSensor.daytimeThreshold = 512;
-    _cfg.soundStartDelayMs = 500; // 500ms
+    _cfg.sound.startDelayMs = 500; // 500ms
 	
     // default relay states
 	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
     {
-        _cfg.defaulRelayState[i] = false; // default off (relay closed)
+        _cfg.relay.defaultState[i] = false; // default off (relay closed)
     }
 
     // reset linked relays
     for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
     {
-        _cfg.linkedRelays[i][0] = 0xFF;
-        _cfg.linkedRelays[i][1] = 0xFF;
+        _cfg.relay.linkedRelays[i][0] = 0xFF;
+        _cfg.relay.linkedRelays[i][1] = 0xFF;
     }
 
-	strncpy(_cfg.mMSI, "000000000", ConfigMmsiLength - 1);
-	strncpy(_cfg.callSign, "NOCALL", ConfigCallSignLength - 1);
-	strncpy(_cfg.homePort, "Unknown", ConfigHomePortLength - 1);
-	_cfg.timezoneOffset = 0; // UTC
+	strncpy(_cfg.vessel.mmsi, "000000000", ConfigMmsiLength - 1);
+	strncpy(_cfg.vessel.callSign, "NOCALL", ConfigCallSignLength - 1);
+	strncpy(_cfg.vessel.homePort, "Unknown", ConfigHomePortLength - 1);
+	_cfg.system.timezoneOffset = 0; // UTC
 
-    _cfg.bluetoothEnabled = false;
+    _cfg.network.bluetoothEnabled = false;
 
-	_cfg.wifiEnabled = true;
-	_cfg.accessMode = AccessModeAP; // 0 = AP, 1 = Client
-	strncpy(_cfg.apSSID, "SmartFuseBox", sizeof(_cfg.apSSID) - 1);
-	_cfg.apSSID[sizeof(_cfg.apSSID) - 1] = '\0';
-	SystemFunctions::GenerateDefaultPassword(_cfg.apPassword, sizeof(_cfg.apPassword));
-	_cfg.apPassword[sizeof(_cfg.apPassword) - 1] = '\0';
-	_cfg.wifiPort = DefaultWifiPort;
-	strncpy(_cfg.apIpAddress, DefaultApIpAddress, sizeof(_cfg.apIpAddress) - 1);
-	_cfg.apIpAddress[sizeof(_cfg.apIpAddress) - 1] = '\0';
+	_cfg.network.wifiEnabled = false;
+	_cfg.network.accessMode = WifiMode::AccessPoint;
+	strncpy(_cfg.network.ssid, "SmartFuseBox", sizeof(_cfg.network.ssid) - 1);
+	_cfg.network.ssid[sizeof(_cfg.network.ssid) - 1] = '\0';
+	SystemFunctions::GenerateDefaultPassword(_cfg.network.password, sizeof(_cfg.network.password));
+	_cfg.network.password[sizeof(_cfg.network.password) - 1] = '\0';
+	_cfg.network.port = DefaultWifiPort;
+	strncpy(_cfg.network.apIpAddress, DefaultApIpAddress, sizeof(_cfg.network.apIpAddress) - 1);
+	_cfg.network.apIpAddress[sizeof(_cfg.network.apIpAddress) - 1] = '\0';
 
 #if defined(WIFI_SUPPORT)
-    _cfg.wifiEnabled = false;
+    _cfg.network.wifiEnabled = true;
 #endif
 
 #if defined(MQTT_SUPPORT)
@@ -234,36 +252,39 @@ void ConfigManager::resetToDefaults()
     _cfg.mqtt.enabled = false;
 #endif
 
-    _cfg.sdCardInitializeSpeed = 4;
-    _cfg.ledConfig.dayBrightness = 80;
-    _cfg.ledConfig.dayGoodColor[0] = 0;
-    _cfg.ledConfig.dayGoodColor[1] = 80; 
-    _cfg.ledConfig.dayGoodColor[2] = 255;
-    _cfg.ledConfig.dayBadColor[0] = 255;
-    _cfg.ledConfig.dayBadColor[1] = 140;
-    _cfg.ledConfig.dayBadColor[2] = 0;
+    _cfg.sdCard.initializeSpeed = 4;
+    _cfg.led.dayBrightness = 80;
+    _cfg.led.dayGoodColor[0] = 0;
+    _cfg.led.dayGoodColor[1] = 80;
+    _cfg.led.dayGoodColor[2] = 255;
+    _cfg.led.dayBadColor[0] = 255;
+    _cfg.led.dayBadColor[1] = 140;
+    _cfg.led.dayBadColor[2] = 0;
 
-    _cfg.ledConfig.nightBrightness = 20;
-    _cfg.ledConfig.nightGoodColor[0] = 100;
-    _cfg.ledConfig.nightGoodColor[1] = 0;
-    _cfg.ledConfig.nightGoodColor[2] = 0;
-    _cfg.ledConfig.nightBadColor[0] = 255;
-    _cfg.ledConfig.nightBadColor[1] = 50;
-    _cfg.ledConfig.nightBadColor[2] = 0;
+    _cfg.led.nightBrightness = 20;
+    _cfg.led.nightGoodColor[0] = 100;
+    _cfg.led.nightGoodColor[1] = 0;
+    _cfg.led.nightGoodColor[2] = 0;
+    _cfg.led.nightBadColor[0] = 255;
+    _cfg.led.nightBadColor[1] = 50;
+    _cfg.led.nightBadColor[2] = 0;
 
-    _cfg.ledConfig.autoSwitch = true;
-    _cfg.ledConfig.gpsEnabled = true;
-    _cfg.ledConfig.warningEnabled = true;
-    _cfg.ledConfig.systemEnabled = true;
+    _cfg.led.autoSwitch = true;
+    _cfg.led.gpsEnabled = true;
+    _cfg.led.warningEnabled = true;
+    _cfg.led.systemEnabled = true;
 
     // default sound config
-    _cfg.soundConfig.goodPreset     = static_cast<uint8_t>(TonePreset::SubmarinePing);
-    _cfg.soundConfig.good_toneHz    = 1000;
-    _cfg.soundConfig.good_durationMs = 100;
-    _cfg.soundConfig.badPreset      = static_cast<uint8_t>(TonePreset::DescendingAlert);
-    _cfg.soundConfig.bad_toneHz     = 500;
-    _cfg.soundConfig.bad_durationMs = 200;
-	_cfg.soundConfig.bad_repeatMs = 60000;
+    _cfg.sound.goodPreset     = static_cast<uint8_t>(TonePreset::SubmarinePing);
+    _cfg.sound.goodToneHz    = 1000;
+    _cfg.sound.goodDurationMs = 100;
+    _cfg.sound.badPreset      = static_cast<uint8_t>(TonePreset::DescendingAlert);
+    _cfg.sound.badToneHz     = 500;
+    _cfg.sound.badDurationMs = 200;
+	_cfg.sound.badRepeatMs = 60000;
+
+    for (uint8_t i = 0; i < ConfigMaxSensors; ++i)
+        memset(_cfg.sensors.sensors[i].pins, 0xFF, ConfigMaxSensorPins);
 
     // compute checksum
     _cfg.checksum = 0;

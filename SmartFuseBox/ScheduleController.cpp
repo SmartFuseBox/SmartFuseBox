@@ -18,8 +18,6 @@
 
 #include "Local.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "ScheduleController.h"
 #include "DateTimeManager.h"
 #include "SystemFunctions.h"
@@ -550,5 +548,3 @@ uint32_t ScheduleController::encodeDay(uint16_t year, uint8_t month, uint8_t day
          + static_cast<uint32_t>(month) * 100u
          + day;
 }
-
-#endif
