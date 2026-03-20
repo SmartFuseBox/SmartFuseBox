@@ -178,9 +178,8 @@ void RelayCommandHandler::configUpdated(Config* config)
         return;
     }
 
-    _relayController->setReservedSoundRelay(config->hornRelayIndex);
+    _relayController->setReservedSoundRelay(config->sound.hornRelayIndex);
 
-    // Defensive check: ensure it's either a valid relay or 0xFF (none)
     if (_relayController->getReservedSoundRelay() >= _relayController->getRelayCount() && _relayController->getReservedSoundRelay() != DefaultValue)
     {
         _relayController->setReservedSoundRelay(DefaultValue);

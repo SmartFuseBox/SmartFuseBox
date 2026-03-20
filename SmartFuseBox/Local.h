@@ -146,7 +146,7 @@ constexpr uint8_t Relays[ConfigRelayCount] = { Relay1, Relay2, Relay3, Relay4, R
 
 // ─── Framework Config ─────────────────────────────────────────────────────────
 // BoardConfig.h reads the defines above and derives EEPROM capacity,
-// WIFI_SUPPORT, SCHEDULER_SUPPORT, and validates combinations.
+// WIFI_SUPPORT and validates combinations.
 // Do not edit BoardConfig.h — it is updated by the upstream repository.
 #include "BoardConfig.h"
 

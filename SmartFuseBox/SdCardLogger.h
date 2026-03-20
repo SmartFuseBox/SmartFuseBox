@@ -117,7 +117,7 @@ private:
     uint8_t _bufferHead;        // Next position to write
     uint8_t _bufferTail;        // Next position to read
     uint8_t _bufferCount;       // Number of records in buffer
-    char _currentFileName[13];  // "YYYYMMDD.csv\0"
+    char _currentFileName[24];  // "YYYYMMDD.csv\0"
     uint8_t _currentDay;        // Track current day for file rotation
     
     // Timing

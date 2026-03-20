@@ -78,7 +78,7 @@ public:
 
     void applyConfig(const Config* cfg) override
     {
-        setEnabled(cfg && cfg->bluetoothEnabled);
+        setEnabled(cfg && cfg->network.bluetoothEnabled);
     }
 
     void loop() override

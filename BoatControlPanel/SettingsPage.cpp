@@ -139,19 +139,19 @@ void SettingsPage::loadConfigPage()
     switch (_currentSettingsIndex)
     {
         case SettingBoatName:
-    		loadPage(FPSTR(SettingsBoatName), config->name, SettingBoatNameLen, ShowAlphaKeyboard, false);
+    		loadPage(FPSTR(SettingsBoatName), config->vessel.name, SettingBoatNameLen, ShowAlphaKeyboard, false);
 			break;
 
 		case SettingCallSign:
-            loadPage(FPSTR(SettingsCallSign), config->callSign, SettingCallSignLen, ShowAlphaKeyboard, true);
+            loadPage(FPSTR(SettingsCallSign), config->vessel.callSign, SettingCallSignLen, ShowAlphaKeyboard, true);
             break;
 
         case SettingMmsiNumber:
-            loadPage(FPSTR(SettingsMmsiNumber), config->mMSI, SettingMmsiNumberLen, ShowNumericKeyboard, true);
+            loadPage(FPSTR(SettingsMmsiNumber), config->vessel.mmsi, SettingMmsiNumberLen, ShowNumericKeyboard, true);
 			break;
 
         case SettingHomePortName:
-            loadPage(FPSTR(SettingsHomePort), config->homePort, ConfigHomePortLength - 1, ShowAlphaKeyboard, true);
+            loadPage(FPSTR(SettingsHomePort), config->vessel.homePort, ConfigHomePortLength - 1, ShowAlphaKeyboard, true);
 			break;
 
 		case SettingShortRelay1:
@@ -178,7 +178,7 @@ void SettingsPage::loadConfigPage()
 
             loadPage(
                 buffer,
-                config->relayShortNames[relayIndex],
+                config->relay.shortNames[relayIndex],
                 ConfigShortRelayNameLength - 1,
                 ShowAlphaKeyboard,
                 true);
@@ -208,7 +208,7 @@ void SettingsPage::loadConfigPage()
             snprintf_P(buffer, sizeof(buffer), LongRelayDescription, relayIndex + 1);
             loadPage(
                 buffer,
-                config->relayLongNames[relayIndex],
+                config->relay.longNames[relayIndex],
                 ConfigLongRelayNameLength - 1,
                 ShowAlphaKeyboard,
                 true);
@@ -301,15 +301,15 @@ bool SettingsPage::validateExternalData()
     switch (_currentSettingsIndex)
     {
     case SettingBoatName:
-        strncpy(config->name, _externalData, ConfigMaxNameLength - 1);
-        config->name[ConfigMaxNameLength - 1] = '\0';
+        strncpy(config->vessel.name, _externalData, ConfigMaxNameLength - 1);
+        config->vessel.name[ConfigMaxNameLength - 1] = '\0';
         result = true;
 
         break;
 
     case SettingCallSign:
-        strncpy(config->callSign, _externalData, ConfigCallSignLength - 1);
-        config->callSign[ConfigCallSignLength - 1] = '\0';
+        strncpy(config->vessel.callSign, _externalData, ConfigCallSignLength - 1);
+        config->vessel.callSign[ConfigCallSignLength - 1] = '\0';
         result = true;
 
         break;
@@ -328,8 +328,8 @@ bool SettingsPage::validateExternalData()
             return false;
         }
 
-        strncpy(config->mMSI, _externalData, ConfigMmsiLength - 1);
-        config->mMSI[ConfigMmsiLength - 1] = '\0';
+        strncpy(config->vessel.mmsi, _externalData, ConfigMmsiLength - 1);
+        config->vessel.mmsi[ConfigMmsiLength - 1] = '\0';
         result = true;
 
 		break;
@@ -341,8 +341,8 @@ bool SettingsPage::validateExternalData()
             return false;
         }
 
-		strncpy(config->homePort, _externalData, ConfigHomePortLength - 1);
-        config->homePort[ConfigHomePortLength - 1] = '\0';
+		strncpy(config->vessel.homePort, _externalData, ConfigHomePortLength - 1);
+        config->vessel.homePort[ConfigHomePortLength - 1] = '\0';
         result = true;
 
 		break;
@@ -370,8 +370,8 @@ bool SettingsPage::validateExternalData()
             return false;
         }
 
-        strncpy(config->relayShortNames[relayIndex], _externalData, ConfigShortRelayNameLength - 1);
-        config->relayShortNames[relayIndex][ConfigShortRelayNameLength - 1] = '\0';
+        strncpy(config->relay.shortNames[relayIndex], _externalData, ConfigShortRelayNameLength - 1);
+        config->relay.shortNames[relayIndex][ConfigShortRelayNameLength - 1] = '\0';
         result = true;
 
         break;
@@ -400,8 +400,8 @@ bool SettingsPage::validateExternalData()
             return false;
         }
 
-        strncpy(config->relayLongNames[relayIndex], _externalData, ConfigLongRelayNameLength - 1);
-        config->relayLongNames[relayIndex][ConfigLongRelayNameLength - 1] = '\0';
+        strncpy(config->relay.longNames[relayIndex], _externalData, ConfigLongRelayNameLength - 1);
+        config->relay.longNames[relayIndex][ConfigLongRelayNameLength - 1] = '\0';
         result = true;
 
         break;

@@ -66,7 +66,7 @@ SoundController::SoundController()
 
 	if (config != nullptr)
 	{
-		_soundStartDelay = config->soundStartDelayMs;
+		_soundStartDelay = config->sound.startDelayMs;
 	}
 }
 
@@ -235,7 +235,7 @@ void SoundController::configUpdated(Config* config)
 {
 	if (config != nullptr)
 	{
-		_soundStartDelay = config->soundStartDelayMs;
-		_soundRelayIndex = config->hornRelayIndex;
+		_soundStartDelay = config->sound.startDelayMs;
+		_soundRelayIndex = config->sound.hornRelayIndex;
 	}
 }

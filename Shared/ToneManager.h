@@ -49,7 +49,7 @@ class ToneManager
 public:
     explicit ToneManager(uint8_t pin);
 
-    void configSet(SoundSignalConfig* config);
+    void configSet(SoundConfig* config);
 
     // Start playing a good or bad tone sequence (non-blocking)
     void play(ToneType type);
@@ -69,7 +69,7 @@ private:
     static constexpr uint8_t MaxSteps = 16;
 
     uint8_t _pin;
-    SoundSignalConfig* _config;
+    SoundConfig* _config;
 
     bool _playing;
     uint8_t _currentStep;

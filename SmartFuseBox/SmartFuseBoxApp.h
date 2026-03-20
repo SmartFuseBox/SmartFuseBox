@@ -65,10 +65,8 @@
 #include "MQTTSystemHandler.h"
 #endif
 
-#if defined(SCHEDULER_SUPPORT)
 #include "SchedulerCommandHandler.h"
 #include "ScheduleController.h"
-#endif
 
 #if defined(LED_MANAGER)
 #include "LedMatrixManager.h"
@@ -128,11 +126,9 @@ private:
     unsigned long _nextRunMqttMs;
 #endif
 
-#if defined(SCHEDULER_SUPPORT)
 	SchedulerCommandHandler _schedulerCommandHandler;
 	SchedulerNetworkHandler _schedulerNetworkHandler;
 	ScheduleController _scheduleController;
-#endif
 
 #if defined(LED_MANAGER)
     LedMatrixManager _ledManager;

@@ -168,7 +168,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C12:v=<0|1>"
 		if (paramCount >= 1)
 		{
-			uint8_t mode = static_cast<uint8_t>(atoi(params[0].value));
+			WifiMode mode = static_cast<WifiMode>(atoi(params[0].value));
 			result = _configController->setWifiAccessMode(mode);
 		}
 		else
@@ -480,7 +480,7 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// Name
 	client->print("\"name\":\"");
-	client->print(config->name);
+	client->print(config->vessel.name);
 	client->print("\",");
 
 	// Relays: short and long names
@@ -490,9 +490,9 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	{
 		if (i > 0) client->print(",");
 		client->print("{\"shortName\":\"");
-		client->print(config->relayShortNames[i]);
+		client->print(config->relay.shortNames[i]);
 		client->print("\",\"longName\":\"");
-		client->print(config->relayLongNames[i]);
+		client->print(config->relay.longNames[i]);
 		client->print("\"}");
 	}
 
@@ -504,7 +504,7 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	for (uint8_t i = 0; i < ConfigHomeButtons; ++i)
 	{
 		if (i > 0) client->print(",");
-		client->print(config->homePageMapping[i]);
+		client->print(config->relay.homePageMapping[i]);
 	}
 
 	client->print("],");
@@ -515,49 +515,49 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
 	{
 		if (i > 0) client->print(",");
-		client->print(config->buttonImage[i]);
+		client->print(config->relay.buttonImage[i]);
 	}
 
 	client->print("],");
 
 	// Vessel type
 	client->print("\"vesselType\":");
-	client->print(static_cast<uint8_t>(config->vesselType));
+	client->print(static_cast<uint8_t>(config->vessel.vesselType));
 	client->print(",");
 
 	// Sound relay ID
 	client->print("\"hornRelayIndex\":");
-	client->print(static_cast<uint8_t>(config->hornRelayIndex));
+	client->print(static_cast<uint8_t>(config->sound.hornRelayIndex));
 	client->print(",");
 
 	// Sound start delay
 	client->print("\"soundStartDelayMs\":");
-	client->print(static_cast<uint16_t>(config->soundStartDelayMs));
+	client->print(static_cast<uint16_t>(config->sound.startDelayMs));
 	client->print(",");
 
 	// Bluetooth, WiFi, SSID, Password, Port, AccessMode
 	client->print("\"bluetoothEnabled\":");
-	client->print(config->bluetoothEnabled ? "true" : "false");
+	client->print(config->network.bluetoothEnabled ? "true" : "false");
 	client->print(",");
 
 	client->print("\"wifiEnabled\":");
-	client->print(config->wifiEnabled ? "true" : "false");
+	client->print(config->network.wifiEnabled ? "true" : "false");
 	client->print(",");
 
 	client->print("\"accessMode\":");
-	client->print(config->accessMode);
+	client->print(static_cast<uint8_t>(config->network.accessMode));
 	client->print(",");
 
 	client->print("\"apSSID\":\"");
-	client->print(config->apSSID);
+	client->print(config->network.ssid);
 	client->print("\",");
 
 	client->print("\"apPassword\":\"");
-	client->print(config->apPassword);
+	client->print(config->network.password);
 	client->print("\",");
 
 	client->print("\"wifiPort\":");
-	client->print(config->wifiPort);
+	client->print(config->network.port);
 	client->print(",");
 
 	// WiFi State
@@ -582,7 +582,7 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	}
 	else
 	{
-		client->print(config->apIpAddress);
+		client->print(config->network.apIpAddress);
 	}
 
 	client->print("\",");
@@ -593,7 +593,7 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
 	{
 		if (i > 0) client->print(",");
-		client->print(config->defaulRelayState[i] ? "true" : "false");
+		client->print(config->relay.defaultState[i] ? "true" : "false");
 	}
 
 	client->print("],");
@@ -605,9 +605,9 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 			client->print(",");
 
 		client->print("[");
-		client->print(config->linkedRelays[i][0]);
+		client->print(config->relay.linkedRelays[i][0]);
 		client->print(",");
-		client->print(config->linkedRelays[i][1]);
+		client->print(config->relay.linkedRelays[i][1]);
 		client->print("]");
 	}
 
@@ -615,103 +615,103 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// C20 Timezone offset
 	client->print("\"timezoneOffset\":");
-	client->print(static_cast<int>(config->timezoneOffset));
+	client->print(static_cast<int>(config->system.timezoneOffset));
 	client->print(",");
 
 	// C21 MMSI
 	client->print("\"mmsi\":\"");
-	client->print(config->mMSI);
+	client->print(config->vessel.mmsi);
 	client->print("\",");
 
 	// C22 Call sign
 	client->print("\"callSign\":\"");
-	client->print(config->callSign);
+	client->print(config->vessel.callSign);
 	client->print("\",");
 
 	// C23 Home port
 	client->print("\"homePort\":\"");
-	client->print(config->homePort);
+	client->print(config->vessel.homePort);
 	client->print("\",");
 
 	// C24 LED Colors
 	client->print("\"ledColors\":{");
 	client->print("\"dayGood\":[");
-	client->print(config->ledConfig.dayGoodColor[0]);
+	client->print(config->led.dayGoodColor[0]);
 	client->print(",");
-	client->print(config->ledConfig.dayGoodColor[1]);
+	client->print(config->led.dayGoodColor[1]);
 	client->print(",");
-	client->print(config->ledConfig.dayGoodColor[2]);
+	client->print(config->led.dayGoodColor[2]);
 	client->print("],");
 
 	client->print("\"dayBad\":[");
-	client->print(config->ledConfig.dayBadColor[0]);
+	client->print(config->led.dayBadColor[0]);
 	client->print(",");
-	client->print(config->ledConfig.dayBadColor[1]);
+	client->print(config->led.dayBadColor[1]);
 	client->print(",");
-	client->print(config->ledConfig.dayBadColor[2]);
+	client->print(config->led.dayBadColor[2]);
 	client->print("],");
 
 	client->print("\"nightGood\":[");
-	client->print(config->ledConfig.nightGoodColor[0]);
+	client->print(config->led.nightGoodColor[0]);
 	client->print(",");
-	client->print(config->ledConfig.nightGoodColor[1]);
+	client->print(config->led.nightGoodColor[1]);
 	client->print(",");
-	client->print(config->ledConfig.nightGoodColor[2]);
+	client->print(config->led.nightGoodColor[2]);
 	client->print("],");
 
 	client->print("\"nightBad\":[");
-	client->print(config->ledConfig.nightBadColor[0]);
+	client->print(config->led.nightBadColor[0]);
 	client->print(",");
-	client->print(config->ledConfig.nightBadColor[1]);
+	client->print(config->led.nightBadColor[1]);
 	client->print(",");
-	client->print(config->ledConfig.nightBadColor[2]);
+	client->print(config->led.nightBadColor[2]);
 	client->print("]");
 	client->print("},");
 
 	// C25 LED Brightness
 	client->print("\"ledBrightness\":{");
 	client->print("\"day\":");
-	client->print(config->ledConfig.dayBrightness);
+	client->print(config->led.dayBrightness);
 	client->print(",\"night\":");
-	client->print(config->ledConfig.nightBrightness);
+	client->print(config->led.nightBrightness);
 	client->print("},");
 
 	// C26 LED Auto-switch
 	client->print("\"ledAutoSwitch\":");
-	client->print(config->ledConfig.autoSwitch ? "true" : "false");
+	client->print(config->led.autoSwitch ? "true" : "false");
 	client->print(",");
 
 	// C27 LED Enable states
 	client->print("\"ledEnable\":{");
 	client->print("\"gps\":");
-	client->print(config->ledConfig.gpsEnabled ? "true" : "false");
+	client->print(config->led.gpsEnabled ? "true" : "false");
 	client->print(",\"warning\":");
-	client->print(config->ledConfig.warningEnabled ? "true" : "false");
+	client->print(config->led.warningEnabled ? "true" : "false");
 	client->print(",\"system\":");
-	client->print(config->ledConfig.systemEnabled ? "true" : "false");
+	client->print(config->led.systemEnabled ? "true" : "false");
 	client->print("},");
 
 	// C28 Control Panel Tones
 	client->print("\"soundConfig\":{");
 	client->print("\"goodPreset\":");
-	client->print(config->soundConfig.goodPreset);
+	client->print(config->sound.goodPreset);
 	client->print(",\"goodToneHz\":");
-	client->print(config->soundConfig.good_toneHz);
+	client->print(config->sound.goodToneHz);
 	client->print(",\"goodDurationMs\":");
-	client->print(config->soundConfig.good_durationMs);
+	client->print(config->sound.goodDurationMs);
 	client->print(",\"badPreset\":");
-	client->print(config->soundConfig.badPreset);
+	client->print(config->sound.badPreset);
 	client->print(",\"badToneHz\":");
-	client->print(config->soundConfig.bad_toneHz);
+	client->print(config->sound.badToneHz);
 	client->print(",\"badDurationMs\":");
-	client->print(config->soundConfig.bad_durationMs);
+	client->print(config->sound.badDurationMs);
 	client->print(",\"badRepeatMs\":");
-	client->print(config->soundConfig.bad_repeatMs);
+	client->print(config->sound.badRepeatMs);
 	client->print("},");
 
 	// C31 SD Card Initialize Speed
 	client->print("\"sdCardInitializeSpeed\":");
-	client->print(config->sdCardInitializeSpeed);
+	client->print(config->sdCard.initializeSpeed);
 
 	client->print("}");
 }

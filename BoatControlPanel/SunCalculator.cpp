@@ -34,7 +34,7 @@ SunTimes SunCalculator::calculateSunTimes(GpsSensorHandler* gpsHandler)
         DateTimeManager::getYear(),
         DateTimeManager::getMonth(),
         DateTimeManager::getDay(),
-        config->timezoneOffset
+        config->system.timezoneOffset
 	);
 }
 

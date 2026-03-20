@@ -28,7 +28,7 @@ ToneManager::ToneManager(uint8_t pin)
     pinMode(_pin, OUTPUT);
 }
 
-void ToneManager::configSet(SoundSignalConfig* config)
+void ToneManager::configSet(SoundConfig* config)
 {
     _config = config;
 }
@@ -66,7 +66,7 @@ bool ToneManager::isPlaying() const
 
 uint32_t ToneManager::getRepeatIntervalMs() const
 {
-    return _config ? _config->bad_repeatMs : 30000;
+    return _config ? _config->badRepeatMs : 30000;
 }
 
 void ToneManager::update(unsigned long now)
@@ -117,14 +117,14 @@ void ToneManager::buildSequence(ToneType type)
     if (type == ToneType::Good)
     {
         preset = _config ? _config->goodPreset : 0;
-        hz     = _config ? _config->good_toneHz : 1000;
-        ms     = _config ? _config->good_durationMs : 100;
+        hz     = _config ? _config->goodToneHz : 1000;
+        ms     = _config ? _config->goodDurationMs : 100;
     }
     else
     {
         preset = _config ? _config->badPreset : 0;
-        hz     = _config ? _config->bad_toneHz : 500;
-        ms     = _config ? _config->bad_durationMs : 200;
+        hz     = _config ? _config->badToneHz : 500;
+        ms     = _config ? _config->badDurationMs : 200;
     }
 
 	switch (static_cast<TonePreset>(preset))

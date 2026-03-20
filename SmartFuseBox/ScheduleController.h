@@ -19,8 +19,6 @@
 
 #include "Config.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "RelayController.h"
 #include "MessageBus.h"
 #include "ConfigManager.h"
@@ -102,5 +100,3 @@ public:
     // Called every loop iteration; nowMs = millis()
     void update(unsigned long nowMs);
 };
-
-#endif

@@ -41,6 +41,10 @@
 extern "C" char* sbrk(int incr);
 #endif
 
+#if defined(ARDUINO_R4_MINIMA)
+#include "bsp_api.h"
+#endif
+
 uint16_t SystemFunctions::stackAvailable()
 {
     extern int __heap_start, * __brkval;
@@ -89,6 +93,35 @@ uint8_t SystemFunctions::GenerateDefaultPassword(char* buffer, size_t bufferSize
     buffer[bufferSize - 1] = '\0';
 
     return BufferSuccess;
+}
+
+uint32_t SystemFunctions::GetSerialNumber()
+{
+#if defined(ESP32)
+    // eFuse MAC — hardware-burned at manufacture, safe to call before WiFi.begin()
+    // Bytes [0..2] are the OUI (same across all ESP32 devices); [2..5] fill the full 32 bits
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    return ((uint32_t)mac[2] << 24) | ((uint32_t)mac[3] << 16) | ((uint32_t)mac[4] << 8) | mac[5];
+#elif defined(ARDUINO_UNO_R4)
+    // WiFi MAC address — hardware unique per device
+    // Bytes [0..2] are the OUI (same across all R4 WiFi devices); [2..5] fill the full 32 bits
+    uint8_t mac[6];
+    WiFi.macAddress(mac);
+    return ((uint32_t)mac[2] << 24) | ((uint32_t)mac[3] << 16) | ((uint32_t)mac[4] << 8) | mac[5];
+#elif defined(ARDUINO_R4_MINIMA)
+    // RA4M1 128-bit Unique ID via Renesas FSP — factory-programmed, read-only
+    // XOR-folded to 32 bits; each word contributes device-specific entropy
+    bsp_unique_id_t const* uid = R_BSP_UniqueIdGet();
+    return uid->unique_id_words[0] ^ uid->unique_id_words[1] ^
+           uid->unique_id_words[2] ^ uid->unique_id_words[3];
+#elif defined(ARDUINO_MEGA2560)
+    // No unique hardware ID available; generate a random value instead
+     randomSeed(analogRead(A0) + analogRead(A1) + millis());
+	 return static_cast<uint32_t>(random(PasswordRandomMin, LONG_MAX));
+#else
+#error "Unrecognized board type — you must define 'ARDUINO_UNO_R4' or 'ARDUINO_R4_MINIMA' or 'ESP32' in your board configuration in Local.h"
+#endif
 }
 
 void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection)

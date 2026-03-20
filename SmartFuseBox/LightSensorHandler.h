@@ -90,7 +90,7 @@ protected:
 
         if (_isDigital)
         {
-            reading = digitalRead(_sensorPin) == HIGH;
+            reading = digitalRead(_sensorPin) == LOW;
             _currentLightLevel = reading ? 1023 : 0;
 
             char buf[32];

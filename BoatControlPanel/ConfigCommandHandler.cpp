@@ -45,8 +45,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             }
 
             // enforce max length BOAT_NAME_MAX_LEN (defined in ConfigManager / Config.h)
-            strncpy(cfg->name, params[0].value, sizeof(cfg->name) - 1);
-            cfg->name[sizeof(cfg->name) - 1] = '\0';
+            strncpy(cfg->vessel.name, params[0].value, sizeof(cfg->vessel.name) - 1);
+            cfg->vessel.name[sizeof(cfg->vessel.name) - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -98,14 +98,14 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			}
 
             // Copy short name with truncation to relay short name length
-            size_t maxShortLen = sizeof(cfg->relayShortNames[idx]) - 1;
-            strncpy(cfg->relayShortNames[idx], shortName, maxShortLen);
-            cfg->relayShortNames[idx][maxShortLen] = '\0';
+            size_t maxShortLen = sizeof(cfg->relay.shortNames[idx]) - 1;
+            strncpy(cfg->relay.shortNames[idx], shortName, maxShortLen);
+            cfg->relay.shortNames[idx][maxShortLen] = '\0';
 
             // Copy long name with truncation to relay long name length
-            size_t maxLongLen = sizeof(cfg->relayLongNames[idx]) - 1;
-            strncpy(cfg->relayLongNames[idx], longName, maxLongLen);
-            cfg->relayLongNames[idx][maxLongLen] = '\0';
+            size_t maxLongLen = sizeof(cfg->relay.longNames[idx]) - 1;
+            strncpy(cfg->relay.longNames[idx], longName, maxLongLen);
+            cfg->relay.longNames[idx][maxLongLen] = '\0';
 
             sendAckOk(sender, command, &params[0]);
         }
@@ -134,7 +134,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-            cfg->homePageMapping[button] = relay;
+            cfg->relay.homePageMapping[button] = relay;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -165,7 +165,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-            cfg->buttonImage[button] = (uint8_t)buttonColor;
+            cfg->relay.buttonImage[button] = (uint8_t)buttonColor;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -187,7 +187,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-			cfg->hornRelayIndex = relay;
+			cfg->sound.hornRelayIndex = relay;
 			char buffer[20];
 			snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), relay);
 			_broadcastManager->sendCommand(ConfigSoundRelayId, buffer, true);
@@ -196,16 +196,16 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             if (relay != DefaultValue)
             {
                 // Only auto-rename if the relay does not already have a custom name
-                if (cfg->relayShortNames[relay][0] == '\0')
+                if (cfg->relay.shortNames[relay][0] == '\0')
                 {
-                    strncpy(cfg->relayShortNames[relay], "Sound", sizeof(cfg->relayShortNames[relay]) - 1);
-                    cfg->relayShortNames[relay][sizeof(cfg->relayShortNames[relay]) - 1] = '\0';
+                    strncpy(cfg->relay.shortNames[relay], "Sound", sizeof(cfg->relay.shortNames[relay]) - 1);
+                    cfg->relay.shortNames[relay][sizeof(cfg->relay.shortNames[relay]) - 1] = '\0';
                 }
 
-                if (cfg->relayLongNames[relay][0] == '\0')
+                if (cfg->relay.longNames[relay][0] == '\0')
                 {
-                    strncpy(cfg->relayLongNames[relay], "Sound\r\nSignals", sizeof(cfg->relayLongNames[relay]) - 1);
-                    cfg->relayLongNames[relay][sizeof(cfg->relayLongNames[relay]) - 1] = '\0';
+                    strncpy(cfg->relay.longNames[relay], "Sound\r\nSignals", sizeof(cfg->relay.longNames[relay]) - 1);
+                    cfg->relay.longNames[relay][sizeof(cfg->relay.longNames[relay]) - 1] = '\0';
                 }
             }
 
@@ -222,7 +222,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         if (paramCount >= 1)
         {
             uint16_t delay = static_cast<uint16_t>(strtoul(params[0].value, nullptr, 0));
-            cfg->soundStartDelayMs = delay;
+            cfg->sound.startDelayMs = delay;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -230,7 +230,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             sendAckErr(sender, command, F("Missing param"));
         }
     }
-#if defined(ARDUINO_UNO_R4)
+#if defined(BLUETOOTH_SUPPORT)
     else if (strcmp(command, ConfigBluetoothEnable) == 0)
     {
         // C10 - Enable/disable Bluetooth
@@ -242,7 +242,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 sendAckErr(sender, command, F("Invalid value (0 or 1)"), &params[0]);
                 return true;
             }
-            cfg->bluetoothEnabled = (enabled == 1);
+            cfg->network.bluetoothEnabled = (enabled == 1);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -250,6 +250,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             sendAckErr(sender, command, F("Missing param"));
         }
     }
+#endif
+#if defined(WIFI_SUPPORT)
     else if (strcmp(command, ConfigWifiEnable) == 0)
     {
         // C11 - Enable/disable WiFi
@@ -261,7 +263,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 sendAckErr(sender, command, F("Invalid value (0 or 1)"), &params[0]);
                 return true;
             }
-            cfg->wifiEnabled = (enabled == 1);
+            cfg->network.wifiEnabled = (enabled == 1);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -274,13 +276,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C12 - Set WiFi mode (0=AP, 1=Client)
         if (paramCount >= 1)
         {
-            uint8_t mode = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
-            if (mode > 1)
-            {
-                sendAckErr(sender, command, F("Invalid mode (0=AP, 1=Client)"), &params[0]);
-                return true;
-            }
-            cfg->accessMode = mode;
+            WifiMode mode = static_cast<WifiMode>(strtoul(params[0].value, nullptr, 0));
+            cfg->network.accessMode = mode;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -293,13 +290,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C13 - Set WiFi SSID
         if (paramCount >= 1)
         {
-            if (cfg->accessMode != static_cast<uint8_t>(WifiMode::Client))
+            if (cfg->network.accessMode != WifiMode::Client)
             {
                 sendAckErr(sender, command, F("Only available in Client mode"));
                 return true;
             }
-            strncpy(cfg->apSSID, params[0].value, sizeof(cfg->apSSID) - 1);
-            cfg->apSSID[sizeof(cfg->apSSID) - 1] = '\0';
+            strncpy(cfg->network.ssid, params[0].value, sizeof(cfg->network.ssid) - 1);
+            cfg->network.ssid[sizeof(cfg->network.ssid) - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -312,13 +309,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C14 - Set WiFi password
         if (paramCount >= 1)
         {
-            if (cfg->accessMode != static_cast<uint8_t>(WifiMode::Client))
+            if (cfg->network.accessMode != static_cast<uint8_t>(WifiMode::Client))
             {
                 sendAckErr(sender, command, F("Only available in Client mode"));
                 return true;
             }
-            strncpy(cfg->apPassword, params[0].value, sizeof(cfg->apPassword) - 1);
-            cfg->apPassword[sizeof(cfg->apPassword) - 1] = '\0';
+            strncpy(cfg->network.password, params[0].value, sizeof(cfg->network.password) - 1);
+            cfg->network.password[sizeof(cfg->network.password) - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -337,7 +334,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 sendAckErr(sender, command, F("Invalid port"), &params[0]);
                 return true;
             }
-            cfg->wifiPort = port;
+            cfg->network.port = port;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -356,8 +353,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C17 - Set AP IP address
         if (paramCount >= 1)
         {
-            strncpy(cfg->apIpAddress, params[0].value, sizeof(cfg->apIpAddress) - 1);
-            cfg->apIpAddress[sizeof(cfg->apIpAddress) - 1] = '\0';
+            strncpy(cfg->network.apIpAddress, params[0].value, sizeof(cfg->network.apIpAddress) - 1);
+            cfg->network.apIpAddress[sizeof(cfg->network.apIpAddress) - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -386,7 +383,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-            cfg->defaulRelayState[relay] = (value == 1);
+            cfg->relay.defaultState[relay] = (value == 1);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -420,7 +417,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
             for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
             {
-                if (cfg->linkedRelays[i][0] == relay)
+                if (cfg->relay.linkedRelays[i][0] == relay)
                 {
                     alreadyLinked = true;
                     existingIndex = i;
@@ -432,8 +429,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             {
                 if (alreadyLinked)
                 {
-                    cfg->linkedRelays[existingIndex][0] = 0xFF;
-                    cfg->linkedRelays[existingIndex][1] = 0xFF;
+                    cfg->relay.linkedRelays[existingIndex][0] = 0xFF;
+                    cfg->relay.linkedRelays[existingIndex][1] = 0xFF;
                 }
             }
             else
@@ -448,10 +445,10 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 bool found = false;
                 for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
                 {
-                    if (cfg->linkedRelays[i][0] == 0xFF)
+                    if (cfg->relay.linkedRelays[i][0] == 0xFF)
                     {
-                        cfg->linkedRelays[i][0] = relay;
-                        cfg->linkedRelays[i][1] = linkedRelay;
+                        cfg->relay.linkedRelays[i][0] = relay;
+                        cfg->relay.linkedRelays[i][1] = linkedRelay;
                         found = true;
                         break;
                     }
@@ -482,7 +479,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 sendAckErr(sender, command, F("Invalid offset (-12 to +14)"), &params[0]);
                 return true;
             }
-            cfg->timezoneOffset = offset;
+            cfg->system.timezoneOffset = offset;
             DateTimeManager::setTimezoneOffset(offset);
             sendAckOk(sender, command, &params[0]);
         }
@@ -502,8 +499,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
 
-            strncpy(cfg->mMSI, params[0].value, ConfigMmsiLength - 1);
-            cfg->mMSI[ConfigMmsiLength - 1] = '\0';
+            strncpy(cfg->vessel.mmsi, params[0].value, ConfigMmsiLength - 1);
+            cfg->vessel.mmsi[ConfigMmsiLength - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -516,8 +513,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C22 - Set call sign
         if (paramCount >= 1)
         {
-            strncpy(cfg->callSign, params[0].value, ConfigCallSignLength - 1);
-            cfg->callSign[ConfigCallSignLength - 1] = '\0';
+            strncpy(cfg->vessel.callSign, params[0].value, ConfigCallSignLength - 1);
+            cfg->vessel.callSign[ConfigCallSignLength - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -530,8 +527,8 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C23 - Set home port
         if (paramCount >= 1)
         {
-            strncpy(cfg->homePort, params[0].value, ConfigHomePortLength - 1);
-            cfg->homePort[ConfigHomePortLength - 1] = '\0';
+            strncpy(cfg->vessel.homePort, params[0].value, ConfigHomePortLength - 1);
+            cfg->vessel.homePort[ConfigHomePortLength - 1] = '\0';
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -559,39 +556,39 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         char buffer[128];
         // return summary of config back to caller in multiple commands
         // C1:<name>
-        sender->sendCommand(ConfigRename, cfg->name);
+        sender->sendCommand(ConfigRename, cfg->vessel.name);
 
         // C4 entries - send both short and long names in format: <idx>=<shortName|longName>
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
         {
-            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%s|%s"), i, cfg->relayShortNames[i], cfg->relayLongNames[i]);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%s|%s"), i, cfg->relay.shortNames[i], cfg->relay.longNames[i]);
             sender->sendCommand(ConfigRenameRelay, buffer);
         }
 
         // C5 entries
         for (uint8_t s = 0; s < ConfigHomeButtons; ++s)
         {
-            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), s, cfg->homePageMapping[s]);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), s, cfg->relay.homePageMapping[s]);
             sender->sendCommand(ConfigMapHomeButton, buffer);
         }
 
 		// C6 Send home page button color mappings
 		for (uint8_t i = 0; i < ConfigRelayCount; i++)
 		{
-			snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->buttonImage[i]);
+			snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->relay.buttonImage[i]);
 			sender->sendCommand(ConfigSetButtonColor, buffer);
 		}
 
 		// C7 Boat type
-		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<int>(cfg->vesselType));
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), static_cast<int>(cfg->vessel.vesselType));
 		sender->sendCommand(ConfigBoatType, buffer);
 
 		// C8 Sound relay ID
-		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->hornRelayIndex);
+		snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->sound.hornRelayIndex);
 		sender->sendCommand(ConfigSoundRelayId, buffer);
 
         // C9 Sound start delay
-        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->soundStartDelayMs);
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%u"), cfg->sound.startDelayMs);
         sender->sendCommand(ConfigSoundStartDelay, buffer);
 
 #if defined(ARDUINO_UNO_R4)
@@ -624,80 +621,80 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         // C18 Default relay states
         for (uint8_t i = 0; i < ConfigRelayCount; ++i)
         {
-            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->defaulRelayState[i] ? 1 : 0);
+            snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), i, cfg->relay.defaultState[i] ? 1 : 0);
             sender->sendCommand(ConfigDefaultRelayState, buffer);
         }
 
         // C19 Linked relays
         for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
         {
-            if (cfg->linkedRelays[i][0] != 0xFF)
+            if (cfg->relay.linkedRelays[i][0] != 0xFF)
             {
-                snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), cfg->linkedRelays[i][0], cfg->linkedRelays[i][1]);
+                snprintf_P(buffer, sizeof(buffer), PSTR("%u=%u"), cfg->relay.linkedRelays[i][0], cfg->relay.linkedRelays[i][1]);
                 sender->sendCommand(ConfigLinkRelays, buffer);
             }
         }
 
         // C20 Timezone offset
-        snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), static_cast<int8_t>(cfg->timezoneOffset));
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%d"), static_cast<int8_t>(cfg->system.timezoneOffset));
         sender->sendCommand(ConfigTimeZoneOffset, buffer);
 
         // C21 MMSI
-        sender->sendCommand(ConfigMmsi, cfg->mMSI);
+        sender->sendCommand(ConfigMmsi, cfg->vessel.mmsi);
 
         // C22 Call sign
-        sender->sendCommand(ConfigCallSign, cfg->callSign);
+        sender->sendCommand(ConfigCallSign, cfg->vessel.callSign);
 
         // C23 Home port
-        sender->sendCommand(ConfigHomePort, cfg->homePort);
+        sender->sendCommand(ConfigHomePort, cfg->vessel.homePort);
 
         // C24 LED colors (send 4 color configs: day good, day bad, night good, night bad)
         snprintf_P(buffer, sizeof(buffer), PSTR("t=0;c=0;r=%u;g=%u;b=%u"), 
-            cfg->ledConfig.dayGoodColor[0], cfg->ledConfig.dayGoodColor[1], cfg->ledConfig.dayGoodColor[2]);
+            cfg->led.dayGoodColor[0], cfg->led.dayGoodColor[1], cfg->led.dayGoodColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
 
         snprintf_P(buffer, sizeof(buffer), PSTR("t=0;c=1;r=%u;g=%u;b=%u"), 
-            cfg->ledConfig.dayBadColor[0], cfg->ledConfig.dayBadColor[1], cfg->ledConfig.dayBadColor[2]);
+            cfg->led.dayBadColor[0], cfg->led.dayBadColor[1], cfg->led.dayBadColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
 
         snprintf_P(buffer, sizeof(buffer), PSTR("t=1;c=0;r=%u;g=%u;b=%u"), 
-            cfg->ledConfig.nightGoodColor[0], cfg->ledConfig.nightGoodColor[1], cfg->ledConfig.nightGoodColor[2]);
+            cfg->led.nightGoodColor[0], cfg->led.nightGoodColor[1], cfg->led.nightGoodColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
 
         snprintf_P(buffer, sizeof(buffer), PSTR("t=1;c=1;r=%u;g=%u;b=%u"), 
-            cfg->ledConfig.nightBadColor[0], cfg->ledConfig.nightBadColor[1], cfg->ledConfig.nightBadColor[2]);
+            cfg->led.nightBadColor[0], cfg->led.nightBadColor[1], cfg->led.nightBadColor[2]);
         sender->sendCommand(ConfigLedColor, buffer);
         
         // C25 LED brightness
-        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;b=%u"), cfg->ledConfig.dayBrightness);
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=0;b=%u"), cfg->led.dayBrightness);
         sender->sendCommand(ConfigLedBrightness, buffer);
 
-        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;b=%u"), cfg->ledConfig.nightBrightness);
+        snprintf_P(buffer, sizeof(buffer), PSTR("t=1;b=%u"), cfg->led.nightBrightness);
         sender->sendCommand(ConfigLedBrightness, buffer);
         
         // C26 LED auto-switch
-        snprintf_P(buffer, sizeof(buffer), PSTR("v=%s"), cfg->ledConfig.autoSwitch ? "true" : "false");
+        snprintf_P(buffer, sizeof(buffer), PSTR("v=%s"), cfg->led.autoSwitch ? "true" : "false");
         sender->sendCommand(ConfigLedAutoSwitch, buffer);
         
         // C27 LED enable states
         snprintf_P(buffer, sizeof(buffer), PSTR("g=%s;w=%s;s=%s"),
-            cfg->ledConfig.gpsEnabled ? "true" : "false",
-            cfg->ledConfig.warningEnabled ? "true" : "false",
-            cfg->ledConfig.systemEnabled ? "true" : "false");
+            cfg->led.gpsEnabled ? "true" : "false",
+            cfg->led.warningEnabled ? "true" : "false",
+            cfg->led.systemEnabled ? "true" : "false");
         sender->sendCommand(ConfigLedEnable, buffer);
 
         // C28 Control panel tones (send both good and bad tone configs)
         snprintf_P(buffer, sizeof(buffer), PSTR("t=0;h=%u;d=%u;p=%u;r=0"),
-            cfg->soundConfig.good_toneHz,
-            cfg->soundConfig.good_durationMs,
-            cfg->soundConfig.goodPreset);
+            cfg->sound.goodToneHz,
+            cfg->sound.goodDurationMs,
+            cfg->sound.goodPreset);
         sender->sendCommand(ControlPanelTones, buffer);
 
         snprintf_P(buffer, sizeof(buffer), PSTR("t=1;h=%u;d=%u;p=%u;r=%lu"),
-            cfg->soundConfig.bad_toneHz,
-            cfg->soundConfig.bad_durationMs,
-            cfg->soundConfig.badPreset,
-            cfg->soundConfig.bad_repeatMs);
+            cfg->sound.badToneHz,
+            cfg->sound.badDurationMs,
+            cfg->sound.badPreset,
+            cfg->sound.badRepeatMs);
         sender->sendCommand(ControlPanelTones, buffer);
 
         // C32 Light sensor night relay
@@ -721,7 +718,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 sendAckErr(sender, command, F("Invalid boat type"), &params[0]);
                 return true;
             }
-            cfg->vesselType = static_cast<VesselType>(type);
+            cfg->vessel.vesselType = static_cast<VesselType>(type);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -780,30 +777,30 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             {
                 if (isGoodColor)
                 {
-                    cfg->ledConfig.dayGoodColor[0] = r;
-                    cfg->ledConfig.dayGoodColor[1] = g;
-                    cfg->ledConfig.dayGoodColor[2] = b;
+                    cfg->led.dayGoodColor[0] = r;
+                    cfg->led.dayGoodColor[1] = g;
+                    cfg->led.dayGoodColor[2] = b;
                 }
                 else
                 {
-                    cfg->ledConfig.dayBadColor[0] = r;
-                    cfg->ledConfig.dayBadColor[1] = g;
-                    cfg->ledConfig.dayBadColor[2] = b;
+                    cfg->led.dayBadColor[0] = r;
+                    cfg->led.dayBadColor[1] = g;
+                    cfg->led.dayBadColor[2] = b;
                 }
             }
             else // Night mode
             {
                 if (isGoodColor)
                 {
-                    cfg->ledConfig.nightGoodColor[0] = r;
-                    cfg->ledConfig.nightGoodColor[1] = g;
-                    cfg->ledConfig.nightGoodColor[2] = b;
+                    cfg->led.nightGoodColor[0] = r;
+                    cfg->led.nightGoodColor[1] = g;
+                    cfg->led.nightGoodColor[2] = b;
                 }
                 else
                 {
-                    cfg->ledConfig.nightBadColor[0] = r;
-                    cfg->ledConfig.nightBadColor[1] = g;
-                    cfg->ledConfig.nightBadColor[2] = b;
+                    cfg->led.nightBadColor[0] = r;
+                    cfg->led.nightBadColor[1] = g;
+                    cfg->led.nightBadColor[2] = b;
                 }
             }
             
@@ -835,9 +832,9 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             }
             
             if (type == 0)
-                cfg->ledConfig.dayBrightness = brightness;
+                cfg->led.dayBrightness = brightness;
             else
-                cfg->ledConfig.nightBrightness = brightness;
+                cfg->led.nightBrightness = brightness;
             
             sendAckOk(sender, command, &params[0]);
         }
@@ -862,7 +859,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                 return true;
             }
             
-            cfg->ledConfig.autoSwitch = autoSwitch;
+            cfg->led.autoSwitch = autoSwitch;
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -891,9 +888,9 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
                     systemEnabled = value;
             }
 
-            cfg->ledConfig.gpsEnabled = gpsEnabled;
-            cfg->ledConfig.warningEnabled = warningEnabled;
-            cfg->ledConfig.systemEnabled = systemEnabled;
+            cfg->led.gpsEnabled = gpsEnabled;
+            cfg->led.warningEnabled = warningEnabled;
+            cfg->led.systemEnabled = systemEnabled;
 
             sendAckOk(sender, command);
         }
@@ -941,16 +938,16 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
             // Store settings based on type
             if (type == 0) // Good tone
             {
-                cfg->soundConfig.goodPreset = preset;
-                cfg->soundConfig.good_toneHz = hz;
-                cfg->soundConfig.good_durationMs = duration;
+                cfg->sound.goodPreset = preset;
+                cfg->sound.goodToneHz = hz;
+                cfg->sound.goodDurationMs = duration;
             }
             else // Bad tone
             {
-                cfg->soundConfig.badPreset = preset;
-                cfg->soundConfig.bad_toneHz = hz;
-                cfg->soundConfig.bad_durationMs = duration;
-                cfg->soundConfig.bad_repeatMs = repeat;
+                cfg->sound.badPreset = preset;
+                cfg->sound.badToneHz = hz;
+                cfg->sound.badDurationMs = duration;
+                cfg->sound.badRepeatMs = repeat;
             }
 
             sendAckOk(sender, command);

@@ -19,8 +19,6 @@
 #include "Local.h"
 #include "SchedulerNetworkHandler.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "ConfigManager.h"
 #include "SystemDefinitions.h"
 
@@ -161,5 +159,3 @@ void SchedulerNetworkHandler::formatWifiStatusJson(IWifiClient* client)
     formatStatusJson(buffer, sizeof(buffer));
     client->print(buffer);
 }
-
-#endif

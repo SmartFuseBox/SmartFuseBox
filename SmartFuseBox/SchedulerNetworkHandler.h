@@ -20,8 +20,6 @@
 
 #include "Config.h"
 
-#if defined(SCHEDULER_SUPPORT)
-
 #include "INetworkCommandHandler.h"
 #include "SystemDefinitions.h"
 
@@ -46,5 +44,3 @@ public:
 private:
     static void formatEventJson(char* buffer, size_t size, uint8_t idx, const ScheduledEvent& ev);
 };
-
-#endif

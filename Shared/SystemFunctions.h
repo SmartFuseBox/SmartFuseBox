@@ -59,6 +59,21 @@ public:
     static uint8_t GenerateDefaultPassword(char* buffer, size_t bufferSize);
 
     /**
+     * @brief Derive a hardware-unique 32-bit serial number from factory-programmed chip identity.
+     *
+     * Reads a hardware-burned identifier that is fixed for the lifetime of the chip and
+     * requires no EEPROM storage. The value is identical across every reboot and survives
+     * a factory config reset.
+     *
+     * - ESP32:           Lower 4 bytes of eFuse MAC (via esp_read_mac)
+     * - Arduino R4 WiFi: Lower 4 bytes of WiFi MAC address
+     * - Arduino R4 Minima: XOR fold of 128-bit RA4M1 Unique ID registers
+     *
+     * @return Hardware-unique serial number for this device.
+     */
+    static uint32_t GetSerialNumber();
+
+    /**
      * @brief Initialize a HardwareSerial port with specified baud rate.
      *
      * Optionally waits for the serial connection to be established (useful for USB serial).

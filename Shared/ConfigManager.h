@@ -42,8 +42,7 @@ public:
 
 private:
     static uint16_t calcChecksum(const Config& c);
-#if defined(SCHEDULER_SUPPORT)
     static void migrateV1toV2();
-#endif
+	static void migrateV2toV3();
     static Config _cfg;
 };

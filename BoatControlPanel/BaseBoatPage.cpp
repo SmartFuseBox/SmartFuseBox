@@ -57,7 +57,7 @@ uint8_t BaseBoatPage::getButtonColor(uint8_t buttonIndex, bool isOn, uint8_t max
     if (isOn)
     {
         // Check if a custom color is configured for this button
-        uint8_t configuredColor = config->buttonImage[buttonIndex];
+        uint8_t configuredColor = config->relay.buttonImage[buttonIndex];
         if (configuredColor != DefaultValue &&
             configuredColor >= ImageButtonColorBlue &&
             configuredColor <= ImageButtonColorYellow)

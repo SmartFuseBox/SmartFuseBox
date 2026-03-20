@@ -56,18 +56,18 @@ void VhfRadioPage::onEnterPage()
 
     // Called when page becomes active
     char buffer[50];
-    snprintf_P(buffer, sizeof(buffer), BoatNameFmt, config->name);
+    snprintf_P(buffer, sizeof(buffer), BoatNameFmt, config->vessel.name);
     sendText(ControlBoatName, buffer);
-	snprintf_P(buffer, sizeof(buffer), HomePortFmt, config->homePort);
+	snprintf_P(buffer, sizeof(buffer), HomePortFmt, config->vessel.homePort);
 	sendText(ControlHomePort, buffer);
-    snprintf_P(buffer, sizeof(buffer), MmsiFmt, config->mMSI);
+    snprintf_P(buffer, sizeof(buffer), MmsiFmt, config->vessel.mmsi);
 	sendText(ControlMmsi, buffer);
 
     char phoneticBuf[128];
-	phoneticize(config->callSign, phoneticBuf, sizeof(phoneticBuf), ", ");
+	phoneticize(config->vessel.callSign, phoneticBuf, sizeof(phoneticBuf), ", ");
 
     char callSignBuf[128];
-    snprintf_P(callSignBuf, sizeof(callSignBuf), CallSignFmt, config->callSign, phoneticBuf);
+    snprintf_P(callSignBuf, sizeof(callSignBuf), CallSignFmt, config->vessel.callSign, phoneticBuf);
 
 	char wrappedBuffer[134];
     SystemFunctions::wrapTextAtWordBoundary(callSignBuf, wrappedBuffer, sizeof(wrappedBuffer), 30);
