@@ -307,10 +307,11 @@ bool ConfigManager::loadHeader()
 {
     EEPROM.get(0, _hdr);
 
-    // Fresh EEPROM — all bytes are 0xFF
-    if (_hdr.bootCount == 0xFFFFFFFF)
+    if (_hdr.magic != SystemHeaderMagic || calcHeaderChecksum(_hdr) != _hdr.checksum)
     {
         memset(&_hdr, 0x00, sizeof(_hdr));
+        _hdr.magic = SystemHeaderMagic;
+        _hdr.headerVersion = 1;
         saveHeader();
     }
 
@@ -319,6 +320,8 @@ bool ConfigManager::loadHeader()
 
 bool ConfigManager::saveHeader()
 {
+    _hdr.checksum = 0;
+    _hdr.checksum = calcHeaderChecksum(_hdr);
     EEPROM.put(0, _hdr);
 #if defined(ESP8266) || defined(ESP32)
     return EEPROM.commit();
@@ -337,4 +340,13 @@ void ConfigManager::resetCrashCounter()
 SystemHeader* ConfigManager::getHeaderPtr()
 {
     return &_hdr;
+}
+
+uint16_t ConfigManager::calcHeaderChecksum(const SystemHeader& h)
+{
+    const uint8_t* p = reinterpret_cast<const uint8_t*>(&h);
+    size_t bytes = sizeof(SystemHeader) - sizeof(h.checksum);
+    uint32_t sum = 0;
+    for (size_t i = 0; i < bytes; ++i) sum += p[i];
+    return static_cast<uint16_t>(sum & 0xFFFF);
 }

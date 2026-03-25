@@ -42,13 +42,18 @@ constexpr uint8_t ConfigMaxSensors = 8;
 constexpr uint8_t ConfigMaxSensorNameLength = 21;
 constexpr uint8_t ConfigMaxSensorPins = 4;
 
+constexpr uint32_t SystemHeaderMagic = 0x53464201;  // 'SFB\x01'
+
 struct SystemHeader {
-    uint8_t  crashCounter;        // incremented pre-boot, reset on success
-    uint32_t bootCount;           // total successful boots
-    uint16_t configWrittenBy;     // firmware version that last wrote config
-    uint8_t  lastResetReason;     // watchdog, power, manual etc.
-    uint8_t  safeModeFlagsf;      // future safe mode options
-    uint8_t  reserved[23];        // future growth to fill 32 bytes
+    uint32_t magic;               // offset 0  — must equal SystemHeaderMagic
+    uint32_t bootCount;           // offset 4
+    uint16_t configWrittenBy;     // offset 8
+    uint8_t  headerVersion;       // offset 10 — for future header migrations
+    uint8_t  crashCounter;        // offset 11
+    uint8_t  lastResetReason;     // offset 12
+    uint8_t  safeModeFlagsf;      // offset 13
+    uint8_t  reserved[16];        // offset 14
+    uint16_t checksum;            // offset 30 — always last
 } __attribute__((packed));        // = 32 bytes
 
 enum class VesselType : uint8_t

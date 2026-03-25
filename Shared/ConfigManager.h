@@ -27,6 +27,7 @@ private:
     static uint16_t calcChecksum(const Config& c);
     static bool loadHeader();
     static bool saveHeader();
+    static uint16_t calcHeaderChecksum(const SystemHeader& h);
     static void migrateV1toV2();
 	static void migrateV2toV3();
     static Config _cfg;
