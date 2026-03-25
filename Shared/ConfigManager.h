@@ -19,8 +19,20 @@
 #include <Arduino.h>
 #include "Config.h"
 
+constexpr uint8_t CrashCounterThreshold = 3;
+
 class ConfigManager
 {
+private:
+    static uint16_t calcChecksum(const Config& c);
+    static bool loadHeader();
+    static bool saveHeader();
+    static uint16_t calcHeaderChecksum(const SystemHeader& h);
+    static void migrateV1toV2();
+	static void migrateV2toV3();
+    static Config _cfg;
+    static SystemHeader _hdr;
+
 public:
     // Call once at startup (handles any board-specific init)
     static void begin();
@@ -40,9 +52,9 @@ public:
     // For debug or UI: how many bytes of EEPROM are available
     static size_t availableEEPROMBytes();
 
-private:
-    static uint16_t calcChecksum(const Config& c);
-    static void migrateV1toV2();
-	static void migrateV2toV3();
-    static Config _cfg;
+    // Call after full system initialisation succeeds to reset the crash counter
+    static void resetCrashCounter();
+
+    // Access current in-memory system header
+    static SystemHeader* getHeaderPtr();
 };
