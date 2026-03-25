@@ -42,6 +42,15 @@ constexpr uint8_t ConfigMaxSensors = 8;
 constexpr uint8_t ConfigMaxSensorNameLength = 21;
 constexpr uint8_t ConfigMaxSensorPins = 4;
 
+struct SystemHeader {
+    uint8_t  crashCounter;        // incremented pre-boot, reset on success
+    uint32_t bootCount;           // total successful boots
+    uint16_t configWrittenBy;     // firmware version that last wrote config
+    uint8_t  lastResetReason;     // watchdog, power, manual etc.
+    uint8_t  safeModeFlagsf;      // future safe mode options
+    uint8_t  reserved[23];        // future growth to fill 32 bytes
+} __attribute__((packed));        // = 32 bytes
+
 enum class VesselType : uint8_t
 {
     Motor = 0x00,                   // Power boat
@@ -103,7 +112,8 @@ constexpr uint8_t ConfigLinkedRelayCount = 2;
 
 struct SystemConfig {
     int8_t  timezoneOffset;
-    uint8_t reserved[16];
+    uint8_t reserved1[4];
+    int8_t reserved2[4];
 } __attribute__((packed));
 
 struct VesselConfig {
@@ -112,7 +122,8 @@ struct VesselConfig {
     char     mmsi[ConfigMmsiLength];
     char     callSign[ConfigCallSignLength];
     char     homePort[ConfigHomePortLength];
-    uint8_t  reserved[8];
+    uint8_t reserved1[4];
+    int8_t reserved2[4];
 } __attribute__((packed));
 
 struct RelayConfig {
@@ -122,7 +133,9 @@ struct RelayConfig {
     uint8_t buttonImage[ConfigRelayCount];
     bool    defaultState[ConfigRelayCount];
     uint8_t linkedRelays[ConfigMaxLinkedRelays][ConfigLinkedRelayCount];
-    uint8_t reserved[8];
+	uint8_t pins[ConfigRelayCount];
+    uint8_t reserved1[4];
+    int8_t reserved2[4];
 } __attribute__((packed));
 
 struct NetworkConfig {
@@ -133,7 +146,8 @@ struct NetworkConfig {
     uint16_t port;
     char     apIpAddress[MaxIpAddressLength];
     bool     bluetoothEnabled;
-    uint8_t  reserved[8];
+    uint8_t reserved1[4];
+    int8_t reserved2[4];
 } __attribute__((packed));
 
 struct SoundConfig {
@@ -146,7 +160,8 @@ struct SoundConfig {
     uint16_t badToneHz;
     uint16_t badDurationMs;
     uint32_t badRepeatMs;
-    uint8_t  reserved[4];
+    uint8_t reserved1[2];
+    int8_t reserved2[2];
 } __attribute__((packed));
 
 struct SdCardConfig {
@@ -202,7 +217,7 @@ struct ScheduledEvent
     uint8_t conditionPayload[ConfigSchedulerPayloadSize];
     SchedulerActionType actionType;
     uint8_t actionPayload[ConfigSchedulerPayloadSize];
-    uint8_t reserved[ConfigScheduleEventReserved];
+    int8_t reserved[ConfigScheduleEventReserved];
 } __attribute__((packed));
 
 struct SchedulerSettings
@@ -214,19 +229,20 @@ struct SchedulerSettings
 } __attribute__((packed));
 
 struct SensorEntry {
-    bool         enabled;                          // 1 byte
-    SensorIdList sensorType;                       // 1 byte (uint8_t)
-    uint8_t      pins[ConfigMaxSensorPins];        // 4 bytes, 0xFF = unused
-    char         name[ConfigMaxSensorNameLength];  // 21 bytes (20 + null)
-    uint8_t      options[4];                       // 4 bytes type-specific options
-    uint8_t      reserved[2];                      // 2 bytes
-} __attribute__((packed));                         // = 33 bytes per entry
+    bool enabled;
+    SensorIdList sensorType;
+    uint8_t pins[ConfigMaxSensorPins];
+    char name[ConfigMaxSensorNameLength];
+    int8_t options1[2];
+    int16_t options2[2];
+} __attribute__((packed));
 
 struct SensorsConfig {
-    uint8_t     count;                             // active entry count
-    SensorEntry sensors[ConfigMaxSensors];         // 8 × 33 = 264 bytes
-    uint8_t     reserved[4];                       // 4 bytes 
-} __attribute__((packed));                         // = 269 bytes total
+    uint8_t count;
+    SensorEntry sensors[ConfigMaxSensors];
+    uint8_t reserved1[2];
+    int8_t reserved2[2];
+} __attribute__((packed));
 
 struct Config {
     uint8_t version;
@@ -241,8 +257,9 @@ struct Config {
     SdCardConfig sdCard;
     SchedulerSettings scheduler;
     SensorsConfig sensors;
-    uint8_t  reserved[8];       // top-level future growth
+    uint8_t reserved1[2];
+    int8_t reserved2[2];
     uint16_t checksum;          // always last
 } __attribute__((packed));
 
-static_assert(sizeof(Config) <= EEPROM_CAPACITY_BYTES, "Config struct exceeds EEPROM capacity for this board. Reduce features or increase EEPROM capacity.");
+static_assert(sizeof(Config) + sizeof(SystemHeader) <= EEPROM_CAPACITY_BYTES, "Config struct exceeds EEPROM capacity for this board. Reduce features or increase EEPROM capacity.");

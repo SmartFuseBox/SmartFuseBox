@@ -28,12 +28,14 @@ constexpr char RelayNameShort[] PROGMEM = "R %u";
 constexpr char RelayNameLong[] PROGMEM = "Relay %u";
 // Static storage (use the shared Config from Config.h)
 Config ConfigManager::_cfg;
+SystemHeader ConfigManager::_hdr;
 
 void ConfigManager::begin()
 {
     // On ESP platforms, EEPROM needs begin(size)
 #if defined(ESP8266) || defined(ESP32)
-    EEPROM.begin(sizeof(Config));
+	size_t requiredBytes = sizeof(SystemHeader) + sizeof(Config);
+    EEPROM.begin(requiredBytes);
 #endif
 }
 
@@ -53,7 +55,7 @@ bool ConfigManager::load()
     begin();
 
     // Read raw bytes
-    EEPROM.get(0, _cfg);
+    EEPROM.get(sizeof(SystemHeader), _cfg);
 
     // Step up through every known version in sequence.
     // Each migration bumps _cfg.version by one, so a device that has missed
@@ -145,7 +147,7 @@ bool ConfigManager::save()
     _cfg.checksum = 0;
     _cfg.checksum = calcChecksum(_cfg);
 
-    EEPROM.put(0, _cfg);
+    EEPROM.put(sizeof(SystemHeader), _cfg);
 #if defined(ESP8266) || defined(ESP32)
     // commit for ESP
     bool ok = EEPROM.commit();
@@ -299,4 +301,40 @@ Config* ConfigManager::getConfigPtr()
 size_t ConfigManager::availableEEPROMBytes()
 {
     return EEPROM.length();
+}
+
+bool ConfigManager::loadHeader()
+{
+    EEPROM.get(0, _hdr);
+
+    // Fresh EEPROM — all bytes are 0xFF
+    if (_hdr.bootCount == 0xFFFFFFFF)
+    {
+        memset(&_hdr, 0x00, sizeof(_hdr));
+        saveHeader();
+    }
+
+    return true;
+}
+
+bool ConfigManager::saveHeader()
+{
+    EEPROM.put(0, _hdr);
+#if defined(ESP8266) || defined(ESP32)
+    return EEPROM.commit();
+#else
+    return true;
+#endif
+}
+
+void ConfigManager::resetCrashCounter()
+{
+    _hdr.crashCounter = 0;
+    _hdr.bootCount++;
+    saveHeader();
+}
+
+SystemHeader* ConfigManager::getHeaderPtr()
+{
+    return &_hdr;
 }
