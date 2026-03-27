@@ -65,17 +65,23 @@ private:
 
 		if (config != nullptr)
 		{
-			// Check for linked relay and update only if its state changes
-			uint8_t linkedRelay = config->relay.relays[relayIndex].linkedRelay;
-			if (linkedRelay < _relayCount)
-			{
-				if (_relayStatus[linkedRelay] != isOn)
+			// Check for linked relays and update only if their state changes
+				for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 				{
-					_relayStatus[linkedRelay] = isOn;
-					digitalWrite(_relays[linkedRelay], isOn ? LOW : HIGH);
-					changedMask |= (1 << linkedRelay);
+					if (config->relay.linkedRelays[i][0] == relayIndex)
+					{
+						uint8_t linkedRelay = config->relay.linkedRelays[i][1];
+						if (linkedRelay < _relayCount)
+						{
+							if (_relayStatus[linkedRelay] != isOn)
+							{
+								_relayStatus[linkedRelay] = isOn;
+								digitalWrite(_relays[linkedRelay], isOn ? LOW : HIGH);
+								changedMask |= (1 << linkedRelay);
+							}
+						}
+					}
 				}
-			}
 		}
 
 		if (_messageBus && changedMask)

@@ -182,8 +182,18 @@ void ConfigManager::resetToDefaults()
 
         _cfg.relay.relays[i].buttonImage = 0x02;    // default color blue
         _cfg.relay.relays[i].defaultState = false;   // default off (relay closed)
-        _cfg.relay.relays[i].linkedRelay = 0xFF;    // not linked
+#if defined(FUSE_BOX_CONTROLLER)
         _cfg.relay.relays[i].pin = Relays[i]; // default pin from Local.h
+#else
+        _cfg.relay.relays[i].pin = 0x255; // default value for no pin
+#endif
+    }
+
+    // Reset linked relay table
+    for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
+    {
+        _cfg.relay.linkedRelays[i][0] = 0xFF;
+        _cfg.relay.linkedRelays[i][1] = 0xFF;
     }
 
     // Default home page mapping: first four relays visible in order

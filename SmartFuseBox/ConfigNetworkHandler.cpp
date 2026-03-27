@@ -86,13 +86,13 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	}
 	else if (strcmp(command, ConfigSetButtonColor) == 0)
 	{
-		// Expect "MAP <button>=<color>" where button 0..3, image 0..5 (or 255 to unmap)
+		// Expect "MAP <relay>=<color>" where relay 0..7, image 0..5 (or 255 to clear)
 		if (paramCount >= 1)
 		{
-			uint8_t button = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
 			uint8_t buttonColor = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
 
-			result = _configController->mapHomeButtonColor(button, buttonColor);
+			result = _configController->mapHomeButtonColor(relayIndex, buttonColor);
 		}
 		else
 		{
@@ -605,15 +605,15 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	client->print("],");
 	client->print("\"linkedRelays\":[");
 
-	for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
 	{
 		if (i > 0)
 			client->print(",");
 
 		client->print("[");
-		client->print(i);
+		client->print(config->relay.linkedRelays[i][0]);
 		client->print(",");
-		client->print(config->relay.relays[i].linkedRelay);
+		client->print(config->relay.linkedRelays[i][1]);
 		client->print("]");
 	}
 	client->print("],");
