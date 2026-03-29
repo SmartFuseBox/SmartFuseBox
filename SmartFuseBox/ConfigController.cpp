@@ -32,12 +32,10 @@ constexpr uint8_t ImageButtonColorYellow = 7;
 
 ConfigController::ConfigController(SoundController* soundController, 
 	IBluetoothRadio* bluetoothRadio,
-	IWifiController* wifiController,
-	RelayController* relayController)
+	IWifiController* wifiController)
 	: _soundController(soundController),
 	_bluetoothRadio(bluetoothRadio),
 	_wifiController(wifiController),
-	_relayController(relayController),
 	_config(nullptr)
 {
 	_config = ConfigManager::getConfigPtr();
@@ -462,149 +460,5 @@ ConfigResult ConfigController::setLightSensorThreshold(const uint16_t threshold)
 		return ConfigResult::InvalidParameter;
 
 	_config->lightSensor.daytimeThreshold = threshold;
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::renameRelay(const uint8_t relayIndex, const char* nameWithPipe)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relayIndex >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	if (nameWithPipe == nullptr)
-		return ConfigResult::InvalidParameter;
-
-	const char* pipe = strchr(nameWithPipe, '|');
-	char shortName[ConfigShortRelayNameLength] = "";
-	char longName[ConfigLongRelayNameLength] = "";
-
-	if (pipe != nullptr)
-	{
-		size_t shortLen = pipe - nameWithPipe;
-		if (shortLen >= ConfigShortRelayNameLength)
-			shortLen = ConfigShortRelayNameLength - 1;
-		strncpy(shortName, nameWithPipe, shortLen);
-		shortName[shortLen] = '\0';
-		strncpy(longName, pipe + 1, sizeof(longName) - 1);
-		longName[sizeof(longName) - 1] = '\0';
-	}
-	else
-	{
-		strncpy(shortName, nameWithPipe, sizeof(shortName) - 1);
-		shortName[sizeof(shortName) - 1] = '\0';
-	}
-
-	strncpy(_config->relay.relays[relayIndex].shortName, shortName, sizeof(_config->relay.relays[relayIndex].shortName) - 1);
-	_config->relay.relays[relayIndex].shortName[sizeof(_config->relay.relays[relayIndex].shortName) - 1] = '\0';
-	strncpy(_config->relay.relays[relayIndex].longName, longName, sizeof(_config->relay.relays[relayIndex].longName) - 1);
-	_config->relay.relays[relayIndex].longName[sizeof(_config->relay.relays[relayIndex].longName) - 1] = '\0';
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::mapHomeButtonColor(const uint8_t relayIndex, const uint8_t buttonColor)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relayIndex >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	_config->relay.relays[relayIndex].buttonImage = buttonColor;
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::setRelayDefaultState(const uint8_t relayIndex, const bool defaultState)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relayIndex >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	_config->relay.relays[relayIndex].defaultState = defaultState;
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::linkRelays(const uint8_t relay1, const uint8_t relay2)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relay1 >= ConfigRelayCount || relay2 >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-	{
-		if (_config->relay.linkedRelays[i][0] == MaxUint8Value)
-		{
-			_config->relay.linkedRelays[i][0] = relay1;
-			_config->relay.linkedRelays[i][1] = relay2;
-			return ConfigResult::Success;
-		}
-	}
-
-	return ConfigResult::Failed;
-}
-
-ConfigResult ConfigController::unlinkRelay(const uint8_t relay)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relay >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-	{
-		if (_config->relay.linkedRelays[i][0] == relay || _config->relay.linkedRelays[i][1] == relay)
-		{
-			_config->relay.linkedRelays[i][0] = MaxUint8Value;
-			_config->relay.linkedRelays[i][1] = MaxUint8Value;
-			return ConfigResult::Success;
-		}
-	}
-
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::setRelayActionType(const uint8_t relayIndex, const RelayActionType actionType)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relayIndex >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	if (actionType > RelayActionType::NightRelay)
-		return ConfigResult::InvalidParameter;
-
-	// Enforce single-instance for Horn and NightRelay
-	if (actionType != RelayActionType::Default)
-	{
-		for (uint8_t i = 0; i < ConfigRelayCount; ++i)
-		{
-			if (i != relayIndex && _config->relay.relays[i].actionType == actionType)
-				_config->relay.relays[i].actionType = RelayActionType::Default;
-		}
-	}
-
-	_config->relay.relays[relayIndex].actionType = actionType;
-	return ConfigResult::Success;
-}
-
-ConfigResult ConfigController::setRelayPin(const uint8_t relayIndex, const uint8_t pin)
-{
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
-
-	if (relayIndex >= ConfigRelayCount)
-		return ConfigResult::InvalidRelay;
-
-	if (pin == 0)
-		return ConfigResult::InvalidParameter;
-
-	_config->relay.relays[relayIndex].pin = pin;
 	return ConfigResult::Success;
 }

@@ -158,7 +158,7 @@ struct RelayConfig {
 
 struct NetworkConfig {
     bool     wifiEnabled;
-    WifiMode accessMode;                      // enum, not raw uint8_t
+    WifiMode accessMode;
     char     ssid[MaxSSIDLength];
     char     password[MaxWiFiPasswordLength];
     uint16_t port;
@@ -169,8 +169,8 @@ struct NetworkConfig {
 } __attribute__((packed));
 
 struct SoundConfig {
-    uint8_t  hornRelayIndex;                  // merged from top-level
-    uint16_t startDelayMs;                    // merged from top-level
+    uint8_t  hornRelayIndex;
+    uint16_t startDelayMs;
     uint8_t  goodPreset;
     uint16_t goodToneHz;
     uint16_t goodDurationMs;

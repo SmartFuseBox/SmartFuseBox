@@ -53,11 +53,10 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
     _wifiController(&_messageBus, commandMgrComputer, &_warningManager),
     _configController(&_soundController, 
         &_bluetoothController,
-        &_wifiController, 
-        &_relayController),
+        &_wifiController),
     _configSyncManager(commandMgrComputer, commandMgrLink, &_configController, &_warningManager),
     _configHandler(&_wifiController, &_configController),
-    _configNetworkHandler(&_configController, &_wifiController),
+    _configNetworkHandler(&_configController, &_wifiController, &_relayController),
     _relayNetworkHandler(&_relayController),
     _soundNetworkHandler(&_soundController),
     _warningNetworkHandler(&_warningManager),
@@ -88,7 +87,7 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 #endif
 
 #if defined(CARD_CONFIG_LOADER)
-      , _sdCardConfigLoader(commandMgrComputer, commandMgrLink, &_configController, &_configSyncManager)
+      , _sdCardConfigLoader(commandMgrComputer, commandMgrLink, &_configController, &_relayController, &_configSyncManager)
 #endif
 {
 #if defined(CARD_CONFIG_LOADER)
@@ -112,6 +111,7 @@ void SmartFuseBoxApp::setup(BaseSensorHandler** sensorHandlers, uint8_t sensorHa
     // Sync relay pin assignments from config (overrides the bootstrap pins
     // passed at construction; disabled relays will have pin == 0xFF).
     _relayController.syncPinsFromConfig();
+    _relayController.setSoundController(&_soundController);
 
 	if (remoteSensorCount > 0 && remoteSensors != nullptr)
     {

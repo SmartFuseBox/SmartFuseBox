@@ -20,7 +20,6 @@
 #include "Local.h"
 #include "ConfigManager.h"
 #include "SoundController.h"
-#include "RelayCommandHandler.h"
 
 // Forward declarations
 class IBluetoothRadio;
@@ -46,16 +45,14 @@ private:
 	SoundController* _soundController;
 	IBluetoothRadio* _bluetoothRadio;
 	IWifiController* _wifiController;
-	RelayController* _relayController;
 	Config* _config;
 
-	void updateSoundControllerConfig(); 
+	void updateSoundControllerConfig();
 public:
 
 	ConfigController(SoundController* soundController,
 		IBluetoothRadio* bluetoothRadio,
-		IWifiController* wifiController,
-		RelayController* relayController);
+		IWifiController* wifiController);
 
 	Config* getConfigPtr();
 	ConfigResult save();
@@ -82,11 +79,4 @@ public:
 	ConfigResult setControlPanelTones(const uint8_t type, const uint8_t preset, const uint16_t toneHz, const uint16_t durationMs, const uint32_t repeatMs);
 	ConfigResult setSdCardInitializeSpeed(const uint8_t speedMhz);
 	ConfigResult setLightSensorThreshold(const uint16_t threshold);
-	ConfigResult renameRelay(const uint8_t relayIndex, const char* nameWithPipe);
-	ConfigResult mapHomeButtonColor(const uint8_t relayIndex, const uint8_t buttonColor);
-	ConfigResult setRelayDefaultState(const uint8_t relayIndex, const bool defaultState);
-	ConfigResult linkRelays(const uint8_t relay1, const uint8_t relay2);
-	ConfigResult unlinkRelay(const uint8_t relay);
-	ConfigResult setRelayActionType(const uint8_t relayIndex, const RelayActionType actionType);
-	ConfigResult setRelayPin(const uint8_t relayIndex, const uint8_t pin);
 };

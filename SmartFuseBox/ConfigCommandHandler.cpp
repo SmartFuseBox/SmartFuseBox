@@ -96,9 +96,6 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		// C3:<name>
 		sender->sendCommand(ConfigRename, config->vessel.name);
 
-		// R5 - relay config (names, colors, default states, links, action types, pins)
-		sender->sendCommand(RelayGetAllConfig, "");
-
 		// C5 entries
 		for (uint8_t s = 0; s < ConfigHomeButtons; ++s)
 		{

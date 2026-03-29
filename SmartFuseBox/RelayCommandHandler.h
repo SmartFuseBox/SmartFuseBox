@@ -20,10 +20,8 @@
 #include "ConfigManager.h"
 #include "RelayController.h"
 
-#if defined(FUSE_BOX_CONTROLLER)
 constexpr uint8_t RelayImageButtonColorBlue   = 2;
 constexpr uint8_t RelayImageButtonColorYellow = 7;
-#endif
 
 // internal message handlers
 class RelayCommandHandler : public BaseCommandHandler

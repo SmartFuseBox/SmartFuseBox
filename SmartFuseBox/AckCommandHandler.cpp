@@ -172,7 +172,7 @@ bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* 
 	}
 
     // Ignore redundant ACK:ACK=ok messages
-    if (SystemFunctions::commandMatches(params[0].key, AckCommand) == 0)
+    if (SystemFunctions::commandMatches(params[0].key, AckCommand))
     {
         return true; // Silently ignore, consider it handled
     }

@@ -170,7 +170,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelayRename))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
 
@@ -200,11 +200,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 strncpy(shortName, params[0].value, sizeof(shortName) - 1);
             }
 
-            strncpy(_config->relay.relays[idx].shortName, shortName, sizeof(_config->relay.relays[idx].shortName) - 1);
-            _config->relay.relays[idx].shortName[sizeof(_config->relay.relays[idx].shortName) - 1] = '\0';
-            strncpy(_config->relay.relays[idx].longName, longName, sizeof(_config->relay.relays[idx].longName) - 1);
-            _config->relay.relays[idx].longName[sizeof(_config->relay.relays[idx].longName) - 1] = '\0';
-
+            _relayController->renameRelay(idx, shortName, longName);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -215,7 +211,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelaySetButtonColor))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
             uint8_t color = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
@@ -235,7 +231,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 return true;
             }
 
-            _config->relay.relays[relayIndex].buttonImage = color;
+            _relayController->setButtonColor(relayIndex, color);
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -246,7 +242,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelaySetDefaultState))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
 
@@ -256,7 +252,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 return true;
             }
 
-            _config->relay.relays[relayIndex].defaultState = SystemFunctions::parseBooleanValue(params[0].value);
+            _relayController->setRelayDefaultState(relayIndex, SystemFunctions::parseBooleanValue(params[0].value));
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -267,7 +263,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelayLink))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
             uint8_t linkedRelay = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
@@ -286,45 +282,17 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
 
             if (linkedRelay == DefaultValue)
             {
-                for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-                {
-                    if (_config->relay.linkedRelays[i][0] == relayIndex || _config->relay.linkedRelays[i][1] == relayIndex)
-                    {
-                        _config->relay.linkedRelays[i][0] = DefaultValue;
-                        _config->relay.linkedRelays[i][1] = DefaultValue;
-                    }
-                }
+                _relayController->unlinkRelay(relayIndex);
                 sendAckOk(sender, command, &params[0]);
             }
             else
             {
-                for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-                {
-                    if (_config->relay.linkedRelays[i][0] == relayIndex)
-                    {
-                        sendAckErr(sender, command, F("Relay already linked"));
-                        return true;
-                    }
-                }
-
-                bool stored = false;
-                for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
-                {
-                    if (_config->relay.linkedRelays[i][0] == DefaultValue)
-                    {
-                        _config->relay.linkedRelays[i][0] = relayIndex;
-                        _config->relay.linkedRelays[i][1] = linkedRelay;
-                        stored = true;
-                        break;
-                    }
-                }
-
-                if (!stored)
+                RelayResult linkResult = _relayController->linkRelays(relayIndex, linkedRelay);
+                if (linkResult == RelayResult::Failed)
                 {
                     sendAckErr(sender, command, F("No available link slots"));
                     return true;
                 }
-
                 sendAckOk(sender, command, &params[0]);
             }
         }
@@ -336,7 +304,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelaySetActionType))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
             uint8_t actionType = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
@@ -353,21 +321,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 return true;
             }
 
-            // Enforce single-instance types: only one Horn and one NightRelay allowed
-            RelayActionType newType = static_cast<RelayActionType>(actionType);
-            if (newType == RelayActionType::Horn || newType == RelayActionType::NightRelay)
-            {
-                for (uint8_t i = 0; i < ConfigRelayCount; ++i)
-                {
-                    if (i != relayIndex && _config->relay.relays[i].actionType == newType)
-                    {
-                        sendAckErr(sender, command, F("Action type already assigned"));
-                        return true;
-                    }
-                }
-            }
-
-            _config->relay.relays[relayIndex].actionType = newType;
+            _relayController->setRelayActionType(relayIndex, static_cast<RelayActionType>(actionType));
             sendAckOk(sender, command, &params[0]);
         }
         else
@@ -378,7 +332,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
     }
     else if (SystemFunctions::commandMatches(command, RelaySetPin))
     {
-        if (paramCount >= 1 && _config != nullptr)
+        if (paramCount >= 1)
         {
             uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
             uint8_t pin = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
@@ -395,8 +349,7 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 return true;
             }
 
-            _config->relay.relays[relayIndex].pin = pin;
-            _relayController->syncPinsFromConfig();
+            _relayController->setRelayPin(relayIndex, pin);
             sendAckOk(sender, command, &params[0]);
         }
         else
