@@ -456,6 +456,12 @@
     <ClInclude Include="WarningType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SensorFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorConfigCommandHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Wifi.md" />
