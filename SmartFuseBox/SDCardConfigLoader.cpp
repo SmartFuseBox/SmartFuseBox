@@ -852,7 +852,10 @@ void SdCardConfigLoader::onSdCardReady(bool isNewCard)
         logInfo("SD card initialized - checking for config...");
     }
 
-    bool configLoaded = loadConfigFromSd();
+    if (loadConfigFromSd() && _computerSerial)
+    {
+		_computerSerial->sendDebug("SD card config loaded successfully", "SdCard");
+    }
 }
 
 #endif
