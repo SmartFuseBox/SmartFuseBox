@@ -18,7 +18,6 @@
 #include <Arduino.h>
 #include "ConfigCommandHandler.h"
 #include "ConfigController.h"
-#include "ConfigSyncManager.h"
 #include "SystemFunctions.h"
 
 #if defined(SD_CARD_SUPPORT)
@@ -36,8 +35,7 @@ ConfigCommandHandler::ConfigCommandHandler(
 	ConfigController* configController)
 	:
 	_wifiController(wifiController),
-	_configController(configController),
-	_configSyncManager(nullptr)
+	_configController(configController)
 #if defined(SD_CARD_SUPPORT)
 	, _sdCardConfigLoader(nullptr)
 #endif
@@ -46,11 +44,6 @@ ConfigCommandHandler::ConfigCommandHandler(
 	, _mqttController(nullptr)
 #endif
 {}
-
-void ConfigCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager)
-{
-	_configSyncManager = syncManager;
-}
 
 #if defined(MQTT_SUPPORT)
 void ConfigCommandHandler::setMqttConfigHandler(MQTTConfigCommandHandler* mqttConfigHandler)
@@ -66,12 +59,6 @@ void ConfigCommandHandler::setMqttController(MQTTController* mqttController)
 
 bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
-	// Notify sync manager that a config command was received (if syncing)
-	if (_configSyncManager)
-	{
-		_configSyncManager->notifyConfigReceived();
-	}
-
 	// Access the in-memory config
 	ConfigResult result;
 

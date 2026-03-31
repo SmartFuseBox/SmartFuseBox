@@ -27,13 +27,11 @@
 SdCardConfigLoader::SdCardConfigLoader(SerialCommandManager* computerSerial,
                                        SerialCommandManager* linkSerial,
                                        ConfigController* configController,
-                                       RelayController* relayController,
-                                       ConfigSyncManager* configSyncManager)
+                                       RelayController* relayController)
     : _computerSerial(computerSerial),
       _linkSerial(linkSerial),
       _configController(configController),
       _relayController(relayController),
-      _configSyncManager(configSyncManager),
       _sdConfigPresent(false)
 {
 }
@@ -534,13 +532,6 @@ bool SdCardConfigLoader::loadConfigFromSd()
             logInfo("Syncing config to control panel...");
             syncConfigToLink();
 
-            // Disable ConfigSyncManager since SD config is authoritative
-            if (_configSyncManager)
-            {
-                _configSyncManager->setEnabled(false);
-                logInfo("ConfigSyncManager disabled (SD config active)");
-            }
-
             _sdConfigPresent = true;
 
             char summary[64];
@@ -862,15 +853,6 @@ void SdCardConfigLoader::onSdCardReady(bool isNewCard)
     }
 
     bool configLoaded = loadConfigFromSd();
-
-    if (!configLoaded && !isNewCard)
-    {
-        // Initial boot and no SD config found - request sync from control panel
-        if (_configSyncManager)
-        {
-            _configSyncManager->requestSync();
-        }
-    }
 }
 
 #endif

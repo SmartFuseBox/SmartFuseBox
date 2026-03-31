@@ -101,7 +101,6 @@
     <ClCompile Include="RelayNetworkHandler.cpp" />
     <ClCompile Include="SensorController.h" />
     <ClCompile Include="SensorNetworkHandler.cpp" />
-    <ClCompile Include="ConfigSyncManager.cpp" />
     <ClCompile Include="SoundNetworkHandler.cpp" />
     <ClCompile Include="SystemCpuMonitor.cpp" />
     <ClCompile Include="SystemFunctions.cpp" />
@@ -173,7 +172,6 @@
     <ClInclude Include="ConfigNetworkHandler.h" />
     <ClInclude Include="LedMatrixManager.h" />
     <ClInclude Include="NetworkJsonVisitor.h" />
-    <ClInclude Include="ConfigSyncManager.h" />
     <ClInclude Include="SystemDefinitions.h" />
     <ClInclude Include="DateTimeManager.h" />
     <ClInclude Include="INetworkCommandHandler.h" />

@@ -25,7 +25,6 @@
 
 // Forward declarations
 class ConfigController;
-class ConfigSyncManager;
 
 #if defined(SD_CARD_SUPPORT)
 class SdCardConfigLoader;
@@ -41,7 +40,6 @@ class ConfigCommandHandler : public BaseConfigCommandHandler
 private:
 	IWifiController* _wifiController;
 	ConfigController* _configController;
-	ConfigSyncManager* _configSyncManager;
 
 #if defined(SD_CARD_SUPPORT)
 	SdCardConfigLoader* _sdCardConfigLoader;
@@ -56,8 +54,6 @@ public:
 	explicit ConfigCommandHandler(
 		IWifiController* wifiController, 
 		ConfigController* configController);
-
-	void setConfigSyncManager(ConfigSyncManager* syncManager);
 
 #if defined(SD_CARD_SUPPORT)
 	void setSdCardConfigLoader(SdCardConfigLoader* sdCardConfigLoader);

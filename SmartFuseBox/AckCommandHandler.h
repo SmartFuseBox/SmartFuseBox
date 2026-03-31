@@ -24,7 +24,6 @@
 #include "SharedBaseCommandHandler.h"
 
 // Forward declarations
-class ConfigSyncManager; 
 class ConfigController;
 
 
@@ -33,14 +32,13 @@ class AckCommandHandler : public SharedBaseCommandHandler
 private:
     bool processConfigAck(SerialCommandManager* sender, const char* key, const char* value);
 
-    ConfigSyncManager* _configSyncManager;
     ConfigController* _configController;
 
 public:
     explicit AckCommandHandler(BroadcastManager* broadcastManager, WarningManager* warningManager);
 
     // Set the config sync manager (optional - needed for config sync feature)
-    void setConfigSyncManager(ConfigSyncManager* syncManager, ConfigController* configController);
+    void setConfigController(ConfigController* configController);
 
     bool handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount) override;
     const char* const* supportedCommands(size_t& count) const override;

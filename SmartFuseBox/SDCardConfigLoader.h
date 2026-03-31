@@ -25,7 +25,6 @@
 #include <SerialCommandManager.h>
 #include "ConfigController.h"
 #include "RelayController.h"
-#include "ConfigSyncManager.h"
 #include "SdCardLogger.h"
 
 constexpr char SD_CONFIG_FILENAME[] = "config.txt";
@@ -46,21 +45,19 @@ constexpr uint16_t SD_CONFIG_MAX_LINE_LENGTH = 128;
  * - Read-only SD card config (not auto-updated during runtime)
  * - Command format validation
  * - Error logging to Serial
- * - Integration with ConfigSyncManager (disable if SD config loaded)
  * - C29: Reload config from SD card
  * - C30: Export current config to SD card
  * 
  * Usage:
  * @code
- * SdCardConfigLoader loader(&commandMgrComputer, &commandMgrLink, 
- *                           &configController, &configSyncManager);
+ * SdCardConfigLoader loader(&commandMgrComputer, &commandMgrLink, &configController);
  * 
  * void setup()
  * {
  *     bool sdConfigLoaded = loader.loadConfigFromSd();
  *     if (sdConfigLoaded)
  *     {
- *         // SD config was applied, ConfigSyncManager will be disabled
+ *         // SD config was applied
  *     }
  * }
  * @endcode
@@ -72,7 +69,6 @@ private:
     SerialCommandManager* _linkSerial;
     ConfigController* _configController;
     RelayController* _relayController;
-    ConfigSyncManager* _configSyncManager;
     bool _sdConfigPresent;
 
     /**
@@ -118,13 +114,11 @@ public:
      * @param computerSerial Serial manager for computer communication
      * @param linkSerial Serial manager for LINK communication
      * @param configController Configuration controller
-     * @param configSyncManager Configuration sync manager (will be disabled if SD config loaded)
      */
     SdCardConfigLoader(SerialCommandManager* computerSerial,
                        SerialCommandManager* linkSerial,
                        ConfigController* configController,
-                       RelayController* relayController,
-                       ConfigSyncManager* configSyncManager);
+                       RelayController* relayController);
 
     /**
      * @brief Load configuration from SD card if present
