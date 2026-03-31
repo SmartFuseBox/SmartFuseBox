@@ -56,7 +56,6 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
     _configController(&_soundController, 
         &_bluetoothController,
         &_wifiController),
-    _configSyncManager(commandMgrComputer, commandMgrLink, &_configController, &_warningManager),
     _configHandler(&_wifiController, &_configController),
     _configNetworkHandler(&_configController, &_wifiController, &_relayController),
     _relayNetworkHandler(&_relayController),
@@ -91,7 +90,7 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 #endif
 
 #if defined(CARD_CONFIG_LOADER)
-      , _sdCardConfigLoader(commandMgrComputer, commandMgrLink, &_configController, &_relayController, &_configSyncManager)
+      , _sdCardConfigLoader(commandMgrComputer, commandMgrLink, &_configController, &_relayController)
 #endif
 {
 #if defined(CARD_CONFIG_LOADER)
@@ -186,8 +185,7 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     _commandMgrComputer->registerHandlers(computerHandlers, computerHandlerCount);
 
     // Link config sync manager to handlers so they can coordinate config synchronization
-    _ackHandler.setConfigSyncManager(&_configSyncManager, &_configController);
-    _configHandler.setConfigSyncManager(&_configSyncManager);
+    _ackHandler.setConfigController(&_configController);
 
 #if defined(MQTT_SUPPORT)
     // Link MQTT config handler and controller
@@ -318,10 +316,6 @@ void SmartFuseBoxApp::loop()
     _mqttSystemHandler.update();
     SystemCpuMonitor::endTask();
 #endif
-
-    SystemCpuMonitor::startTask();
-    _configSyncManager.update(now);
-    SystemCpuMonitor::endTask();
 
     SystemCpuMonitor::startTask();
     _scheduleController.update(now);

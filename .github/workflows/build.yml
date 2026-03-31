@@ -1,0 +1,47 @@
+name: Build SmartFuseBox Firmware
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+
+    - name: Configure Arduino CLI
+      run: |
+        arduino-cli config init
+        arduino-cli config set board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+        arduino-cli core update-index
+        arduino-cli core install esp32:esp32
+
+    - name: Install required libraries
+      run: |
+        arduino-cli lib install "ArduinoJson"
+        arduino-cli lib install "SerialCommandManager"
+        arduino-cli lib install "SensorManager"
+        arduino-cli lib install "SdFat"
+        arduino-cli lib install "DHT11"
+
+    - name: Compile SmartFuseBox firmware
+      run: |
+        arduino-cli compile \
+          --fqbn esp32:esp32:esp32s3 \
+          --output-dir SmartFuseBox/Build \
+          SmartFuseBox
+
+    - name: Upload firmware artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: SmartFuseBox-firmware
+        path: SmartFuseBox/Build/SmartFuseBox.ino.bin

@@ -17,11 +17,7 @@
  */
 #include "AckCommandHandler.h"
 #include "SystemFunctions.h"
-
-#if defined(FUSE_BOX_CONTROLLER)
-#include "ConfigSyncManager.h"
 #include "ConfigController.h"
-#endif
 
 
 const char AckCommand[] = "ACK";
@@ -31,105 +27,15 @@ AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, Nextion
     : BaseBoatCommandHandler(broadcastManager, nextionControl, warningManager)
 #elif defined(FUSE_BOX_CONTROLLER)
 AckCommandHandler::AckCommandHandler(BroadcastManager* broadcastManager, WarningManager* warningManager)
-    : SharedBaseCommandHandler(broadcastManager, warningManager),
-      _configSyncManager(nullptr),
-      _configController(nullptr)
+    : SharedBaseCommandHandler(broadcastManager, warningManager), _configController(nullptr)
 #endif
 {
 
 }
 
-#if defined(BOAT_CONTROL_PANEL)
-bool AckCommandHandler::processHeartbeatAck(SerialCommandManager* sender, const char* key, const char* value)
+
+void AckCommandHandler::setConfigController(ConfigController* configController)
 {
-	(void)sender;
-
-    // Check for heartbeat acknowledgement (F0=ok)
-    if (strcmp(key, SystemHeartbeatCommand) != 0 || strcmp(value, AckSuccess) != 0)
-        return false;
-
-    if (getWarningManager())
-    {
-        // Notify the warning manager to update heartbeat timestamp
-        getWarningManager()->notifyHeartbeatAck();
-	}
-
-    // Notify the current page about the heartbeat acknowledgement
-    notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::HeartbeatAck), nullptr);
-
-    return true;
-}
-
-bool AckCommandHandler::processWarningsListAck(SerialCommandManager* sender, const char* key, const char* value, const StringKeyValue params[], uint8_t paramCount)
-{
-    // Check for warnings list acknowledgement (W1=ok)
-    if (strcmp(key, WarningsList) != 0 || strcmp(value, AckSuccess) != 0)
-        return false;
-
-    WarningManager* warningManager = getWarningManager();
-    if (!warningManager)
-    {
-        sendDebugMessage(F("Warning manager not available"), AckCommand);
-        return false;
-    }
-
-    // Format: ACK:W1=ok:v=0x06 (paramCount == 2)
-    // The warning bitmask is in params[1].value
-    if (paramCount >= 2)
-    {
-        if (SystemFunctions::startsWith(params[1].key, ValueParamName))
-        {
-            // Parse the hexadecimal bitmask
-            uint32_t remoteWarningMask = 0;
-            
-            if (SystemFunctions::startsWith(params[1].value, F("0x")) || SystemFunctions::startsWith(params[1].value, F("0X")))
-            {
-                // Parse hexadecimal (skip the "0x" prefix)
-                remoteWarningMask = strtoul(params[1].value, nullptr, 16);
-            }
-            else if (SystemFunctions::isAllDigits(params[1].value))
-            {
-                // Parse decimal
-                remoteWarningMask = static_cast<uint8_t>(strtoul(params[1].value, nullptr, 0));
-            }
-            else
-            {
-                sendDebugMessage(F("Invalid warning mask format"), AckCommand);
-                return false;
-            }
-
-            // UPDATE (replace) remote warnings - this allows remote warnings to be cleared
-            warningManager->updateRemoteWarnings(remoteWarningMask);
-
-            // Notify the warning page to update display
-            notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Warning), nullptr);
-
-            sendDebugMessage(F("Remote warnings updated"), AckCommand);
-
-            return true;
-        }
-    }
-    else
-    {
-        // No warning data provided - clear remote warnings
-        warningManager->updateRemoteWarnings(0);
-        notifyCurrentPage(static_cast<uint8_t>(PageUpdateType::Warning), nullptr);
-        
-        if (sender)
-        {
-            sendDebugMessage(F("W1 ACK received (no warnings)"), AckCommand);
-        }
-        return true;
-    }
-
-    return false;
-}
-#endif
-
-#if defined(FUSE_BOX_CONTROLLER)
-void AckCommandHandler::setConfigSyncManager(ConfigSyncManager* syncManager, ConfigController* configController)
-{
-    _configSyncManager = syncManager;
     _configController = configController;
 }
 
@@ -148,7 +54,6 @@ bool AckCommandHandler::processConfigAck(SerialCommandManager* sender, const cha
     // Just acknowledge them here
     return false;
 }
-#endif
 
 bool AckCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {

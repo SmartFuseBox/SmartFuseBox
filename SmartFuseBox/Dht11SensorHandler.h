@@ -18,7 +18,7 @@
 #pragma once
 
 
-#include <dht11.h>
+#include <DHT11.h>
 
 #include "Local.h"
 #include "SystemDefinitions.h"
@@ -41,8 +41,8 @@ private:
 	MessageBus* _messageBus;
 	SensorCommandHandler* _sensorCommandHandler;
 	WarningManager* _warningManager;
-	dht11 _dht11Sensor;
 	const uint8_t _sensorPin;
+	DHT11 _dht11Sensor;
 	float _humidityOffset;
 	float _temperatureOffset;
 	float _humidity;
@@ -58,21 +58,22 @@ private:
 protected:
 	void initialize() override
 	{
-		pinMode(_sensorPin, INPUT);
 	}
 
 	unsigned long update() override
 	{
 		sendDebug("Reading DHT11 sensor...", _name);
-		uint16_t result = _dht11Sensor.read(_sensorPin);
+		int rawTemp = 0;
+		int rawHumidity = 0;
+		int result = _dht11Sensor.readTemperatureHumidity(rawTemp, rawHumidity);
 
-		if (result != DHTLIB_OK)
+		if (result != 0)
 		{
 			if (_warningManager && !_warningManager->isWarningActive(WarningType::TemperatureSensorFailure))
 			{
 				_warningManager->raiseWarning(WarningType::TemperatureSensorFailure);
-				char buffer[32];
-				snprintf(buffer, sizeof(buffer), "DHT11 read error: %u", result);
+				char buffer[48];
+				snprintf(buffer, sizeof(buffer), "DHT11 read error: %s", DHT11::getErrorString(result).c_str());
 				sendError(buffer, "DHT11 Error");
 			}
 
@@ -84,8 +85,8 @@ protected:
 			_warningManager->clearWarning(WarningType::TemperatureSensorFailure);
 		}
 
-		_humidity = _dht11Sensor.humidity + _humidityOffset;
-		_celsius = _dht11Sensor.temperature + _temperatureOffset;
+		_humidity = static_cast<float>(rawHumidity) + _humidityOffset;
+		_celsius = static_cast<float>(rawTemp) + _temperatureOffset;
 
 		if (_messageBus)
 		{
@@ -115,7 +116,7 @@ public:
 	Dht11SensorHandler(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
 		WarningManager* warningManager, uint8_t sensorPin, float humidityOffset, float temperatureOffset, const char* name = "Dht11")
 		: BaseSensor(name), BroadcastLoggerSupport(broadcastManager), _messageBus(messageBus), _sensorCommandHandler(sensorCommandHandler),
-		_warningManager(warningManager), _dht11Sensor(), _sensorPin(sensorPin), _humidityOffset(humidityOffset), 
+		_warningManager(warningManager), _sensorPin(sensorPin), _dht11Sensor(sensorPin), _humidityOffset(humidityOffset),
 		_temperatureOffset(temperatureOffset), _humidity(0.0f), _celsius(0.0f)
 	{
 #if defined(MQTT_SUPPORT)

@@ -124,9 +124,6 @@
     <ClCompile Include="LedMatrixManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigSyncManager.cpp">
-      <Filter>Source Files\BusinessLogic</Filter>
-    </ClCompile>
     <ClCompile Include="SdCardLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -290,9 +287,6 @@
     </ClInclude>
     <ClInclude Include="LightSensorHandler.h">
       <Filter>Header Files\Sensors</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigSyncManager.h">
-      <Filter>Header Files\BusinessLogic</Filter>
     </ClInclude>
     <ClInclude Include="SensorDataRecord.h">
       <Filter>Header Files</Filter>

@@ -42,7 +42,6 @@
 #include "WifiController.h"
 #include "IWifiController.h"
 #include "ConfigController.h"
-#include "ConfigSyncManager.h"
 #include "SensorController.h"
 #include "ConfigNetworkHandler.h"
 #include "RelayNetworkHandler.h"
@@ -103,7 +102,6 @@ private:
     WifiController _wifiController;
 
     ConfigController _configController;
-    ConfigSyncManager _configSyncManager;
     ConfigCommandHandler _configHandler;
 
     ConfigNetworkHandler _configNetworkHandler;
