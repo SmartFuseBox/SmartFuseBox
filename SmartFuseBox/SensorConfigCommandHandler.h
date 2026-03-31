@@ -33,17 +33,17 @@
  * Every mutating ACK carries a "reboot=1" field to make this explicit to the client.
  *
  * Command reference:
- *   N0          — Get all sensor config entries
- *   N1:i=<idx>;t=<type>;n=<name>;p0=<pin0>;p1=<pin1>;o0=<opt0>;o1=<opt1>
+ *   S0          — Get all sensor config entries
+ *   S1:i=<idx>;t=<type>;n=<name>;o0=<opt0>;o1=<opt1>
  *               — Add or update sensor at <idx> (0-based, up to ConfigMaxSensors)
- *   N2:<idx>    — Remove sensor at <idx> (sets enabled=false, clears entry)
- *   N3:<idx>=<name>
+ *   S2:<idx>    — Remove sensor at <idx> (sets enabled=false, clears entry)
+ *   S3:<idx>=<name>
  *               — Rename sensor at <idx>
- *   N4:<idx>;s=<slot>;v=<pin>
+ *   S4:<idx>;s=<slot>;v=<pin>
  *               — Set pin at slot (0..ConfigMaxSensorPins-1) for sensor <idx>
- *   N5:<idx>=<0|1>
+ *   S5:<idx>=<0|1>
  *               — Enable (1) or disable (0) sensor at <idx>
- *   N6:<idx>;s=<slot>;v=<value>
+ *   S6:<idx>;s=<slot>;v=<value>
  *               — Set options1[slot] for sensor <idx>
  */
 class SensorConfigCommandHandler : public BaseConfigCommandHandler

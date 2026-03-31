@@ -17,7 +17,6 @@
  */
 #pragma once
 
-
 #include "BaseCommandHandler.h"
 #include "ConfigManager.h"
 #include "SystemDefinitions.h"
@@ -32,9 +31,7 @@ protected:
 		for (uint8_t i = 0; i < paramCount; ++i)
 		{
 			if (strcmp(params[i].key, key) == 0)
-			{
 				return params[i].value;
-			}
 		}
 
 		return nullptr;
@@ -42,95 +39,63 @@ protected:
 
 	uint8_t getParamValueU8t(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				if (!SystemFunctions::isAllDigits(params[i].value))
-					break;
+		const char* v = getParamValue(params, paramCount, key);
 
-				return static_cast<uint8_t>(atoi(params[i].value));
-			}
-		}
+		if (!v)
+			return DefaultValue;
 
-		return DefaultValue;
+		uint8_t out;
+		return SystemFunctions::parseUnsigned(v, out) ? out : DefaultValue;
 	}
 
 	int8_t getParamValue8t(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				if (!SystemFunctions::isAllDigits(params[i].value))
-					break;
+		const char* v = getParamValue(params, paramCount, key);
 
-				return static_cast<int8_t>(atoi(params[i].value));
-			}
-		}
+		if (!v)
+			return 0;
 
-		return 0;
+		int8_t out;
+		return SystemFunctions::parseSigned(v, out) ? out : 0;
 	}
 
 	int16_t getParamValue16t(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				if (!SystemFunctions::isAllDigits(params[i].value))
-					break;
+		const char* v = getParamValue(params, paramCount, key);
 
-				return static_cast<int16_t>(atoi(params[i].value));
-			}
-		}
+		if (!v)
+			return 0;
 
-		return 0;
+		int16_t out;
+		return SystemFunctions::parseSigned(v, out) ? out : 0;
 	}
 
 	uint16_t getParamValueU16t(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				if (!SystemFunctions::isAllDigits(params[i].value))
-					break;
+		const char* v = getParamValue(params, paramCount, key);
 
-				return static_cast<uint16_t>(atoi(params[i].value));
-			}
-		}
+		if (!v)
+			return 0;
 
-		return 0;
+		uint16_t out;
+		return SystemFunctions::parseUnsigned(v, out) ? out : 0;
 	}
 
 	uint32_t getParamValueU32t(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				if (!SystemFunctions::isAllDigits(params[i].value))
-					break;
+		const char* v = getParamValue(params, paramCount, key);
 
-				return static_cast<uint32_t>(atoi(params[i].value));
-			}
-		}
+		if (!v)
+			return 0;
 
-		return 0;
+		uint32_t out;
+		return SystemFunctions::parseUnsigned(v, out) ? out : 0;
 	}
 
 	bool getParamValueBool(const StringKeyValue params[], uint8_t paramCount, const char* key) const
 	{
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, key) == 0)
-			{
-				return SystemFunctions::parseBooleanValue(params[i].value);
-			}
-		}
-
-		return false;
+		const char* v = getParamValue(params, paramCount, key);
+		return v ? SystemFunctions::parseBooleanValue(v) : false;
 	}
 
 };
