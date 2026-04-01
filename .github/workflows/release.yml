@@ -12,6 +12,12 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        board:
+          - { name: "esp32", fqbn: "esp32:esp32:esp32" }
+          - { name: "esp32s3", fqbn: "esp32:esp32:esp32s3" }
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -26,38 +32,36 @@ jobs:
         arduino-cli core update-index
         arduino-cli core install esp32:esp32
 
-    - name: Install required libraries
+    - name: Generate FirmwareVersion.h
       run: |
-        arduino-cli lib install "ArduinoJson"
-        arduino-cli lib install "SerialCommandManager"
-        arduino-cli lib install "SensorManager"
-        arduino-cli lib install "SdFat"
-        arduino-cli lib install "dht11"
+        TAG="${GITHUB_REF#refs/tags/}"
+        VERSION="${TAG#v}"
+        IFS='.' read -r MAJOR MINOR PATCH BUILD <<< "$VERSION"
+        cat <<EOF > SmartFuseBox/FirmwareVersion.h
+        #pragma once
+        #include <Arduino.h>
+        constexpr uint8_t FirmwareMajor = ${MAJOR};
+        constexpr uint8_t FirmwareMinor = ${MINOR};
+        constexpr uint8_t FirmwarePatch = ${PATCH};
+        constexpr uint8_t FirmwareBuild = ${BUILD};
+        EOF
 
     - name: Compile SmartFuseBox firmware
       run: |
         arduino-cli compile \
-          --fqbn esp32:esp32:esp32s3 \
-          --output-dir SmartFuseBox/build \
+          --fqbn ${{ matrix.board.fqbn }} \
+          --output-dir SmartFuseBox/build/${{ matrix.board.name }} \
           SmartFuseBox
 
     - name: Generate checksum
       run: |
-        sha256sum SmartFuseBox/build/SmartFuseBox.ino.bin | awk '{print $1}' > checksum.sha256
-
-    - name: Generate version.json
-      run: |
-        TAG="${GITHUB_REF#refs/tags/}"
-        URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/SmartFuseBox.ino.bin"
-        CHECKSUM=$(cat checksum.sha256)
-        echo "{ \"version\": \"${TAG}\", \"url\": \"${URL}\", \"sha256\": \"${CHECKSUM}\" }" > version.json
+        sha256sum SmartFuseBox/build/${{ matrix.board.name }}/SmartFuseBox.ino.bin | awk '{print $1}' > checksum-${{ matrix.board.name }}.sha256
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          SmartFuseBox/build/SmartFuseBox.ino.bin
-          version.json
-          checksum.sha256
+          SmartFuseBox/build/${{ matrix.board.name }}/SmartFuseBox.ino.bin#SmartFuseBox-${{ matrix.board.name }}.bin
+          checksum-${{ matrix.board.name }}.sha256
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
