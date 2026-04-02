@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     strategy:
@@ -55,7 +55,7 @@ jobs:
             --output-dir SmartFuseBox/build/${{ matrix.board.name }} \
             SmartFuseBox
 
-      - name: Rename and checksum firmware binary
+      - name: Rename and checksum firmware
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           SRC="SmartFuseBox/build/${{ matrix.board.name }}/SmartFuseBox.ino.bin"
@@ -63,34 +63,11 @@ jobs:
           cp "$SRC" "$DEST"
           sha256sum "$DEST" | awk '{print $1}' > "SmartFuseBox-${{ matrix.board.name }}-${TAG}.sha256"
 
-      - name: Upload firmware artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware-${{ matrix.board.name }}
-          path: |
-            SmartFuseBox-${{ matrix.board.name }}-*.bin
-            SmartFuseBox-${{ matrix.board.name }}-*.sha256
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Debug files
-        run: ls -R
-        
-      - name: Prepare release files
-        run: |
-          mkdir release
-          find . -name "*.bin" -exec cp {} release/ \;
-          find . -name "*.sha256" -exec cp {} release/ \;
-
-      - name: Create GitHub Release
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*
+          files: |
+            SmartFuseBox-${{ matrix.board.name }}-${TAG}.bin
+            SmartFuseBox-${{ matrix.board.name }}-${TAG}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
