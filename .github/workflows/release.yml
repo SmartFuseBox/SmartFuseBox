@@ -67,7 +67,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            SmartFuseBox-${{ matrix.board.name }}-${TAG}.bin
-            SmartFuseBox-${{ matrix.board.name }}-${TAG}.sha256
+            SmartFuseBox-${{ matrix.board.name }}-${{ github.ref_name }}.bin
+            SmartFuseBox-${{ matrix.board.name }}-${{ github.ref_name }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
