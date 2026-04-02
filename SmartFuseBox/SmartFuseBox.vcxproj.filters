@@ -212,7 +212,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OtaManager.cpp">
-      <Filter>Source Files\BusinessLogic</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -462,11 +462,8 @@
     <ClInclude Include="SensorConfigCommandHandler.h">
       <Filter>Header Files\SerialCommandHandlers</Filter>
     </ClInclude>
-    <ClInclude Include="FirmwareVersion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OtaManager.h">
-      <Filter>Header Files\BusinessLogic</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@
 #pragma once
 
 
-#include <DHT11.h>
+#include <Arduino.h>
 
 #include "Local.h"
 #include "SystemDefinitions.h"
@@ -42,7 +42,6 @@ private:
 	SensorCommandHandler* _sensorCommandHandler;
 	WarningManager* _warningManager;
 	const uint8_t _sensorPin;
-	DHT11 _dht11Sensor;
 	float _humidityOffset;
 	float _temperatureOffset;
 	float _humidity;
@@ -56,6 +55,122 @@ private:
 #endif
 
 protected:
+	// ── Return codes ─────────────────────────────────────────────────────────
+	static constexpr int Dht11Ok       =  0;
+	static constexpr int Dht11Timeout  = -1;
+	static constexpr int Dht11Checksum = -2;
+
+	// ── DHT11 one-wire protocol constants ────────────────────────────────────
+
+	// Spec: host pulls bus LOW for a minimum of 18 ms to trigger the sensor.
+	static constexpr uint8_t Dht11StartLowMs        = 18;
+
+	// Spec: host drives HIGH for 20–40 µs before releasing to INPUT so the
+	// sensor can detect the rising edge.  40 µs satisfies the upper bound.
+	static constexpr uint8_t Dht11StartHighUs        = 40;
+
+	// Spec: 40 bits (5 bytes) per reading, transmitted MSB-first within each byte.
+	static constexpr uint8_t Dht11BitCount           = 40;
+	static constexpr uint8_t Dht11ByteCount          = 5;
+	static constexpr uint8_t Dht11BitsPerByte        = 8;
+
+	// Spec: each bit is preceded by a 50 µs LOW separator, then a HIGH pulse:
+	//   bit '0' → 26–28 µs HIGH
+	//   bit '1' → 70 µs HIGH
+	// 40 µs sits unambiguously between the two ranges and is the standard threshold.
+	static constexpr uint8_t Dht11BitOneThresholdUs  = 40;
+
+	// Spec: byte layout of the 5 transmitted data bytes.
+	static constexpr uint8_t Dht11HumIntIdx          = 0; // humidity    integer part
+	static constexpr uint8_t Dht11HumDecIdx          = 1; // humidity    decimal part (always 0 on DHT11)
+	static constexpr uint8_t Dht11TmpIntIdx          = 2; // temperature integer part
+	static constexpr uint8_t Dht11TmpDecIdx          = 3; // temperature decimal part (always 0 on DHT11)
+	static constexpr uint8_t Dht11ChecksumIdx        = 4; // checksum = (byte0+byte1+byte2+byte3) & 0xFF
+
+	// Spec: decimal byte encodes tenths (e.g. decimal byte 5 → +0.5 °C / +0.5 %).
+	static constexpr float   Dht11DecimalScale       = 0.1f;
+
+	// Iteration cap for every bounded spin-wait in readDht11().
+	// digitalRead() on ESP32 at 240 MHz takes ~0.5–1 µs, so 10 000 iterations
+	// gives a ~5–10 ms hard ceiling per transition — well above any legitimate
+	// DHT11 signal period (max 80 µs response, 70 µs bit-HIGH) yet fast enough
+	// to recover from a fault without stalling the main loop.
+	static constexpr unsigned int Dht11MaxLoopCount  = 10000;
+
+	/**
+	 * @brief Read temperature and humidity from a DHT11 sensor.
+	 *
+	 * Every spin-wait is bounded by Dht11MaxLoopCount so the function can never
+	 * hang, regardless of sensor state or electrical faults.  The 18 ms host
+	 * start-signal uses delay() which on ESP32/FreeRTOS calls vTaskDelay(),
+	 * yielding to the scheduler — not a hard block.
+	 *
+	 * Adapted from https://github.com/adidax/dht11 which is distributed under GPL v3
+	 *
+	 * @param pin             GPIO data pin connected to the DHT11.
+	 * @param outTemperature  Receives temperature in °C on success.
+	 * @param outHumidity     Receives relative humidity (%) on success.
+	 * @return Dht11Ok, Dht11Timeout, or Dht11Checksum.
+	 */
+	static int readDht11(uint8_t pin, float& outTemperature, float& outHumidity)
+	{
+		uint8_t bits[Dht11ByteCount] = {};
+		uint8_t cnt = Dht11BitsPerByte - 1;   // start at MSB (bit 7)
+		uint8_t idx = 0;
+
+		// Host start signal: pull LOW ≥ Dht11StartLowMs then drive HIGH briefly before releasing
+		pinMode(pin, OUTPUT);
+		digitalWrite(pin, LOW);
+		delay(Dht11StartLowMs);
+		digitalWrite(pin, HIGH);
+		delayMicroseconds(Dht11StartHighUs);
+		pinMode(pin, INPUT);
+
+		// Sensor acknowledgement (80 µs LOW + 80 µs HIGH) — every loop is bounded
+		unsigned int loopCnt = Dht11MaxLoopCount;
+		while (digitalRead(pin) == LOW)
+			if (loopCnt-- == 0) return Dht11Timeout;
+
+		loopCnt = Dht11MaxLoopCount;
+		while (digitalRead(pin) == HIGH)
+			if (loopCnt-- == 0) return Dht11Timeout;
+
+		// Read Dht11BitCount bits; each bit = 50 µs LOW separator + variable-width HIGH
+		for (int i = 0; i < Dht11BitCount; i++)
+		{
+			loopCnt = Dht11MaxLoopCount;
+			while (digitalRead(pin) == LOW)
+				if (loopCnt-- == 0) return Dht11Timeout;
+
+			unsigned long t = micros();
+
+			loopCnt = Dht11MaxLoopCount;
+			while (digitalRead(pin) == HIGH)
+				if (loopCnt-- == 0) return Dht11Timeout;
+
+			// HIGH pulse longer than Dht11BitOneThresholdUs µs decodes as logic '1'
+			if ((micros() - t) > Dht11BitOneThresholdUs)
+				bits[idx] |= (1 << cnt);
+
+			if (cnt == 0)
+			{
+				cnt = Dht11BitsPerByte - 1;
+				idx++;
+			}
+			else cnt--;
+		}
+
+		// Verify checksum: low byte of the sum of the four data bytes
+		uint8_t sum = (bits[Dht11HumIntIdx] + bits[Dht11HumDecIdx]
+					 + bits[Dht11TmpIntIdx]  + bits[Dht11TmpDecIdx]) & 0xFF;
+
+		if (bits[Dht11ChecksumIdx] != sum) return Dht11Checksum;
+
+		outHumidity    = bits[Dht11HumIntIdx] + (bits[Dht11HumDecIdx] * Dht11DecimalScale);
+		outTemperature = bits[Dht11TmpIntIdx]  + (bits[Dht11TmpDecIdx] * Dht11DecimalScale);
+		return Dht11Ok;
+	}
+
 	void initialize() override
 	{
 	}
@@ -63,30 +178,29 @@ protected:
 	unsigned long update() override
 	{
 		sendDebug("Reading DHT11 sensor...", _name);
-		int rawTemp = 0;
-		int rawHumidity = 0;
-		int result = _dht11Sensor.readTemperatureHumidity(rawTemp, rawHumidity);
 
-		if (result != 0)
+		float temperature = 0.0f;
+		float humidity    = 0.0f;
+		int result = readDht11(_sensorPin, temperature, humidity);
+
+		if (result != Dht11Ok)
 		{
 			if (_warningManager && !_warningManager->isWarningActive(WarningType::TemperatureSensorFailure))
 			{
 				_warningManager->raiseWarning(WarningType::TemperatureSensorFailure);
 				char buffer[48];
-				snprintf(buffer, sizeof(buffer), "DHT11 read error: %s", DHT11::getErrorString(result).c_str());
+				const char* errStr = (result == Dht11Checksum) ? "checksum failure" : "timeout";
+				snprintf(buffer, sizeof(buffer), "DHT11 read error: %s", errStr);
 				sendError(buffer, "DHT11 Error");
 			}
-
 			return TempHumidityCheckMs;
 		}
 
 		if (_warningManager && _warningManager->isWarningActive(WarningType::TemperatureSensorFailure))
-		{
 			_warningManager->clearWarning(WarningType::TemperatureSensorFailure);
-		}
 
-		_humidity = static_cast<float>(rawHumidity) + _humidityOffset;
-		_celsius = static_cast<float>(rawTemp) + _temperatureOffset;
+		_humidity = humidity + _humidityOffset;
+		_celsius  = temperature + _temperatureOffset;
 
 		if (_messageBus)
 		{
@@ -116,10 +230,9 @@ public:
 	Dht11SensorHandler(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
 		WarningManager* warningManager, uint8_t sensorPin, float humidityOffset, float temperatureOffset, const char* name = "Dht11")
 		: BaseSensor(name), BroadcastLoggerSupport(broadcastManager), _messageBus(messageBus), _sensorCommandHandler(sensorCommandHandler),
-		_warningManager(warningManager), _sensorPin(sensorPin), _dht11Sensor(sensorPin), _humidityOffset(humidityOffset),
+		_warningManager(warningManager), _sensorPin(sensorPin), _humidityOffset(humidityOffset),
 		_temperatureOffset(temperatureOffset), _humidity(0.0f), _celsius(0.0f)
 	{
-		_dht11Sensor.setDelay(0);
 #if defined(MQTT_SUPPORT)
 		snprintf(_slugTemp, sizeof(_slugTemp), "%s_temperature", _safeSlug);
 		snprintf(_slugHumidity, sizeof(_slugHumidity), "%s_humidity", _safeSlug);
