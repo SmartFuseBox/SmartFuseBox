@@ -78,6 +78,13 @@ jobs:
 
       - name: Debug files
         run: ls -R
+        
+      - name: Prepare release files
+        run: |
+          mkdir release
+          find . -name "*.bin" -exec cp {} release/ \;
+          find . -name "*.sha256" -exec cp {} release/ \;
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
