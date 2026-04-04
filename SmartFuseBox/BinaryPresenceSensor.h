@@ -73,7 +73,8 @@ public:
 	BinaryPresenceSensor(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
 		RelayController* relayController, uint8_t sensorPin, int activeState, const char* name,
 		ExecutionActionType onDetectedAction, uint8_t onDetectedPayload,
-		ExecutionActionType onClearAction, uint8_t onClearPayload);
+		ExecutionActionType onClearAction, uint8_t onClearPayload,
+		uint16_t pulseDurationSec = 0);
 
 	void formatStatusJson(char* buffer, size_t size) override;
 

@@ -87,6 +87,11 @@ struct SystemMetricsUpdated
     using Callback = std::function<void()>;
 };
 
+struct BinaryPresenceUpdated
+{
+    using Callback = std::function<void(bool detected, const char* sensorName)>;
+};
+
 struct MqttConnected
 {
     using Callback = std::function<void()>;

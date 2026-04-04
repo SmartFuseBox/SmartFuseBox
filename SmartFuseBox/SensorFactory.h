@@ -206,29 +206,32 @@ private:
 			case SensorIdList::BinaryPresenceSensor:
 			{
 				// pins[0] = sensor pin
-				// options1[0] = active state (non-zero = HIGH, 0 = LOW)
-				// options1[1] = onDetected action (ExecutionActionType)
-				// pins[1] = onDetected action payload byte 0 (e.g. relay index)
-				// options2[0] = onClear action (ExecutionActionType)
-				// pins[2] = onClear action payload byte 0 (e.g. relay index)
-				uint8_t sensorPin = entry.pins[0];
-				int activeState = (entry.options1[0] != 0) ? HIGH : LOW;
-                ExecutionActionType onDetectedAction = static_cast<ExecutionActionType>(entry.options1[1]);
-				uint8_t onDetectedPayload = entry.pins[1];
-                ExecutionActionType onClearAction = static_cast<ExecutionActionType>(static_cast<uint8_t>(entry.options2[0]));
-				uint8_t onClearPayload = entry.pins[2];
-				return new BinaryPresenceSensor(
-					ctx.messageBus,
-					ctx.broadcastManager,
-					ctx.sensorCommandHandler,
-                    ctx.relayController,
-					sensorPin,
-					activeState,
-                    entry.name,
-					onDetectedAction,
-					onDetectedPayload,
-					onClearAction,
-					onClearPayload);
+					// options1[0] = active state (non-zero = HIGH, 0 = LOW)
+					// options1[1] = onDetected action (ExecutionActionType)
+					// pins[1] = onDetected action payload byte 0 (e.g. relay index)
+					// options2[0] = onClear action (ExecutionActionType)
+					// pins[2] = onClear action payload byte 0 (e.g. relay index)
+					// options2[1] = pulse duration in seconds (shared; used when either action is RelayPulse)
+					uint8_t sensorPin = entry.pins[0];
+					int activeState = (entry.options1[0] != 0) ? HIGH : LOW;
+					ExecutionActionType onDetectedAction = static_cast<ExecutionActionType>(entry.options1[1]);
+					uint8_t onDetectedPayload = entry.pins[1];
+					ExecutionActionType onClearAction = static_cast<ExecutionActionType>(static_cast<uint8_t>(entry.options2[0]));
+					uint8_t onClearPayload = entry.pins[2];
+					uint16_t pulseDurationSec = static_cast<uint16_t>(entry.options2[1]);
+					return new BinaryPresenceSensor(
+						ctx.messageBus,
+						ctx.broadcastManager,
+						ctx.sensorCommandHandler,
+						ctx.relayController,
+						sensorPin,
+						activeState,
+						entry.name,
+						onDetectedAction,
+						onDetectedPayload,
+						onClearAction,
+						onClearPayload,
+						pulseDurationSec);
 			}
 
             default:

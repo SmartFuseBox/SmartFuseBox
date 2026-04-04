@@ -23,7 +23,8 @@
 BinaryPresenceSensor::BinaryPresenceSensor(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,
     RelayController* relayController, uint8_t sensorPin, int activeState, const char* name,
     ExecutionActionType onDetectedAction, uint8_t onDetectedPayload,
-    ExecutionActionType onClearAction, uint8_t onClearPayload)
+    ExecutionActionType onClearAction, uint8_t onClearPayload,
+    uint16_t pulseDurationSec)
     : BaseSensor(name), BroadcastLoggerSupport(broadcastManager), _messageBus(messageBus), _sensorCommandHandler(sensorCommandHandler),
     _relayController(relayController), _sensorPin(sensorPin), _activeState(activeState), _lastState(-1), _lastChangeMs(0),
     _onDetectedAction(onDetectedAction), _onClearAction(onClearAction),
@@ -34,8 +35,12 @@ BinaryPresenceSensor::BinaryPresenceSensor(MessageBus* messageBus, BroadcastMana
 {
     memset(_onDetectedPayload, 0, sizeof(_onDetectedPayload));
     _onDetectedPayload[0] = onDetectedPayload;
+    _onDetectedPayload[1] = static_cast<uint8_t>(pulseDurationSec & 0xFF);
+    _onDetectedPayload[2] = static_cast<uint8_t>((pulseDurationSec >> 8) & 0xFF);
     memset(_onClearPayload, 0, sizeof(_onClearPayload));
     _onClearPayload[0] = onClearPayload;
+    _onClearPayload[1] = static_cast<uint8_t>(pulseDurationSec & 0xFF);
+    _onClearPayload[2] = static_cast<uint8_t>((pulseDurationSec >> 8) & 0xFF);
 
 #if defined(MQTT_SUPPORT)
     snprintf(_slugPresence, sizeof(_slugPresence), "%s_presence", _safeSlug);
@@ -100,10 +105,20 @@ void BinaryPresenceSensor::getMqttValue(uint8_t channelIndex, char* buffer, size
 void BinaryPresenceSensor::initialize()
 {
     pinMode(_sensorPin, INPUT);
+	_lastState = digitalRead(_sensorPin);
 }
 
 unsigned long BinaryPresenceSensor::update()
 {
+    if (_directPulseActive && _relayController)
+    {
+        if (SystemFunctions::hasElapsed(millis(), _directPulseStartMs, _directPulseDurMs))
+        {
+            _relayController->setRelayState(_directPulseRelayIdx, false);
+            _directPulseActive = false;
+        }
+    }
+
     int state = digitalRead(_sensorPin);
 
     if (state != _lastState)
@@ -111,6 +126,16 @@ unsigned long BinaryPresenceSensor::update()
         _lastState = state;
         _lastChangeMs = SystemFunctions::millis64();
         bool detected = (state == _activeState);
+
+        StringKeyValue params[2];
+        strncpy(params[0].key, ValueParamName, sizeof(params[0].key));
+        snprintf(params[0].value, sizeof(params[0].value), "%d", detected ? 1 : 0);
+        strncpy(params[1].key, "name", sizeof(params[1].key));
+        strncpy(params[1].value, _name, sizeof(params[1].value));
+        sendCommand(SensorBinaryPresence, params, 2);
+
+        if (_messageBus)
+            _messageBus->publish<BinaryPresenceUpdated>(detected, _name);
 
         if (detected)
             executeAction(_onDetectedAction, _onDetectedPayload, ConfigSchedulerPayloadSize);
