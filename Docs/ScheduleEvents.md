@@ -59,7 +59,7 @@ struct ScheduledEvent {
     uint8_t             triggerPayload[4];    // type-specific bytes b0..b3
     ConditionType       conditionType;
     uint8_t             conditionPayload[4];  // type-specific bytes b0..b3
-    SchedulerActionType actionType;
+    ExecutionActionType actionType;
     uint8_t             actionPayload[4];     // type-specific bytes b0..b3
     uint8_t             reserved[8];
 };

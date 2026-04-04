@@ -156,6 +156,7 @@ constexpr char SensorGpsAltitude[] = "S18";
 constexpr char SensorGpsSpeed[] = "S19";
 constexpr char SensorGpsSatellites[] = "S20";
 constexpr char SensorGpsDistance[] = "S21";
+constexpr char SensorBinaryPresence[] = "S22";
 
 
 constexpr char AckSuccess[] = "ok";
@@ -221,7 +222,8 @@ enum class SensorIdList : uint8_t
     Dht11Sensor = 0x1,
     LightSensor = 0x2,
     GpsSensor = 0x3,
-    SystemSensor = 0x4
+    SystemSensor = 0x4,
+    BinaryPresenceSensor = 0x5,
 };
 
 struct CommandResult {
