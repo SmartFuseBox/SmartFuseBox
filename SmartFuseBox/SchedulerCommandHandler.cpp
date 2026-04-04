@@ -69,7 +69,7 @@ void SchedulerCommandHandler::rebuildEventCount(Config* cfg)
     for (uint8_t i = 0; i < ConfigMaxScheduledEvents; ++i)
     {
         if (cfg->scheduler.events[i].triggerType != TriggerType::None ||
-            cfg->scheduler.events[i].actionType != SchedulerActionType::None)
+            cfg->scheduler.events[i].actionType != ExecutionActionType::None)
         {
             ++count;
         }
@@ -121,7 +121,7 @@ bool SchedulerCommandHandler::handleCommand(SerialCommandManager* sender, const 
         }
 
         const ScheduledEvent& ev = cfg->scheduler.events[idx];
-        if (ev.triggerType == TriggerType::None && ev.actionType == SchedulerActionType::None && !ev.enabled)
+        if (ev.triggerType == TriggerType::None && ev.actionType == ExecutionActionType::None && !ev.enabled)
         {
             sendAckErr(sender, command, F("Slot is empty"), &params[0]);
             return true;
@@ -204,7 +204,7 @@ bool SchedulerCommandHandler::handleCommand(SerialCommandManager* sender, const 
             return true;
         }
 
-        if (actType > static_cast<uint8_t>(SchedulerActionType::AllRelaysOff))
+        if (actType > static_cast<uint8_t>(ExecutionActionType::AllRelaysOff))
         {
             sendAckErr(sender, command, F("Invalid action type"));
             return true;
@@ -216,7 +216,7 @@ bool SchedulerCommandHandler::handleCommand(SerialCommandManager* sender, const 
         memcpy(ev.triggerPayload, trigPayload, ConfigSchedulerPayloadSize);
         ev.conditionType = static_cast<ConditionType>(condType);
         memcpy(ev.conditionPayload, condPayload, ConfigSchedulerPayloadSize);
-        ev.actionType = static_cast<SchedulerActionType>(actType);
+        ev.actionType = static_cast<ExecutionActionType>(actType);
         memcpy(ev.actionPayload, actPayload, ConfigSchedulerPayloadSize);
         rebuildEventCount(cfg);
 
@@ -343,7 +343,7 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
 
     switch (event.actionType)
     {
-        case SchedulerActionType::RelayOn:
+        case ExecutionActionType::RelayOn:
         {
             CommandResult result = _relayController->setRelayState(event.actionPayload[0], true);
             if (!result.success)
@@ -354,7 +354,7 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
             return true;
         }
 
-        case SchedulerActionType::RelayOff:
+        case ExecutionActionType::RelayOff:
         {
             CommandResult result = _relayController->setRelayState(event.actionPayload[0], false);
             if (!result.success)
@@ -365,7 +365,7 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
             return true;
         }
 
-        case SchedulerActionType::RelayToggle:
+        case ExecutionActionType::RelayToggle:
         {
             CommandResult current = _relayController->getRelayStatus(event.actionPayload[0]);
             if (current.status == DefaultValue)
@@ -382,7 +382,7 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
             return true;
         }
 
-        case SchedulerActionType::RelayPulse:
+        case ExecutionActionType::RelayPulse:
         {
             // Pulse duration is managed by the runtime scheduler; T6 performs the on transition only
             CommandResult result = _relayController->setRelayState(event.actionPayload[0], true);
@@ -394,15 +394,15 @@ bool SchedulerCommandHandler::executeAction(SerialCommandManager* sender, const 
             return true;
         }
 
-        case SchedulerActionType::AllRelaysOn:
+        case ExecutionActionType::AllRelaysOn:
             _relayController->turnAllRelaysOn();
             return true;
 
-        case SchedulerActionType::AllRelaysOff:
+        case ExecutionActionType::AllRelaysOff:
             _relayController->turnAllRelaysOff();
             return true;
 
-        case SchedulerActionType::None:
+        case ExecutionActionType::None:
         default:
             sendAckErr(sender, command, F("No action defined"));
             return false;

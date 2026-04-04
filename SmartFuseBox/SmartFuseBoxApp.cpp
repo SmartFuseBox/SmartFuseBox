@@ -130,15 +130,15 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
 
     {
         SensorFactoryContext ctx;
-        ctx.messageBus           = &_messageBus;
-        ctx.broadcastManager     = &_broadcastManager;
+        ctx.messageBus = &_messageBus;
+        ctx.broadcastManager = &_broadcastManager;
         ctx.sensorCommandHandler = &_sensorCommandHandler;
-        ctx.warningManager       = &_warningManager;
-        ctx.relayController      = &_relayController;
-        ctx.wifiController       = &_wifiController;
-        ctx.bluetoothRadio       = &_bluetoothController;
+        ctx.warningManager = &_warningManager;
+        ctx.relayController = &_relayController;
+        ctx.wifiController = &_wifiController;
+        ctx.bluetoothRadio = &_bluetoothController;
 #if defined(SD_CARD_SUPPORT)
-        ctx.sdCardLogger         = &_sdCardLogger;
+        ctx.sdCardLogger = &_sdCardLogger;
 #endif
 
         _factorySensors = SensorFactory::create(config->sensors, ctx, _factorySensorCount);

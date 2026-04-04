@@ -74,6 +74,8 @@
     <ProjectCapability Include="VisualMicroLinux" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BinaryPresenceSensor.cpp" />
+    <ClCompile Include="BinaryPresenceSensor.h" />
     <ClCompile Include="OtaManager.cpp" />
     <ClCompile Include="ScheduleController.cpp" />
     <ClCompile Include="SchedulerCommandHandler.cpp" />
@@ -136,6 +138,7 @@
     <ClInclude Include="Dht11SensorHandler.h" />
     <ClInclude Include="Esp32WifiClient.h" />
     <ClInclude Include="Esp32WifiRadio.h" />
+    <ClInclude Include="FirmwareVersion.h" />
     <ClInclude Include="IBluetoothRadio.h" />
     <ClInclude Include="IWifiClient.h" />
     <ClInclude Include="IWifiController.h" />
@@ -216,6 +219,7 @@
   <ItemGroup>
     <None Include="Docs\Commands.md" />
     <None Include="Docs\Sensors.md" />
+    <None Include="SmartFuseBox\Docs\Commands.md" />
     <None Include="Wifi.md" />
   </ItemGroup>
   <PropertyGroup>

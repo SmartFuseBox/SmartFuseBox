@@ -185,7 +185,7 @@ Returns JSON formatted response with all relay states.
 
 
 ## Sensor Commands
-All sensor-related commands use the `S` prefix, mirroring how `R` commands own both relay runtime and relay configuration. `S0`–`S6` are sensor configuration commands; `S7`–`S21` are sensor telemetry commands.
+All sensor-related commands use the `S` prefix, mirroring how `R` commands own both relay runtime and relay configuration. `S0`–`S6` are sensor configuration commands; `S7`–`S22` are sensor telemetry commands.
 
 ### Sensor Configuration Commands (SFB)
 These commands configure the persisted sensor definitions stored in EEPROM (`SensorsConfig`). `SensorFactory` uses these definitions to construct live sensor instances at boot — **a reboot is required for any change to take effect**. Every mutating ACK carries `reboot=1` to make this explicit.
@@ -204,10 +204,11 @@ These commands configure the persisted sensor definitions stored in EEPROM (`Sen
 
 | Value | Name | Notes |
 |---|---|---|
-| `0` | WaterSensor | Uses `p0`=data pin, `p1`=power pin |
+| `0` | Water Sensor | Uses `p0`=data pin, `p1`=power pin |
 | `1` | Dht11 | Uses `p0`=data pin |
-| `2` | LightSensor | Uses `p0`=analogue pin; `o0=1` enables digital mode |
-| `3` | SystemSensor | No pin required |
+| `2` | Light Sensor | Uses `p0`=analogue pin; `o0=1` enables digital mode |
+| `3` | System Sensor | No pin required |
+| `5` | Binary Presence Sensor | `p0`=sensor pin; `o0`=active state (1=HIGH, 0=LOW), `o1`=onDetected action (SchedulerActionType value); use `S4` to set `p1`=onDetected relay/pin payload, `p2`=onClear relay/pin payload; use `S6` (option=1, slot=0) to set onClear action (SchedulerActionType value) |
 
 Common sensor config error responses: `Config not available`, `Invalid sensor index`, `Missing sensor index`, `Missing parameters`, `Missing name`, `Invalid pin slot`, `Invalid option slot`.
 
@@ -232,6 +233,7 @@ These commands carry live sensor readings. They are sent automatically by the SF
 | `S19` — GPS Speed | `S19:v=15.75;course=245.30;dir=NNW` | Send GPS speed in km/h with optional course/heading in degrees and optional direction. Param format: `v=<speed>;course=<degrees>;dir=<direction>`. Speed is in kilometers per hour with 2 decimal places precision. Course is in degrees (0-360) with 2 decimal places precision, where 0° is North, 90° is East, 180° is South, and 270° is West. Direction is optional cardinal direction string (N, NE, E, SE, S, SW, W, NW, etc.). |
 | `S20` — GPS Satellites | `S20:v=8` | Send GPS satellite count. Param format: `v=<value>`. Value is the number of satellites currently connected to the GPS module. |
 | `S21` — GPS Distance | `S21:v=1.23` | Send GPS distance moved. Param format: `v=<value>`. Value is the total distance travelled according to the GPS module. |
+| `S22` — Binary Presence | `S22:v=1;name=PIR` | Sent when a `BinaryPresenceSensor` pin state changes. Param format: `v=<0|1>;name=<sensor_name>`. `v=1` = detected (pin matches configured active state), `v=0` = clear. `name` is the sensor name as configured. |
 
 
 ### Wifi Sensor Commands (SFB)
@@ -349,6 +351,8 @@ Evaluated at trigger time. If the condition is not met the action is skipped. Us
 | `4` | RelayPulse | `b0`=relay index, `b1..b2`=uint16 duration seconds (little-endian), `b3`=unused |
 | `5` | AllRelaysOn | Unused |
 | `6` | AllRelaysOff | Unused |
+| `7` | SetPinHigh | `b0`=GPIO pin number, `b1..b3`=unused — sets the pin HIGH (OUTPUT mode). Used by scheduler and `BinaryPresenceSensor` actions. |
+| `8` | SetPinLow  | `b0`=GPIO pin number, `b1..b3`=unused — sets the pin LOW (OUTPUT mode). Used by scheduler and `BinaryPresenceSensor` actions. |
 
 ---
 

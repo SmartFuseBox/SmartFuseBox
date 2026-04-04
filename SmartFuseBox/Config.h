@@ -89,7 +89,7 @@ enum class ConditionType : uint8_t
 	RelayIsOff = 0x06,  // conditionPayload[0]=relay index
 };
 
-enum class SchedulerActionType : uint8_t
+enum class ExecutionActionType : uint8_t
 {
 	None         = 0x00,
 	RelayOn      = 0x01,  // actionPayload[0]=relay index
@@ -98,6 +98,8 @@ enum class SchedulerActionType : uint8_t
 	RelayPulse   = 0x04,  // actionPayload[0]=relay index, [1..2]=uint16 duration seconds
 	AllRelaysOn  = 0x05,
 	AllRelaysOff = 0x06,
+	SetPinHigh = 0x07,  // actionPayload[0]=pin number
+	SetPinLow = 0x08,  // actionPayload[0]=pin number
 };
 
 enum class RelayActionType : uint8_t
@@ -236,7 +238,7 @@ struct ScheduledEvent
     uint8_t triggerPayload[ConfigSchedulerPayloadSize];
     ConditionType conditionType;
     uint8_t conditionPayload[ConfigSchedulerPayloadSize];
-    SchedulerActionType actionType;
+    ExecutionActionType actionType;
     uint8_t actionPayload[ConfigSchedulerPayloadSize];
     int8_t reserved[ConfigScheduleEventReserved];
 } __attribute__((packed));

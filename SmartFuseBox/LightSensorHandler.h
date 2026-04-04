@@ -241,6 +241,9 @@ public:
 
     void getMqttValue(uint8_t channelIndex, char* buffer, size_t size) const override
     {
+        if (!buffer || size == 0)
+            return;
+
         switch (channelIndex)
         {
             case 1: snprintf(buffer, size, "%u", _currentLightLevel); break;

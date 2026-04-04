@@ -127,7 +127,7 @@ void ScheduleController::update(unsigned long nowMs)
         if (!ev.enabled)
             continue;
 
-        if (ev.triggerType == TriggerType::None && ev.actionType == SchedulerActionType::None)
+        if (ev.triggerType == TriggerType::None && ev.actionType == ExecutionActionType::None)
             continue;
 
         if (!isTriggerDue(i, ev, hour, min, dowBit, day, month, today, nowMs))
@@ -339,22 +339,22 @@ void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, un
 
     switch (ev.actionType)
     {
-        case SchedulerActionType::RelayOn:
+        case ExecutionActionType::RelayOn:
             _relayController->setRelayState(ev.actionPayload[0], true);
             break;
 
-        case SchedulerActionType::RelayOff:
+        case ExecutionActionType::RelayOff:
             _relayController->setRelayState(ev.actionPayload[0], false);
             break;
 
-        case SchedulerActionType::RelayToggle:
+        case ExecutionActionType::RelayToggle:
         {
             CommandResult current = _relayController->getRelayStatus(ev.actionPayload[0]);
             _relayController->setRelayState(ev.actionPayload[0], current.status == 0);
             break;
         }
 
-        case SchedulerActionType::RelayPulse:
+        case ExecutionActionType::RelayPulse:
         {
             uint16_t durationSec = static_cast<uint16_t>(ev.actionPayload[1]
                                                         | (ev.actionPayload[2] << 8));
@@ -370,15 +370,31 @@ void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, un
             break;
         }
 
-        case SchedulerActionType::AllRelaysOn:
+        case ExecutionActionType::AllRelaysOn:
             _relayController->turnAllRelaysOn();
             break;
 
-        case SchedulerActionType::AllRelaysOff:
+        case ExecutionActionType::AllRelaysOff:
             _relayController->turnAllRelaysOff();
             break;
 
-        case SchedulerActionType::None:
+        case ExecutionActionType::SetPinLow:
+        {
+            uint8_t pin = ev.actionPayload[0];
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, LOW);
+            break;
+		}
+
+        case ExecutionActionType::SetPinHigh:
+        {
+            uint8_t pin = ev.actionPayload[0];
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, HIGH);
+            break;
+        }
+
+        case ExecutionActionType::None:
         default:
             break;
     }
