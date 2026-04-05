@@ -369,64 +369,75 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			}
 
 			// Read available data (non-blocking)
-			// Don't check connected() here - it can be false during TCP handshake
-			// The timeout will catch truly dead connections
-			bool requestComplete = false;
-			size_t requestLen = strlen(client.request);
+				// Don't check connected() here - it can be false during TCP handshake
+				// The timeout will catch truly dead connections
+				bool requestComplete = false;
+				size_t requestLen = strlen(client.request);
 
-			while (client.client->available())
-			{
-				char c = client.client->read();
-
-				// Append character to buffer
-				if (requestLen < MaximumRequestSize)
+				while (client.client->available())
 				{
-					client.request[requestLen++] = c;
-					client.request[requestLen] = '\0';
-					client.lastActivity = now;
-				}
+					char c = client.client->read();
 
-				// Safety check for request size
-				if (requestLen >= MaximumRequestSize)
-				{
-					sendDebug(F("Request too large"), F("WifiServer"));
-					send400(*client.client, false);
-					cleanupClient(index);
-					return;
-				}
-			}
-
-			// Determine if the full request (headers + any body) has been received.
-			// For GET: complete once we see the blank line (\r\n\r\n).
-			// For POST: complete once Content-Length body bytes have also been read.
-			// Content-Length is only honoured for methods that carry a body (POST);
-			// applying it to GET would stall completion if the client sends a
-			// Content-Length header (some clients do).
-			const char* headerEnd = strstr(client.request, "\r\n\r\n");
-			if (headerEnd)
-			{
-				size_t headerEndIdx = (headerEnd - client.request) + 4;
-				int32_t contentLength = 0;
-				if (strncmp(client.request, "POST", 4) == 0)
-				{
-					const char* clHeader = strstr(client.request, "Content-Length:");
-					if (clHeader)
+					// Append character to buffer
+					if (requestLen < MaximumRequestSize)
 					{
-						clHeader += 15;
-						while (*clHeader == ' ') clHeader++;
-						contentLength = atoi(clHeader);
+						client.request[requestLen++] = c;
+						client.request[requestLen] = '\0';
+						client.lastActivity = now;
+					}
+
+					// Safety check for request size
+					if (requestLen >= MaximumRequestSize)
+					{
+						sendDebug(F("Request too large"), F("WifiServer"));
+						send400(*client.client, false);
+						cleanupClient(index);
+						return;
+					}
+
+					// Determine if the full request (headers + any body) has been received.
+					// For GET: complete once we see the blank line (\r\n\r\n).
+					// For POST: complete once Content-Length body bytes have also been read.
+					// Content-Length is only honoured for methods that carry a body (POST);
+					// applying it to GET would stall completion if the client sends a
+					// Content-Length header (some clients do).
+					const char* headerEnd = strstr(client.request, "\r\n\r\n");
+					if (headerEnd)
+					{
+						size_t headerEndIdx = (headerEnd - client.request) + 4;
+						size_t bodyRequired = 0;
+
+						if (strncmp(client.request, "POST", 4) == 0)
+						{
+							const char* clHeader = strstr(client.request, "Content-Length:");
+							if (clHeader)
+							{
+								clHeader += 15;
+								while (*clHeader == ' ') clHeader++;
+								int32_t cl = atoi(clHeader);
+
+								if (cl < 0 || static_cast<size_t>(cl) > MaximumRequestSize - headerEndIdx)
+								{
+									sendDebug(F("Invalid Content-Length"), F("WifiServer"));
+									send400(*client.client, false);
+									cleanupClient(index);
+									return;
+								}
+
+								bodyRequired = static_cast<size_t>(cl);
+							}
+						}
+
+						if (requestLen >= headerEndIdx + bodyRequired)
+						{
+							requestComplete = true;
+							char msg[48];
+							snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
+							sendDebug(msg, F("WifiServer"));
+							break;  // Exit read loop — any further bytes belong to the next request
+						}
 					}
 				}
-
-				if (requestLen >= headerEndIdx + static_cast<size_t>(contentLength))
-				{
-					requestComplete = true;
-					char msg[48];
-					snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
-					sendDebug(msg, F("WifiServer"));
-					break;  // Stop reading — any further bytes belong to the next request
-				}
-			}
 
 				// Transition to processing if request is complete
 				if (requestComplete)

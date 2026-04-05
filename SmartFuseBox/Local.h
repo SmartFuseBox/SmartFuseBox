@@ -158,5 +158,5 @@ constexpr uint8_t Relays[ConfigRelayCount] = { Relay1, Relay2, Relay3, Relay4, R
 
 
 // ─── Network Config ───────────────────────────────────────────────────────────
-constexpr uint8_t MaxConcurrentClients = 2;
+constexpr uint8_t MaxConcurrentClients = 8;
 constexpr uint8_t MaxPersistentClients = 1;

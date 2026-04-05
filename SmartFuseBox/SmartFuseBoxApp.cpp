@@ -83,8 +83,8 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 #endif
 
       , _schedulerCommandHandler(&_relayController)
-      , _scheduleController(&_relayController, &_messageBus)
       , _serialHandlerCount(0)
+      , _scheduleController(&_relayController, &_messageBus)
 
 #if defined(LED_MANAGER)
       , _ledManager(&_messageBus)
