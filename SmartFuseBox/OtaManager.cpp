@@ -436,13 +436,11 @@ void OtaManager::parseVersionTag(const char* tag, uint8_t& major, uint8_t& minor
 bool OtaManager::fetchChecksum(const char* tag, char* hashHexOut, size_t hashLen)
 {
     // ── Step 1: ask github.com for the redirect URL ───────────────────────────
-    // github.com release downloads return a 302 to a CDN host
-    // (release-assets.githubusercontent.com).  The CDN host has a different TLS
-    // certificate chain, so we cannot follow the redirect with the same
-    // WiFiClientSecure that has OtaGithubRootCA pinned.  Instead we capture the
-    // Location header, then open a fresh insecure client for the CDN leg.  The
-    // CDN URL is already a signed, time-limited JWT so transport-only TLS is
-    // sufficient for that second hop.
+    // github.com release downloads return a 302 to release-assets.githubusercontent.com.
+    // That host has a different TLS certificate chain (ISRG Root X1 / Let's Encrypt)
+    // from github.com (Sectigo E46), so we cannot follow the redirect with the same
+    // WiFiClientSecure.  Capture the Location header here, then open a second client
+    // with OtaCdnRootCA for the CDN leg.
 
     char url[256];
     snprintf(url, sizeof(url),
@@ -508,7 +506,7 @@ bool OtaManager::fetchChecksum(const char* tag, char* hashHexOut, size_t hashLen
 
     // ── Step 2: fetch the actual content from the CDN URL
     WiFiClientSecure cdnClient;
-    cdnClient.setInsecure();   // CDN URL is a signed JWT — transport TLS only
+    cdnClient.setCACert(OtaCdnRootCA);   // release-assets.githubusercontent.com — ISRG Root X1
 
     HTTPClient cdnHttp;
     cdnHttp.begin(cdnClient, cdnUrl);
@@ -607,10 +605,10 @@ bool OtaManager::fetchChecksum(const char* tag, char* hashHexOut, size_t hashLen
 bool OtaManager::downloadAndApply(const char* tag, const char* expectedHash)
 {
     // ── Step 1: resolve the CDN redirect URL from github.com ─────────────────
-    // github.com release downloads redirect to a CDN host with a different TLS
-    // certificate chain.  Capture the Location header here, then open a fresh
-    // insecure client for the CDN leg (the CDN URL is a signed, time-limited
-    // JWT so transport-only TLS is sufficient).
+    // github.com release downloads redirect to release-assets.githubusercontent.com.
+    // That host presents a Let's Encrypt certificate (ISRG Root X1), which differs
+    // from the Sectigo E46 chain used by github.com.  Capture the Location header
+    // here, then open a second client with OtaCdnRootCA for the CDN leg.
 
     char url[256];
     snprintf(url, sizeof(url),
@@ -663,7 +661,7 @@ bool OtaManager::downloadAndApply(const char* tag, const char* expectedHash)
 
     // ── Step 2: stream the binary from the CDN URL
     WiFiClientSecure secureClient;
-    secureClient.setInsecure();   // CDN URL is a signed JWT — transport TLS only
+    secureClient.setCACert(OtaCdnRootCA);   // release-assets.githubusercontent.com — ISRG Root X1
 
     HTTPClient http;
     http.begin(secureClient, cdnUrl);

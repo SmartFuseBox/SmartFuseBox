@@ -399,17 +399,23 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			// Determine if the full request (headers + any body) has been received.
 			// For GET: complete once we see the blank line (\r\n\r\n).
 			// For POST: complete once Content-Length body bytes have also been read.
+			// Content-Length is only honoured for methods that carry a body (POST);
+			// applying it to GET would stall completion if the client sends a
+			// Content-Length header (some clients do).
 			const char* headerEnd = strstr(client.request, "\r\n\r\n");
 			if (headerEnd)
 			{
 				size_t headerEndIdx = (headerEnd - client.request) + 4;
 				int32_t contentLength = 0;
-				const char* clHeader = strstr(client.request, "Content-Length:");
-				if (clHeader)
+				if (strncmp(client.request, "POST", 4) == 0)
 				{
-					clHeader += 15;
-					while (*clHeader == ' ') clHeader++;
-					contentLength = atoi(clHeader);
+					const char* clHeader = strstr(client.request, "Content-Length:");
+					if (clHeader)
+					{
+						clHeader += 15;
+						while (*clHeader == ' ') clHeader++;
+						contentLength = atoi(clHeader);
+					}
 				}
 
 				if (requestLen >= headerEndIdx + static_cast<size_t>(contentLength))
@@ -418,16 +424,17 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 					char msg[48];
 					snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
 					sendDebug(msg, F("WifiServer"));
+					break;  // Stop reading — any further bytes belong to the next request
 				}
 			}
 
-			// Transition to processing if request is complete
-			if (requestComplete)
-			{
-				client.state = ClientHandlingState::ProcessingRequest;
-			}
+				// Transition to processing if request is complete
+				if (requestComplete)
+				{
+					client.state = ClientHandlingState::ProcessingRequest;
+				}
 
-			break;
+				break;
 		}
 
 		case ClientHandlingState::ProcessingRequest:
@@ -683,13 +690,33 @@ void WifiServer::processClientRequest(uint8_t index)
 	bool handled = false;
 
 	// For POST requests, locate the body (bytes after the blank line \r\n\r\n)
+	// and null-terminate at exactly Content-Length bytes to prevent the parser
+	// reading into any pipelined request that may follow in the same buffer.
 	const char* body = nullptr;
 	if (strcmp(method, "POST") == 0)
 	{
 		const char* bodyStart = strstr(client.request, "\r\n\r\n");
 		if (bodyStart)
 		{
-			body = bodyStart + 4;
+			bodyStart += 4;
+
+			int32_t contentLength = 0;
+			const char* clHeader = strstr(client.request, "Content-Length:");
+			if (clHeader)
+			{
+				clHeader += 15;
+				while (*clHeader == ' ') clHeader++;
+				contentLength = atoi(clHeader);
+			}
+
+			// Clamp to what is actually in the buffer, then null-terminate so
+			// the parser cannot stray beyond the intended body.
+			size_t available = strlen(bodyStart);
+			size_t bodyLen = (contentLength > 0 && static_cast<size_t>(contentLength) < available)
+								 ? static_cast<size_t>(contentLength)
+								 : available;
+			client.request[bodyStart - client.request + bodyLen] = '\0';
+			body = bodyStart;
 		}
 	}
 
