@@ -233,7 +233,7 @@ bool OtaManager::fetchLatestTag(char* tagOut, size_t tagLen)
 
     if (_broadcaster)
     {
-        char dbg[144];
+        char dbg[164];
         snprintf(dbg, sizeof(dbg), "OTA: querying GitHub releases API: %s", url);
         _broadcaster->sendDebug(dbg, "OTA");
     }
@@ -355,41 +355,20 @@ bool OtaManager::fetchLatestTag(char* tagOut, size_t tagLen)
 
 bool OtaManager::parseTagName(const char* json, size_t jsonLen, char* tagOut, size_t tagLen)
 {
-    // Locate the html_url value
-    //   "html_url": "https://github.com/.../releases/tag/v0.9.0.4"
-    //   "html_url":"https://github.com/.../releases/tag/v0.9.0.4"
-    // Whitespace between ':' and '"' is ignored — we find the 2nd '"' after
-    // the key to reach the opening quote of the URL value regardless of spacing.
-    const char* key = "\"html_url\"";
-    const char* found = strstr(json, key);
-    if (!found)
+    // The html_url value contains the tag as the final path segment, e.g.:
+    //   "https://github.com/.../releases/tag/v0.9.0.4"
+    // Search directly for "/tag/" — simpler and unambiguous vs. quote-walking.
+    const char* tagPath = strstr(json, "/tag/");
+    if (!tagPath)
         return false;
 
-    // q1 = closing quote
-    const char* q1 = strchr(found + strlen(key), '"');
-    if (!q1)
-        return false;
+    const char* start = tagPath + 5;  // first char of the tag itself
 
-    // q2 = opening quote
-    const char* q2 = strchr(q1 + 1, '"');
-    if (!q2)
-        return false;
-
-    // urlStart points to first character
-    const char* urlStart = q2 + 1;
-    const char* endQuote = strchr(urlStart, '"');
+    // The tag ends at the next '"' (closing quote of the URL value).
+    const char* endQuote = strchr(start, '"');
     if (!endQuote)
         return false;
 
-    // The tag is the final path segment
-    const char* lastSlash = endQuote - 1;
-    while (lastSlash > urlStart && *lastSlash != '/')
-        --lastSlash;
-
-    if (*lastSlash != '/')
-        return false;
-
-    const char* start = lastSlash + 1;
     size_t len = static_cast<size_t>(endQuote - start);
 
     if (len == 0 || len >= tagLen)
@@ -449,7 +428,7 @@ bool OtaManager::fetchChecksum(const char* tag, char* hashHexOut, size_t hashLen
 
     if (_broadcaster)
     {
-        char dbg[272];
+        char dbg[275];
         snprintf(dbg, sizeof(dbg), "OTA: checksum url=%s", url);
         _broadcaster->sendDebug(dbg, "OTA");
     }
@@ -617,7 +596,7 @@ bool OtaManager::downloadAndApply(const char* tag, const char* expectedHash)
 
     if (_broadcaster)
     {
-        char dbg[272];
+        char dbg[273];
         snprintf(dbg, sizeof(dbg), "OTA: binary url=%s", url);
         _broadcaster->sendDebug(dbg, "OTA");
     }
