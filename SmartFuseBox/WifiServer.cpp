@@ -369,54 +369,83 @@ void WifiServer::handleClientState(uint8_t index, unsigned long now)
 			}
 
 			// Read available data (non-blocking)
-			// Don't check connected() here - it can be false during TCP handshake
-			// The timeout will catch truly dead connections
-			bool requestComplete = false;
-			size_t requestLen = strlen(client.request);
+				// Don't check connected() here - it can be false during TCP handshake
+				// The timeout will catch truly dead connections
+				bool requestComplete = false;
+				size_t requestLen = strlen(client.request);
 
-			while (client.client->available())
-			{
-				char c = client.client->read();
-
-				// Append character to buffer
-				if (requestLen < MaximumRequestSize)
+				while (client.client->available())
 				{
-					client.request[requestLen++] = c;
-					client.request[requestLen] = '\0';
-					client.lastActivity = now;
+					char c = client.client->read();
+
+					// Append character to buffer
+					if (requestLen < MaximumRequestSize)
+					{
+						client.request[requestLen++] = c;
+						client.request[requestLen] = '\0';
+						client.lastActivity = now;
+					}
+
+					// Safety check for request size
+					if (requestLen >= MaximumRequestSize)
+					{
+						sendDebug(F("Request too large"), F("WifiServer"));
+						send400(*client.client, false);
+						cleanupClient(index);
+						return;
+					}
+
+					// Determine if the full request (headers + any body) has been received.
+					// For GET: complete once we see the blank line (\r\n\r\n).
+					// For POST: complete once Content-Length body bytes have also been read.
+					// Content-Length is only honoured for methods that carry a body (POST);
+					// applying it to GET would stall completion if the client sends a
+					// Content-Length header (some clients do).
+					const char* headerEnd = strstr(client.request, "\r\n\r\n");
+					if (headerEnd)
+					{
+						size_t headerEndIdx = (headerEnd - client.request) + 4;
+						size_t bodyRequired = 0;
+
+						if (strncmp(client.request, "POST", 4) == 0)
+						{
+							const char* clHeader = strstr(client.request, "Content-Length:");
+							if (clHeader)
+							{
+								clHeader += 15;
+								while (*clHeader == ' ') clHeader++;
+								int32_t cl = atoi(clHeader);
+
+								if (cl < 0 || static_cast<size_t>(cl) > MaximumRequestSize - headerEndIdx)
+								{
+									sendDebug(F("Invalid Content-Length"), F("WifiServer"));
+									send400(*client.client, false);
+									cleanupClient(index);
+									return;
+								}
+
+								bodyRequired = static_cast<size_t>(cl);
+							}
+						}
+
+						if (requestLen >= headerEndIdx + bodyRequired)
+						{
+							requestComplete = true;
+							char msg[48];
+							snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
+							sendDebug(msg, F("WifiServer"));
+							break;  // Exit read loop — any further bytes belong to the next request
+						}
+					}
 				}
 
-				// Check for end of HTTP headers (\r\n\r\n)
-				if (requestLen >= 4 && 
-					client.request[requestLen - 4] == '\r' &&
-					client.request[requestLen - 3] == '\n' &&
-					client.request[requestLen - 2] == '\r' &&
-					client.request[requestLen - 1] == '\n')
+				// Transition to processing if request is complete
+				if (requestComplete)
 				{
-					requestComplete = true;
-					char msg[48];
-					snprintf(msg, sizeof(msg), "Request complete [slot %d, %d bytes]", index, requestLen);
-					sendDebug(msg, F("WifiServer"));
-					break;
+					client.state = ClientHandlingState::ProcessingRequest;
 				}
 
-				// Safety check for request size
-				if (requestLen >= MaximumRequestSize)
-				{
-					sendDebug(F("Request too large"), F("WifiServer"));
-					send400(*client.client, false);
-					cleanupClient(index);
-					return;
-				}
-			}
-
-			// Transition to processing if request is complete
-			if (requestComplete)
-			{
-				client.state = ClientHandlingState::ProcessingRequest;
-			}
-
-			break;
+				break;
 		}
 
 		case ClientHandlingState::ProcessingRequest:
@@ -573,8 +602,8 @@ void WifiServer::processClientRequest(uint8_t index)
 		return;
 	}
 
-	// Only support GET for now
-	if (strcmp(method, "GET") != 0)
+	// Only support GET and POST
+	if (strcmp(method, "GET") != 0 && strcmp(method, "POST") != 0)
 	{
 		send404(*client.client, isPersistent);
 		if (!isPersistent)
@@ -671,6 +700,37 @@ void WifiServer::processClientRequest(uint8_t index)
 	sendDebug(F("Processing request"), F("WifiServer"));
 	bool handled = false;
 
+	// For POST requests, locate the body (bytes after the blank line \r\n\r\n)
+	// and null-terminate at exactly Content-Length bytes to prevent the parser
+	// reading into any pipelined request that may follow in the same buffer.
+	const char* body = nullptr;
+	if (strcmp(method, "POST") == 0)
+	{
+		const char* bodyStart = strstr(client.request, "\r\n\r\n");
+		if (bodyStart)
+		{
+			bodyStart += 4;
+
+			int32_t contentLength = 0;
+			const char* clHeader = strstr(client.request, "Content-Length:");
+			if (clHeader)
+			{
+				clHeader += 15;
+				while (*clHeader == ' ') clHeader++;
+				contentLength = atoi(clHeader);
+			}
+
+			// Clamp to what is actually in the buffer, then null-terminate so
+			// the parser cannot stray beyond the intended body.
+			size_t available = strlen(bodyStart);
+			size_t bodyLen = (contentLength > 0 && static_cast<size_t>(contentLength) < available)
+								 ? static_cast<size_t>(contentLength)
+								 : available;
+			client.request[bodyStart - client.request + bodyLen] = '\0';
+			body = bodyStart;
+		}
+	}
+
 	if (SystemFunctions::startsWith(path, F("/api/index")))
 	{
 		handleIndex(*client.client, client.isPersistent, path);
@@ -684,7 +744,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		{
 			if (_handlers[i] && SystemFunctions::startsWith(path, _handlers[i]->getRoute()))
 			{
-				handled = dispatchToHandler(*client.client, _handlers[i], path, method, query, isPersistent);
+				handled = dispatchToHandler(*client.client, _handlers[i], path, method, query, body, isPersistent);
 				break;
 			}
 		}
@@ -878,7 +938,7 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 	return true;
 }
 
-bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, bool isPersistent)
+bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* handler, const char* path, const char* method, const char* query, const char* body, bool isPersistent)
 {
 	if (!handler)
 	{
@@ -924,39 +984,76 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 	    }
 	}
 
-	// Parse query string into parameter array (max 6 parameters)
+	// Parse parameters:
+	//   POST requests → newline-delimited key=value lines from the body
+	//   GET  requests → '&'-delimited key=value pairs from the query string
 	StringKeyValue params[MaximumParameterCount] = {};
 	uint8_t paramCount = 0;
-	uint16_t queryLength = SystemFunctions::calculateLength(query);
 
-	if (queryLength > 0)
+	if (strcmp(method, "POST") == 0 && body && body[0] != '\0')
 	{
-		uint8_t startIdx = 0;
+		// Body format supports two styles:
+		//   Newline-delimited:  "key=value\nkey=value\n..."
+		//   Semicolon-delimited: "key=value;key=value;..."  (serial/dat-file style)
+		// Both styles are parsed identically — split on '\n', '\r', or ';'.
+		const char* lineStart = body;
 
-		while (paramCount < MaximumParameterCount && startIdx < queryLength)
+		while (paramCount < MaximumParameterCount && lineStart && *lineStart != '\0')
 		{
-			// Find the next '&' or end of string
-			int32_t ampIdx = SystemFunctions::indexOf(query, '&', startIdx);
-			if (ampIdx == -1)
+			// Find end of token (newline or semicolon delimiter)
+			const char* lineEnd = lineStart;
+			while (*lineEnd && *lineEnd != '\n' && *lineEnd != '\r' && *lineEnd != ';') lineEnd++;
+
+			size_t lineLen = lineEnd - lineStart;
+			if (lineLen > 0 && lineLen < DefaultMaxParamKeyLength + DefaultMaxParamValueLength + 1)
 			{
-				ampIdx = queryLength;
+				char line[DefaultMaxParamKeyLength + DefaultMaxParamValueLength + 2];
+				strncpy(line, lineStart, lineLen);
+				line[lineLen] = '\0';
+
+				int32_t eqIdx = SystemFunctions::indexOf(line, '=', 0);
+				if (eqIdx > 0)
+				{
+					SystemFunctions::substr(params[paramCount].key,   sizeof(params[paramCount].key),   line, 0, eqIdx);
+					SystemFunctions::substr(params[paramCount].value, sizeof(params[paramCount].value), line, eqIdx + 1);
+					paramCount++;
+				}
 			}
 
-			// Extract this parameter
-			char param[DefaultMaxParamKeyLength];
-			SystemFunctions::substr(param, sizeof(param), query, startIdx, ampIdx - startIdx);
+			// Advance past delimiter(s)
+			lineStart = lineEnd;
+			while (*lineStart == '\r' || *lineStart == '\n' || *lineStart == ';') lineStart++;
+		}
+	}
+	else
+	{
+		uint16_t queryLength = SystemFunctions::calculateLength(query);
 
-			// Split on '='
-			int32_t equalsIdx = SystemFunctions::indexOf(param, '=', 0);
+		if (queryLength > 0)
+		{
+			uint8_t startIdx = 0;
 
-			if (equalsIdx != -1)
+			while (paramCount < MaximumParameterCount && startIdx < queryLength)
 			{
-				SystemFunctions::substr(params[paramCount].key, sizeof(params[paramCount].key), param, 0, equalsIdx);
-				SystemFunctions::substr(params[paramCount].value, sizeof(params[paramCount].value), param, equalsIdx + 1);
-				paramCount++;
-			}
+				int32_t ampIdx = SystemFunctions::indexOf(query, '&', startIdx);
+				if (ampIdx == -1)
+				{
+					ampIdx = queryLength;
+				}
 
-			startIdx = ampIdx + 1;
+				char param[DefaultMaxParamKeyLength];
+				SystemFunctions::substr(param, sizeof(param), query, startIdx, ampIdx - startIdx);
+
+				int32_t equalsIdx = SystemFunctions::indexOf(param, '=', 0);
+				if (equalsIdx != -1)
+				{
+					SystemFunctions::substr(params[paramCount].key,   sizeof(params[paramCount].key),   param, 0, equalsIdx);
+					SystemFunctions::substr(params[paramCount].value, sizeof(params[paramCount].value), param, equalsIdx + 1);
+					paramCount++;
+				}
+
+				startIdx = ampIdx + 1;
+			}
 		}
 	}
 
