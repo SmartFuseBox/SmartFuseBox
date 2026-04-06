@@ -210,7 +210,7 @@ void MQTTSystemHandler::handleTimeUpdate(const char* payload)
     if (_commandMgr != nullptr)
     {
         char buf[100];
-        snprintf(buf, sizeof(buf), "Time synced: %lu", timestamp);
+        snprintf(buf, sizeof(buf), "Time synced: %llu", timestamp);
         _commandMgr->sendDebug(buf, F("MQTT System"));
     }
 }

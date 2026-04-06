@@ -24,6 +24,9 @@
 #include "RemoteSensor.h"
 #include "SharedBaseCommandHandler.h"
 
+ //forward declaration
+class RemoteSensor;
+
 class SensorCommandHandler : public SharedBaseCommandHandler
 {
 private:
