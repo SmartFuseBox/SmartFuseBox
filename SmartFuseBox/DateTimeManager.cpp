@@ -17,14 +17,14 @@
  */
 #include "DateTimeManager.h"
 
-constexpr unsigned long DefaultTimestamp = 1735689600UL;
+constexpr uint64_t DefaultTimestamp = 1735689600UL;
 
 #if defined(BOAT_CONTROL_PANEL)
 RtcDS1302Driver DateTimeManager::_rtcDriver;
 #endif
 
-unsigned long DateTimeManager::_syncedTimestamp = 0;
-unsigned long DateTimeManager::_syncedMillis = 0;
+uint64_t DateTimeManager::_syncedTimestamp = 0;
+uint64_t DateTimeManager::_syncedMillis = 0;
 bool DateTimeManager::_isSet = false;
 int8_t DateTimeManager::_timezoneOffset = 0;
 
@@ -35,7 +35,7 @@ void DateTimeManager::begin()
 
 	if (_rtcDriver.isAvailable())
 	{
-		unsigned long rtcTimestamp = _rtcDriver.readTimestamp();
+        uint64_t rtcTimestamp = _rtcDriver.readTimestamp();
 		if (rtcTimestamp > 0)
 		{
 			setDateTime(rtcTimestamp);
@@ -53,10 +53,10 @@ void DateTimeManager::setDateTime()
     setDateTime(DefaultTimestamp);
 }
 
-void DateTimeManager::setDateTime(unsigned long unixTimestamp)
+void DateTimeManager::setDateTime(uint64_t unixTimestamp)
 {
     _syncedTimestamp = unixTimestamp;
-    _syncedMillis = millis();
+    _syncedMillis = SystemFunctions::millis64();
     _isSet = true;
 
 #if defined(BOAT_CONTROL_PANEL)
@@ -99,35 +99,27 @@ bool DateTimeManager::setDateTimeISO(const char* isoDateTime)
     }
 
     // Convert to Unix timestamp and store
-    unsigned long timestamp = dateTimeToUnix(year, month, day, hour, minute, second);
+    uint64_t timestamp = dateTimeToUnix(year, month, day, hour, minute, second);
     setDateTime(timestamp);
     return true;
 }
 
-unsigned long DateTimeManager::getCurrentTime()
+uint64_t DateTimeManager::getCurrentTime()
 {
     if (!_isSet)
     {
         return 0;
     }
 
-    unsigned long currentMillis = millis();
-    unsigned long elapsedMillis;
+    uint64_t elapsedMillis = SystemFunctions::millis64() - _syncedMillis;
+    uint64_t elapsedSeconds = elapsedMillis / 1000;
+    uint64_t utcTime = _syncedTimestamp + elapsedSeconds;
 
-    if (currentMillis >= _syncedMillis)
-    {
-        elapsedMillis = currentMillis - _syncedMillis;
-    }
+    int32_t offsetSeconds = static_cast<int32_t>(_timezoneOffset) * 3600;
+    if (offsetSeconds >= 0)
+        return utcTime + static_cast<uint64_t>(offsetSeconds);
     else
-    {
-        elapsedMillis = (0xFFFFFFFF - _syncedMillis) + currentMillis + 1;
-    }
-
-    unsigned long elapsedSeconds = elapsedMillis / 1000;
-    unsigned long utcTime = _syncedTimestamp + elapsedSeconds;
-
-    long offsetSeconds = static_cast<long>(_timezoneOffset) * 3600L;
-    return utcTime + offsetSeconds;
+        return utcTime - static_cast<uint64_t>(-offsetSeconds);
 }
 
 bool DateTimeManager::isTimeSet()
@@ -135,23 +127,14 @@ bool DateTimeManager::isTimeSet()
     return _isSet;
 }
 
-unsigned long DateTimeManager::getSecondsSinceSync()
+uint64_t DateTimeManager::getSecondsSinceSync()
 {
     if (!_isSet)
     {
         return 0;
     }
 
-    unsigned long currentMillis = millis();
-    unsigned long elapsedMillis;
-    
-    if (currentMillis >= _syncedMillis)
-    {
-        elapsedMillis = currentMillis - _syncedMillis;
-    } else {
-        elapsedMillis = (0xFFFFFFFF - _syncedMillis) + currentMillis + 1;
-    }
-
+    uint64_t elapsedMillis = SystemFunctions::millis64() - _syncedMillis;
     return elapsedMillis / 1000;
 }
 
@@ -240,7 +223,7 @@ bool DateTimeManager::formatDateTime(char* buffer, const uint8_t bufferLength)
         return false;
     }
 
-    unsigned long currentTime = getCurrentTime();
+    uint64_t currentTime = getCurrentTime();
     uint16_t year;
     uint8_t month, day, hour, minute, second;
     unixToDateTime(currentTime, year, month, day, hour, minute, second);
@@ -257,7 +240,7 @@ bool DateTimeManager::formatDateTimeReadable(char* buffer, const uint8_t bufferL
         return false;
     }
 
-    unsigned long currentTime = getCurrentTime();
+    uint64_t currentTime = getCurrentTime();
     uint16_t year;
     uint8_t month, day, hour, minute, second;
     unixToDateTime(currentTime, year, month, day, hour, minute, second);
@@ -287,7 +270,7 @@ int8_t DateTimeManager::getTimezoneOffset()
     return _timezoneOffset;
 }
 
-unsigned long DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint8_t day,
+uint64_t DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint8_t day,
     uint8_t hour, uint8_t minute, uint8_t second)
 {
     // Simple Unix timestamp calculation (no timezone, no leap seconds)
@@ -295,7 +278,7 @@ unsigned long DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint
     const uint8_t daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
     // Calculate days since epoch (Jan 1, 1970)
-    unsigned long days = 0;
+    uint64_t days = 0;
     
     // Years
     for (uint16_t y = 1970; y < year; y++)
@@ -323,7 +306,7 @@ unsigned long DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint
     days += day - 1;
     
     // Convert to seconds and add time components
-    unsigned long timestamp = days * 86400UL;  // 86400 seconds per day
+    uint64_t timestamp = days * 86400UL;  // 86400 seconds per day
     timestamp += hour * 3600UL;
     timestamp += minute * 60UL;
     timestamp += second;
@@ -331,7 +314,7 @@ unsigned long DateTimeManager::dateTimeToUnix(uint16_t year, uint8_t month, uint
     return timestamp;
 }
 
-void DateTimeManager::unixToDateTime(unsigned long unixTime, uint16_t& year, uint8_t& month, uint8_t& day,
+void DateTimeManager::unixToDateTime(uint64_t unixTime, uint16_t& year, uint8_t& month, uint8_t& day,
     uint8_t& hour, uint8_t& minute, uint8_t& second)
 {
     // Extract time components
@@ -340,7 +323,7 @@ void DateTimeManager::unixToDateTime(unsigned long unixTime, uint16_t& year, uin
     minute = unixTime % 60;
     unixTime /= 60;
     hour = unixTime % 24;
-    unsigned long days = unixTime / 24;
+    uint64_t days = unixTime / 24;
     
     // Calculate year
     year = 1970;

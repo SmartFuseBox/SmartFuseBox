@@ -25,7 +25,7 @@
 #include "SystemFunctions.h"
 
 constexpr uint8_t MaxRemoteParams = 5;
-constexpr unsigned long RemoteSensorDefaultUpdateIntervalMs = 60000; // 60s
+constexpr uint64_t RemoteSensorDefaultUpdateIntervalMs = 60000; // 60s
 
 // Generic remote sensor base - listens for MqttMessageReceived events and
 // receives updates from remote sensors via SensorCommandHandler.
@@ -91,7 +91,7 @@ public:
     {
     }
 
-    unsigned long update() override
+    uint64_t update() override
     {
 		// no need for polling, updates are triggered by SensorCommandHandler 
         // when a command is received, so just return a long delay here

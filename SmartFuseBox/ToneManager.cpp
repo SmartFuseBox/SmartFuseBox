@@ -16,6 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include "ToneManager.h"
+#include "SystemFunctions.h"
 
 ToneManager::ToneManager(uint8_t pin)
     : _pin(pin),
@@ -42,7 +43,7 @@ void ToneManager::play(ToneType type)
     {
         _playing = true;
         _currentStep = 0;
-        _stepStartTime = millis();
+        _stepStartTime = SystemFunctions::millis64();
         startCurrentStep();
     }
 }
@@ -69,12 +70,12 @@ uint32_t ToneManager::getRepeatIntervalMs() const
     return _config ? _config->badRepeatMs : 30000;
 }
 
-void ToneManager::update(unsigned long now)
+void ToneManager::update(uint64_t now)
 {
     if (!_playing)
         return;
 
-    if (now - _stepStartTime >= _steps[_currentStep].durationMs)
+    if (SystemFunctions::hasElapsed(_stepStartTime, _steps[_currentStep].durationMs))
     {
         _currentStep++;
 

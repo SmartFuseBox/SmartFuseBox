@@ -49,7 +49,7 @@ class ToneManager;
  * WarningManager warningMgr(&commandMgrLink);
  * 
  * // In loop or refresh:
- * warningMgr.update(millis());
+ * warningMgr.update(SystemFunctions::millis64());
  * 
  * // When ACK:F0=ok received:
  * warningMgr.notifyHeartbeatAck();
@@ -76,14 +76,14 @@ private:
 	uint32_t _remoteWarnings;               // Bitmap of REMOTE warnings (from connected device)
 #if defined(BOAT_CONTROL_PANEL)
 	uint32_t _previousWarnings;             // Previous warning state for change detection
-	unsigned long _lastTonePlayed;          // Last time bad tone was played
+    uint64_t _lastTonePlayed;          // Last time bad tone was played
 #endif
 
     // Heartbeat state
-    unsigned long _heartbeatInterval;       // How often to send heartbeat (ms)
-    unsigned long _heartbeatTimeout;        // Timeout before connection lost (ms)
-    unsigned long _lastHeartbeatSent;       // When last heartbeat was sent
-    unsigned long _lastHeartbeatReceived;   // When last ack was received
+    uint64_t _heartbeatInterval;       // How often to send heartbeat (ms)
+    uint64_t _heartbeatTimeout;        // Timeout before connection lost (ms)
+    uint64_t _lastHeartbeatSent;       // When last heartbeat was sent
+    uint64_t _lastHeartbeatReceived;   // When last ack was received
     bool _heartbeatEnabled;                 // Is heartbeat active
 
     /**
@@ -95,7 +95,7 @@ private:
      * @brief Update connection state based on heartbeat.
      * @param now Current time in milliseconds
      */
-    void updateConnection(unsigned long now);
+    void updateConnection(uint64_t now);
 
     /**
      * @brief Broadcast warning change to connected device via LINK.
@@ -118,8 +118,8 @@ public:
      * @param heartbeatTimeout Timeout before connection considered lost in milliseconds
 	 * @param warningStatus Pointer to RgbLedFade for warning status LED
      */
-    explicit WarningManager(SerialCommandManager* commandMgr, unsigned long heartbeatInterval,
-        unsigned long heartbeatTimeout
+    explicit WarningManager(SerialCommandManager* commandMgr, uint64_t heartbeatInterval,
+        uint64_t heartbeatTimeout
 #if defined(BOAT_CONTROL_PANEL)
         , RgbLedFade* warningStatus, ToneManager* toneManager = nullptr);
 #else
@@ -128,9 +128,9 @@ public:
     /**
      * @brief Update heartbeat and check for timeouts.
      * Call this periodically (e.g., from refresh()).
-     * @param now Current time in milliseconds (from millis())
+     * @param now Current time in milliseconds (SystemFunctions::millis64())
      */
-    void update(unsigned long now);
+    void update(uint64_t now);
 
     /**
      * @brief Notify that a heartbeat acknowledgement was received.

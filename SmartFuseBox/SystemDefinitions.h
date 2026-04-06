@@ -163,8 +163,8 @@ constexpr char AckSuccess[] = "ok";
 constexpr char ValueParamName[] = "v";
 
 
-constexpr unsigned long HeartbeatIntervalMs = 1000;
-constexpr unsigned long HeartbeatTimeoutMs = 3000;
+constexpr uint64_t HeartbeatIntervalMs = 1000;
+constexpr uint64_t HeartbeatTimeoutMs = 3000;
 
 
 constexpr uint8_t ConfigMaxLinkedRelays = 2;
@@ -182,7 +182,7 @@ constexpr char HexPrefix[] = "0x";
 constexpr char CelsiusSuffix[] = "C";
 
 
-constexpr unsigned long SerialInitTimeoutMs = 300;
+constexpr uint64_t SerialInitTimeoutMs = 300;
 constexpr uint16_t SerialPollingDelayMs = 10;
 constexpr uint16_t SerialStabilizationDelayMs = 100;
 

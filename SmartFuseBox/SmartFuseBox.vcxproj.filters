@@ -214,6 +214,15 @@
     <ClCompile Include="OtaManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BinaryPresenceSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryPresenceSensor.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WifiCommandBridge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
@@ -465,10 +474,17 @@
     <ClInclude Include="OtaManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FirmwareVersion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WifiCommandBridge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Wifi.md" />
     <None Include="Docs\Sensors.md" />
     <None Include="Docs\Commands.md" />
+    <None Include="SmartFuseBox\Docs\Commands.md" />
   </ItemGroup>
 </Project>

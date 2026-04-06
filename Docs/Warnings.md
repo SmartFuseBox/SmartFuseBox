@@ -94,7 +94,7 @@ uint32_t local  = warningManager.getLocalWarningsMask();
 uint32_t remote = warningManager.getRemoteWarningsMask();
 
 // Called from the main loop — drives heartbeat and connection state
-warningManager.update(millis());
+warningManager.update(SystemFunctions::millis64());
 
 // Called from AckCommandHandler when ACK:F0=ok arrives
 warningManager.notifyHeartbeatAck();

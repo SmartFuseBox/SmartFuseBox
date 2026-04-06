@@ -114,9 +114,9 @@ void* BluetoothSensorService::getBLEService()
     return _service;
 }
 
-void BluetoothSensorService::loop(unsigned long currentMillis)
+void BluetoothSensorService::loop(uint64_t currentMillis)
 {
-    if (currentMillis - _lastUpdate >= UpdateIntervalMs)
+    if (SystemFunctions::hasElapsed(currentMillis, _lastUpdate, UpdateIntervalMs))
     {
         updateAll();
         _lastUpdate = currentMillis;

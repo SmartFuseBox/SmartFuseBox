@@ -16,18 +16,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include "SystemCpuMonitor.h"
+#include "SystemFunctions.h"
 
 
-unsigned long SystemCpuMonitor::_busyTimeMicros = 0;
-unsigned long SystemCpuMonitor::_windowStartMillis = 0;
-unsigned long SystemCpuMonitor::_taskStartMicros = 0;
+uint64_t SystemCpuMonitor::_busyTimeMicros = 0;
+uint64_t SystemCpuMonitor::_windowStartMillis = 0;
+uint64_t SystemCpuMonitor::_taskStartMicros = 0;
 uint8_t SystemCpuMonitor::_lastCpuPercent = 0;
 bool SystemCpuMonitor::_taskTiming = false;
-unsigned long SystemCpuMonitor::_windowSizeMs = CPU_MONITOR_WINDOW_MS;
+uint64_t SystemCpuMonitor::_windowSizeMs = CPU_MONITOR_WINDOW_MS;
 
 constexpr uint16_t MinimumWindowMonitorTime = 100;
 constexpr uint16_t MaximumWindowMonitorTime = 2000;
-constexpr unsigned long MilliSecondsPerSeconds = 1000;
+constexpr uint64_t MilliSecondsPerSeconds = 1000;
 constexpr uint8_t MaxCpuPercentage = 100;
 constexpr uint8_t PercentageMultiplier = 100;
 
@@ -58,7 +59,7 @@ uint8_t SystemCpuMonitor::getCpuUsage()
 
 void SystemCpuMonitor::update()
 {
-    unsigned long now = millis();
+    uint64_t now = SystemFunctions::millis64();
     
     // Initialize on first call
     if (_windowStartMillis == 0)
@@ -68,11 +69,11 @@ void SystemCpuMonitor::update()
     }
     
     // Calculate when window expires
-    unsigned long elapsed = now - _windowStartMillis;
+    uint64_t elapsed = now - _windowStartMillis;
     if (elapsed >= _windowSizeMs)
     {
         // Convert window size to microseconds for calculation
-        unsigned long windowMicros = _windowSizeMs * MilliSecondsPerSeconds;
+        uint64_t windowMicros = _windowSizeMs * MilliSecondsPerSeconds;
         
         // CPU % = (busy time / total time) * 100
         _lastCpuPercent = min(MaxCpuPercentage, (uint8_t)((_busyTimeMicros * PercentageMultiplier) / windowMicros));
@@ -83,7 +84,7 @@ void SystemCpuMonitor::update()
     }
 }
 
-void SystemCpuMonitor::setWindowSize(unsigned long milliseconds)
+void SystemCpuMonitor::setWindowSize(uint64_t milliseconds)
 {
     // Enforce reasonable limits: 100ms to 2 seconds
     if (milliseconds < MinimumWindowMonitorTime)

@@ -27,7 +27,7 @@
 #include "BaseSensor.h"
 #include "MessageBus.h"
 
-constexpr unsigned long TempHumidityCheckMs = 2500;
+constexpr uint64_t TempHumidityCheckMs = 2500;
 
 /**
  * @brief Sensor handler for DHT11 monitoring.
@@ -175,7 +175,7 @@ protected:
 	{
 	}
 
-	unsigned long update() override
+	uint64_t update() override
 	{
 		sendDebug("Reading DHT11 sensor...", _name);
 

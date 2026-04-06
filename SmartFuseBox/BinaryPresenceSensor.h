@@ -26,7 +26,7 @@
 #include "RelayController.h"
 #include "SensorCommandHandler.h"
 
-constexpr unsigned long BinaryPresenceCheckMs = 300;
+constexpr uint64_t BinaryPresenceCheckMs = 300;
 
 /**
  * @brief Sensor handler for binary presence monitoring.
@@ -44,7 +44,7 @@ private:
 	const uint8_t _sensorPin;
 	int _activeState; // HIGH or LOW depending on sensor type
 	int _lastState;
-	unsigned long _lastChangeMs;
+	uint64_t _lastChangeMs;
 
 	ExecutionActionType _onDetectedAction;
 	uint8_t _onDetectedPayload[ConfigSchedulerPayloadSize];
@@ -52,10 +52,10 @@ private:
 	uint8_t _onClearPayload[ConfigSchedulerPayloadSize];
 
 	// Pulse state for sensor-triggered direct actions (single dedicated slot)
-	bool          _directPulseActive;
-	unsigned long _directPulseStartMs;
-	unsigned long _directPulseDurMs;
-	uint8_t       _directPulseRelayIdx;
+	bool _directPulseActive;
+	uint64_t _directPulseStartMs;
+	uint64_t _directPulseDurMs;
+	uint8_t _directPulseRelayIdx;
 
 
 #if defined(MQTT_SUPPORT)
@@ -67,7 +67,7 @@ private:
 
 protected:
 	void initialize() override;
-	unsigned long update() override;
+	uint64_t update() override;
 
 public:
 	BinaryPresenceSensor(MessageBus* messageBus, BroadcastManager* broadcastManager, SensorCommandHandler* sensorCommandHandler,

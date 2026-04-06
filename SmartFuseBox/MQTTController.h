@@ -20,6 +20,7 @@
 #include "MQTTClient.h"
 #include "MessageBus.h"
 #include "IWifiRadio.h"
+#include "SystemFunctions.h"
 
 // Forward declarations
 struct Config;
@@ -35,13 +36,14 @@ private:
     
     // Connection management
     uint8_t _retryCount;
-    unsigned long _lastRetryTime;
+    uint64_t _lastRetryTime;
+    uint64_t _lastDebugTime;
     bool _isEnabled;
     
     SerialCommandManager* _commandMgr;
 
     // Statistics
-    unsigned long _connectedSince;
+    uint64_t _connectedSince;
     uint32_t _reconnectCount;
     
     // Internal helpers
@@ -78,7 +80,7 @@ public:
     
     // Statistics
     uint32_t getReconnectCount() const;
-    unsigned long getUptime() const;
+    uint64_t getUptime() const;
     
     // Access to client for advanced usage
     MQTTClient* getClient();

@@ -23,13 +23,13 @@
 #include "MessageBus.h"
 #include "ConfigManager.h"
 
-constexpr int16_t       SunTimeUnknown         = -1;
-constexpr unsigned long ScheduleCheckIntervalMs = 1000UL;
+constexpr int16_t SunTimeUnknown = -1;
+constexpr uint64_t ScheduleCheckIntervalMs = 1000UL;
 
-constexpr uint16_t      MinutesPerDay    = 1440u;
-constexpr unsigned long MsPerMinute      = 60000UL;
-constexpr unsigned long MsPerSecond      = 1000UL;
-constexpr uint16_t      NeverFiredMinute = 0xFFFFu;
+constexpr uint16_t MinutesPerDay = 1440u;
+constexpr uint64_t MsPerMinute = 60000UL;
+constexpr uint64_t MsPerSecond = 1000UL;
+constexpr uint16_t NeverFiredMinute = 0xFFFFu;
 
 class ScheduleController
 {
@@ -40,9 +40,9 @@ private:
     // Per-event runtime state (not persisted — reset on boot)
     uint32_t      _lastFiredDay[ConfigMaxScheduledEvents];       // packed YYYYMMDD of last fire
     uint16_t      _lastFiredMinute[ConfigMaxScheduledEvents];    // minute-of-day (0-1439) of last fire
-    unsigned long _lastIntervalFireMs[ConfigMaxScheduledEvents]; // millis() of last interval fire
-    unsigned long _pulseStartMs[ConfigMaxScheduledEvents];       // millis() when pulse started
-    unsigned long _pulseDurMs[ConfigMaxScheduledEvents];         // pulse duration in ms
+    uint64_t _lastIntervalFireMs[ConfigMaxScheduledEvents]; // SystemFunctions::millis64() of last interval fire
+    uint64_t _pulseStartMs[ConfigMaxScheduledEvents];       // SystemFunctions::millis64() when pulse started
+    uint64_t _pulseDurMs[ConfigMaxScheduledEvents];         // pulse duration in ms
     uint8_t       _pulseRelayIdx[ConfigMaxScheduledEvents];      // relay index for active pulse
     bool          _pulseActive[ConfigMaxScheduledEvents];        // true while pulse relay is on
 
@@ -55,16 +55,16 @@ private:
     int16_t _sunsetMinutes;  // local minutes from midnight, SunTimeUnknown if unavailable
     uint32_t _sunCalcDay;    // packed YYYYMMDD for which sun times were computed
 
-    unsigned long _lastCheckMs;
+    uint64_t _lastCheckMs;
 
     // Returns true when the trigger for event idx is due to fire right now
     bool isTriggerDue(uint8_t idx,
-                      const ScheduledEvent& ev,
-                      uint8_t hour, uint8_t minute,
-                      uint8_t dowBit,
-                      uint8_t day, uint8_t month,
-                      uint32_t today,
-                      unsigned long nowMs);
+        const ScheduledEvent& ev,
+        uint8_t hour, uint8_t minute,
+        uint8_t dowBit,
+        uint8_t day, uint8_t month,
+        uint32_t today,
+        uint64_t now);
 
     // Returns true when all conditions for the event are satisfied
     bool isConditionMet(const ScheduledEvent& ev,
@@ -72,10 +72,10 @@ private:
                         uint8_t dowBit) const;
 
     // Executes the action associated with an event
-    void executeAction(uint8_t idx, const ScheduledEvent& ev, unsigned long nowMs);
+    void executeAction(uint8_t idx, const ScheduledEvent& ev, uint64_t now);
 
     // Turns off any relay pulses whose duration has expired
-    void updatePulses(unsigned long nowMs);
+    void updatePulses(uint64_t now);
 
     // Recomputes sunrise/sunset minute-of-day values for the given date
     void recomputeSunTimes(uint16_t year, uint8_t month, uint8_t day);
@@ -97,6 +97,5 @@ public:
     // Subscribe to MessageBus events — call once during setup
     void begin();
 
-    // Called every loop iteration; nowMs = millis()
-    void update(unsigned long nowMs);
+    void update(uint64_t now);
 };

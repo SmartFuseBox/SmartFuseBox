@@ -62,7 +62,7 @@ private:
 	uint8_t _soundRelayIndex;
 	
 	uint8_t _currentBlastIndex;
-	unsigned long _stateStartTime;
+	uint64_t _stateStartTime;
 	
 	const SoundPattern* _currentPattern;
 	

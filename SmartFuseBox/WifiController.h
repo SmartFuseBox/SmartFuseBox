@@ -29,7 +29,7 @@
 #include "WarningManager.h"
 #include "MessageBus.h"
 
-constexpr unsigned long LedUpdateIntevalMs = 300;
+constexpr uint64_t LedUpdateIntevalMs = 300;
 class WifiController : public IWifiController
 {
 private:
@@ -43,7 +43,7 @@ private:
     uint16_t _port = 80;
     NetworkJsonVisitor** _jsonVisitors;
     uint8_t _jsonVisitorCount;
-	unsigned long _lastUpdateTime;
+    uint64_t _lastUpdateTime;
 
     bool isConfigValid(const Config* cfg) const
     {
@@ -200,7 +200,7 @@ public:
         }
     }
 
-	void update(unsigned long now) override
+	void update(uint64_t now) override
 	{
 		if (_enabled && _wifiServer)
 		{

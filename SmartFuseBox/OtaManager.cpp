@@ -59,7 +59,7 @@ void OtaManager::begin()
         _broadcaster->sendDebug("OTA: auto-check enabled, 24h interval", "OTA");
 }
 
-void OtaManager::update(unsigned long now)
+void OtaManager::update(uint64_t now)
 {
     // Only run at most once per second — avoids burning CPU on every loop() tick.
     if (now < _nextUpdateMs)
@@ -703,7 +703,7 @@ bool OtaManager::downloadAndApply(const char* tag, const char* expectedHash)
     uint8_t buf[OtaDownloadBufSize];
     int remaining = contentLength;
     int lastProgressPct = 0;
-    unsigned long deadline = SystemFunctions::millis64() + 120000UL;  // 2-minute download budget
+    uint64_t deadline = SystemFunctions::millis64() + 120000UL;  // 2-minute download budget
 
     while (remaining > 0 && SystemFunctions::millis64() < deadline)
     {

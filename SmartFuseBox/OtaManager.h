@@ -24,13 +24,14 @@
 #include <Arduino.h>
 #include "BroadcastManager.h"
 #include "IWifiController.h"
+#include "SystemFunctions.h"
 
 // How often to poll GitHub for a new release when no manual trigger is active.
-constexpr unsigned long OtaCheckIntervalMs = 24UL * 60UL * 60UL * 1000UL;
+constexpr uint64_t OtaCheckIntervalMs = 24UL * 60UL * 60UL * 1000UL;
 
 // How often update() checks whether a timed or triggered action is due.
 // Keeps the method near-zero cost between checks.
-constexpr unsigned long OtaUpdatePollMs = 10000UL;
+constexpr uint64_t OtaUpdatePollMs = 10000UL;
 
 // GitHub repository owner and name — update if the repo is ever moved.
 constexpr char OtaGithubOwner[] = "SmartFuseBox";
@@ -117,8 +118,8 @@ private:
     IWifiController* _wifiController;
     BroadcastManager* _broadcaster;
     OtaState _state;
-    unsigned long _lastCheckMs;
-    unsigned long _nextUpdateMs;
+    uint64_t _lastCheckMs;
+    uint64_t _nextUpdateMs;
     char _availableVersion[16];
     bool _triggerCheck;
     bool _triggerApply;
@@ -140,7 +141,7 @@ public:
     void begin();
 
     // Call every iteration of SmartFuseBoxApp::loop().
-    void update(unsigned long now);
+    void update(uint64_t now);
 
     // Request an immediate version check. Pass applyIfAvailable = true to also
     // apply the update without waiting for the auto-apply flag (one-shot manual update).

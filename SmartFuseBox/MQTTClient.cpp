@@ -162,7 +162,7 @@ bool MQTTClient::connect()
     }
     
     _state = MqttConnectionState::Connecting;
-    _connectAttemptTime = millis();
+    _connectAttemptTime = SystemFunctions::millis64();
 
     // Build and send CONNECT packet
     uint16_t packetLength = buildConnectPacket(_txBuffer, sizeof(_txBuffer));
@@ -252,7 +252,7 @@ bool MQTTClient::update()
     // Handle connecting state timeout
     if (_state == MqttConnectionState::Connecting)
     {
-        unsigned long waitMs = millis() - _connectAttemptTime;
+        uint64_t waitMs = SystemFunctions::millis64() - _connectAttemptTime;
         if (waitMs > MqttConnectTimeout)
         {
             if (_commandMgr != nullptr)
@@ -281,10 +281,10 @@ bool MQTTClient::update()
     // Keep-alive management
     if (_state == MqttConnectionState::Connected)
     {
-        unsigned long now = millis();
-        unsigned long timeSinceLastSend = now - _lastSendTime;
-        unsigned long timeSinceLastReceive = now - _lastReceiveTime;
-        unsigned long keepAliveMs = _keepAlive * 1000UL;
+        uint64_t now = SystemFunctions::millis64();
+        uint64_t timeSinceLastSend = now - _lastSendTime;
+        uint64_t timeSinceLastReceive = now - _lastReceiveTime;
+        uint64_t keepAliveMs = _keepAlive * 1000ULL;
 
         // Send PINGREQ if no packet sent within keep-alive interval
         if (timeSinceLastSend > keepAliveMs)
@@ -538,7 +538,7 @@ bool MQTTClient::writePacket(const uint8_t* buffer, uint16_t length)
         return false;
     }
     
-    _lastSendTime = millis();
+    _lastSendTime = SystemFunctions::millis64();
     _packetsSent++;
     
     return true;
@@ -622,7 +622,7 @@ bool MQTTClient::readPacket()
         _rxBufferPos = 0;
         _rxPacketLength = MqttRxLengthNotDecoded;
         
-        _lastReceiveTime = millis();
+        _lastReceiveTime = SystemFunctions::millis64();
         _packetsReceived++;
         
         return result;
@@ -933,7 +933,7 @@ bool MQTTClient::processConnAck(const uint8_t* payload, uint16_t length)
     {
         raiseEvent(MqttEvent::Connected);
         _state = MqttConnectionState::Connected;
-        _lastReceiveTime = millis();
+        _lastReceiveTime = SystemFunctions::millis64();
 
         if (_connectionCallback != nullptr)
         {

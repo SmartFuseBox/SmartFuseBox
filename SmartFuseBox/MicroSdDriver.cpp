@@ -25,6 +25,7 @@
 
 #include "MicroSdDriver.h"
 #include "WarningManager.h"
+#include "SystemFunctions.h"
 #include <SPI.h>
 
 // Initialize static singleton instance
@@ -303,7 +304,7 @@ void MicroSdDriver::releaseExclusiveAccess()
     _exclusiveAccessActive = false;
 }
 
-void MicroSdDriver::update(unsigned long now)
+void MicroSdDriver::update(uint64_t now)
 {
     // Handle non-blocking initialization
     if (_initState == MicroSdInitState::Initializing)
@@ -464,8 +465,8 @@ void MicroSdDriver::updateCardInfo(bool forceExpensiveCheck)
     }
 
     // Expensive: Only recalculate free space if forced or cache is stale (> 1 hour)
-    unsigned long now = millis();
-    bool freeSpaceStale = (now - _lastFreeSpaceUpdate) >= SdFreeSpaceCacheMs;
+    uint64_t now = SystemFunctions::millis64();
+    bool freeSpaceStale = SystemFunctions::hasElapsed(now, _lastFreeSpaceUpdate, SdFreeSpaceCacheMs);
 
     if (forceExpensiveCheck || freeSpaceStale || _lastFreeSpaceUpdate == 0)
     {

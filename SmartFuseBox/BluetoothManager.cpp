@@ -130,7 +130,7 @@ bool BluetoothManager::initializeServices()
 
 void BluetoothManager::loop()
 {
-    unsigned long currentMillis = millis();
+    uint64_t currentMillis = SystemFunctions::millis64();
 
     // Poll for BLE events
     BLE.poll();

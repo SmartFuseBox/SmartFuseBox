@@ -26,8 +26,8 @@
 #include "BaseSensor.h"
 #include "MessageBus.h"
 
-constexpr unsigned long WaterSensorCheckIntervalMs = 5000;
-constexpr unsigned long WaterSensorStabilizeMs = 10;
+constexpr uint64_t WaterSensorCheckIntervalMs = 5000;
+constexpr uint64_t WaterSensorStabilizeMs = 10;
 
 /**
  * @brief Sensor handler for water level monitoring with averaging.
@@ -56,7 +56,7 @@ protected:
 	{
 	};
 
-	unsigned long update() override
+	uint64_t update() override
 	{
 		if (_waterPumpQueue.isFull())
 		{

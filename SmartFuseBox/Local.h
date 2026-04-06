@@ -84,7 +84,7 @@
 
 // ─── Serial ───────────────────────────────────────────────────────────────────
 // Maximum milliseconds to wait for serial connection before proceeding with setup.
-constexpr unsigned long serialInitTimeoutMs = 300;
+constexpr uint64_t serialInitTimeoutMs = 300;
 
 
 // ─── Sensor Pins ──────────────────────────────────────────────────────────────

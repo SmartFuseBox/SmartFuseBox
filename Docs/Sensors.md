@@ -345,7 +345,7 @@ protected:
         pinMode(_sensorPin, INPUT);
     }
 
-    unsigned long update() override
+    uint64_t update() override
     {
         _lastValue = analogRead(_sensorPin);
 

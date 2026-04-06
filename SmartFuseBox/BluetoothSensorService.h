@@ -47,7 +47,7 @@ public:
     bool begin() override;
     const char* getServiceUUID() const override;
     const char* getServiceName() const override;
-    void loop(unsigned long currentMillis) override;
+    void loop(uint64_t currentMillis) override;
     uint8_t getCharacteristicCount() const override;
     void* getBLEService() override;
 
@@ -63,9 +63,9 @@ private:
     BLEIntCharacteristic* _charWaterLevelUsage;
     BLEByteCharacteristic* _charWaterPumpActive;
 
-    unsigned long _lastUpdate;
+    uint64_t _lastUpdate;
 
-    static constexpr unsigned long UpdateIntervalMs = 1000;
+    static constexpr uint64_t UpdateIntervalMs = 1000;
 
 	void updateAll();
     void updateTemperature();

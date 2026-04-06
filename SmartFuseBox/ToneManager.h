@@ -63,7 +63,7 @@ public:
     uint32_t getRepeatIntervalMs() const;
 
     // Call from loop(); advances the step sequence
-    void update(unsigned long now);
+    void update(uint64_t now);
 
 private:
     static constexpr uint8_t MaxSteps = 16;
@@ -74,7 +74,7 @@ private:
     bool _playing;
     uint8_t _currentStep;
     uint8_t _totalSteps;
-    unsigned long _stepStartTime;
+    uint64_t _stepStartTime;
     ToneStep _steps[MaxSteps];
 
     void buildSequence(ToneType type);

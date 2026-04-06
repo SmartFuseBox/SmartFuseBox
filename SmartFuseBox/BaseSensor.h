@@ -114,7 +114,7 @@ public:
 
 	virtual void getMqttValue(uint8_t channelIndex, char* buffer, size_t size) const = 0;
 
-	virtual unsigned long getMqttPublishIntervalMs(uint8_t channelIndex) const
+	virtual uint64_t getMqttPublishIntervalMs(uint8_t channelIndex) const
 	{
 		(void)channelIndex;
 		return 1000; // Default: publish every 1 second

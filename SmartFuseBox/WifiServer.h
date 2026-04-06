@@ -30,12 +30,12 @@
 constexpr uint16_t MaximumRequestSize = 512;   // Headers ~200 bytes + POST body up to ~256 bytes
 constexpr uint8_t MaximumPathLength = 128;
 
-static constexpr unsigned long ConnectionRetryIntervalMs = 10000;
-static constexpr unsigned long ConnectionTimeoutMs = 10000;
-static constexpr unsigned long ConnectionCheckIntervalMs = 500;
-static constexpr unsigned long ClientReadTimeoutMs = 2500;
-static constexpr unsigned long RSSICheckIntervalMs = 5000;
-static constexpr unsigned long BackoffIntervalMs = 60000;
+static constexpr uint64_t ConnectionRetryIntervalMs = 10000;
+static constexpr uint64_t ConnectionTimeoutMs = 10000;
+static constexpr uint64_t ConnectionCheckIntervalMs = 500;
+static constexpr uint64_t ClientReadTimeoutMs = 2500;
+static constexpr uint64_t RSSICheckIntervalMs = 5000;
+static constexpr uint64_t BackoffIntervalMs = 60000;
 static constexpr uint8_t MaxConsecutiveFailures = 3;
 
 class WifiServer : public SingleLoggerSupport
@@ -58,27 +58,27 @@ private:
 	uint8_t _jsonVisitorCount;
 
 	// Connection tracking
-	unsigned long _lastConnectionAttempt;
-	unsigned long _connectionStartTime;
+	uint64_t _lastConnectionAttempt;
+	uint64_t _connectionStartTime;
 	uint8_t _consecutiveFailures;
 	int8_t _lastRSSI;
-	unsigned long _lastRSSICheck;
+	uint64_t _lastRSSICheck;
 	IWifiRadio* _radio;
-	unsigned long _restartTime;
+	uint64_t _restartTime;
 	// AP mode settings
 	char _ssid[MaxSSIDLength];
 	char _password[MaxWiFiPasswordLength];
 	char _ipAddress[MaxIpAddressLength];
 
 
-	static constexpr unsigned long PersistentTimeoutMs = 30000;
+	static constexpr uint64_t PersistentTimeoutMs = 30000;
 
 	struct ActiveClient
 	{
 		IWifiClient* client;
 		char request[MaximumRequestSize + 1];
-		unsigned long startTime;
-		unsigned long lastActivity;
+		uint64_t startTime;
+		uint64_t lastActivity;
 		ClientHandlingState state;
 		bool isPersistent;
 	};
@@ -101,8 +101,8 @@ private:
 	int8_t findFreeClientSlot();
 	uint8_t getPersistentClientCount();
 	void cleanupClient(uint8_t index);
-	void handleClientState(uint8_t index, unsigned long now);
-	bool acceptNewClient(IWifiClient* client, unsigned long now);
+	void handleClientState(uint8_t index, uint64_t now);
+	bool acceptNewClient(IWifiClient* client, uint64_t now);
 	bool isStaticAssetRequest(const char* path);
 	
 public:

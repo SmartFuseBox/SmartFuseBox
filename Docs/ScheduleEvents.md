@@ -24,7 +24,7 @@ Config (EEPROM)                  Persists ScheduledEvent array via ConfigManager
      │  read by
      ▼
 ScheduleController               Runtime engine — called every loop()
-  ├── isTriggerDue()             Evaluates trigger against current time / millis()
+  ├── isTriggerDue()             Evaluates trigger against current time / millis64()
   ├── isConditionMet()           Evaluates guard condition
   ├── executeAction()            Drives RelayController
   └── updatePulses()             Turns off relays when pulse duration expires
@@ -215,7 +215,7 @@ The scheduler overview is also included in the main status response at `GET /`.
 _scheduleController.begin();   // subscribes to MessageBus events
 
 // loop()
-_scheduleController.update(millis());
+_scheduleController.update(millis64());
 ```
 
 ### Evaluation Cycle
@@ -259,9 +259,9 @@ State is held in stack-allocated arrays indexed by event slot. It is **not persi
 |---|---|---|
 | `_lastFiredDay` | `uint32_t[20]` | Packed YYYYMMDD of last trigger evaluation |
 | `_lastFiredMinute` | `uint16_t[20]` | Minute-of-day (0–1439) of last trigger evaluation |
-| `_lastIntervalFireMs` | `unsigned long[20]` | `millis()` timestamp of last interval fire |
-| `_pulseStartMs` | `unsigned long[20]` | `millis()` when `RelayPulse` began |
-| `_pulseDurMs` | `unsigned long[20]` | `RelayPulse` duration in milliseconds |
+| `_lastIntervalFireMs` | `uint64_t[20]` | `SystemFunctions::millis64()` timestamp of last interval fire |
+| `_pulseStartMs` | `uint64_t[20]` | `SystemFunctions::millis64()` when `RelayPulse` began |
+| `_pulseDurMs` | `uint64_t[20]` | `RelayPulse` duration in milliseconds |
 | `_pulseRelayIdx` | `uint8_t[20]` | Relay to turn off when pulse expires |
 | `_pulseActive` | `bool[20]` | Whether a pulse is currently running for the slot |
 

@@ -53,18 +53,18 @@ class LedMatrixManager
 {
 private:
 	MessageBus* _messageBus;
-	unsigned long _nextLedUpdate;
+	uint64_t _nextLedUpdate;
 	ArduinoLEDMatrix* _matrix;
 	uint8_t _ledFrame[MaxLedRows][MaxLedColumns];
 	uint8_t _relayStates;
 	float _temperature;
-	unsigned long _lastTemperatureUpdate;
+	uint64_t _lastTemperatureUpdate;
 	float _humididty;
-	unsigned long _lastHumidityUpdate;
+	uint64_t _lastHumidityUpdate;
 	LedSequenceType _activeSequence;
 	uint8_t _sequenceStep;
-	unsigned long _sequenceLastStepTime;
-	unsigned long _sequenceDelay;
+	uint64_t _sequenceLastStepTime;
+	uint64_t _sequenceDelay;
 	bool _sequenceIsOn;
 	uint8_t _shutdownTopRow;
 	uint8_t _shutdownBottomRow;
@@ -72,11 +72,11 @@ private:
 	uint8_t _shutdownRightColumn;
 	bool _ledInitialized;
 
-	void updateTemperature(unsigned long currMillis);
-	void updateHumidity(unsigned long currMillis);
+	void updateTemperature(uint64_t currMillis);
+	void updateHumidity(uint64_t currMillis);
 	void updateLed();
-	void processStartupSequence(unsigned long currMillis);
-	void processShutdownSequence(unsigned long currMillis);
+	void processStartupSequence(uint64_t currMillis);
+	void processShutdownSequence(uint64_t currMillis);
 	void UpdateConnectedState(WifiConnectionState status);
 	void UpdateSignalStrength(int16_t strenth);
 	void setRelayStatus(uint8_t relayStatus);
@@ -88,7 +88,7 @@ public:
 	LedMatrixManager(MessageBus* messageBus);
 	~LedMatrixManager();
 	void Initialize();
-	void ProcessLedMatrix(unsigned long currMillis);
+	void ProcessLedMatrix(uint64_t currMillis);
 	void UpdateLedFrame(uint8_t state);
 	void UpdateRow(uint8_t row, uint8_t state);
 	void UpdateColumn(uint8_t column, uint8_t state);

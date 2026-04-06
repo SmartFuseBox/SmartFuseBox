@@ -16,6 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 #include "WarningManager.h"
+#include "SystemFunctions.h"
 
 #if defined(BOAT_CONTROL_PANEL)
 #include "ToneManager.h"
@@ -25,8 +26,8 @@
 // Define sensor warning mask (bits 20-31)
 constexpr uint32_t SENSOR_WARNING_MASK = 0xFFF00000U; // Bits 20-31 set
 
-WarningManager::WarningManager(SerialCommandManager* commandMgr, unsigned long heartbeatInterval, 
-	unsigned long heartbeatTimeout
+WarningManager::WarningManager(SerialCommandManager* commandMgr, uint64_t heartbeatInterval,
+	uint64_t heartbeatTimeout
 #if defined(BOAT_CONTROL_PANEL)
 	, RgbLedFade* warningStatus,
 	ToneManager* toneManager
@@ -55,7 +56,7 @@ WarningManager::WarningManager(SerialCommandManager* commandMgr, unsigned long h
 #endif
 }
 
-void WarningManager::update(unsigned long now)
+void WarningManager::update(uint64_t now)
 {
 	if (_heartbeatEnabled && _commandMgr)
 	{
@@ -86,7 +87,7 @@ void WarningManager::update(unsigned long now)
 			else if (_lastTonePlayed > 0 && !_toneManager->isPlaying())
 			{
 				// Check if we need to repeat the tone
-				unsigned long repeatInterval = _toneManager->getRepeatIntervalMs();
+				uint64_t repeatInterval = _toneManager->getRepeatIntervalMs();
 				if (repeatInterval == 0)
 					repeatInterval = 5000; // Fallback if 0 configured
 
@@ -115,7 +116,7 @@ void WarningManager::update(unsigned long now)
 
 void WarningManager::notifyHeartbeatAck()
 {
-	_lastHeartbeatReceived = millis();
+	_lastHeartbeatReceived = SystemFunctions::millis64();
 
 	// Clear the connection lost warning (connection is now established)
 	clearWarning(WarningType::ConnectionLost);
@@ -238,7 +239,7 @@ void WarningManager::sendHeartbeat()
 	}
 }
 
-void WarningManager::updateConnection(unsigned long now)
+void WarningManager::updateConnection(uint64_t now)
 {
 	// Send heartbeat if interval elapsed
 	if (now - _lastHeartbeatSent >= _heartbeatInterval)
@@ -251,9 +252,9 @@ void WarningManager::updateConnection(unsigned long now)
 	if (_lastHeartbeatSent > 0 || now >= _heartbeatTimeout)
 	{
 		// Protect against race condition: if lastHeartbeatReceived is in the future
-		// (due to notifyHeartbeatAck calling millis() after we captured 'now'),
+		// (due to notifyHeartbeatAck calling SystemFunctions::millis64() after we captured 'now'),
 		// treat it as just received (delta = 0)
-		unsigned long delta = (_lastHeartbeatReceived > now) ? 0 : (now - _lastHeartbeatReceived);
+		uint64_t delta = (_lastHeartbeatReceived > now) ? 0 : (now - _lastHeartbeatReceived);
 
 		bool connected = (_lastHeartbeatReceived > 0) && (delta < _heartbeatTimeout);
 

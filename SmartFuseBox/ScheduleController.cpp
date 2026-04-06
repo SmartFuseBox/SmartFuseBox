@@ -80,35 +80,35 @@ void ScheduleController::begin()
     });
 }
 
-void ScheduleController::update(unsigned long nowMs)
+void ScheduleController::update(uint64_t now)
 {
     if (!DateTimeManager::isTimeSet())
         return;
 
     // Pulse ends must be checked every tick for accurate relay-off timing
-    updatePulses(nowMs);
+    updatePulses(now);
 
     // Throttle event evaluation to once per second
-    if (!SystemFunctions::hasElapsed(nowMs, _lastCheckMs, ScheduleCheckIntervalMs))
+    if (!SystemFunctions::hasElapsed(now, _lastCheckMs, ScheduleCheckIntervalMs))
         return;
 
-    _lastCheckMs = nowMs;
+    _lastCheckMs = now;
 
     Config* cfg = ConfigManager::getConfigPtr();
 
     if (!cfg || !cfg->scheduler.isEnabled)
         return;
 
-    uint8_t  hour  = DateTimeManager::getHour();
-    uint8_t  min   = DateTimeManager::getMinute();
-    uint8_t  day   = DateTimeManager::getDay();
-    uint8_t  month = DateTimeManager::getMonth();
-    uint16_t year  = DateTimeManager::getYear();
+    uint8_t hour = DateTimeManager::getHour();
+    uint8_t min = DateTimeManager::getMinute();
+    uint8_t day = DateTimeManager::getDay();
+    uint8_t month = DateTimeManager::getMonth();
+    uint16_t year = DateTimeManager::getYear();
 
     if (year == 0)
         return;
 
-    uint32_t today       = encodeDay(year, month, day);
+    uint32_t today = encodeDay(year, month, day);
     uint16_t minuteOfDay = static_cast<uint16_t>(hour) * MinutesPerHour + min;
 
     // Recompute sunrise/sunset when the calendar date changes
@@ -130,7 +130,7 @@ void ScheduleController::update(unsigned long nowMs)
         if (ev.triggerType == TriggerType::None && ev.actionType == ExecutionActionType::None)
             continue;
 
-        if (!isTriggerDue(i, ev, hour, min, dowBit, day, month, today, nowMs))
+        if (!isTriggerDue(i, ev, hour, min, dowBit, day, month, today, now))
             continue;
 
         // Record that the trigger was seen for this minute, whether or not
@@ -144,7 +144,7 @@ void ScheduleController::update(unsigned long nowMs)
         if (!isConditionMet(ev, hour, min, dowBit))
             continue;
 
-        executeAction(i, ev, nowMs);
+        executeAction(i, ev, now);
     }
 }
 
@@ -153,12 +153,12 @@ void ScheduleController::update(unsigned long nowMs)
 // ---------------------------------------------------------------------------
 
 bool ScheduleController::isTriggerDue(uint8_t idx,
-                                       const ScheduledEvent& ev,
-                                       uint8_t hour, uint8_t minute,
-                                       uint8_t dowBit,
-                                       uint8_t day, uint8_t month,
-                                       uint32_t today,
-                                       unsigned long nowMs)
+    const ScheduledEvent& ev,
+    uint8_t hour, uint8_t minute,
+    uint8_t dowBit,
+    uint8_t day, uint8_t month,
+    uint32_t today,
+    uint64_t now)
 {
     uint16_t currentMOD = static_cast<uint16_t>(hour) * MinutesPerHour + minute;
 
@@ -209,19 +209,19 @@ bool ScheduleController::isTriggerDue(uint8_t idx,
             if (intervalMin == 0)
                 return false;
 
-            unsigned long intervalMs = static_cast<unsigned long>(intervalMin) * MsPerMinute;
+            uint64_t intervalMs = static_cast<uint64_t>(intervalMin) * MsPerMinute;
 
             if (_lastIntervalFireMs[idx] == 0)
             {
                 // First encounter: arm the timer, do not fire yet
-                _lastIntervalFireMs[idx] = nowMs;
+                _lastIntervalFireMs[idx] = now;
                 return false;
             }
 
-            if (!SystemFunctions::hasElapsed(nowMs, _lastIntervalFireMs[idx], intervalMs))
+            if (!SystemFunctions::hasElapsed(now, _lastIntervalFireMs[idx], intervalMs))
                 return false;
 
-            _lastIntervalFireMs[idx] = nowMs;
+            _lastIntervalFireMs[idx] = now;
             return true;
         }
 
@@ -332,7 +332,7 @@ bool ScheduleController::isConditionMet(const ScheduledEvent& ev,
 // Action execution
 // ---------------------------------------------------------------------------
 
-void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, unsigned long nowMs)
+void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, uint64_t now)
 {
     if (!_relayController)
         return;
@@ -363,8 +363,8 @@ void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, un
 
             uint8_t relayIdx = ev.actionPayload[0];
             _relayController->setRelayState(relayIdx, true);
-            _pulseStartMs[idx]  = nowMs;
-            _pulseDurMs[idx]    = static_cast<unsigned long>(durationSec) * MsPerSecond;
+            _pulseStartMs[idx]  = now;
+            _pulseDurMs[idx]    = static_cast<uint64_t>(durationSec) * MsPerSecond;
             _pulseRelayIdx[idx] = relayIdx;
             _pulseActive[idx]   = true;
             break;
@@ -404,7 +404,7 @@ void ScheduleController::executeAction(uint8_t idx, const ScheduledEvent& ev, un
 // Pulse management
 // ---------------------------------------------------------------------------
 
-void ScheduleController::updatePulses(unsigned long nowMs)
+void ScheduleController::updatePulses(uint64_t now)
 {
     if (!_relayController)
         return;
@@ -414,7 +414,7 @@ void ScheduleController::updatePulses(unsigned long nowMs)
         if (!_pulseActive[i])
             continue;
 
-        if (!SystemFunctions::hasElapsed(nowMs, _pulseStartMs[i], _pulseDurMs[i]))
+        if (!SystemFunctions::hasElapsed(now, _pulseStartMs[i], _pulseDurMs[i]))
             continue;
 
         _relayController->setRelayState(_pulseRelayIdx[i], false);

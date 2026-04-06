@@ -26,6 +26,7 @@
 #include "BluetoothServiceBase.h"
 #include "WarningManager.h"
 #include "LoggingSupport.h"
+#include "SystemFunctions.h"
 
 /**
  * @brief Central coordinator for Bluetooth BLE communication.
@@ -146,7 +147,7 @@ private:
     void* _server;  // BLEServer* (void* to avoid exposing BLE library headers)
     bool _isAdvertising;
     bool _deviceConnected;
-    unsigned long _lastLoopTime;
+    uint64_t _lastLoopTime;
     const char* _deviceName;
 
     /**

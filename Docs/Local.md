@@ -117,7 +117,7 @@ On **Arduino Uno R4 WiFi**, the ANNA-B112 (BLE) and ESP32-S3 (WiFi) modules shar
 ## 4. Serial Initialisation Timeout
 
 ```cpp
-constexpr unsigned long serialInitTimeoutMs = 300;
+constexpr uint64_t serialInitTimeoutMs = 300;
 ```
 
 If `waitForConnection` is `true` when initialising serial, the firmware waits up to this many milliseconds for the USB serial connection before continuing with setup. Useful when debugging startup log messages that would otherwise be missed because the serial monitor opens after the board has already booted.

@@ -20,6 +20,7 @@
 #include "MQTTHandler.h"
 #include "RelayController.h"
 #include "ConfigManager.h"
+#include "SystemFunctions.h"
 
 // Forward declaration
 class SerialCommandManager;
@@ -37,7 +38,7 @@ private:
     // Discovery state
     bool _discoveryPending;
     uint8_t _discoveryIndex;
-    unsigned long _lastDiscoveryPublish;
+    uint64_t _lastDiscoveryPublish;
 
     static constexpr uint16_t MinPublishInterval = 200;
 
