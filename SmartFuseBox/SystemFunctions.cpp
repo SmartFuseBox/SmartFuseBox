@@ -130,9 +130,9 @@ void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long
 
 	if (waitForConnection)
 	{
-		unsigned long leave = millis() + SerialInitTimeoutMs;
+		uint64_t leave = SystemFunctions::millis64() + SerialInitTimeoutMs;
 
-		while (!serialPort && millis() < leave)
+		while (!serialPort && SystemFunctions::millis64() < leave)
 			delay(SerialPollingDelayMs);
 
 		if (serialPort)
@@ -164,12 +164,18 @@ bool SystemFunctions::isAllDigits(const char* s)
     return true;
 }
 
-unsigned long SystemFunctions::elapsedMillis(unsigned long now, unsigned long previous)
+
+uint64_t SystemFunctions::elapsedMillis(uint64_t previous)
 {
-    return now - previous;
+    return SystemFunctions::millis64() - previous;
 }
 
-bool SystemFunctions::hasElapsed(unsigned long now, unsigned long previous, unsigned long interval)
+bool SystemFunctions::hasElapsed(uint64_t previous, uint64_t interval)
+{
+    return (SystemFunctions::millis64() - previous) >= interval;
+}
+
+bool SystemFunctions::hasElapsed(uint64_t now, uint64_t previous, uint64_t interval)
 {
     return (now - previous) >= interval;
 }

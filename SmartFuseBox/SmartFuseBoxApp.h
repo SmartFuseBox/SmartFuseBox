@@ -27,7 +27,7 @@
 #include "RelayController.h"
 #include "SoundController.h"
 #include "WarningManager.h"
-
+#include "SystemFunctions.h"
 #include "RelayCommandHandler.h"
 #include "SoundCommandHandler.h"
 #include "InterceptDebugCommandHandler.h"
@@ -131,7 +131,7 @@ private:
     MQTTRelayHandler _mqttRelayHandler;
     MQTTSensorHandler* _mqttSensorHandler;
     MQTTSystemHandler _mqttSystemHandler;
-    unsigned long _nextRunMqttMs;
+    uint64_t _nextRunMqttMs;
 #endif
 
 	SchedulerCommandHandler _schedulerCommandHandler;

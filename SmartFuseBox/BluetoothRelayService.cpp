@@ -128,7 +128,7 @@ void* BluetoothRelayService::getBLEService()
     return _service;
 }
 
-void BluetoothRelayService::loop(unsigned long /*currentMillis*/)
+void BluetoothRelayService::loop(uint64_t /*currentMillis*/)
 {
     // No periodic work required; notifications are sent on change via notifyAll().
 }

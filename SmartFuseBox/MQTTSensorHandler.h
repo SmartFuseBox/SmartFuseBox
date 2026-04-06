@@ -20,6 +20,7 @@
 #include "MQTTHandler.h"
 #include "ConfigManager.h"
 #include "SensorController.h"
+#include "SystemFunctions.h"
 #include <vector>
 #include <map>
 
@@ -31,8 +32,8 @@ struct MqttChannelMap
     BaseSensor* sensor;
     uint8_t channelIndex;
     const char* typeSlug;
-    unsigned long long lastPublishTime;  // 64-bit timestamp of last MQTT publish (overflow-safe)
-    unsigned long publishIntervalMs;     // Cached publish interval from sensor
+    uint64_t lastPublishTime;
+    uint64_t publishIntervalMs;
 };
 
 class MQTTSensorHandler : public MQTTHandler
@@ -60,7 +61,7 @@ private:
     // Discovery state
     bool _discoveryPending;
     uint8_t _discoveryIndex;
-    unsigned long _lastDiscoveryPublish;
+    uint64_t _lastDiscoveryPublish;
 
     static constexpr uint16_t MinPublishInterval = 200;
 

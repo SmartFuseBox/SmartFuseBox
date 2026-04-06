@@ -33,7 +33,7 @@ private:
     SerialCommandManager* _computerSerial;
     SerialCommandManager* _linkSerial;
 
-	unsigned long _nextUpdateTime;
+    uint64_t _nextUpdateTime;
 
 public:
     /**
@@ -49,7 +49,7 @@ public:
      *
 	 * @param now current time in milliseconds
      */
-    void update(unsigned long now);
+    void update(uint64_t now);
 
     /**
      * @brief Send a command to all registered serial managers.

@@ -177,29 +177,41 @@ public:
         out = static_cast<T>(v);
         return true;
     }
+
     /**
-     * @brief Calculate elapsed time between two millis() timestamps safely handling wrap-around.
+     * @brief Calculate elapsed time since a previous SystemFunctions::millis64() timestamp.
      *
-     * This function uses unsigned arithmetic to correctly handle the millis() overflow
-     * at ~49.7 days. The subtraction wraps correctly due to unsigned integer behavior.
+     * This function uses unsigned arithmetic to correctly handle wrap-around.
+     * Since millis64() returns a 64-bit value, overflow will not occur within
+     * any practical device lifetime.
      *
-     * @param now Current timestamp from millis()
-     * @param previous Previous timestamp from millis()
-     * @return Elapsed milliseconds (handles wrap-around correctly)
+     * @param previous Previous timestamp from millis64()
+     * @return Elapsed milliseconds since 'previous'
      */
-    static unsigned long elapsedMillis(unsigned long now, unsigned long previous);
+    static uint64_t elapsedMillis(uint64_t previous);
 
     /**
      * @brief Check if a time interval has elapsed since a previous timestamp.
      *
      * This is a convenience wrapper that handles millis() wrap-around safely.
      *
-     * @param now Current timestamp from millis()
-     * @param previous Previous timestamp from millis()
+     * @param previous Previous timestamp from SystemFunctions::millis64()
      * @param interval Interval to check in milliseconds
      * @return true if interval has elapsed
      */
-    static bool hasElapsed(unsigned long now, unsigned long previous, unsigned long interval);
+    static bool hasElapsed(uint64_t previous, uint64_t interval);
+
+    /**
+     * @brief Check if a time interval has elapsed since a previous timestamp.
+     *
+     * This is a convenience wrapper that handles millis64() wrap-around safely.
+     *
+     * @param now  Current timestamp from SystemFunctions::millis64()
+     * @param previous Previous timestamp from SystemFunctions::millis64()
+     * @param interval Interval to check in milliseconds
+     * @return true if interval has elapsed
+     */
+    static bool hasElapsed(uint64_t now, uint64_t previous, uint64_t interval);
 
     /**
      * @brief Reset a serial port by flushing outgoing data and clearing incoming buffer.

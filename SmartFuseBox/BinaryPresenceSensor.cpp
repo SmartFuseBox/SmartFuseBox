@@ -108,11 +108,11 @@ void BinaryPresenceSensor::initialize()
 	_lastState = digitalRead(_sensorPin);
 }
 
-unsigned long BinaryPresenceSensor::update()
+uint64_t BinaryPresenceSensor::update()
 {
     if (_directPulseActive && _relayController)
     {
-        if (SystemFunctions::hasElapsed(millis(), _directPulseStartMs, _directPulseDurMs))
+        if (SystemFunctions::hasElapsed(_directPulseStartMs, _directPulseDurMs))
         {
             _relayController->setRelayState(_directPulseRelayIdx, false);
             _directPulseActive = false;
@@ -176,8 +176,8 @@ void BinaryPresenceSensor::executeAction(ExecutionActionType actionType, const u
 
         uint8_t relayIdx = payload[0];
         _relayController->setRelayState(relayIdx, true);
-        _directPulseStartMs = millis();
-        _directPulseDurMs = static_cast<unsigned long>(durationSec) * MillisecondsPerSecond;
+        _directPulseStartMs = SystemFunctions::millis64();
+        _directPulseDurMs = static_cast<uint64_t>(durationSec) * MillisecondsPerSecond;
         _directPulseRelayIdx = relayIdx;
         _directPulseActive = true;
         break;

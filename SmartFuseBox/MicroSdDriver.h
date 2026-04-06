@@ -159,10 +159,10 @@ private:
 	// Statistics
 	uint64_t _totalSize;
 	uint64_t _freeSpace;
-	unsigned long _lastPresenceCheck;
+    uint64_t _lastPresenceCheck;
 	uint32_t _cardSerialNumber;      // Card serial number for change detection
-	unsigned long _lastFreeSpaceUpdate;  // Last time free space was calculated
-	unsigned long _lastInitAttemptTime;  // Last initialization attempt time
+    uint64_t _lastFreeSpaceUpdate;  // Last time free space was calculated
+    uint64_t _lastInitAttemptTime;  // Last initialization attempt time
 
 	// Private constructor (singleton)
 	MicroSdDriver();
@@ -407,9 +407,9 @@ public:
      * MUST be called regularly in loop() to progress initialization and
      * maintain card presence detection.
      * 
-     * @param now Current time from millis()
+     * @param now Current time from SystemFunctions::millis64()
      */
-    void update(unsigned long now);
+    void update(uint64_t now);
 };
 
 #endif

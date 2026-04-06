@@ -106,7 +106,7 @@ bool MQTTSensorHandler::begin()
             uint8_t channelIndex = static_cast<uint8_t>(_channelMap.size());
 
             // Cache publish interval from sensor (Option 1)
-            unsigned long interval = sensor->getMqttPublishIntervalMs(c);
+            uint64_t interval = sensor->getMqttPublishIntervalMs(c);
 
             _channelMap.push_back({ sensor, c, ch.typeSlug, 0, interval });
 
@@ -151,7 +151,7 @@ bool MQTTSensorHandler::begin()
 
 void MQTTSensorHandler::update()
 {
-    unsigned long now = millis();
+    uint64_t now = SystemFunctions::millis64();
 
     if (_discoveryPending && _discoveryIndex < _channelMap.size())
     {
@@ -209,7 +209,7 @@ void MQTTSensorHandler::onTemperatureUpdated(float temperature)
 {
     (void)temperature;
 
-    unsigned long long now = SystemFunctions::millis64();
+    uint64_t now = SystemFunctions::millis64();
     auto it = _typeSlugToIndices.find("temperature");
     if (it != _typeSlugToIndices.end())
     {
@@ -231,7 +231,7 @@ void MQTTSensorHandler::onHumidityUpdated(uint8_t humidity)
 {
     (void)humidity;
 
-    unsigned long long now = SystemFunctions::millis64();
+    uint64_t now = SystemFunctions::millis64();
     auto it = _typeSlugToIndices.find("humidity");
     if (it != _typeSlugToIndices.end())
     {
@@ -255,7 +255,7 @@ void MQTTSensorHandler::onLightSensorUpdated(bool isDaytime, uint16_t lightLevel
     (void)lightLevel;
     (void)averageLightLevel;
 
-    unsigned long long now = SystemFunctions::millis64();
+    uint64_t now = SystemFunctions::millis64();
 
     // Publish all light-related channels
     const char* lightTypes[] = { "light", "light_level", "avg_light_level" };
@@ -284,7 +284,7 @@ void MQTTSensorHandler::onWaterLevelUpdated(uint16_t waterLevel, uint16_t averag
     (void)waterLevel;
     (void)averageWaterLevel;
 
-    unsigned long long now = SystemFunctions::millis64();
+    uint64_t now = SystemFunctions::millis64();
     auto it = _typeSlugToIndices.find("water_level");
     if (it != _typeSlugToIndices.end())
     {
@@ -327,11 +327,6 @@ void MQTTSensorHandler::publishSensorState(uint8_t channelIndex)
 
     snprintf_P(topic, sizeof(topic), StateTopicFormat, _config->mqtt.deviceId, channel.slug);
     entry.sensor->getMqttValue(entry.channelIndex, payload, sizeof(payload));
-
-    if (_commandMgr != nullptr)
-    {
-        _commandMgr->sendDebug(topic, F("MQTT Sensor State"));
-    }
 
     _mqttController->publishState(topic, payload);
 }

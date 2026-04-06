@@ -25,12 +25,12 @@
 class SystemCpuMonitor
 {
 private:
-    static unsigned long _busyTimeMicros;
-    static unsigned long _windowStartMillis;
-    static unsigned long _taskStartMicros;
+    static uint64_t _busyTimeMicros;
+    static uint64_t _windowStartMillis;
+    static uint64_t _taskStartMicros;
     static uint8_t _lastCpuPercent;
     static bool _taskTiming;
-    static unsigned long _windowSizeMs;
+    static uint64_t _windowSizeMs;
 
 public:
     // Start timing a task
@@ -48,6 +48,6 @@ public:
     // Set the measurement window size in milliseconds (default: 1000ms)
     // Smaller values = more responsive but noisier
     // Larger values = more stable but less responsive
-    static void setWindowSize(unsigned long milliseconds);
+    static void setWindowSize(uint64_t milliseconds);
 };
 

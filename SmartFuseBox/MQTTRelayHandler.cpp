@@ -96,7 +96,7 @@ bool MQTTRelayHandler::begin()
 
 void MQTTRelayHandler::update()
 {
-    unsigned long now = millis();
+    uint64_t now = SystemFunctions::millis64();
 
     if (_discoveryPending && _discoveryIndex < ConfigRelayCount)
     {

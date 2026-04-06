@@ -85,7 +85,7 @@ Abstract base class. All services inherit from it and implement:
 | `begin()` | Create characteristics, initialise values, register with `BLE` |
 | `getServiceUUID()` | Return the service UUID string |
 | `getServiceName()` | Return a human-readable name for logging |
-| `loop(unsigned long)` | Periodic work — send notifications, update cached values |
+| `loop(uint64_t)` | Periodic work — send notifications, update cached values |
 | `getCharacteristicCount()` | Return number of characteristics (for diagnostics) |
 | `getBLEService()` | Return `void*` to the underlying `BLEService` (used by manager for advertising) |
 
@@ -258,7 +258,7 @@ public:
         return true;
     }
 
-    void loop(unsigned long currentMillis) override
+    void loop(uint64_t currentMillis) override
     {
         if (currentMillis - _lastUpdate >= 2000)
         {
@@ -275,7 +275,7 @@ public:
 private:
     BLEService* _service = nullptr;
     BLEIntCharacteristic* _charValue = nullptr;
-    unsigned long _lastUpdate = 0;
+    uint64_t _lastUpdate = 0;
 };
 ```
 

@@ -35,7 +35,7 @@
 
 #include "FirmwareVersion.h"
 
-constexpr unsigned long SystemSensorUpdateIntervalMs = 2500;
+constexpr uint64_t SystemSensorUpdateIntervalMs = 2500;
 
 /**
  * @brief Sensor handler that exposes device diagnostics as MQTT sensor channels.
@@ -69,7 +69,7 @@ protected:
 	void initialize() override
 	{}
 
-	unsigned long update() override
+	uint64_t update() override
 	{
 		if (_messageBus)
 		{
@@ -202,7 +202,7 @@ public:
 		}
 	}
 
-	unsigned long getMqttPublishIntervalMs(uint8_t channelIndex) const override
+	uint64_t getMqttPublishIntervalMs(uint8_t channelIndex) const override
 	{
 		(void)channelIndex;
 		return 3000; // System metrics publish every 3 seconds

@@ -279,7 +279,7 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
 
 void SmartFuseBoxApp::loop()
 {
-    unsigned long now = millis();
+    uint64_t now = SystemFunctions::millis64();
 
     SystemCpuMonitor::startTask();
     _commandMgrComputer->readCommands();

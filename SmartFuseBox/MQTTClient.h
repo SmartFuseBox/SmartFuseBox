@@ -20,6 +20,7 @@
 #include <Arduino.h>
 #include "IWifiClient.h"
 #include "MQTTDefinitions.h"
+#include "SystemFunctions.h"
 
 // Forward declarations
 class SerialCommandManager;
@@ -56,9 +57,9 @@ private:
     uint16_t _packetId;
     
     // Timing
-    unsigned long _lastSendTime;
-    unsigned long _lastReceiveTime;
-    unsigned long _connectAttemptTime;
+    uint64_t _lastSendTime;
+    uint64_t _lastReceiveTime;
+    uint64_t _connectAttemptTime;
     
     // Callbacks
     MqttMessageCallback _messageCallback;

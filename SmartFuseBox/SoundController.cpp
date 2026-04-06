@@ -17,6 +17,7 @@
  */
 #include "SoundController.h"
 #include "SmartFuseBoxConstants.h"
+#include "SystemFunctions.h"
 
 // Define sound patterns according to COLREGS
 // Maneuvering Signals (COLREGS Rule 34 - one-shot, non-repeating)
@@ -97,8 +98,8 @@ void SoundController::update()
 	if (!_isPlaying || !_currentPattern)
 		return;
 
-	unsigned long currentTime = millis();
-	unsigned long elapsed = currentTime - _stateStartTime;
+	uint64_t currentTime = SystemFunctions::millis64();
+	uint64_t elapsed = currentTime - _stateStartTime;
 
 	switch (_state)
 	{
@@ -186,7 +187,7 @@ void SoundController::startPattern(const SoundPattern* pattern)
 	_currentPattern = pattern;
 	_currentBlastIndex = 0;
 	_state = SoundState::StartDelay;
-	_stateStartTime = millis();
+	_stateStartTime = SystemFunctions::millis64();
 	_isPlaying = true;
 }
 

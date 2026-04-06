@@ -152,7 +152,7 @@ bool WifiServer::begin()
 		
 		_radio->beginClient(_ssid, _password);
 		_connectionState = WifiConnectionState::Connecting;
-		_connectionStartTime = millis();
+		_connectionStartTime = SystemFunctions::millis64();
 		_lastConnectionAttempt = _connectionStartTime;
 		
 		// Return true to indicate initialization started (not necessarily connected yet)
@@ -258,6 +258,7 @@ void WifiServer::cleanupClient(uint8_t index)
 
 	if (_activeClients[index].client)
 	{
+		_activeClients[index].client->flush();
 		_activeClients[index].client->stop();
 		delete _activeClients[index].client;
 		_activeClients[index].client = nullptr;
@@ -297,7 +298,7 @@ bool WifiServer::isStaticAssetRequest(const char* path)
 			strcmp(ext, "ttf") == 0);
 }
 
-bool WifiServer::acceptNewClient(IWifiClient* client, unsigned long now)
+bool WifiServer::acceptNewClient(IWifiClient* client, uint64_t now)
 {
 	int8_t slot = findFreeClientSlot();
 	if (slot < 0)
@@ -321,7 +322,7 @@ bool WifiServer::acceptNewClient(IWifiClient* client, unsigned long now)
 
 void WifiServer::updateClientHandling()
 {
-	unsigned long now = millis();
+	uint64_t now = SystemFunctions::millis64();
 
 	// Process all active clients
 for (uint8_t i = 0; i < MaxConcurrentClients; i++)
@@ -352,7 +353,7 @@ for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	}
 }
 
-void WifiServer::handleClientState(uint8_t index, unsigned long now)
+void WifiServer::handleClientState(uint8_t index, uint64_t now)
 {
 	ActiveClient& client = _activeClients[index];
 
@@ -560,7 +561,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -578,7 +579,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -597,7 +598,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -613,7 +614,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -631,7 +632,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -657,7 +658,7 @@ void WifiServer::processClientRequest(uint8_t index)
 			else
 			{
 				client.state = ClientHandlingState::KeepAlive;
-				client.lastActivity = millis();
+				client.lastActivity = SystemFunctions::millis64();
 			}
 			return;
 		}
@@ -688,7 +689,7 @@ void WifiServer::processClientRequest(uint8_t index)
 		else
 		{
 			client.state = ClientHandlingState::KeepAlive;
-			client.lastActivity = millis();
+			client.lastActivity = SystemFunctions::millis64();
 		}
 		return;
 	}
@@ -764,7 +765,7 @@ void WifiServer::processClientRequest(uint8_t index)
 	else
 	{
 		client.request[0] = '\0';  // Clear request buffer for next request
-		client.lastActivity = millis();
+		client.lastActivity = SystemFunctions::millis64();
 		client.state = ClientHandlingState::KeepAlive;
 		sendDebug(F("Client kept alive (persistent)"), F("WifiServer"));
 	}
@@ -815,7 +816,9 @@ void WifiServer::sendResponse(IWifiClient& client, int statusCode, const char* c
 	{
 		client.println(F("Connection: keep-alive"));
 		client.print(F("Keep-Alive: timeout="));
-		client.println(PersistentTimeoutMs / 1000);  // Send timeout in seconds
+		uint64_t seconds = PersistentTimeoutMs / 1000ULL;
+		unsigned long seconds32 = static_cast<unsigned long>(seconds);
+		client.println(seconds32);  // Send timeout in seconds
 	}
 	else
 	{
@@ -902,7 +905,9 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 	{
 		client.print(F("Connection: keep-alive\r\n"));
 		client.print(F("Keep-Alive: timeout="));
-		client.print(PersistentTimeoutMs / 1000);  // Send timeout in seconds
+		uint64_t seconds = PersistentTimeoutMs / 1000ULL;
+		unsigned long seconds32 = static_cast<unsigned long>(seconds);
+		client.print(seconds32);  // Send timeout in seconds
 		client.print(F("\r\n"));
 	}
 	else
@@ -1089,7 +1094,7 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 void WifiServer::updateClientConnection()
 {
 	WifiConnectionState status = _radio->status();
-	unsigned long now = millis();
+	uint64_t now = SystemFunctions::millis64();
 
 	switch (_connectionState)
 	{
@@ -1159,7 +1164,7 @@ void WifiServer::updateClientConnection()
 		case WifiConnectionState::Failed:
 		{
 			// Use exponential backoff after multiple failures
-			unsigned long retryInterval = ConnectionRetryIntervalMs;
+			uint64_t retryInterval = ConnectionRetryIntervalMs;
 			if (_consecutiveFailures >= MaxConsecutiveFailures)
 			{
 				retryInterval = BackoffIntervalMs;

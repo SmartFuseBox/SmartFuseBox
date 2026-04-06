@@ -39,7 +39,7 @@ enum class SensorDataType : uint8_t {
  * Designed to be compact for efficient memory usage in circular buffer.
  */
 struct SensorDataRecord {
-    unsigned long timestamp;        // millis() when reading was taken
+    uint64_t timestamp;        // SystemFunctions::millis64() when reading was taken
     SensorDataType sensorType;      // Type of sensor data
     float value1;                   // Primary value (e.g., temperature, water level)
     float value2;                   // Secondary value (e.g., humidity, average water level)
@@ -49,7 +49,7 @@ struct SensorDataRecord {
     {
     }
     
-    SensorDataRecord(unsigned long ts, SensorDataType type, float val1, float val2 = 0.0f)
+    SensorDataRecord(uint64_t ts, SensorDataType type, float val1, float val2 = 0.0f)
         : timestamp(ts), sensorType(type), value1(val1), value2(val2)
     {
     }

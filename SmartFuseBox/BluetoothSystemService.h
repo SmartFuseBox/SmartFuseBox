@@ -42,7 +42,7 @@ public:
     bool begin() override;
     const char* getServiceUUID() const override;
     const char* getServiceName() const override;
-    void loop(unsigned long currentMillis) override;
+    void loop(uint64_t currentMillis) override;
     uint8_t getCharacteristicCount() const override;
     void* getBLEService() override;
 
@@ -56,13 +56,13 @@ private:
     BLEUnsignedIntCharacteristic* _charFreeMemory;
     BLEFloatCharacteristic* _charCpuUsage;
 
-    unsigned long _lastHeartbeat;
-    unsigned long _lastMemoryUpdate;
-    unsigned long _lastCpuUpdate;
+    uint64_t _lastHeartbeat;
+    uint64_t _lastMemoryUpdate;
+    uint64_t _lastCpuUpdate;
     
-    static constexpr unsigned long HEARTBEAT_INTERVAL_MS = 1000;
-    static constexpr unsigned long MEMORY_UPDATE_INTERVAL_MS = 5000;
-    static constexpr unsigned long CPU_UPDATE_INTERVAL_MS = 2000;
+    static constexpr uint64_t HEARTBEAT_INTERVAL_MS = 1000;
+    static constexpr uint64_t MEMORY_UPDATE_INTERVAL_MS = 5000;
+    static constexpr uint64_t CPU_UPDATE_INTERVAL_MS = 2000;
 
     void updateFreeMemory();
     void updateCpuUsage();

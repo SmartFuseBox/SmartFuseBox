@@ -42,7 +42,7 @@ public:
     virtual void applyConfig(const Config* config) = 0;
 
     // Per-loop processing called from the app loop.
-    virtual void update(unsigned long currentMillis) = 0;
+    virtual void update(uint64_t currentMillis) = 0;
 
     // Register network command handlers (for dependency injection).
     virtual void registerHandlers(INetworkCommandHandler** handlers, size_t count) = 0;

@@ -20,6 +20,7 @@
 #include <Arduino.h>
 
 #include "Local.h"
+#include "SystemFunctions.h"
 
 #if defined(BOAT_CONTROL_PANEL)
 #include "RtcDS1302Driver.h"
@@ -40,7 +41,7 @@ constexpr uint8_t DateTimeISOBufferLength = 20;  // "YYYY-MM-DDTHH:MM:SS" + null
  * - Hardware RTC backup via RtcDS1302Driver
  * - Unix timestamp storage (seconds since epoch)
  * - Millisecond-precision offset tracking
- * - Automatic time progression using millis()
+ * - Automatic time progression using SystemFunctions::millis64()
  * - Bidirectional sync: RTC → DateTimeManager on boot, DateTimeManager → RTC on updates
  * - Graceful fallback if RTC is not present
  * 
@@ -59,7 +60,7 @@ constexpr uint8_t DateTimeISOBufferLength = 20;  // "YYYY-MM-DDTHH:MM:SS" + null
  * }
  * 
  * // Get current time
- * unsigned long currentTime = DateTimeManager::getCurrentTime();
+ * uint64_t currentTime = DateTimeManager::getCurrentTime();
  * 
  * // Check if time has been synchronized
  * if (DateTimeManager::isTimeSet())
@@ -91,7 +92,7 @@ public:
      * Automatically updates RTC if available.
      * @param unixTimestamp Seconds since Unix epoch (Jan 1, 1970 00:00:00 UTC)
      */
-    static void setDateTime(unsigned long unixTimestamp);
+    static void setDateTime(uint64_t unixTimestamp);
 
     /**
      * @brief Set the current date/time using ISO 8601 format string.
@@ -103,10 +104,10 @@ public:
 
     /**
      * @brief Get the current Unix timestamp.
-     * Calculates elapsed time since last sync using millis().
+     * Calculates elapsed time since last sync using SystemFunctions::millis64().
      * @return Current Unix timestamp (seconds since epoch), 0 if not set
      */
-    static unsigned long getCurrentTime();
+    static uint64_t getCurrentTime();
 
     /**
      * @brief Check if date/time has been set.
@@ -118,7 +119,7 @@ public:
      * @brief Get time elapsed since last sync in seconds.
      * @return Seconds elapsed since setDateTime() was called
      */
-    static unsigned long getSecondsSinceSync();
+    static uint64_t getSecondsSinceSync();
 
     /**
      * @brief Get the current year.
@@ -211,8 +212,8 @@ private:
 #if defined(BOAT_CONTROL_PANEL)
     static RtcDS1302Driver _rtcDriver;
 #endif
-    static unsigned long _syncedTimestamp;
-    static unsigned long _syncedMillis;
+    static uint64_t _syncedTimestamp;
+    static uint64_t _syncedMillis;
     static bool _isSet;
     static int8_t _timezoneOffset;
 
@@ -220,7 +221,7 @@ private:
      * @brief Convert year/month/day/hour/minute/second to Unix timestamp.
      * Simple implementation without leap second handling.
      */
-    static unsigned long dateTimeToUnix(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+    static uint64_t dateTimeToUnix(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
 
     /**
      * @brief Convert Unix timestamp to year/month/day/hour/minute/second.
@@ -232,7 +233,7 @@ private:
      * @param minute Output minute (0-59)
      * @param second Output second (0-59)
      */
-    static void unixToDateTime(unsigned long unixTime, uint16_t& year, uint8_t& month, uint8_t& day,
+    static void unixToDateTime(uint64_t unixTime, uint16_t& year, uint8_t& month, uint8_t& day,
         uint8_t& hour, uint8_t& minute, uint8_t& second);
 };
 

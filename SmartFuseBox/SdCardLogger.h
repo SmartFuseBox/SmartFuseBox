@@ -27,12 +27,13 @@
 #include "SensorCommandHandler.h"
 #include "WarningManager.h"
 #include "MicroSdDriver.h"
+#include "SystemFunctions.h"
 
 constexpr uint8_t SD_BUFFER_SIZE = 64;              // Number of records to buffer
 constexpr uint8_t SD_MAX_WRITES_PER_LOOP = 5;       // Max records to write per update() call
-constexpr uint16_t SD_WRITE_INTERVAL_MS = 1000;     // Minimum time between write operations
-constexpr uint16_t SD_FILE_CHECK_INTERVAL_MS = 60000; // Check for date change every minute
-constexpr uint16_t SD_CARD_PRESENCE_CHECK_MS = 5000; // Check for card presence every 5 seconds
+constexpr uint64_t SD_WRITE_INTERVAL_MS = 1000;     // Minimum time between write operations
+constexpr uint64_t SD_FILE_CHECK_INTERVAL_MS = 60000; // Check for date change every minute
+constexpr uint64_t SD_CARD_PRESENCE_CHECK_MS = 5000; // Check for card presence every 5 seconds
 
 /**
  * @struct SensorSnapshot
@@ -95,7 +96,7 @@ struct SensorSnapshot {
  * 
  * void loop()
  * {
- *     unsigned long now = millis();
+ *     uint64_t now = SystemFunctions::millis64();
  *     logger.update(now);
  * }
  * @endcode
@@ -121,9 +122,9 @@ private:
     uint8_t _currentDay;        // Track current day for file rotation
     
     // Timing
-    unsigned long _lastWriteTime;
-    unsigned long _lastFileCheckTime;
-    unsigned long _lastCardPresenceCheck;
+    uint64_t _lastWriteTime;
+    uint64_t _lastFileCheckTime;
+    uint64_t _lastCardPresenceCheck;
     
     // Statistics
     unsigned long _totalRecordsLogged;
@@ -134,7 +135,7 @@ private:
     uint32_t _initialLogFileSize;
 
     // Internal methods
-    bool openOrCreateFile(unsigned long now);
+    bool openOrCreateFile(uint64_t now);
     void closeCurrentFile();
     bool writeRecordsToCard(uint8_t maxRecords);
     void writeSnapshotToCsv(const SensorSnapshot& snapshot);
@@ -142,8 +143,8 @@ private:
     void addSnapshotToBuffer(const SensorSnapshot& snapshot);
     bool isBufferFull() const;
     bool isBufferEmpty() const;
-    void updateFileName(unsigned long now);
-    void checkForDateChange(unsigned long now);
+    void updateFileName(uint64_t now);
+    void checkForDateChange(uint64_t now);
     void checkSdCardStatus();
     
 public:
@@ -163,9 +164,9 @@ public:
     
     /**
      * @brief Update logger - processes buffered writes in non-blocking manner
-     * @param now Current time from millis()
+     * @param now Current time from SystemFunctions::millis64()
      */
-    void update(unsigned long now);
+    void update(uint64_t now);
     
     /**
      * @brief Check if SD card is initialized and working

@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+#include <stdio.h>
+#include <SerialCommandManager.h>
 #include "Local.h"
 #include "MQTTController.h"
 #include "Config.h"
-#include <SerialCommandManager.h>
-#include <stdio.h>
+#include "SystemFunctions.h"
 
+constexpr uint64_t DebugMessageIntervalMs = 1000;
 
 // Static instance pointer for callbacks
 MQTTController* MQTTController::_instance = nullptr;
@@ -32,6 +34,7 @@ MQTTController::MQTTController(MessageBus* messageBus, Config* config, IWifiRadi
     , _wifiRadio(wifiRadio)
     , _retryCount(0)
     , _lastRetryTime(0)
+    , _lastDebugTime(0)
     , _isEnabled(false)
     , _commandMgr(commandMgr)
     , _connectedSince(0)
@@ -123,7 +126,7 @@ void MQTTController::update()
     MqttConnectionState state = _mqttClient->getState();
     if (state == MqttConnectionState::Disconnected && shouldRetry())
     {
-        _lastRetryTime = millis();
+        _lastRetryTime = SystemFunctions::millis64();
         connect();
     }
 }
@@ -157,7 +160,12 @@ bool MQTTController::connect()
     {
         if (_commandMgr != nullptr)
         {
-            _commandMgr->sendDebug(F("WiFi not connected, skipping connect"), F("MQTT Controller"));
+            uint64_t now = SystemFunctions::millis64();
+            if (SystemFunctions::hasElapsed(now, _lastDebugTime, DebugMessageIntervalMs))
+            {
+                _commandMgr->sendDebug(F("WiFi not connected, skipping connect"), F("MQTT Controller"));
+                _lastDebugTime = now;
+            }
         }
 
         return false;
@@ -241,14 +249,14 @@ uint32_t MQTTController::getReconnectCount() const
     return _reconnectCount;
 }
 
-unsigned long MQTTController::getUptime() const
+uint64_t MQTTController::getUptime() const
 {
     if (!isConnected() || _connectedSince == 0)
     {
         return 0;
     }
     
-    return (millis() - _connectedSince) / 1000; // Convert to seconds
+    return (SystemFunctions::millis64() - _connectedSince) / 1000; // Convert to seconds
 }
 
 MQTTClient* MQTTController::getClient()
@@ -269,7 +277,7 @@ void MQTTController::onMqttConnected(bool connected)
             _commandMgr->sendDebug(F("Connected"), F("MQTT Controller"));
         }
         _retryCount = 0;
-        _connectedSince = millis();
+        _connectedSince = SystemFunctions::millis64();
         _reconnectCount++;
 
 #if defined(MQTT_SUPPORT)
@@ -407,9 +415,9 @@ bool MQTTController::shouldRetry()
         return false;
     }
 
-    unsigned long now = millis();
+    uint64_t now = SystemFunctions::millis64();
     uint16_t delay = getRetryDelay();
-    unsigned long elapsed = now - _lastRetryTime;
+    uint64_t elapsed = now - _lastRetryTime;
 
     return elapsed >= delay;
 }

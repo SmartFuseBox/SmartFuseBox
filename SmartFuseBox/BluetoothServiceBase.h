@@ -79,7 +79,7 @@ public:
      * 
      * @param currentMillis Current system time in milliseconds
      */
-    virtual void loop(unsigned long currentMillis) = 0;
+    virtual void loop(uint64_t currentMillis) = 0;
 
     /**
      * @brief Get the number of characteristics in this service.

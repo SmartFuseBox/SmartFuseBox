@@ -130,7 +130,7 @@ void LedMatrixManager::UpdateSignalStrength(int16_t strength)
     }
 }
 
-void LedMatrixManager::ProcessLedMatrix(unsigned long currMillis)
+void LedMatrixManager::ProcessLedMatrix(uint64_t currMillis)
 {
 	if (_activeSequence == LedSequenceType::Startup)
 	{
@@ -185,12 +185,12 @@ void LedMatrixManager::StartupSequence()
 {
 	_activeSequence = LedSequenceType::Startup;
 	_sequenceStep = 0;
-	_sequenceLastStepTime = millis();
+	_sequenceLastStepTime = SystemFunctions::millis64();
 	_sequenceDelay = 30;
 	_sequenceIsOn = true;
 }
 
-void LedMatrixManager::processStartupSequence(unsigned long currMillis)
+void LedMatrixManager::processStartupSequence(uint64_t currMillis)
 {
 	if (_sequenceStep < MaxLedRows * MaxLedColumns)
 	{
@@ -226,7 +226,7 @@ void LedMatrixManager::ShutdownSequence()
 {
     _activeSequence = LedSequenceType::Shutdown;
     _sequenceStep = 0;
-    _sequenceLastStepTime = millis();
+    _sequenceLastStepTime = SystemFunctions::millis64();
     _sequenceDelay = 400;
     _shutdownTopRow = 0;
     _shutdownBottomRow = MaxLedRows - 1;
@@ -234,7 +234,7 @@ void LedMatrixManager::ShutdownSequence()
     _shutdownRightColumn = MaxLedColumns - 1;
 }
 
-void LedMatrixManager::processShutdownSequence(unsigned long currMillis)
+void LedMatrixManager::processShutdownSequence(uint64_t currMillis)
 {
     if (_sequenceStep == 0)
 	{
@@ -312,7 +312,7 @@ void LedMatrixManager::updateLed()
 	}
 }
 
-void LedMatrixManager::updateTemperature(unsigned long currMillis)
+void LedMatrixManager::updateTemperature(uint64_t currMillis)
 {
 	if (currMillis < _lastTemperatureUpdate)
 		return;
@@ -327,7 +327,7 @@ void LedMatrixManager::updateTemperature(unsigned long currMillis)
 	_lastTemperatureUpdate = currMillis + LedUpdateFrequency;
 }
 
-void LedMatrixManager::updateHumidity(unsigned long currMillis)
+void LedMatrixManager::updateHumidity(uint64_t currMillis)
 {
 	if (currMillis < _lastHumidityUpdate)
 		return;

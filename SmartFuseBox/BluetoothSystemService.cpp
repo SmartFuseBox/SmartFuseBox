@@ -99,21 +99,21 @@ void* BluetoothSystemService::getBLEService()
     return _service;
 }
 
-void BluetoothSystemService::loop(unsigned long currentMillis)
+void BluetoothSystemService::loop(uint64_t currentMillis)
 {
-    if (currentMillis - _lastHeartbeat >= HEARTBEAT_INTERVAL_MS)
+    if (SystemFunctions::hasElapsed(currentMillis, _lastHeartbeat, HEARTBEAT_INTERVAL_MS))
     {
         sendHeartbeat();
         _lastHeartbeat = currentMillis;
     }
 
-    if (currentMillis - _lastMemoryUpdate >= MEMORY_UPDATE_INTERVAL_MS)
+    if (SystemFunctions::hasElapsed(currentMillis, _lastMemoryUpdate, MEMORY_UPDATE_INTERVAL_MS))
     {
         updateFreeMemory();
         _lastMemoryUpdate = currentMillis;
     }
 
-    if (currentMillis - _lastCpuUpdate >= CPU_UPDATE_INTERVAL_MS)
+    if (SystemFunctions::hasElapsed(currentMillis, _lastCpuUpdate, CPU_UPDATE_INTERVAL_MS))
     {
         updateCpuUsage();
         _lastCpuUpdate = currentMillis;

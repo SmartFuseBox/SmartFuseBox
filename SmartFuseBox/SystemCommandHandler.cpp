@@ -59,7 +59,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         const char* tStr = getParamValue(params, paramCount, "t");
         if (tStr)
         {
-            unsigned long timestamp = static_cast<unsigned long>(strtoul(tStr, nullptr, 0));
+            uint64_t timestamp = static_cast<uint64_t>(strtoull(tStr, nullptr, 0));
             if (timestamp > 0)
             {
                 DateTimeManager::setDateTime(timestamp);
@@ -147,7 +147,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         bool success = false;
 
         // Only supports Unix timestamp (all digits)
-        unsigned long timestamp = static_cast<unsigned long>(strtoul(params[0].value, nullptr, 0));
+        uint64_t timestamp = static_cast<uint64_t>(strtoull(params[0].value, nullptr, 0));
         if (timestamp > 0)
         {
             DateTimeManager::setDateTime(timestamp);

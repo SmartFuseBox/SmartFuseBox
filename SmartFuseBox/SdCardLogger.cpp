@@ -61,7 +61,7 @@ bool SdCardLogger::initialize()
     return true;
 }
 
-void SdCardLogger::update(unsigned long now)
+void SdCardLogger::update(uint64_t now)
 {
     MicroSdDriver& sdDriver = MicroSdDriver::getInstance();
 
@@ -134,7 +134,7 @@ bool SdCardLogger::writeRecordsToCard(uint8_t maxRecords)
     // Open or create file if needed
     if (_currentFile == nullptr || !_fileOpen)
     {
-        if (!openOrCreateFile(millis()))
+        if (!openOrCreateFile(SystemFunctions::millis64()))
         {
             return false;
         }
@@ -267,7 +267,7 @@ void SdCardLogger::writeSnapshotToCsv(const SensorSnapshot& snapshot)
     _currentFile->println();
 }
 
-bool SdCardLogger::openOrCreateFile(unsigned long now)
+bool SdCardLogger::openOrCreateFile(uint64_t now)
 {
     MicroSdDriver& sdDriver = MicroSdDriver::getInstance();
 
@@ -319,7 +319,7 @@ void SdCardLogger::closeCurrentFile()
     }
 }
 
-void SdCardLogger::updateFileName(unsigned long now)
+void SdCardLogger::updateFileName(uint64_t now)
 {
 	(void)now; // Unused parameter, but could be used for future enhancements
     uint16_t year = DateTimeManager::getYear();
@@ -333,7 +333,7 @@ void SdCardLogger::updateFileName(unsigned long now)
     _currentDay = day;
 }
 
-void SdCardLogger::checkForDateChange(unsigned long now)
+void SdCardLogger::checkForDateChange(uint64_t now)
 {
     uint8_t currentDay = DateTimeManager::getDay();
     

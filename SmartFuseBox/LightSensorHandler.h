@@ -22,7 +22,7 @@
 #include "Queue.h"
 #include "RelayController.h"
 
-constexpr unsigned long LightCheckMs = 30000;
+constexpr uint64_t LightCheckMs = 30000;
 constexpr uint8_t LightQueueCapacity = 10;
 constexpr uint8_t DaytimeConfirmReadings = 3;
 constexpr uint8_t AnalogHysteresisPct = 10;
@@ -91,7 +91,7 @@ protected:
         syncNightRelay(ConfigManager::getConfigPtr());
     }
 
-    unsigned long update() override
+    uint64_t update() override
     {
         Config* config = ConfigManager::getConfigPtr();
         bool reading;

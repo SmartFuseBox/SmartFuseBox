@@ -41,7 +41,7 @@ public:
     bool begin() override;
     const char* getServiceUUID() const override;
     const char* getServiceName() const override;
-    void loop(unsigned long currentMillis) override;
+    void loop(uint64_t currentMillis) override;
     uint8_t getCharacteristicCount() const override;
     void* getBLEService() override;
 
