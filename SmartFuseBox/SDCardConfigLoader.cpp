@@ -272,7 +272,7 @@ bool SdCardConfigLoader::applyConfigCommand(const char* line)
     }
     else if (SystemFunctions::commandMatches(command, ConfigBoatType) && paramCount >= 1)
     {
-        result = _configController->setVesselType(static_cast<uint8_t>(atoi(params[0].value)));
+        result = _configController->setLocationType(static_cast<uint8_t>(atoi(params[0].value)));
     }
     else if (SystemFunctions::commandMatches(command, ConfigSoundStartDelay) && paramCount >= 1)
     {
@@ -604,11 +604,11 @@ bool SdCardConfigLoader::exportConfigToSd()
     configFile->println();
 
     // C3 - Boat name
-    if (strlen(config->vessel.name) > 0)
+    if (strlen(config->location.name) > 0)
     {
         configFile->print(ConfigRename);
         configFile->print(":");
-        configFile->println(config->vessel.name);
+        configFile->println(config->location.name);
     }
 
     // R6 - Relay names (short|long)
@@ -695,7 +695,7 @@ bool SdCardConfigLoader::exportConfigToSd()
     // C7 - Vessel type
     configFile->print(ConfigBoatType);
     configFile->print(":v=");
-    configFile->println(static_cast<uint8_t>(config->vessel.vesselType));
+    configFile->println(static_cast<uint8_t>(config->location.locationType));
 
     // C9 - Sound delay
     configFile->print(ConfigSoundStartDelay);
@@ -745,17 +745,17 @@ bool SdCardConfigLoader::exportConfigToSd()
     // C21 - MMSI
     configFile->print(ConfigMmsi);
     configFile->print(":");
-    configFile->println(config->vessel.mmsi);
+    configFile->println(config->location.mmsi);
 
     // C22 - Call sign
     configFile->print(ConfigCallSign);
     configFile->print(":");
-    configFile->println(config->vessel.callSign);
+    configFile->println(config->location.callSign);
 
     // C23 - Home port
     configFile->print(ConfigHomePort);
     configFile->print(":");
-    configFile->println(config->vessel.homePort);
+    configFile->println(config->location.homePort);
 
     // C24 - LED colors
     configFile->print(ConfigLedColor);

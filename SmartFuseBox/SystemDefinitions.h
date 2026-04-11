@@ -75,7 +75,7 @@ constexpr char ConfigSaveSettings[] = "C0";
 constexpr char ConfigGetSettings[] = "C1";
 constexpr char ConfigResetSettings[] = "C2";
 constexpr char ConfigRename[] = "C3";
-constexpr char ConfigRenameRelay[] = "C4";    // Retired — use RelayRename (R6)
+constexpr char ConfigSpiPins[] = "C4";
 constexpr char ConfigMapHomeButton[] = "C5";
 constexpr char ConfigSetButtonColor[] = "C6";  // Retired — use RelaySetButtonColor (R7)
 constexpr char ConfigBoatType[] = "C7";
@@ -106,7 +106,7 @@ constexpr char ControlPanelTones[] = "C28";
 constexpr char ConfigReloadFromSd[] = "C29";
 constexpr char ConfigExportToSd[] = "C30";
 constexpr char ConfigSdCardSpeed[] = "C31";
-constexpr char ConfigLightSensorNightRelay[] = "C32"; // Retired — use RelaySetActionType (R10) with NightRelay
+constexpr char ConfigSdCardCsPin[] = "C32";
 constexpr char ConfigLightSensorThreshold[] = "C33";
 
 constexpr char MqttConfigEnable[] = "M0";

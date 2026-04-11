@@ -24,15 +24,16 @@ constexpr uint8_t CrashCounterThreshold = 3;
 class ConfigManager
 {
 private:
-    static uint16_t calcChecksum(const Config& c);
-    static bool loadHeader();
-    static bool saveHeader();
-    static uint16_t calcHeaderChecksum(const SystemHeader& h);
+	static uint16_t calcChecksum(const Config& c);
+	static bool loadHeader();
+	static bool saveHeader();
+	static uint16_t calcHeaderChecksum(const SystemHeader& h);
 	static void migrateV1toV2();
 	static void migrateV2toV3();
 	static void migrateV3toV4();
-    static Config _cfg;
-    static SystemHeader _hdr;
+	static void migrateV4toV5();
+	static Config _cfg;
+	static SystemHeader _hdr;
 
 public:
     // Call once at startup (handles any board-specific init)

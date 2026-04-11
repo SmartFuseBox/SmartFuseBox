@@ -115,10 +115,10 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
         _warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
     }
 
-    // Sync relay pin assignments from config (overrides the bootstrap pins
-    // passed at construction; disabled relays will have pin == 0xFF).
-    _relayController.syncPinsFromConfig();
-    _relayController.setSoundController(&_soundController);
+	// Sync relay pin assignments from config (overrides the bootstrap pins
+	// passed at construction; disabled relays will have pin == 0xFF).
+	_relayController.syncPinsFromConfig();
+	_relayController.setSoundController(&_soundController);
 
 	if (remoteSensorCount > 0 && remoteSensors != nullptr)
     {
@@ -145,7 +145,7 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
         _factorySensors = SensorFactory::create(config->sensors, ctx, _factorySensorCount);
     }
 
-    // Merge factory-built local sensors and caller-supplied remote sensors into
+    // Merge factory-built local sensors
     // flat arrays for SensorController (query/status) and SensorManager (poll loop).
     uint8_t totalCount = _factorySensorCount + remoteSensorCount;
     BaseSensor**        allSensors  = (totalCount > 0) ? new BaseSensor*[totalCount]        : nullptr;
@@ -170,7 +170,6 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     _sensorManager    = new SensorManager(allHandlers, totalCount);
 
     _sensorNetworkHandler = new SensorNetworkHandler(_sensorController);
-
     _relayController.setup();
 
     // middleware
@@ -191,7 +190,7 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     _commandMgrLink->registerHandlers(_serialHandlers, _serialHandlerCount);
     _commandMgrComputer->registerHandlers(_serialHandlers, _serialHandlerCount);
 
-    // Give the WiFi command bridge a pointer to the same handler array so
+    // Give the WiFi command bridge
     // POST /api/command/{cmd} delegates to the exact same implementations.
     _wifiCommandBridge.setHandlers(_serialHandlers, _serialHandlerCount);
 
@@ -253,7 +252,10 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     microSdDriver.setOnCardReadyCallback(onSdCardReadyCallback);
 #endif
 
-    microSdDriver.beginInitialize(SdCardCsPin, config->sdCard.initializeSpeed);
+    if (config->sdCard.csPin != PinDisabled)
+    {
+        microSdDriver.beginInitialize(config->spiPins.misoPin, config->spiPins.mosiPin, config->spiPins.sckPin, config->sdCard.csPin, config->sdCard.initializeSpeed);
+    }
 
     // Initialize SD card logger
     _sdCardLogger.initialize();

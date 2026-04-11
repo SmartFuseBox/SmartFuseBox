@@ -65,7 +65,7 @@ protected:
 
 		if (!_waitingForStabilization)
 		{
-			digitalWrite(WaterSensorActivePin, HIGH);
+			digitalWrite(_activePin, HIGH);
 			_waitingForStabilization = true;
 			return WaterSensorStabilizeMs;
 		}
@@ -75,7 +75,7 @@ protected:
 		_latestWaterLevel = static_cast<uint16_t>(sensorValue);
 		_waterPumpQueue.enqueue(_latestWaterLevel);
 
-		digitalWrite(WaterSensorActivePin, LOW);
+		digitalWrite(_activePin, LOW);
 
 		StringKeyValue params[2];
 		strncpy(params[0].key, "avg", sizeof(params[0].key));

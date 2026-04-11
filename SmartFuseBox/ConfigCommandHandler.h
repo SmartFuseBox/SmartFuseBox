@@ -35,7 +35,7 @@ class MQTTConfigCommandHandler;
 class MQTTController;
 #endif
 
-class ConfigCommandHandler : public BaseConfigCommandHandler
+class ConfigCommandHandler : public virtual BaseCommandHandler, public BaseConfigCommandHandler
 {
 private:
 	IWifiController* _wifiController;

@@ -29,7 +29,7 @@
   *
   * Rules:
   * 1) Activate exactly ONE board define below.
-  * 2) Set ConfigRelayCount and the Relays array to match your hardware.
+  * 2) Set ConfigRelayCount to the number of relay channels on your hardware.
   * 3) Opt in/out of features using the trailing-underscore convention.
   * 4) Do not commit hardware-specific changes back to the main repository.
   */
@@ -47,6 +47,17 @@
 #define ESP32
 #endif
 
+
+// CONFIGURE_SPI gates the board-specific SPI.begin(sck, miso, mosi) overload used
+// by cores that support custom pin assignment at bus-init time (e.g. ESP32).
+// When undefined, the portable SPI.begin() is called with the core's default pins.
+// Pin values passed to beginInitialize() are always stored regardless of this flag,
+// so board-specific code can still apply them (e.g. via SPI.setSCK/setMISO/setMOSI)
+// if the target core provides those helpers.
+#define CONFIGURE_SPI
+#if defined(ARDUINO_UNO_R4) || defined(ARDUINO_R4_MINIMA)
+#undef CONFIGURE_SPI
+#endif
 
 // ─── Controller Mode ──────────────────────────────────────────────────────────
 // Undefine to use only the underlying components (WiFi, MQTT etc.) without
@@ -87,67 +98,9 @@
 constexpr uint64_t serialInitTimeoutMs = 300;
 
 
-// ─── Sensor Pins ──────────────────────────────────────────────────────────────
-#if defined(ESP32)
-// ESP32 NodeMCU-32S — adjust to your actual sensor wiring.
-// ADC1 pins are safe; ADC2 pins (0,2,4,12-15,25-27) conflict with WiFi when active.
-constexpr uint8_t WaterSensorPin = 34;       // ADC1, input-only, safe for analog read
-constexpr uint8_t WaterSensorActivePin = 21; // GPIO21, output-capable, used to drive sensor power/enable
-constexpr uint8_t Dht11SensorPin = 4;
-constexpr uint8_t LightSensorPin = 36;       // ADC1 (VP), input-only, safe
-constexpr bool LightSensorIsDigital = false;
-#else
-constexpr uint8_t WaterSensorPin = A0;
-constexpr uint8_t WaterSensorActivePin = 8;
-constexpr uint8_t Dht11SensorPin = 9;
-// LightSensorPin can be used for either a digital or analog light sensor. Indicate 
-// whether digital (on/off) sensor, of false for analog (light level) sensor
-constexpr uint8_t LightSensorPin = 3;
-constexpr bool LightSensorIsDigital = true;
-#endif
-
-#if defined(SD_CARD_SUPPORT)
-#if defined(ESP32)
-constexpr uint8_t SdCardCsPin = 5;
-constexpr uint8_t SdCardMosiPin = 23;
-constexpr uint8_t SdCardMisoPin = 19;
-constexpr uint8_t SdCardSckPin = 18;
-#else
-constexpr uint8_t SdCardCsPin = 10;
-constexpr uint8_t SdCardMosiPin = 11;
-constexpr uint8_t SdCardMisoPin = 12;
-constexpr uint8_t SdCardSckPin = 13;
-#endif
-#endif
-
-
 // ─── Relay Config ─────────────────────────────────────────────────────────────
-// ConfigRelayCount must match the number of entries in Relays[].
+// Number of relay channels. Pins are assigned at runtime via configuration.
 constexpr uint8_t ConfigRelayCount = 8;
-
-#if defined(ESP32)
-// ESP32 NodeMCU-32S safe GPIO pins (avoids flash SPI pins 6-11 and strapping pins).
-// Adjust these to match your actual relay board wiring.
-constexpr uint8_t Relay1 = 32;
-constexpr uint8_t Relay2 = 33;
-constexpr uint8_t Relay3 = 25;
-constexpr uint8_t Relay4 = 26;
-constexpr uint8_t Relay5 = 27;
-constexpr uint8_t Relay6 = 14;
-constexpr uint8_t Relay7 = 12;
-constexpr uint8_t Relay8 = 13;
-#else
-constexpr uint8_t Relay1 = 7;
-constexpr uint8_t Relay2 = 6;
-constexpr uint8_t Relay3 = 5;
-constexpr uint8_t Relay4 = 4;
-constexpr uint8_t Relay5 = 19;
-constexpr uint8_t Relay6 = 18;
-constexpr uint8_t Relay7 = 17;
-constexpr uint8_t Relay8 = 16;
-#endif
-
-constexpr uint8_t Relays[ConfigRelayCount] = { Relay1, Relay2, Relay3, Relay4, Relay5, Relay6, Relay7, Relay8 };
 
 
 // ─── Framework Config ─────────────────────────────────────────────────────────

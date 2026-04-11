@@ -47,6 +47,9 @@ constexpr uint32_t SystemHeaderMagic = 0x53464201;  // 'SFB\x01'
 // Flags stored in SystemHeader::reserved[0]
 constexpr uint8_t OtaFlagAutoApply = 0x01;  // bit0: automatically download and apply updates
 
+constexpr uint8_t ConfigAuthApiKeyLength = 32;
+constexpr uint8_t ConfigAuthHmacKeyLength = 32;
+
 struct SystemHeader {
     uint32_t magic;               // offset 0  — must equal SystemHeaderMagic
     uint32_t bootCount;           // offset 4
@@ -59,12 +62,19 @@ struct SystemHeader {
     uint16_t checksum;            // offset 30 — always last
 } __attribute__((packed));        // = 32 bytes
 
-enum class VesselType : uint8_t
+enum class LocationType : uint8_t
 {
-    Motor = 0x00,                   // Power boat
+    Power = 0x00,                   // Power boat
     Sail = 0x01,                    // Sailing boat
     Fishing = 0x02,                 // Fishing boat
     Yacht = 0x03,                   // Yacht
+	Shed = 0x04,                    // Shed
+	Basement = 0x05,                // Basement
+	Workshop = 0x06,                // Workshop
+	Garage = 0x07,                  // Garage
+	Bedroom = 0x08,                 // Bedroom
+	Office = 0x09,                  // Office
+	Other = 0xFF                    // Other/unspecified
 };
 
 enum class TriggerType : uint8_t
@@ -116,7 +126,8 @@ constexpr uint8_t ConfigVersion1 = 1;
 constexpr uint8_t ConfigVersion2 = 2;
 constexpr uint8_t ConfigVersion3 = 3;
 constexpr uint8_t ConfigVersion4 = 4;
-constexpr uint8_t ConfigVersion = ConfigVersion4;
+constexpr uint8_t ConfigVersion5 = 5;
+constexpr uint8_t ConfigVersion = ConfigVersion5;
 
 constexpr uint8_t ConfigHomeButtons = 4;
 constexpr uint8_t ConfigMaxNameLength = 31; // max characters (inc null)
@@ -129,52 +140,53 @@ constexpr uint8_t ConfigLinkedRelayCount = 2;
 
 struct SystemConfig {
     int8_t  timezoneOffset;
-    uint8_t reserved1[4];
-    int8_t reserved2[4];
+    bool    rebootOnSave;       // if true, device reboots after C0 persists config
+    uint8_t reserved1[3];
+    int8_t  reserved2[4];
 } __attribute__((packed));
 
-struct VesselConfig {
-    char     name[ConfigMaxNameLength];
-    VesselType vesselType;
-    char     mmsi[ConfigMmsiLength];
-    char     callSign[ConfigCallSignLength];
-    char     homePort[ConfigHomePortLength];
+struct LocationConfig {
+    char name[ConfigMaxNameLength];
+    LocationType locationType;
+    char mmsi[ConfigMmsiLength];
+    char callSign[ConfigCallSignLength];
+    char homePort[ConfigHomePortLength];
     uint8_t reserved1[4];
     int8_t reserved2[4];
 } __attribute__((packed));
 
 struct RelayEntry {
-    char            shortName[ConfigShortRelayNameLength];  // 6 bytes
-    char            longName[ConfigLongRelayNameLength];    // 21 bytes
-    uint8_t         pin;                                   // 1 byte
-    uint8_t         buttonImage;                           // 1 byte
-    bool            defaultState;                          // 1 byte
-    RelayActionType actionType;                            // 1 byte
-    uint8_t         reserved[1];                           // 1 byte future growth
+    char shortName[ConfigShortRelayNameLength];
+    char longName[ConfigLongRelayNameLength];
+    uint8_t pin;
+    uint8_t buttonImage;
+    bool defaultState;
+    RelayActionType actionType; 
+    uint8_t reserved[1];
 } __attribute__((packed));
 
 struct RelayConfig {
-    uint8_t    homePageMapping[ConfigHomeButtons];  // 4 bytes  — UI layout, not per-relay
-    RelayEntry relays[ConfigRelayCount];            // 8 × 33 = 264 bytes
-    uint8_t    linkedRelays[ConfigMaxLinkedRelays][ConfigLinkedRelayCount]; // 4 bytes, 0xFF = unused
-    uint8_t    reserved1[4];                        // 4 bytes
-    int8_t     reserved2[4];                        // 4 bytes
+    uint8_t homePageMapping[ConfigHomeButtons]; 
+    RelayEntry relays[ConfigRelayCount];
+    uint8_t linkedRelays[ConfigMaxLinkedRelays][ConfigLinkedRelayCount];
+    uint8_t reserved1[4];
+    int8_t reserved2[4];
 } __attribute__((packed));
 
 struct NetworkConfig {
-    bool     wifiEnabled;
+    bool wifiEnabled;
     WifiMode accessMode;
-    char     ssid[MaxSSIDLength];
-    char     password[MaxWiFiPasswordLength];
+    char ssid[MaxSSIDLength];
+    char password[MaxWiFiPasswordLength];
     uint16_t port;
-    char     apIpAddress[MaxIpAddressLength];
-    bool     bluetoothEnabled;
+    char apIpAddress[MaxIpAddressLength];
+    bool bluetoothEnabled; 
     uint8_t reserved1[4];
     int8_t reserved2[4];
 } __attribute__((packed));
 
 struct SoundConfig {
-    uint8_t  hornRelayIndex;
+    uint8_t hornRelayIndex;
     uint16_t startDelayMs;
     uint8_t  goodPreset;
     uint16_t goodToneHz;
@@ -189,7 +201,8 @@ struct SoundConfig {
 
 struct SdCardConfig {
     uint8_t initializeSpeed;
-    uint8_t reserved[4];
+    uint8_t csPin;
+    uint8_t reserved[3];
 } __attribute__((packed));
 
 struct LedConfig {
@@ -267,10 +280,24 @@ struct SensorsConfig {
     int8_t reserved2[2];
 } __attribute__((packed));
 
+struct SpiPins {
+    uint8_t sckPin;
+    uint8_t misoPin;
+    uint8_t mosiPin;
+} __attribute__((packed));
+
+struct NetworkAuthConfig {
+    bool enabled;
+    uint8_t version;
+    char apiKey[ConfigAuthApiKeyLength];
+    char hmacKey[ConfigAuthHmacKeyLength];
+    uint8_t reserved[4];
+} __attribute__((packed));
+
 struct Config {
     uint8_t version;
     SystemConfig system;
-    VesselConfig vessel;
+    LocationConfig location;
     RelayConfig relay;
     NetworkConfig network;
     SoundConfig sound;
@@ -280,6 +307,8 @@ struct Config {
     SdCardConfig sdCard;
     SchedulerSettings scheduler;
     SensorsConfig sensors;
+    SpiPins spiPins;
+    NetworkAuthConfig auth;
     uint8_t reserved1[2];
     int8_t reserved2[2];
     uint16_t checksum;          // always last

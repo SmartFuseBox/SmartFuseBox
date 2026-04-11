@@ -51,23 +51,25 @@ uint16_t ConfigManager::calcChecksum(const Config& c)
 
 bool ConfigManager::load()
 {
-    // Ensure EEPROM is initialised for boards that require it
-    begin();
+	// Ensure EEPROM is initialised for boards that require it
+	begin();
 
-    // Read raw bytes
-    EEPROM.get(sizeof(SystemHeader), _cfg);
+	loadHeader();
 
-    // Step up through every known version in sequence.
-    // Each migration bumps _cfg.version by one, so a device that has missed
-    // multiple releases will chain through all intermediate steps automatically.
-    bool migrated = false;
-    while (_cfg.version < ConfigVersion)
-    {
-        if (_cfg.version == ConfigVersion1)
-        {
-            migrateV1toV2();
-            migrated = true;
-        }
+	// Read raw bytes
+	EEPROM.get(sizeof(SystemHeader), _cfg);
+
+	// Step up through every known version in sequence.
+	// Each migration bumps _cfg.version by one, so a device that has missed
+	// multiple releases will chain through all intermediate steps automatically.
+	bool migrated = false;
+	while (_cfg.version < ConfigVersion)
+	{
+		if (_cfg.version == ConfigVersion1)
+		{
+			migrateV1toV2();
+			migrated = true;
+		}
 		else if (_cfg.version == ConfigVersion2)
 		{
 			migrateV2toV3();
@@ -78,42 +80,47 @@ bool ConfigManager::load()
 			migrateV3toV4();
 			migrated = true;
 		}
+		else if (_cfg.version == ConfigVersion4)
+		{
+			migrateV4toV5();
+			migrated = true;
+		}
 		else
 		{
-            // Version is below the oldest known migration (e.g. 0x00 on some blank boards).
-            // Cannot migrate safely — reset and persist clean defaults.
-            resetToDefaults();
-            save();
-            return false;
-        }
-    }
+			// Version is below the oldest known migration (e.g. 0x00 on some blank boards).
+			// Cannot migrate safely — reset and persist clean defaults.
+			resetToDefaults();
+			save();
+			return false;
+		}
+	}
 
-    // Version is above ConfigVersion (future firmware downgraded, or 0xFF on a fresh board)
-    if (_cfg.version != ConfigVersion)
-    {
-        resetToDefaults();
-        save();
-        return false;
-    }
+	// Version is above ConfigVersion (future firmware downgraded, or 0xFF on a fresh board)
+	if (_cfg.version != ConfigVersion)
+	{
+		resetToDefaults();
+		save();
+		return false;
+	}
 
-    // Migration succeeded — persist the upgraded config and skip the checksum check
-    // (the old checksum is no longer valid for the new layout).
-    if (migrated)
-    {
-        save();
-        return true;
-    }
+	// Migration succeeded — persist the upgraded config and skip the checksum check
+	// (the old checksum is no longer valid for the new layout).
+	if (migrated)
+	{
+		save();
+		return true;
+	}
 
-    uint16_t expected = calcChecksum(_cfg);
-    if (expected != _cfg.checksum)
-    {
-        // corrupted: reset to defaults and persist
-        resetToDefaults();
-        save();
-        return false;
-    }
+	uint16_t expected = calcChecksum(_cfg);
+	if (expected != _cfg.checksum)
+	{
+		// corrupted: reset to defaults and persist
+		resetToDefaults();
+		save();
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 void ConfigManager::migrateV1toV2()
@@ -167,6 +174,23 @@ void ConfigManager::migrateV3toV4()
     _cfg.version = ConfigVersion4;
 }
 
+void ConfigManager::migrateV4toV5()
+{
+    // V4 -> V5: introduced user configurable SPI pins
+    _cfg.spiPins.misoPin = PinDisabled;
+    _cfg.spiPins.mosiPin = PinDisabled;
+    _cfg.spiPins.sckPin = PinDisabled;
+    _cfg.auth.enabled = false;
+    _cfg.auth.version = 0;
+    _cfg.auth.apiKey[0] = '\0';
+    _cfg.auth.hmacKey[0] = '\0';
+    memset(_cfg.auth.reserved, 0x00, sizeof(_cfg.auth.reserved));
+    
+    _cfg.version = ConfigVersion5;
+    _cfg.system.rebootOnSave = false;
+    _cfg.sdCard.csPin = PinDisabled;
+}
+
 bool ConfigManager::save()
 {
     // prepare checksum
@@ -176,7 +200,6 @@ bool ConfigManager::save()
 
     EEPROM.put(sizeof(SystemHeader), _cfg);
 #if defined(ESP8266) || defined(ESP32)
-    // commit for ESP
     bool ok = EEPROM.commit();
     return ok;
 #else
@@ -192,8 +215,8 @@ void ConfigManager::resetToDefaults()
     _cfg.version = ConfigVersion;
 
     // Default boat name
-    strncpy_P(_cfg.vessel.name, DefaultBoatName, ConfigMaxNameLength - 1);
-    _cfg.vessel.name[ConfigMaxNameLength - 1] = '\0';  // Ensure null termination
+    strncpy_P(_cfg.location.name, DefaultBoatName, ConfigMaxNameLength - 1);
+    _cfg.location.name[ConfigMaxNameLength - 1] = '\0';  // Ensure null termination
 
     for (uint8_t i = 0; i < ConfigRelayCount; ++i)
     {
@@ -209,12 +232,10 @@ void ConfigManager::resetToDefaults()
 
         _cfg.relay.relays[i].buttonImage = 0x02;    // default color blue
         _cfg.relay.relays[i].defaultState = false;   // default off (relay closed)
-#if defined(FUSE_BOX_CONTROLLER)
-        _cfg.relay.relays[i].pin = Relays[i]; // default pin from Local.h
-#else
         _cfg.relay.relays[i].pin = PinDisabled; // no pin assigned
-#endif
     }
+
+    _cfg.sdCard.csPin = PinDisabled;
 
     // Reset linked relay table
     for (uint8_t i = 0; i < ConfigMaxLinkedRelays; ++i)
@@ -229,17 +250,21 @@ void ConfigManager::resetToDefaults()
         _cfg.relay.homePageMapping[i] = i; // map slot i -> relay i
     }
 
-	_cfg.vessel.vesselType = VesselType::Motor;
+	_cfg.location.locationType = LocationType::Other;
 	_cfg.sound.hornRelayIndex = PinDisabled; // none
     _cfg.lightSensor.nightRelayIndex = PinDisabled; // none
     _cfg.lightSensor.daytimeThreshold = 512;
     _cfg.sound.startDelayMs = 500; // 500ms
 
 
-	strncpy(_cfg.vessel.mmsi, "000000000", ConfigMmsiLength - 1);
-	strncpy(_cfg.vessel.callSign, "NOCALL", ConfigCallSignLength - 1);
-	strncpy(_cfg.vessel.homePort, "Unknown", ConfigHomePortLength - 1);
-	_cfg.system.timezoneOffset = 0; // UTC
+    strncpy(_cfg.location.mmsi, "000000000", ConfigMmsiLength - 1);
+    _cfg.location.mmsi[ConfigMmsiLength - 1] = '\0';
+    strncpy(_cfg.location.callSign, "NOCALL", ConfigCallSignLength - 1);
+    _cfg.location.callSign[ConfigCallSignLength - 1] = '\0';
+    strncpy(_cfg.location.homePort, "Unknown", ConfigHomePortLength - 1);
+    _cfg.location.homePort[ConfigHomePortLength - 1] = '\0';
+    _cfg.system.timezoneOffset = 0; // UTC
+    _cfg.system.rebootOnSave = false;
 
     _cfg.network.bluetoothEnabled = false;
 
@@ -252,6 +277,13 @@ void ConfigManager::resetToDefaults()
 	_cfg.network.port = DefaultWifiPort;
 	strncpy(_cfg.network.apIpAddress, DefaultApIpAddress, sizeof(_cfg.network.apIpAddress) - 1);
 	_cfg.network.apIpAddress[sizeof(_cfg.network.apIpAddress) - 1] = '\0';
+
+    // Network auth defaults
+    _cfg.auth.enabled = false;
+    _cfg.auth.version = 0;
+    _cfg.auth.apiKey[0] = '\0';
+    _cfg.auth.hmacKey[0] = '\0';
+    memset(_cfg.auth.reserved, 0x00, sizeof(_cfg.auth.reserved));
 
 #if defined(WIFI_SUPPORT)
     _cfg.network.wifiEnabled = true;
@@ -276,6 +308,7 @@ void ConfigManager::resetToDefaults()
 #endif
 
     _cfg.sdCard.initializeSpeed = 4;
+
     _cfg.led.dayBrightness = 80;
     _cfg.led.dayGoodColor[0] = 0;
     _cfg.led.dayGoodColor[1] = 80;
@@ -308,6 +341,11 @@ void ConfigManager::resetToDefaults()
 
     for (uint8_t i = 0; i < ConfigMaxSensors; ++i)
         memset(_cfg.sensors.sensors[i].pins, PinDisabled, ConfigMaxSensorPins);
+
+    // spi pins
+    _cfg.spiPins.misoPin = PinDisabled;
+    _cfg.spiPins.mosiPin = PinDisabled;
+    _cfg.spiPins.sckPin = PinDisabled;
 
     // compute checksum
     _cfg.checksum = 0;

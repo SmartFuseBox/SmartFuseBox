@@ -54,10 +54,10 @@ These are commands used to configure the system settings and can only be sent fr
 | Command | Example | Purpose |
 |---|---|---|
 | `C0` — Save settings | `C0` | Persist current in-memory config to EEPROM. Responds `SAVED` on success; error `EEPROM commit failed` on failure. No params. |
-| `C1` — Get settings | `C1` | Request full config. Device replies with multiple commands: `C3 <boatName>`, `C5 <slot>:<relay>` for each home-slot mapping, `C7 v=<type>` for vessel type, `C9 v=<delay>` for sound delay, `C10`-`C17` for WiFi/Bluetooth settings (SFB only), `C20 v=<offset>` for timezone, `C21 <mmsi>` for MMSI, `C22 <callsign>` for call sign, `C23 <homeport>` for home port, `R6 <idx>=<shortName\|longName>` for each relay name, `R7 <idx>=<color>` for each button color, `R8 <relay>=<state>` for default relay states, `R9 <relay>=<linkedrelay>` for linked relay pairs (active pairs only), `R10 <relay>=<actionType>` for non-default action types only, `R11 <relay>=<pin>` for relay pins, `S0` for all sensor config entries (one `S0` response per configured sensor), then `OK`. No params. |
+| `C1` — Get settings | `C1` | Request full config. Device replies with multiple commands: `C3 <boatName>`, `C4 sck=<pin>;mosi=<pin>;miso=<pin>` (SPI bus pins), `C5 <slot>:<relay>` for each home-slot mapping, `C7 v=<type>` for vessel type, `C9 v=<delay>` for sound delay, `C10`-`C17` for WiFi/Bluetooth settings (SFB only), `C20 v=<offset>` for timezone, `C21 <mmsi>` for MMSI, `C22 <callsign>` for call sign, `C23 <homeport>` for home port, `R6 <idx>=<shortName\|longName>` for each relay name, `R7 <idx>=<color>` for each button color, `R8 <relay>=<state>` for default relay states, `R9 <relay>=<linkedrelay>` for linked relay pairs (active pairs only), `R10 <relay>=<actionType>` for non-default action types only, `R11 <relay>=<pin>` for relay pins, `S0` for all sensor config entries (one `S0` response per configured sensor), then `OK`. No params. |
 | `C2` — Reset settings | `C2` | Request full reset of all config settings. No params. |
-| `C3` — Rename boat (BCP) | `C3:Sea Wolf` or `C3:name=SeaWolf` | Set the boat name. `<key>:<value>` pair (value is used as boat name. Empty name → error. Name is truncated to configured max length. |
-| ~~`C4`~~ — ~~Rename relay~~ | — | **Retired.** Use `R6` — Relay Rename instead. |
+| `C3` — Rename boat | `C3:Sea Wolf` or `C3:name=SeaWolf` | Set the boat name. `<key>:<value>` pair (value is used as boat name. Empty name → error. Name is truncated to configured max length. |
+| `C4` — SPI pins | `C4:sck=12;mosi=11;miso=13` | Set the SD card SPI bus pins. Param format: `sck=<pin>;mosi=<pin>;miso=<pin>`. All three keys are required. Use `255` (PinDisabled) to clear a pin. Returned by `C1` with the current stored values. Call `C0` to persist. |
 | `C5` — Map home button (BCP) | `C5:1=3` (map) — `C5:1=255` (unmap) | Map a home-page slot to a relay. Param format: `<slot>:<relay>`. `button` must be 0..3 (`HOME_BUTTONS`). `relay` must be 0..7 or `255` to clear/unmap. |
 | ~~`C6`~~ — ~~Set relay button color~~ | — | **Retired.** Use `R7` — Relay Set Button Color instead. |
 | `C7` — Set vessel type | `C7:v=1` | Set the vessel type. Param format: `v=<type>`. Possible values for `<type>` are: 0 (Motor), 1 (Sail), 2 (Fishing), 3 (Yacht). Uses enum values as defined in `Config.h`. Invalid or missing value → error. |
@@ -132,7 +132,7 @@ C0                              # Save to EEPROM
 Common MQTT error responses: `Config not available`, `Invalid port`, `Invalid keep-alive interval`, `Invalid value (true/false or 0/1)`.
 
 
-Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`, `Invalid type (0=day, 1=night)`, `Brightness must be 0-100`, `Invalid value (true/false or 0/1)`, `Missing params (t,r,g,b)`, `Missing params (t,b)`, `Missing params (g,w,s)`, `Invalid speed (4, 8, 12, 16, 20, or 24 MHz)`, `Config not available`, `Invalid port`, `Invalid keep-alive interval`.
+Common error responses you may see: `Missing param`, `Missing params`, `Missing name`, `Empty name`, `Index out of range`, `Button out of range`, `Slot out of range`, `Relay out of range (or 255 to clear)`, `Invalid value (0 or 1)`, `Invalid mode (0=AP, 1=Client)`, `Only available in Client mode`, `Invalid port`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid boat type`, `No available link slots`, `EEPROM commit failed`, `Unknown config command`, `Invalid type (0=day, 1=night)`, `Brightness must be 0-100`, `Invalid value (true/false or 0/1)`, `Missing params (t,r,g,b)`, `Missing params (t,b)`, `Missing params (g,w,s)`, `Missing params (sck,mosi,miso)`, `Invalid speed (4, 8, 12, 16, 20, or 24 MHz)`, `Config not available`, `Invalid port`, `Invalid keep-alive interval`.
 
 
 ### Wifi Configuration Commands (SFB)
@@ -162,8 +162,8 @@ These commands are used to control the relays on the Boat Control Panel. Command
 
 | Command | Example | Purpose |
 |---|---|---|
-| `R0` — Turn All Off | `R0` | Indicates that the C4 command was processed and the index specified was out of range. |
-| `R1` — Turn All On | `R1` | Indicates that the C4 command was processed successfully. |
+| `R0` — Turn All Off | `R0` | Turns off all relays. No params. |
+| `R1` — Turn All On | `R1` | Turns on all relays. No params. |
 | `R2` — Retrieve States | `R2` | Retrieve the state of all relays. |
 | `R3` — Relay State Set | `R3:3=1` (turn on relay 3) — `R3:5=0` (turn off relay 5) | Set the state of a specific relay. Param format: `<idx>=<state>`. `idx` must be 0..7 (`RELAY_COUNT`). `state` must be `0` (off) or `1` (on). |
 | `R4` — Relay State Get | `R4:3` (retrieves status of relay 3) — `R4:5` (returns status of relay 5). Param format: `<idx>`. `idx` must be 0..7 (`RELAY_COUNT`). |
