@@ -42,7 +42,7 @@
 #include "OtaManager.h"
 #endif
 
-class SystemCommandHandler : public SharedBaseCommandHandler, public BaseConfigCommandHandler
+class SystemCommandHandler : public virtual BaseCommandHandler, public SharedBaseCommandHandler, public BaseConfigCommandHandler
 {
 private:
 #if defined(WIFI_SUPPORT)

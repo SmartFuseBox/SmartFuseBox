@@ -146,6 +146,9 @@ private:
 
 	// SD card state
 	SdFat _sd;
+    uint8_t _misoPin;
+    uint8_t _mosiPin;
+    uint8_t _sckPin;
 	uint8_t _csPin;
 	uint32_t _speedMhz;              // Current initialization speed
 	MicroSdInitState _initState;
@@ -242,7 +245,7 @@ public:
      * @param csPin Chip select pin for SD card
      * @param speedMhz SPI speed in MHz (4, 8, 12, 16, 20, or 24)
      */
-    void beginInitialize(uint8_t csPin, uint32_t speedMhz);
+    void beginInitialize(uint8_t misoPin, uint8_t mosiPin, uint8_t sckPin, uint8_t csPin, uint32_t speedMhz);
 
     /**
      * @brief Re-initialize SD card (e.g., after card insertion)

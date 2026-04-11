@@ -74,8 +74,8 @@ ConfigResult ConfigController::rename(const char* name)
 	if (strlen(name) > ConfigMaxNameLength)
 		return ConfigResult::TooLong;
 
-	strncpy(_config->vessel.name, name, sizeof(_config->vessel.name) - 1);
-	_config->vessel.name[sizeof(_config->vessel.name) - 1] = '\0';
+	strncpy(_config->location.name, name, sizeof(_config->location.name) - 1);
+	_config->location.name[sizeof(_config->location.name) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -99,10 +99,10 @@ ConfigResult ConfigController::setVesselType(const uint8_t vesselType)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	if (vesselType > static_cast<uint8_t>(VesselType::Yacht))
+	if (vesselType > static_cast<uint8_t>(LocationType::Yacht))
 		return ConfigResult::InvalidParameter;
 
-	_config->vessel.vesselType = static_cast<VesselType>(vesselType);
+	_config->location.vesselType = static_cast<LocationType>(vesselType);
 	updateSoundControllerConfig();
 	return ConfigResult::Success;
 }
@@ -278,8 +278,8 @@ ConfigResult ConfigController::setMmsi(const char* mmsi)
 			return ConfigResult::InvalidParameter;
 	}
 
-	strncpy(_config->vessel.mmsi, mmsi, sizeof(_config->vessel.mmsi) - 1);
-	_config->vessel.mmsi[sizeof(_config->vessel.mmsi) - 1] = '\0';
+	strncpy(_config->location.mmsi, mmsi, sizeof(_config->location.mmsi) - 1);
+	_config->location.mmsi[sizeof(_config->location.mmsi) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -292,8 +292,8 @@ ConfigResult ConfigController::setCallSign(const char* callSign)
 	if (callSign == nullptr)
 		return ConfigResult::InvalidParameter;
 
-	strncpy(_config->vessel.callSign, callSign, sizeof(_config->vessel.callSign) - 1);
-	_config->vessel.callSign[sizeof(_config->vessel.callSign) - 1] = '\0';
+	strncpy(_config->location.callSign, callSign, sizeof(_config->location.callSign) - 1);
+	_config->location.callSign[sizeof(_config->location.callSign) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -306,8 +306,8 @@ ConfigResult ConfigController::setHomePort(const char* homePort)
 	if (homePort == nullptr)
 		return ConfigResult::InvalidParameter;
 
-	strncpy(_config->vessel.homePort, homePort, sizeof(_config->vessel.homePort) - 1);
-	_config->vessel.homePort[sizeof(_config->vessel.homePort) - 1] = '\0';
+	strncpy(_config->location.homePort, homePort, sizeof(_config->location.homePort) - 1);
+	_config->location.homePort[sizeof(_config->location.homePort) - 1] = '\0';
 	return ConfigResult::Success;
 }
 
@@ -447,6 +447,28 @@ ConfigResult ConfigController::setSdCardInitializeSpeed(const uint8_t speedMhz)
 		return ConfigResult::InvalidParameter;
 
 	_config->sdCard.initializeSpeed = speedMhz;
+	return ConfigResult::Success;
+}
+
+// C32: Set SD card CS pin
+ConfigResult ConfigController::setSdCardCsPin(const uint8_t csPin)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	_config->sdCard.csPin = csPin;
+	return ConfigResult::Success;
+}
+
+// C4: Set SPI pins
+ConfigResult ConfigController::setSpiPins(const uint8_t sckPin, const uint8_t mosiPin, const uint8_t misoPin)
+{
+	if (_config == nullptr)
+		return ConfigResult::InvalidConfig;
+
+	_config->spiPins.sckPin = sckPin;
+	_config->spiPins.mosiPin = mosiPin;
+	_config->spiPins.misoPin = misoPin;
 	return ConfigResult::Success;
 }
 

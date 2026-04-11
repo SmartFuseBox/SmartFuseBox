@@ -85,10 +85,16 @@ void setup()
 	// Serial initialization is performed first to ensure that any logging or error messages
 	// from DateTimeManager or ConfigManager during initialization are properly output.
 	SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
+	COMPUTER_SERIAL.println(F("[DBG] Computer serial ready"));
+	COMPUTER_SERIAL.flush();
 	SystemFunctions::initializeSerial(LINK_SERIAL, 19200, true);
+	COMPUTER_SERIAL.println(F("[DBG] Link serial ready"));
+	COMPUTER_SERIAL.flush();
 
 	// configure app
 	app.setup(remoteSensors, remoteSensorCount);
+	COMPUTER_SERIAL.println(F("[DBG] App setup complete"));
+	COMPUTER_SERIAL.flush();
 }
 
 void loop()

@@ -26,6 +26,7 @@
 #include "MicroSdDriver.h"
 #include "WarningManager.h"
 #include "SystemFunctions.h"
+#include "SystemDefinitions.h"
 #include <SPI.h>
 
 // Initialize static singleton instance
@@ -34,7 +35,10 @@ MicroSdDriver* MicroSdDriver::_instance = nullptr;
 MicroSdDriver::MicroSdDriver()
     : _warningManager(nullptr),
       _onCardReadyCallback(nullptr),
-      _csPin(0),
+      _misoPin(PinDisabled),
+      _mosiPin(PinDisabled),
+      _sckPin(PinDisabled),
+      _csPin(PinDisabled),
       _speedMhz(4),
       _initState(MicroSdInitState::NotInitialized),
       _cardPresent(false),
@@ -68,10 +72,25 @@ void MicroSdDriver::setOnCardReadyCallback(SdCardEventCallback callback)
     _onCardReadyCallback = callback;
 }
 
-void MicroSdDriver::beginInitialize(uint8_t csPin, uint32_t speedMhz)
+void MicroSdDriver::beginInitialize(uint8_t misoPin, uint8_t mosiPin, uint8_t sckPin, uint8_t csPin, uint32_t speedMhz)
 {
+    _misoPin = misoPin;
+    _mosiPin = mosiPin;
+    _sckPin = sckPin;
     _csPin = csPin;
     _speedMhz = speedMhz;
+
+    if (_misoPin == PinDisabled || _mosiPin == PinDisabled || _sckPin == PinDisabled || _csPin == PinDisabled)
+    {
+        if (_warningManager != nullptr)
+        {
+            if (!_warningManager->isWarningActive(WarningType::SpiPinConfigError))
+				_warningManager->raiseWarning(WarningType::SpiPinConfigError);
+        }
+
+        return;
+    }
+
     _initState = MicroSdInitState::Initializing;
     _lastInitAttemptTime = 0;
     _cardPresent = false;
@@ -79,7 +98,7 @@ void MicroSdDriver::beginInitialize(uint8_t csPin, uint32_t speedMhz)
     pinMode(_csPin, OUTPUT);
     digitalWrite(_csPin, HIGH);
 
-    SPI.begin();
+    SPI.begin(_sckPin, _misoPin, _mosiPin);
 }
 
 void MicroSdDriver::reinitialize()
@@ -87,7 +106,7 @@ void MicroSdDriver::reinitialize()
     closeAllFiles();
     _initState = MicroSdInitState::NotInitialized;
     _cardPresent = false;
-    beginInitialize(_csPin, _speedMhz);
+    beginInitialize(_misoPin, _mosiPin, _sckPin, _csPin, _speedMhz);
 }
 
 bool MicroSdDriver::isCardPresent(bool forceCheck)

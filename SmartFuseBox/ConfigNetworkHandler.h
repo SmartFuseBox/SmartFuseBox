@@ -18,12 +18,13 @@
 #pragma once
 
 #include "INetworkCommandHandler.h"
+#include "BaseConfigCommandHandler.h"
 #include "ConfigController.h"
 #include "WifiController.h"
 
 class RelayController;
 
-class ConfigNetworkHandler : public INetworkCommandHandler
+class ConfigNetworkHandler : public INetworkCommandHandler, public BaseConfigCommandHandler
 {
 private:
 	ConfigController* _configController;

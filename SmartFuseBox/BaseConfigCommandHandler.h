@@ -23,7 +23,7 @@
 #include "SystemFunctions.h"
 
 
-class BaseConfigCommandHandler : public virtual BaseCommandHandler
+class BaseConfigCommandHandler
 {
 protected:
 	const char* getParamValue(const StringKeyValue params[], uint8_t paramCount, const char* key) const
@@ -97,5 +97,4 @@ protected:
 		const char* v = getParamValue(params, paramCount, key);
 		return v ? SystemFunctions::parseBooleanValue(v) : false;
 	}
-
 };

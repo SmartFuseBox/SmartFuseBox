@@ -78,5 +78,7 @@ public:
 	ConfigResult setLedEnableStates(const bool gps, const bool warning, const bool system);
 	ConfigResult setControlPanelTones(const uint8_t type, const uint8_t preset, const uint16_t toneHz, const uint16_t durationMs, const uint32_t repeatMs);
 	ConfigResult setSdCardInitializeSpeed(const uint8_t speedMhz);
+	ConfigResult setSdCardCsPin(const uint8_t csPin);
+	ConfigResult setSpiPins(const uint8_t sckPin, const uint8_t mosiPin, const uint8_t misoPin);
 	ConfigResult setLightSensorThreshold(const uint16_t threshold);
 };

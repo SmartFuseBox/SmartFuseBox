@@ -258,8 +258,8 @@ bool MQTTClient::update()
         {
             if (_commandMgr != nullptr)
             {
-                char buf[48];
-                snprintf(buf, sizeof(buf), "Connection timeout: waited %lums", waitMs);
+                char buf[64];
+                snprintf(buf, sizeof(buf), "Connection timeout: waited %" PRIu64 "ms", waitMs);
                 _commandMgr->sendError(buf, F("MQTT Client"));
             }
             raiseEvent(MqttEvent::ConnectionTimeout);
@@ -292,7 +292,7 @@ bool MQTTClient::update()
         {
             if (_commandMgr != nullptr)
             {
-                char buf[48];
+                char buf[100];
                 snprintf(buf, sizeof(buf), "Sending PINGREQ (no send for %" PRIu64 "ms)", timeSinceLastSend);
                 _commandMgr->sendDebug(buf, F("MQTT Client"));
             }

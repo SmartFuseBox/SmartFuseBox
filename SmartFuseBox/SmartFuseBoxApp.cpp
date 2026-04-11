@@ -105,20 +105,30 @@ SmartFuseBoxApp::SmartFuseBoxApp(SerialCommandManager* commandMgrComputer,
 
 void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCount)
 {
+    Serial.println(F("[DBG] setup: start"));
+    Serial.flush();
     DateTimeManager::setDateTime();
+    Serial.println(F("[DBG] setup: datetime done"));
+    Serial.flush();
 
     // retrieve config settings
     ConfigManager::begin();
+    Serial.println(F("[DBG] setup: config begin done"));
+    Serial.flush();
 
     if (!ConfigManager::load())
     {
         _warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
     }
+    Serial.println(F("[DBG] setup: config loaded"));
+    Serial.flush();
 
-    // Sync relay pin assignments from config (overrides the bootstrap pins
-    // passed at construction; disabled relays will have pin == 0xFF).
-    _relayController.syncPinsFromConfig();
-    _relayController.setSoundController(&_soundController);
+	// Sync relay pin assignments from config (overrides the bootstrap pins
+	// passed at construction; disabled relays will have pin == 0xFF).
+	_relayController.syncPinsFromConfig();
+	_relayController.setSoundController(&_soundController);
+	Serial.println(F("[DBG] setup: relay pins synced"));
+	Serial.flush();
 
 	if (remoteSensorCount > 0 && remoteSensors != nullptr)
     {
@@ -144,8 +154,10 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
 
         _factorySensors = SensorFactory::create(config->sensors, ctx, _factorySensorCount);
     }
+    Serial.println(F("[DBG] setup: sensor factory done"));
+    Serial.flush();
 
-    // Merge factory-built local sensors and caller-supplied remote sensors into
+    // Merge factory-built local sensors
     // flat arrays for SensorController (query/status) and SensorManager (poll loop).
     uint8_t totalCount = _factorySensorCount + remoteSensorCount;
     BaseSensor**        allSensors  = (totalCount > 0) ? new BaseSensor*[totalCount]        : nullptr;
@@ -170,11 +182,17 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     _sensorManager    = new SensorManager(allHandlers, totalCount);
 
     _sensorNetworkHandler = new SensorNetworkHandler(_sensorController);
-
+    Serial.println(F("[DBG] setup: sensor ctrl/mgr/net created"));
+    Serial.flush();
+	Serial.println("[DBG] setup: total sensors = " + String(totalCount));
     _relayController.setup();
+    Serial.println(F("[DBG] setup: relay controller done"));
+    Serial.flush();
 
     // middleware
     _relayHandler.setup();
+    Serial.println(F("[DBG] setup: relay handler done"));
+    Serial.flush();
 
     // serial command handlers
     _serialHandlerCount = 0;
@@ -190,8 +208,10 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
 
     _commandMgrLink->registerHandlers(_serialHandlers, _serialHandlerCount);
     _commandMgrComputer->registerHandlers(_serialHandlers, _serialHandlerCount);
+    Serial.println(F("[DBG] setup: handlers registered"));
+    Serial.flush();
 
-    // Give the WiFi command bridge a pointer to the same handler array so
+    // Give the WiFi command bridge
     // POST /api/command/{cmd} delegates to the exact same implementations.
     _wifiCommandBridge.setHandlers(_serialHandlers, _serialHandlerCount);
 
@@ -209,7 +229,11 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
 #endif
 
     configureWifiSupport(config);
+    Serial.println(F("[DBG] setup: wifi configured"));
+    Serial.flush();
     configureBluetoothSupport(config);
+    Serial.println(F("[DBG] setup: bt configured"));
+    Serial.flush();
 
 #if defined(MQTT_SUPPORT)
 
@@ -234,6 +258,8 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     _soundController.configUpdated(config);
     _relayHandler.configUpdated(config);
     _sensorManager->setup();
+    Serial.println(F("[DBG] setup: sensor mgr setup done"));
+    Serial.flush();
 
 #if defined(MQTT_SUPPORT)
     _systemCommandHandler.setMqttController(&_mqttController);
@@ -253,7 +279,10 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
     microSdDriver.setOnCardReadyCallback(onSdCardReadyCallback);
 #endif
 
-    microSdDriver.beginInitialize(SdCardCsPin, config->sdCard.initializeSpeed);
+    if (config->sdCard.csPin != PinDisabled)
+    {
+        microSdDriver.beginInitialize(config->spiPins.misoPin, config->spiPins.mosiPin, config->spiPins.sckPin, config->sdCard.csPin, config->sdCard.initializeSpeed);
+    }
 
     // Initialize SD card logger
     _sdCardLogger.initialize();
@@ -271,10 +300,14 @@ void SmartFuseBoxApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSensorCo
             _relayController.setRelayState(i, true);
         }
     }
+    Serial.println(F("[DBG] setup: relay defaults set"));
+    Serial.flush();
 
     // indicate system initialized
     _commandMgrComputer->sendCommand(SystemInitialized, "");
     _scheduleController.begin();
+    Serial.println(F("[DBG] setup: complete"));
+    Serial.flush();
 }
 
 void SmartFuseBoxApp::loop()

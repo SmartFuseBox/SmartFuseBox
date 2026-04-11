@@ -57,6 +57,28 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 			result = ConfigResult::InvalidParameter;
 		}
 	}
+    else if (SystemFunctions::commandMatches(command, ConfigSpiPins))
+	{
+		if (paramCount >= 3)
+		{
+           uint8_t sckPin = getParamValueU8t(params, paramCount, "sck");
+			uint8_t mosiPin = getParamValueU8t(params, paramCount, "mosi");
+			uint8_t misoPin = getParamValueU8t(params, paramCount, "miso");
+
+          if (sckPin == DefaultValue || mosiPin == DefaultValue || misoPin == DefaultValue)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				result = _configController->setSpiPins(sckPin, mosiPin, misoPin);
+			}
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
 	else if (SystemFunctions::commandMatches(command, ConfigMapHomeButton))
 	{
 		// Expect "MAP <button>=<relay>" where button 0..3, relay 0..7 (or 255 to unmap)
@@ -135,7 +157,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C7:type=<value>" where value is 0..3
 		if (paramCount >= 1)
 		{
-			uint8_t type = atoi(params[0].value);
+			uint8_t type = getParamValueU8t(params, paramCount, "v");
 			result = _configController->setVesselType(type);
 		}
 		else
@@ -145,9 +167,9 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	}
 	else if (SystemFunctions::commandMatches(command, ConfigSoundStartDelay))
 	{
-		if (paramCount == 1)
+		if (paramCount >= 1)
 		{
-			uint16_t soundStartDelay = atoi(params[0].value);
+			uint16_t soundStartDelay = getParamValueU16t(params, paramCount, "v");
 			result = _configController->setsoundDelayStart(soundStartDelay);
 		}
 		else
@@ -160,7 +182,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C10:v=<0|1>"
 		if (paramCount >= 1)
 		{
-			bool enable = SystemFunctions::parseBooleanValue(params[0].value);
+			bool enable = getParamValueBool(params, paramCount, "v");
 			result = _configController->setBluetoothEnabled(enable);
 		}
 		else
@@ -173,7 +195,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C11:v=<0|1>"
 		if (paramCount >= 1)
 		{
-			bool enable = SystemFunctions::parseBooleanValue(params[0].value);
+			bool enable = getParamValueBool(params, paramCount, "v");
 			result = _configController->setWifiEnabled(enable);
 		}
 		else
@@ -186,7 +208,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C12:v=<0|1>"
 		if (paramCount >= 1)
 		{
-			WifiMode mode = static_cast<WifiMode>(atoi(params[0].value));
+			WifiMode mode = static_cast<WifiMode>(getParamValueU8t(params, paramCount, "v"));
 			result = _configController->setWifiAccessMode(mode);
 		}
 		else
@@ -223,7 +245,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Expect "C15:v=<value>"
 		if (paramCount >= 1)
 		{
-			uint16_t port = static_cast<uint16_t>(atoi(params[0].value));
+			uint16_t port = getParamValueU16t(params, paramCount, "v");
 			result = _configController->setWifiPort(port);
 		}
 		else
@@ -261,7 +283,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C20 - Set timezone offset
 		if (paramCount >= 1)
 		{
-			int8_t offset = static_cast<int8_t>(atoi(params[0].value));
+			int8_t offset = getParamValue8t(params, paramCount, "v");
 			result = _configController->setTimezoneOffset(offset);
 		}
 		else
@@ -310,21 +332,11 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C24 - Set LED RGB color
 		if (paramCount >= 5)
 		{
-			uint8_t type = 0, colorSet = 0, r = 0, g = 0, b = 0;
-
-			for (uint8_t i = 0; i < paramCount; i++)
-			{
-				if (strcmp(params[i].key, "t") == 0)
-					type = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "c") == 0)
-					colorSet = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "r") == 0)
-					r = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "g") == 0)
-					g = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "b") == 0)
-					b = static_cast<uint8_t>(atoi(params[i].value));
-			}
+			uint8_t type     = getParamValueU8t(params, paramCount, "t");
+			uint8_t colorSet = getParamValueU8t(params, paramCount, "c");
+			uint8_t r        = getParamValueU8t(params, paramCount, "r");
+			uint8_t g        = getParamValueU8t(params, paramCount, "g");
+			uint8_t b        = getParamValueU8t(params, paramCount, "b");
 
 			result = _configController->setLedColor(type, colorSet, r, g, b);
 		}
@@ -338,15 +350,8 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C25 - Set LED brightness
 		if (paramCount >= 2)
 		{
-			uint8_t type = 0, brightness = 0;
-
-			for (uint8_t i = 0; i < paramCount; i++)
-			{
-				if (strcmp(params[i].key, "t") == 0)
-					type = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "b") == 0)
-					brightness = static_cast<uint8_t>(atoi(params[i].value));
-			}
+			uint8_t type       = getParamValueU8t(params, paramCount, "t");
+			uint8_t brightness = getParamValueU8t(params, paramCount, "b");
 
 			result = _configController->setLedBrightness(type, brightness);
 		}
@@ -360,7 +365,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C26 - Enable/disable auto day/night switching
 		if (paramCount >= 1)
 		{
-			bool enabled = SystemFunctions::parseBooleanValue(params[0].value);
+			bool enabled = getParamValueBool(params, paramCount, "v");
 			result = _configController->setLedAutoSwitch(enabled);
 		}
 		else
@@ -373,17 +378,9 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C27 - Enable/disable individual LEDs
 		if (paramCount >= 3)
 		{
-			bool gps = false, warning = false, system = false;
-
-			for (uint8_t i = 0; i < paramCount; i++)
-			{
-				if (strcmp(params[i].key, "g") == 0)
-					gps = SystemFunctions::parseBooleanValue(params[i].value);
-				else if (strcmp(params[i].key, "w") == 0)
-					warning = SystemFunctions::parseBooleanValue(params[i].value);
-				else if (strcmp(params[i].key, "s") == 0)
-					system = SystemFunctions::parseBooleanValue(params[i].value);
-			}
+			bool gps     = getParamValueBool(params, paramCount, "g");
+			bool warning = getParamValueBool(params, paramCount, "w");
+			bool system  = getParamValueBool(params, paramCount, "s");
 
 			result = _configController->setLedEnableStates(gps, warning, system);
 		}
@@ -397,23 +394,11 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C28 - Configure control panel tones
 		if (paramCount >= 4)
 		{
-			uint8_t type = 0, preset = 0;
-			uint16_t toneHz = 0, durationMs = 0;
-			uint32_t repeatMs = 0;
-
-			for (uint8_t i = 0; i < paramCount; i++)
-			{
-				if (strcmp(params[i].key, "t") == 0)
-					type = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "h") == 0)
-					toneHz = static_cast<uint16_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "d") == 0)
-					durationMs = static_cast<uint16_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "p") == 0)
-					preset = static_cast<uint8_t>(atoi(params[i].value));
-				else if (strcmp(params[i].key, "r") == 0)
-					repeatMs = static_cast<uint32_t>(strtoul(params[i].value, nullptr, 0));
-			}
+			uint8_t  type       = getParamValueU8t(params, paramCount, "t");
+			uint8_t  preset     = getParamValueU8t(params, paramCount, "p");
+			uint16_t toneHz     = getParamValueU16t(params, paramCount, "h");
+			uint16_t durationMs = getParamValueU16t(params, paramCount, "d");
+			uint32_t repeatMs   = getParamValueU32t(params, paramCount, "r");
 
 			result = _configController->setControlPanelTones(type, preset, toneHz, durationMs, repeatMs);
 		}
@@ -428,8 +413,22 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// Format: C31:v=4 (or 8, 12, 16, 20, 24)
 		if (paramCount >= 1)
 		{
-			uint8_t speedMhz = static_cast<uint8_t>(atoi(params[0].value));
+			uint8_t speedMhz = getParamValueU8t(params, paramCount, "v");
 			result = _configController->setSdCardInitializeSpeed(speedMhz);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, ConfigSdCardCsPin))
+	{
+		// C32 - Set SD card CS pin
+		// Format: C32:v=10
+		if (paramCount >= 1)
+		{
+			uint8_t csPin = getParamValueU8t(params, paramCount, "v");
+			result = _configController->setSdCardCsPin(csPin);
 		}
 		else
 		{
@@ -463,12 +462,23 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// Name
 	client->print("\"name\":\"");
-	client->print(config->vessel.name);
+	client->print(config->location.name);
 	client->print("\",");
+
+	client->print("\"spiPins\":{");
+	client->print("\"sck\":");
+	client->print(config->spiPins.sckPin);
+	client->print(",");
+	client->print("\"mosi\":");
+	client->print(config->spiPins.mosiPin);
+	client->print(",");
+	client->print("\"miso\":");
+	client->print(config->spiPins.misoPin);
+	client->print("},");
 
 	// Vessel type
 	client->print("\"vesselType\":");
-	client->print(static_cast<uint8_t>(config->vessel.vesselType));
+	client->print(static_cast<uint8_t>(config->location.vesselType));
 	client->print(",");
 
 	// Sound relay ID
@@ -540,17 +550,17 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	// C21 MMSI
 	client->print("\"mmsi\":\"");
-	client->print(config->vessel.mmsi);
+	client->print(config->location.mmsi);
 	client->print("\",");
 
 	// C22 Call sign
 	client->print("\"callSign\":\"");
-	client->print(config->vessel.callSign);
+	client->print(config->location.callSign);
 	client->print("\",");
 
 	// C23 Home port
 	client->print("\"homePort\":\"");
-	client->print(config->vessel.homePort);
+	client->print(config->location.homePort);
 	client->print("\",");
 
 	// C24 LED Colors
@@ -632,6 +642,11 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	// C31 SD Card Initialize Speed
 	client->print("\"sdCardInitializeSpeed\":");
 	client->print(config->sdCard.initializeSpeed);
+	client->print(",");
+
+	// C32 SD Card CS pin
+	client->print("\"sdCardCsPin\":");
+	client->print(config->sdCard.csPin);
 
 	client->print("}");
 }

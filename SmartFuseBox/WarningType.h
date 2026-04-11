@@ -46,9 +46,10 @@ enum class WarningType : uint32_t
 	WifiInvalidConfig = 1UL << 7,                     // 0x00000080 - WiFi configuration invalid
 	WeakWifiSignal = 1UL << 8,                        // 0x00000100 - WiFi signal weak
 	SyncFailed = 1UL << 9,                            // 0x00000200 - Configuration sync issue detected
-	SdCardError = 1UL << 10,                          // 0x00000400 - SD card read/write error
-	SdCardMissing = 1UL << 11,                        // 0x00000800 - SD card not detected
-	SdCardLowSpace = 1UL << 12,                       // 0x00001000 - SD card free space below 10%
+	SpiPinConfigError = 1UL << 10,                    // 0x00000400 - SD card configuration error
+	SdCardError = 1UL << 11,                          // 0x00000800 - SD card read/write error
+	SdCardMissing = 1UL << 12,                        // 0x00001000 - SD card not detected
+	SdCardLowSpace = 1UL << 13,                       // 0x00002000 - SD card free space below 10%
 
     // Sensor warnings (bits 20+)
     SensorFailure = 1UL << 20,                        // 0x00100000 - Sensor communication failure

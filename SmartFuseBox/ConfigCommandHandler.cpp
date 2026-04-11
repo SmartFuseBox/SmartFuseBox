@@ -81,7 +81,14 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 		// return summary of config back to caller in multiple commands
 		// C3:<name>
-		sender->sendCommand(ConfigRename, config->vessel.name);
+		sender->sendCommand(ConfigRename, config->location.name);
+
+		// C4 SPI pins
+		snprintf(buffer, sizeof(buffer), "sck=%u;mosi=%u;miso=%u",
+			config->spiPins.sckPin,
+			config->spiPins.mosiPin,
+			config->spiPins.misoPin);
+		sender->sendCommand(ConfigSpiPins, buffer);
 
 		// C5 entries
 		for (uint8_t s = 0; s < ConfigHomeButtons; ++s)
@@ -91,7 +98,7 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		}
 
 		// C7 Boat type
-		snprintf(buffer, sizeof(buffer), "v=%d", static_cast<uint8_t>(config->vessel.vesselType));
+		snprintf(buffer, sizeof(buffer), "v=%d", static_cast<uint8_t>(config->location.vesselType));
 		sender->sendCommand(ConfigBoatType, buffer);
 
 		// C9 Sound start delay
@@ -143,13 +150,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		sender->sendCommand(ConfigTimeZoneOffset, buffer);
 
 		// C21 MMSI
-		sender->sendCommand(ConfigMmsi, config->vessel.mmsi);
+		sender->sendCommand(ConfigMmsi, config->location.mmsi);
 
 		// C22 Call sign
-		sender->sendCommand(ConfigCallSign, config->vessel.callSign);
+		sender->sendCommand(ConfigCallSign, config->location.callSign);
 
 		// C23 Home port
-		sender->sendCommand(ConfigHomePort, config->vessel.homePort);
+		sender->sendCommand(ConfigHomePort, config->location.homePort);
 
 		// C24 LED Colors (send all 4: day/good, day/bad, night/good, night/bad)
 		// Day mode, good color
@@ -217,6 +224,10 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		snprintf(buffer, sizeof(buffer), "v=%u", config->sdCard.initializeSpeed);
 		sender->sendCommand(ConfigSdCardSpeed, buffer);
 
+		// C32 SD Card CS pin
+		snprintf(buffer, sizeof(buffer), "v=%u", config->sdCard.csPin);
+		sender->sendCommand(ConfigSdCardCsPin, buffer);
+
 		// C33 Light sensor daytime threshold
 		snprintf(buffer, sizeof(buffer), "v=%u", config->lightSensor.daytimeThreshold);
 		sender->sendCommand(ConfigLightSensorThreshold, buffer);
@@ -248,6 +259,28 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			uint8_t relay = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
 
 			result = _configController->mapHomeButton(button, relay);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+	}
+  else if (SystemFunctions::commandMatches(command, ConfigSpiPins))
+	{
+        if (paramCount >= 3)
+		{
+			uint8_t sckPin = getParamValueU8t(params, paramCount, "sck");
+			uint8_t mosiPin = getParamValueU8t(params, paramCount, "mosi");
+			uint8_t misoPin = getParamValueU8t(params, paramCount, "miso");
+
+			if (sckPin == PinDisabled || mosiPin == PinDisabled || misoPin == PinDisabled)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				result = _configController->setSpiPins(sckPin, mosiPin, misoPin);
+			}
 		}
 		else
 		{
@@ -576,11 +609,28 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 	}
 	else if (SystemFunctions::commandMatches(command, ConfigSdCardSpeed))
 	{
-#if defined(CARD_CONFIG_LOADER)
+#if defined(SD_CARD_SUPPORT)
 		if (paramCount >= 1)
 		{
 			uint8_t speedMhz = static_cast<uint8_t>(atoi(params[0].value));
 			result = _configController->setSdCardInitializeSpeed(speedMhz);
+		}
+		else
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+#else
+		sendAckErr(sender, command, F("SD card not supported"));
+		return true;
+#endif
+	}
+	else if (SystemFunctions::commandMatches(command, ConfigSdCardCsPin))
+	{
+#if defined(SD_CARD_SUPPORT)
+		if (paramCount >= 1)
+		{
+			uint8_t csPin = static_cast<uint8_t>(atoi(params[0].value));
+			result = _configController->setSdCardCsPin(csPin);
 		}
 		else
 		{
@@ -797,6 +847,7 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 	static const char* cmds[] = {
 		ConfigSaveSettings, ConfigGetSettings, ConfigResetSettings,
 		ConfigRename, ConfigMapHomeButton,
+      ConfigSpiPins,
 		ConfigBoatType, ConfigSoundStartDelay,
 		ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID,
 		ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
@@ -808,7 +859,7 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 		ConfigTimeZoneOffset, ConfigMmsi, ConfigCallSign, ConfigHomePort,
 		ConfigLedColor, ConfigLedBrightness, ConfigLedAutoSwitch, ConfigLedEnable,
 		ControlPanelTones,
-		ConfigReloadFromSd, ConfigExportToSd, ConfigSdCardSpeed,
+		ConfigReloadFromSd, ConfigExportToSd, ConfigSdCardSpeed, ConfigSdCardCsPin,
 		ConfigLightSensorThreshold
 	};
 	count = sizeof(cmds) / sizeof(cmds[0]);

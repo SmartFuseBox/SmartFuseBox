@@ -46,7 +46,7 @@
  *   S6:<idx>;s=<slot>;v=<value>
  *               — Set options1[slot] for sensor <idx>
  */
-class SensorConfigCommandHandler : public BaseConfigCommandHandler
+class SensorConfigCommandHandler : public virtual BaseCommandHandler, public BaseConfigCommandHandler
 {
 private:
     SerialCommandManager* _commandMgrComputer;
