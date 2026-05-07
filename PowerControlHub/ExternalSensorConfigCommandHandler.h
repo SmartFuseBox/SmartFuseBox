@@ -213,18 +213,25 @@ public:
 
         if (SystemFunctions::commandMatches(command, ExternalSensorRemove))
         {
-            // E3:<idx>
-            if (paramCount < 1)
+            // E3:v=<idx>
+            uint8_t idx;
+            if (paramCount < 1 || !getParamValueU8t(params, paramCount, "v", idx))
             {
                 sendAckErr(sender, command, F("Missing sensor index"));
                 return true;
             }
 
-            uint8_t idx = static_cast<uint8_t>(atoi(params[0].value));
-
-            if (idx >= ConfigMaxSensors || idx >= config->remoteSensors.count)
+            if (idx >= ConfigMaxSensors)
             {
                 sendAckErr(sender, command, F("Invalid sensor index"));
+                return true;
+            }
+
+            // Index beyond current count means the slot is already absent — treat as success.
+            if (idx >= config->remoteSensors.count)
+            {
+                StringKeyValue reboot = makeParam("reboot", 1);
+                sendAckOk(sender, command, &reboot);
                 return true;
             }
 

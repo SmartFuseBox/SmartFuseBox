@@ -95,6 +95,25 @@ void MicroSdDriver::beginInitialize(uint8_t misoPin, uint8_t mosiPin, uint8_t sc
     _lastInitAttemptTime = 0;
     _cardPresent = false;
 
+    // Guard: reject any pin that PinGuard hard-blocks for SPI use.
+    // This catches invalid ESP32 GPIOs (flash-reserved, input-only) that would
+    // hang or crash the SPI bus initialisation.
+    if (PinGuard::validate(_sckPin,  PinUse::SpiSck)  == PinGuardResult::HardBlocked ||
+        PinGuard::validate(_mosiPin, PinUse::SpiMosi) == PinGuardResult::HardBlocked ||
+        PinGuard::validate(_misoPin, PinUse::SpiMiso) == PinGuardResult::HardBlocked ||
+        PinGuard::validate(_csPin,   PinUse::SpiCs)   == PinGuardResult::HardBlocked)
+    {
+        _initState = MicroSdInitState::NotInitialized;
+
+        if (_warningManager != nullptr)
+        {
+            if (!_warningManager->isWarningActive(WarningType::SpiPinConfigError))
+                _warningManager->raiseWarning(WarningType::SpiPinConfigError);
+        }
+
+        return;
+    }
+
     pinMode(_csPin, OUTPUT);
     digitalWrite(_csPin, HIGH);
 

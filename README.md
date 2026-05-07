@@ -157,6 +157,8 @@ Key events: `WarningChanged`, `RelayStatusChanged`, `TemperatureUpdated`, `Humid
 - **CPU usage monitoring** via `SystemCpuMonitor`. Available over serial, WiFi, and MQTT.
 - **Boot counter** and **crash counter** tracked in `SystemHeader` with magic number validation (`0x53464201`).
 - **RGB LED warning indicator** (HW479) driven on configurable pins (`C8`).
+- **PinGuard** — compile-time GPIO validation layer that rejects flash-reserved, input-only, and strapping pins at the point of assignment, returning `ACK:<cmd>=Invalid pin` before the value reaches EEPROM. Board-specific tables are selected automatically from the IDF toolchain macros — no manual configuration required. See [Docs/PinGuard.md](Docs/PinGuard.md).
+- **Crash loop guard** — `crashCounter` in `SystemHeader` is incremented at the start of every boot and only reset after full initialisation succeeds. If the counter reaches `CrashCounterThreshold` (default 3), the firmware resets the config to safe defaults before any hardware initialisation runs, breaking a watchdog reset loop caused by invalid pin configuration.
 
 ### Nextion Display
 
@@ -386,6 +388,7 @@ GET /api/system/F13
 |---|---|
 | [Docs/Commands.md](Docs/Commands.md) | Full serial and REST command reference (all groups F, C, R, H, W, S, M, N, E, T) |
 | [Docs/Local.md](Docs/Local.md) | `Local.h` configuration reference: board selection, feature flags, pin layout |
+| [Docs/PinGuard.md](Docs/PinGuard.md) | GPIO validation: board pin tables, blocked pin tiers, crash loop guard |
 | [Docs/Sensors.md](Docs/Sensors.md) | Sensor classes, poll intervals, MQTT channels, warning behaviour, extensibility guide |
 | [Docs/Warnings.md](Docs/Warnings.md) | 32-bit warning type reference, `WarningManager` API, propagation model |
 | [Docs/Wifi.md](Docs/Wifi.md) | WiFi architecture: connection state machine, persistent connection model, handler pattern |
@@ -416,7 +419,7 @@ GET /api/system/F13
 | [Setup Guide](Docs/SETUP.md) | [Local.h Reference](Docs/Local.md) | [WiFi Architecture](Docs/Wifi.md) |
 | [Bill of Materials](Docs/BOM.md) | [Scheduled Events](Docs/ScheduleEvents.md) | [Bluetooth BLE](Docs/BluetoothBle.md) |
 | [Sensor Reference](Docs/Sensors.md) | [Warning System](Docs/Warnings.md) | [Message Bus](Docs/MessageBus.md) |
-| [Command Reference](Docs/Commands.md) | | |
+| [Command Reference](Docs/Commands.md) | [PinGuard & Crash Loop](Docs/PinGuard.md) | |
 
 ---
 

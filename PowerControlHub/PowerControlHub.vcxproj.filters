@@ -324,9 +324,6 @@
     <ClCompile Include="PowerControlHub.ino" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="__vm\.SmartFuseBox.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SoundCommandHandler.h">
       <Filter>Header Files\SerialCommandHandlers</Filter>
     </ClInclude>
@@ -702,17 +699,11 @@
     <ClInclude Include="PowerControlHubConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Wifi.md" />
-    <None Include="Docs\Sensors.md" />
-    <None Include="Docs\Commands.md" />
-    <None Include="SmartFuseBox\Docs\Commands.md" />
-    <None Include="Docs\Local.md" />
-    <None Include="Docs\Warnings.md" />
-    <None Include="vcxproj.filters" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="SmartFuseSync\TestData\config-commands.txt" />
+    <ClInclude Include="PinGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoltageSensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

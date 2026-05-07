@@ -37,6 +37,7 @@
 #include "LightSensorHandler.h"
 #include "SystemSensorHandler.h"
 #include "BinaryPresenceSensor.h"
+#include "VoltageSensorHandler.h"
 
 /**
  * @brief Dependencies injected by PowerControlHubApp into SensorFactory::create().
@@ -236,14 +237,64 @@ private:
 
             case SensorIdList::GpsSensor:
             {
-                if (ctx.gpsSerial == nullptr)
+#if defined(ESP32)
+                // pins[0] = RX pin, pins[1] = TX pin, options1[0] = UART number (1 or 2; 0/unset defaults to 2)
+                const uint8_t rxPin = entry.pins[0];
+                const uint8_t txPin = entry.pins[1];
+
+                if (rxPin == PinDisabled || txPin == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::GpsInvalidConfig);
                     return nullptr;
+                }
+
+                const uint8_t uartNum = (entry.options1[0] == 1 || entry.options1[0] == 2)
+                    ? static_cast<uint8_t>(entry.options1[0])
+                    : 2;
+
+                // HardwareSerial is allocated once; ownership transferred to GpsSensorHandler via Stream*.
+                HardwareSerial* hwSerial = new HardwareSerial(uartNum);
+                hwSerial->begin(GpsBaudRate, SERIAL_8N1, rxPin, txPin);
+
+                return new GpsSensorHandler(
+                    hwSerial,
+                    ctx.broadcastManager,
+                    ctx.sensorCommandHandler,
+                    ctx.warningManager,
+                    entry.name);
+#else
+                if (ctx.gpsSerial == nullptr)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::GpsInvalidConfig);
+                    return nullptr;
+                }
 
                 return new GpsSensorHandler(
                     ctx.gpsSerial,
                     ctx.broadcastManager,
                     ctx.sensorCommandHandler,
                     ctx.warningManager,
+                    entry.name);
+#endif
+            }
+
+            case SensorIdList::VoltageSensor:
+            {
+                // pins[0]     = analog sensor pin
+                // options1[0] = ADC Vref in tenths of a volt (e.g. 50 = 5.0 V); 0 = default (5.0 V)
+                // options1[1] = R2 in tenths of kΩ (e.g. 75 = 7.5 kΩ);          0 = default (7.5 kΩ)
+                // options2[0] = R1 in whole kΩ (e.g. 30 = 30 kΩ);               0 = default (30 kΩ)
+                // options2[1] = low-voltage warning threshold in tenths of a volt (e.g. 114 = 11.4 V); 0 = disabled
+                return new VoltageSensorHandler(
+                    ctx.broadcastManager,
+                    ctx.warningManager,
+                    entry.pins[0],
+                    entry.options1[0],
+                    entry.options2[0],
+                    entry.options1[1],
+                    entry.options2[1],
                     entry.name);
             }
 

@@ -93,3 +93,9 @@
     #undef OTA_AUTO_UPDATE
   #endif
 #endif
+
+// ─── Pin Guard ───────────────────────────────────────────────────────────────
+// Reads ESP32 sub-variant defines (ESP32_NODEMCU_32S / ESP32_S3_DEVMODULE) set
+// in Local.h and builds compile-time pin validation tables.
+// Non-ESP32 boards get a no-op implementation.
+#include "PinGuard.h"

@@ -55,9 +55,16 @@ public:
     // For debug or UI: how many bytes of EEPROM are available
     static size_t availableEEPROMBytes();
 
+    // Increment crash counter and persist immediately. Call at the very start of
+    // setup(), before any hardware initialisation, so a watchdog reset is counted.
+    static void incrementCrashCounter();
+
     // Call after full system initialisation succeeds to reset the crash counter
     static void resetCrashCounter();
 
     // Access current in-memory system header
     static SystemHeader* getHeaderPtr();
+
+    // Update pinGuardFlags in the system header and persist immediately.
+    static void setPinGuardFlags(uint8_t flags);
 };

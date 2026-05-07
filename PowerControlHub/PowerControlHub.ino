@@ -26,14 +26,11 @@
 #include "Dht11SensorHandler.h"
 #include "LightSensorHandler.h"
 #include "SystemSensorHandler.h"
-#include "GpsSensorHandler.h"
 
  // Hardware UART selection. Change this define if your board routes its serial
 // port differently.
 // COMPUTER_SERIAL – connected to the host PC / debug monitor.
-// GPS_SERIAL      – connected to the GPS module.
 #define COMPUTER_SERIAL Serial
-#define GPS_SERIAL Serial2
 
 // forward declares
 void onComputerCommandReceived(SerialCommandManager* mgr);
@@ -43,9 +40,10 @@ void onComputerCommandReceived(SerialCommandManager* mgr);
 // - `commandMgrComputer` is local to your .ino so you can select the hardware
 //   Serial instance and baud rate appropriate for your board. Keep the callback
 //   `onComputerCommandReceived` in this file so it can access the serial manager.
-// - Construct `PowerControlHubApp` with a pointer to the serial manager. Then
-//   configure board-specific resources (e.g. GPS serial) via app accessors before
-//   calling `app.setup()`. Call `app.loop()` from `loop()`.
+// - Construct `PowerControlHubApp` with a pointer to the serial manager, then
+//   call `app.setup()`. GPS and Nextion serial ports are initialised automatically
+//   from persisted config (SensorEntry pins/uartNum and NextionConfig respectively).
+// - Call `app.loop()` from `loop()`.
 
 SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);
 
@@ -56,9 +54,6 @@ void setup()
 	// Serial initialization is performed first to ensure that any logging or error messages
 	// from DateTimeManager or ConfigManager during initialization are properly output.
 	SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
-	SystemFunctions::initializeSerial(GPS_SERIAL, GpsBaudRate, false);
-
-	app.setGpsSerial(&GPS_SERIAL);
 
 	// configure app
 	app.setup(nullptr, 0);

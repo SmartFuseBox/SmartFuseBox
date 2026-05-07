@@ -58,6 +58,7 @@ These are commands used to configure the system settings and can only be sent fr
 | `F11` — Uptime | F11 | Returns system uptime as "days HH:MM:SS" (e.g. 2d 03:12:45). No params. |
 | `F12` — OTA Check / Apply | `F12` or `F12:apply=1` | Trigger an OTA firmware check against the latest GitHub release. Without params (or `apply=0`) checks only and returns current status. With `apply=1` downloads and applies the update if one is available (or queues apply if a check is already in progress). Response params: `v=<current>` current firmware version, `av=<available>` available version tag (empty if none found yet), `s=<state>` OTA state string. **PCH only** — requires `OTA_AUTO_UPDATE`, ESP32 and WiFi in client mode. |
 | `F13` — OTA Status | `F13` | Query current OTA state without triggering a check. Response params: `v=<current>` current firmware version, `av=<available>` available version tag, `s=<state>` OTA state string (`idle`, `checking`, `available`, `downloading`, `rebooting`, `failed`, `uptodate`), `auto=<0\|1>` whether auto-apply is enabled. **PCH only** — requires `OTA_AUTO_UPDATE`, ESP32 and WiFi in client mode. |
+| `F14` — PinGuard Mode | `F14` or `F14:a=true` or `F14:a=false;b=false` | Read or write the persistent PinGuard mode flags stored in `SystemHeader::pinGuardFlags`. **Params:** `a=<bool>` — AllowAdvisory: when `true`, advisory (strapping/UART) pins are permitted. `b=<bool>` — Bypass: when `true`, all PinGuard checks are skipped (no validation at all). If both `a` and `b` are `true`, Bypass takes precedence and the system returns `Safe` immediately. Changes are persisted immediately via `saveHeader()` and take effect at runtime without reboot. **Response:** `a=<0\|1>` current AllowAdvisory state, `b=<0\|1>` current Bypass state. No params = read-only. |
 
 
 **OTA behaviour (F12 / F13):**
@@ -187,6 +188,7 @@ E0:i=<idx>;mt=<mqttTypeSlug>;md=<mqttDeviceClass>;mu=<mqttUnit>;bin=<0|1>
 | `3` | GpsSensor |
 | `4` | SystemSensor |
 | `5` | BinaryPresenceSensor |
+| `6` | VoltageSensor |
 
 **How external sensors receive value updates:**  
 After boot the `name` field doubles as the sensor's serial command ID. An external device pushes readings by sending the name as a command:
@@ -328,32 +330,88 @@ Route: `/api/config/{command}` (shares the config route)
 ## Sensor Commands — `S`
 
 `S0`–`S6` are configuration commands (persisted in EEPROM, **reboot required**).  
-`S7`–`S22` are live telemetry commands (sensor readings).
+`S7`–`S23` are live telemetry commands (sensor readings).
 
 ### Sensor Configuration — `S0`–`S6`
 
 | Command | Example | Purpose |
 |---|---|---|
-| `S0` — Get All Sensor Config | `S0` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;o0=<opt>;o1=<opt>;en=<0\|1>`. No params. |
-| `S1` — Add / Update Sensor | `S1:i=0;t=1;o0=0;o1=0` | Add or update sensor at index `i`. Params: `i=<idx>;t=<type>;o0=<opt0>;o1=<opt1>`. `t` = `SensorIdList` enum value. ACK carries `reboot=1`. |
-| `S2` — Remove Sensor | `S2:0` | Remove (clear) sensor at index. Param: `<idx>`. ACK carries `reboot=1`. |
+| `S0` — Get All Sensor Config | `S0` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;u0=<opt1_0>;u1=<opt1_1>;o0=<opt2_0>;o1=<opt2_1>;en=<0\|1>`. The labels in the response are read-only aliases: `p0`/`p1` = `pins[0]`/`pins[1]`; `u0`/`u1` = `options1[0]`/`options1[1]` (signed byte); `o0`/`o1` = `options2[0]`/`options2[1]` (signed 16-bit). No params. |
+| `S1` — Add / Update Sensor | `S1:i=<idx>;t=<type>;o0=<val>;o1=<val>` | Add or update sensor at index `i`. **Only four params are accepted:** `i` (sensor index), `t` (type — `SensorIdList` enum value), `o0` (writes `options1[0]`), `o1` (writes `options1[1]`). Pins and all other options must be set separately via `S4` and `S6` **after** `S1`. All four params are required. ACK carries `reboot=1`. |
+| `S2` — Remove Sensor | `S2:v=0` | Remove (clear) sensor at index. Param: `v=<idx>`. ACK carries `reboot=1`. |
 | `S3` — Rename Sensor | `S3:0=Bilge Pump` | Rename sensor at index. Param: `<idx>=<name>`. ACK carries `reboot=1`. |
-| `S4` — Set Sensor Pin | `S4:i=0;s=0;v=34` | Set pin slot `s` (0..`ConfigMaxSensorPins-1`) for sensor `i` to GPIO `v`. Use `255` to clear. ACK carries `reboot=1`. |
+| `S4` — Set Sensor Pin | `S4:i=0;s=0;v=34` | Set a GPIO pin for sensor `i`. **All three params are required:** `i` (sensor index), `s` (pin slot, 0..`ConfigMaxSensorPins-1`), `v` (GPIO pin number; `255` to clear). Each sensor type uses specific slots — see the sensor type table below. ACK carries `reboot=1`. |
 | `S5` — Set Sensor Enabled | `S5:0=1` | Enable (`1`) / disable (`0`) sensor at index. ACK carries `reboot=1`. |
-| `S6` — Set Sensor Option | `S6:i=0;s=0;v=1` | Set `options1[s]` for sensor `i` to signed byte `v`. ACK carries `reboot=1`. |
+| `S6` — Set Sensor Option | `S6:i=0;s=0;o=0;v=1` | Set an option value for sensor `i`. **All four params are required:** `i` (sensor index), `s` (slot, 0 or 1), `o` (group: `0`=`options1` signed byte, `1`=`options2` signed 16-bit), `v` (value). See the sensor type table below for which slot/group each sensor uses. ACK carries `reboot=1`. |
 
-**Sensor type values (`t` for `S1`):**
+> **Understanding the field storage and response labels**
+>
+> Sensor configuration is stored in three arrays inside `SensorEntry`. The `S0` response exposes these with short labels for readability, but you **cannot use those labels as input to `S1`**:
+>
+> | `S0` response label | Underlying storage | Command to write it |
+> |---|---|---|
+> | `p0` | `pins[0]` | `S4:i=<idx>;s=0;v=<pin>` |
+> | `p1` | `pins[1]` | `S4:i=<idx>;s=1;v=<pin>` |
+> | `u0` | `options1[0]` (signed byte) | `S6:i=<idx>;s=0;o=0;v=<val>` |
+> | `u1` | `options1[1]` (signed byte) | `S6:i=<idx>;s=1;o=0;v=<val>` |
+> | `o0` | `options2[0]` (signed 16-bit) | `S6:i=<idx>;s=0;o=1;v=<val>` |
+> | `o1` | `options2[1]` (signed 16-bit) | `S6:i=<idx>;s=1;o=1;v=<val>` |
+>
+> `S1` only writes `options1[0]` and `options1[1]` (its `o0`/`o1` params). Everything else requires a separate `S4` or `S6` call.
 
-| Value | Name | Pins / Options |
-|---|---|---|
-| `0` | Water Sensor | `p0`=data pin, `p1`=power pin |
-| `1` | DHT11 | `p0`=data pin |
-| `2` | Light Sensor | `p0`=analogue pin; `o0=1` enables digital mode |
-| `3` | GPS Sensor | Requires GPS serial configured via `setGpsSerial()` |
-| `4` | System Sensor | No pin required |
-| `5` | Binary Presence Sensor | `p0`=sensor pin; `o0`=active state (1=HIGH, 0=LOW); `o1`=onDetected action; use `S4` to set `p1`=onDetected payload, `p2`=onClear payload; use `S6` (slot=1) to set onClear action |
+**Sensor type values (`t` for `S1`) — field mapping:**
+
+The table below shows what each storage field means for each sensor type and which command sets it.
+
+| Value | Name | Field | Meaning | Command |
+|---|---|---|---|---|
+| `0` | Water Sensor | `pins[0]` | Data pin | `S4:i=<idx>;s=0;v=<pin>` |
+| | | `pins[1]` | Power pin | `S4:i=<idx>;s=1;v=<pin>` |
+| `1` | DHT11 | `pins[0]` | Data pin | `S4:i=<idx>;s=0;v=<pin>` |
+| `2` | Light Sensor | `pins[0]` | Analogue pin | `S4:i=<idx>;s=0;v=<pin>` |
+| | | `options1[0]` | `1`=digital mode, `0`=analogue mode | `S1:…;o0=<val>;o1=0` |
+| `3` | GPS Sensor | `pins[0]` | RX pin (**required** — `255` raises `GpsInvalidConfig`) | `S4:i=<idx>;s=0;v=<pin>` |
+| | | `pins[1]` | TX pin (**required** — `255` raises `GpsInvalidConfig`) | `S4:i=<idx>;s=1;v=<pin>` |
+| | | `options1[0]` | UART number: `1` or `2` (ESP32 only; other values default to `2`). Baud rate fixed at 9600. | `S6:i=<idx>;s=0;o=0;v=<uart>` |
+| `4` | System Sensor | — | No pin or option required | — |
+| `5` | Binary Presence Sensor | `pins[0]` | Sensor pin | `S4:i=<idx>;s=0;v=<pin>` |
+| | | `pins[1]` | onDetected payload | `S4:i=<idx>;s=1;v=<val>` |
+| | | `pins[2]` | onClear payload | `S4:i=<idx>;s=2;v=<val>` |
+| | | `options1[0]` | Active state: `1`=HIGH, `0`=LOW | `S1:…;o0=<val>;o1=0` |
+| | | `options1[1]` | onDetected action | `S6:i=<idx>;s=1;o=0;v=<val>` |
+| | | `options2[1]` | onClear action | `S6:i=<idx>;s=1;o=1;v=<val>` |
+| `6` | Voltage Sensor | `pins[0]` | Analogue input pin | `S4:i=<idx>;s=0;v=<pin>` |
+| | | `options1[0]` | ADC Vref in tenths of a volt (`50`=5.0 V, `33`=3.3 V; `0`=default 5.0 V) | `S6:i=<idx>;s=0;o=0;v=<val>` |
+| | | `options1[1]` | R2 in tenths of kΩ (`75`=7.5 kΩ; `0`=default 7.5 kΩ) | `S6:i=<idx>;s=1;o=0;v=<val>` |
+| | | `options2[0]` | R1 in whole kΩ (`30`=30 kΩ; `0`=default 30 kΩ) | `S6:i=<idx>;s=0;o=1;v=<val>` |
+| | | `options2[1]` | Low-voltage warning threshold in tenths of a volt (`114`=11.4 V; `0`=disabled) | `S6:i=<idx>;s=1;o=1;v=<val>` |
+
+**Voltage sensor setup example (30 kΩ / 7.5 kΩ divider, 12 V system, warn below 11.4 V):**
+```
+S1:i=1;t=6;o0=0;o1=0   # Add Voltage sensor (type 6)
+S3:1=Battery            # Name it
+S4:i=1;s=0;v=34         # Analogue pin = 34
+S6:i=1;s=0;o=0;v=50     # Vref = 5.0 V (50 tenths)
+S6:i=1;s=1;o=0;v=75     # R2 = 7.5 kΩ (75 tenths)
+S6:i=1;s=0;o=1;v=30     # R1 = 30 kΩ
+S6:i=1;s=1;o=1;v=114    # Low-voltage warn at 11.4 V (114 tenths); use 0 to disable
+S5:1=1                  # Enable sensor
+C0                      # Save to EEPROM — reboot to activate
+```
 
 Common sensor config errors: `Config not available`, `Invalid sensor index`, `Missing sensor index`, `Missing parameters`, `Missing name`, `Invalid pin slot`, `Invalid option slot`.
+
+**GPS setup example (ESP32 NodeMCU-32S — Nextion on UART2, GPS remapped to UART1 on pins 25/26):**
+```
+S1:i=0;t=3;o0=0;o1=0   # Add GPS sensor (type 3)
+S3:0=GPS                # Name it
+S4:i=0;s=0;v=25         # RX pin = 25
+S4:i=0;s=1;v=26         # TX pin = 26
+S6:i=0;s=0;o=0;v=1      # UART number = 1 (avoids conflict with Nextion on UART2)
+S5:0=1                  # Enable sensor
+C0                      # Save to EEPROM — reboot to activate
+```
+> **Note:** If either RX or TX pin is `255` (disabled) the GPS sensor will **not** be created at boot and a `GpsInvalidConfig` warning will be raised. Both pins must be set before saving.
 
 ### Sensor Telemetry — `S7`–`S22`
 
@@ -375,6 +433,7 @@ Common sensor config errors: `Config not available`, `Invalid sensor index`, `Mi
 | `S20` — GPS Satellites | `S20:v=8` | Number of connected satellites. |
 | `S21` — GPS Distance | `S21:v=1.23` | Total distance travelled. |
 | `S22` — Binary Presence | `S22:v=1;name=PIR` | Pin-change event: `v=1` detected, `v=0` clear. `name` = configured sensor name. |
+| `S23` — Voltage | `S23:v=12.45;avg=12.41` | Voltage reading from the DC 0–25 V module. `v`=latest sample in volts (2 d.p.), `avg`=10-reading rolling average in volts (2 d.p.). Raises `LowVoltage` warning when `avg` drops below the configured threshold; clears when it recovers. |
 
 ### WiFi sensor commands
 Route: `/api/sensor/`  

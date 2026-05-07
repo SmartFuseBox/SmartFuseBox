@@ -51,12 +51,14 @@ enum class WarningType : uint32_t
 	SdCardMissing = 1UL << 12,                        // 0x00001000 - SD card not detected
 	SdCardLowSpace = 1UL << 13,                       // 0x00002000 - SD card free space below 10%
 	NextionInvalidConfig = 1UL << 14,                 // 0x00004000 - Nextion display configuration invalid
+	GpsInvalidConfig = 1UL << 15,                     // 0x00008000 - GPS sensor pin/UART configuration invalid
 
-    // Sensor warnings (bits 20+)
+	// Sensor warnings (bits 20+)
     SensorFailure = 1UL << 20,                        // 0x00100000 - Sensor communication failure
     TemperatureSensorFailure = 1UL << 21,             // 0x00200000 - Temperature sensor failure
     CompassFailure = 1UL << 22,                       // 0x00400000 - Compass failed to initialize
 	GpsFailure = 1UL << 23,                           // 0x00800000 - GPS sensor failure
+	LowVoltage = 1UL << 24,                            // 0x01000000 - Voltage below configured threshold
 };
 
 // Warning type display strings - keep in sync with WarningType enum
@@ -76,7 +78,7 @@ static const char WT_11[] PROGMEM = "SD Card Error";
 static const char WT_12[] PROGMEM = "SD Card Not Found";
 static const char WT_13[] PROGMEM = "SD Card Low Space";
 static const char WT_14[] PROGMEM = "Nextion Invalid Config";
-static const char WT_15[] PROGMEM = "";
+static const char WT_15[] PROGMEM = "GPS Invalid Config";
 static const char WT_16[] PROGMEM = "";
 static const char WT_17[] PROGMEM = "";
 static const char WT_18[] PROGMEM = "";
@@ -85,7 +87,7 @@ static const char WT_20[] PROGMEM = "Sensor Failure";
 static const char WT_21[] PROGMEM = "Temperature Sensor Failure";
 static const char WT_22[] PROGMEM = "Compass Failure";
 static const char WT_23[] PROGMEM = "GPS Module Failure";
-static const char WT_24[] PROGMEM = "";
+static const char WT_24[] PROGMEM = "Low Voltage";
 static const char WT_25[] PROGMEM = "";
 static const char WT_26[] PROGMEM = "";
 static const char WT_27[] PROGMEM = "";

@@ -453,6 +453,14 @@ bool ConfigManager::saveHeader()
 #endif
 }
 
+void ConfigManager::incrementCrashCounter()
+{
+	if (_hdr.crashCounter < 0xFF)
+		_hdr.crashCounter++;
+
+	saveHeader();
+}
+
 void ConfigManager::resetCrashCounter()
 {
 	_hdr.crashCounter = 0;
@@ -463,6 +471,12 @@ void ConfigManager::resetCrashCounter()
 SystemHeader* ConfigManager::getHeaderPtr()
 {
 	return &_hdr;
+}
+
+void ConfigManager::setPinGuardFlags(uint8_t flags)
+{
+	_hdr.pinGuardFlags = flags;
+	saveHeader();
 }
 
 uint16_t ConfigManager::calcHeaderChecksum(const SystemHeader& h)
