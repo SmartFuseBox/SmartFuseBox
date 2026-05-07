@@ -41,6 +41,7 @@ constexpr char SystemRtcDiagnostic[] = "F10";
 constexpr char SystemUptime[] = "F11";
 constexpr char SystemCheckForUpdate[] = "F12";
 constexpr char SystemOtaStatus[] = "F13";
+constexpr char SystemPinGuardMode[] = "F14";
 constexpr char SystemPageDemo[] = "F150";
 
 constexpr char RelayTurnAllOff[] = "R0";
@@ -157,6 +158,7 @@ constexpr char SensorGpsSpeed[] = "S19";
 constexpr char SensorGpsSatellites[] = "S20";
 constexpr char SensorGpsDistance[] = "S21";
 constexpr char SensorBinaryPresence[] = "S22";
+constexpr char SensorVoltage[] = "S23";
 
 constexpr char NextionGetConfig[] = "N0";
 constexpr char NextionEnabled[] = "N1";
@@ -233,6 +235,7 @@ enum class SensorIdList : uint8_t
     GpsSensor = 0x3,
     SystemSensor = 0x4,
     BinaryPresenceSensor = 0x5,
+    VoltageSensor = 0x6,
 
     None = 0xFF
 };

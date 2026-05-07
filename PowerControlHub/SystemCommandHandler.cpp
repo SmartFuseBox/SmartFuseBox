@@ -18,6 +18,7 @@
 #include "SystemCommandHandler.h"
 #include "SystemCpuMonitor.h"
 #include "ConfigManager.h"
+#include "PinGuard.h"
 #include "DateTimeManager.h"
 #if defined(WIFI_SUPPORT)
 #include "WifiController.h"
@@ -42,7 +43,7 @@ const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
         SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
         SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
         SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime,
-        SystemCheckForUpdate, SystemOtaStatus
+        SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode
     };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
@@ -341,6 +342,54 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
         sendAckOk(sender, command, respParams, argCount);
     }
 #endif // OTA_AUTO_UPDATE
+    else if (SystemFunctions::commandMatches(command, SystemPinGuardMode))
+    {
+        if (paramCount > 0)
+        {
+            // Write mode: a=<bool> for AllowAdvisory, b=<bool> for Bypass
+            SystemHeader* hdr = ConfigManager::getHeaderPtr();
+            if (hdr)
+            {
+                const char* aStr = getParamValue(params, paramCount, "a");
+                const char* bStr = getParamValue(params, paramCount, "b");
+
+                if (aStr)
+                {
+                    bool allow = (strcmp(aStr, "true") == 0 || strcmp(aStr, "1") == 0);
+
+                    if (allow)
+                        hdr->pinGuardFlags |= PinGuardMode::AllowAdvisory;
+                    else
+                        hdr->pinGuardFlags &= ~PinGuardMode::AllowAdvisory;
+                }
+
+                if (bStr)
+                {
+                    bool bypass = (strcmp(bStr, "true") == 0 || strcmp(bStr, "1") == 0);
+
+                    if (bypass)
+                        hdr->pinGuardFlags |= PinGuardMode::Bypass;
+                    else
+                        hdr->pinGuardFlags &= ~PinGuardMode::Bypass;
+                }
+
+                ConfigManager::setPinGuardFlags(hdr->pinGuardFlags);
+                PinGuard::setMode(hdr->pinGuardFlags);
+            }
+        }
+
+        // Read back current mode
+        SystemHeader* hdr = ConfigManager::getHeaderPtr();
+        constexpr uint8_t argCount = 2;
+        StringKeyValue respParams[argCount];
+        strncpy(respParams[0].key, "a", sizeof(respParams[0].key));
+        respParams[0].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::AllowAdvisory)) ? '1' : '0';
+        respParams[0].value[1] = '\0';
+        strncpy(respParams[1].key, "b", sizeof(respParams[1].key));
+        respParams[1].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::Bypass)) ? '1' : '0';
+        respParams[1].value[1] = '\0';
+        sendAckOk(sender, command, respParams, argCount);
+    }
     else
     {
         sendAckErr(sender, command, F("Unknown system command"));

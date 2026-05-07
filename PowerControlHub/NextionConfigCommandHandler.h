@@ -143,9 +143,19 @@ public:
             {
                 uint8_t pin;
                 if (!getParamValueU8t(params, paramCount, "v", pin))
+                {
                     result = ConfigResult::InvalidParameter;
+                }
                 else
+                {
                     result = _configController->setNextionRxPin(pin);
+                    if (result == ConfigResult::InvalidPin)
+                    {
+                        char dbg[40];
+                        snprintf(dbg, sizeof(dbg), "Nextion RX pin %u blocked", pin);
+                        sender->sendDebug(dbg, "N3");
+                    }
+                }
             }
             else
             {
@@ -158,9 +168,19 @@ public:
             {
                 uint8_t pin;
                 if (!getParamValueU8t(params, paramCount, "v", pin))
+                {
                     result = ConfigResult::InvalidParameter;
+                }
                 else
+                {
                     result = _configController->setNextionTxPin(pin);
+                    if (result == ConfigResult::InvalidPin)
+                    {
+                        char dbg[40];
+                        snprintf(dbg, sizeof(dbg), "Nextion TX pin %u blocked", pin);
+                        sender->sendDebug(dbg, "N4");
+                    }
+                }
             }
             else
             {
@@ -205,6 +225,9 @@ public:
             break;
         case ConfigResult::InvalidParameter:
             sendAckErr(sender, command, F("Invalid parameter"), &params[0]);
+            break;
+        case ConfigResult::InvalidPin:
+            sendAckErr(sender, command, F("Invalid pin"), &params[0]);
             break;
         case ConfigResult::InvalidConfig:
             sendAckErr(sender, command, F("Config not available"), &params[0]);

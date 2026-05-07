@@ -93,3 +93,9 @@
     #undef OTA_AUTO_UPDATE
   #endif
 #endif
+
+// ─── Pin Guard ───────────────────────────────────────────────────────────────
+// PinGuard selects ESP32 pin validation tables using IDF target macros
+// (for example CONFIG_IDF_TARGET_ESP32S3 / CONFIG_IDF_TARGET_ESP32).
+// Non-ESP32 boards get a no-op implementation.
+#include "PinGuard.h"

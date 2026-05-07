@@ -356,7 +356,18 @@ bool RelayCommandHandler::handleCommand(SerialCommandManager* sender, const char
                 return true;
             }
 
-            _relayController->setRelayPin(relayIndex, pin);
+            RelayResult pinResult = _relayController->setRelayPin(relayIndex, pin);
+
+            if (pinResult == RelayResult::InvalidPin)
+            {
+                PinGuardResult pgr = PinGuard::validate(pin, PinUse::Relay);
+                char debugMsg[56];
+                snprintf(debugMsg, sizeof(debugMsg), "Pin %u blocked: %s", pin,
+                    reinterpret_cast<const char*>(PinGuard::reasonString(pgr)));
+                sender->sendDebug(debugMsg, "RelaySetPin");
+                sendAckErr(sender, command, F("Invalid pin"), &params[0]);
+                return true;
+            }
             sendAckOk(sender, command, &params[0]);
         }
         else

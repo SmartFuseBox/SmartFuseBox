@@ -47,6 +47,12 @@
 #define ESP32
 #endif
 
+// ─── ESP32 Pin Guard ─────────────────────────────────────────────────────────
+// PinGuard.h selects the correct pin table automatically using the IDF-provided
+// CONFIG_IDF_TARGET_ESP32S3 / CONFIG_IDF_TARGET_ESP32 macros, which are set by
+// the Arduino-ESP32 toolchain based on the board chosen in the IDE.  No manual
+// sub-variant selection is needed here.
+
 
 // CONFIGURE_SPI gates the board-specific SPI.begin(sck, miso, mosi) overload used
 // by cores that support custom pin assignment at bus-init time (e.g. ESP32).
