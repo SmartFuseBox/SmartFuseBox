@@ -95,7 +95,7 @@
 #endif
 
 // ─── Pin Guard ───────────────────────────────────────────────────────────────
-// Reads ESP32 sub-variant defines (ESP32_NODEMCU_32S / ESP32_S3_DEVMODULE) set
-// in Local.h and builds compile-time pin validation tables.
+// PinGuard selects ESP32 pin validation tables using IDF target macros
+// (for example CONFIG_IDF_TARGET_ESP32S3 / CONFIG_IDF_TARGET_ESP32).
 // Non-ESP32 boards get a no-op implementation.
 #include "PinGuard.h"
