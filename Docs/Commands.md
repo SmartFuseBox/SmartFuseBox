@@ -413,7 +413,7 @@ C0                      # Save to EEPROM — reboot to activate
 ```
 > **Note:** If either RX or TX pin is `255` (disabled) the GPS sensor will **not** be created at boot and a `GpsInvalidConfig` warning will be raised. Both pins must be set before saving.
 
-### Sensor Telemetry — `S7`–`S22`
+### Sensor Telemetry — `S7`–`S23`
 
 | Command | Example | Purpose |
 |---|---|---|
