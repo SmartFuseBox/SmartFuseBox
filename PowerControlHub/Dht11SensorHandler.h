@@ -250,24 +250,24 @@ public:
 
 	void formatStatusJson(char* buffer, size_t size) override
 	{
-        // Validate output buffer
+		// Validate output buffer
 		if (!buffer || size == 0)
 		{
 			return;
 		}
 
-		char celsius[8];
-		char humidity[8];
-		char celsiusOffset[8];
-		char humidityOffset[8];
-		dtostrf(_celsius, 1, 1, celsius);
-		dtostrf(_humidity, 1, 1, humidity);
-		dtostrf(_temperatureOffset, 1, 1, celsiusOffset);
-		dtostrf(_humidityOffset, 1, 1, humidityOffset);
+		char celsius[16];
+		char humidity[16];
+		char celsiusOffset[16];
+		char humidityOffset[16];
+		SystemFunctions::safeJsonFloat(_celsius, celsius, sizeof(celsius), 1);
+		SystemFunctions::safeJsonFloat(_humidity, humidity, sizeof(humidity), 1);
+		SystemFunctions::safeJsonFloat(_temperatureOffset, celsiusOffset, sizeof(celsiusOffset), 1);
+		SystemFunctions::safeJsonFloat(_humidityOffset, humidityOffset,sizeof(humidityOffset), 1);
 
 		double dewPt = Environment::dewPoint(_celsius, _humidity);
-		char dewPointStr[8];
-		dtostrf(dewPt, 1, 1, dewPointStr);
+		char dewPointStr[16];
+		SystemFunctions::safeJsonFloat(static_cast<float>(dewPt), dewPointStr, sizeof(dewPointStr), 1);
 
 		char comfortBuf[24];
 		strncpy_P(comfortBuf, Environment::getComfortDescription(_celsius, _humidity, dewPt), sizeof(comfortBuf));
