@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    x:Class="PowerControlHubApp.Views.Templates.GenericSensorTemplate">
+
+    <DataTemplate x:Key="GenericSensorTemplate" x:DataType="models:SensorModel">
+        <Border Style="{StaticResource SensorCardBorder}" Margin="0">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Name}" Style="{StaticResource SensorCardHeader}" />
+                <Label Text="{Binding ValueSummary}"
+                       Style="{StaticResource SensorSecondaryValue}"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

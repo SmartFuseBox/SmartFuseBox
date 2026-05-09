@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    x:Class="PowerControlHubApp.Views.Templates.LightSensorTemplate">
+
+    <DataTemplate x:Key="LightSensorTemplate" x:DataType="models:SensorModel">
+        <Border Style="{StaticResource SensorCardBorder}" Margin="0">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Header -->
+                <Label Text="{Binding Name}"
+                       Style="{StaticResource SensorCardHeader}" />
+
+                <!-- Primary: day/night -->
+                <VerticalStackLayout Spacing="2" Margin="0,6,0,6" HorizontalOptions="Center">
+                    <Label Text="{Binding DayNightIcon}" FontSize="32" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding DayNightLabel}"
+                           Style="{StaticResource SensorPrimaryValue}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <!-- Analog-only: raw level + rolling average.
+                     Digital sensors report 0 or 1023 for these fields
+                     (the firmware still emits them); we show them but
+                     they naturally read "0" or "1023" — acceptable.
+                     If you prefer to hide them entirely in digital mode
+                     add an IsVisible binding on SensorModel. -->
+                <BoxView Style="{StaticResource SensorDivider}" />
+
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="3" ColumnSpacing="8">
+                    <Label Grid.Row="0" Grid.Column="0" Text="Level"   Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding LightLevel}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Avg"     Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding LightLevelAvg}" Style="{StaticResource SensorSecondaryValue}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="PowerControlHubApp.Resources.Styles.AppColorsDark">
+
+    <!-- Dark palette — referenced by ThemeService when theme is Dark -->
+    <Color x:Key="AppPageBg">#0a0a1a</Color>
+    <Color x:Key="AppBarBg">#16213e</Color>
+    <Color x:Key="AppLogPanelBg">#0d0d1f</Color>
+    <Color x:Key="AppCardBg">#1a1a2e</Color>
+    <Color x:Key="AppCardStroke">#0f3460</Color>
+    <Color x:Key="AppSensorCardBg">#0d1b2a</Color>
+    <Color x:Key="AppHelpCardBg">#111122</Color>
+    <Color x:Key="AppHelpCardStroke">#333355</Color>
+    <Color x:Key="AppAccent">#00d4ff</Color>
+    <Color x:Key="AppLabelPrimary">#ffffff</Color>
+    <Color x:Key="AppLabelMuted">#888888</Color>
+    <Color x:Key="AppLabelSubtle">#666666</Color>
+    <Color x:Key="AppBarText">#00d4ff</Color>
+    <Color x:Key="AppLogTimestamp">#555577</Color>
+    <Color x:Key="AppLogText">#aaaaaa</Color>
+    <Color x:Key="AppSwitchOn">#00d4ff</Color>
+    <Color x:Key="AppEntryBg">#16213e</Color>
+    <Color x:Key="AppEntryStroke">#0f3460</Color>
+    <Color x:Key="AppEntryText">#ffffff</Color>
+    <Color x:Key="AppPlaceholderText">#555555</Color>
+
+</ResourceDictionary>

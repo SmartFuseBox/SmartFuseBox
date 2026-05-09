@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:models="clr-namespace:PowerControlHubApp.Models"
+             xmlns:templates="clr-namespace:PowerControlHubApp.Views.Templates"
+             x:Class="PowerControlHubApp.Views.DashboardPage"
+             Title="Dashboard">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Relay card style -->
+            <Style x:Key="RelayCardBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="12" />
+            </Style>
+
+            <!-- Relay label -->
+            <Style x:Key="RelayLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelPrimary}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="HorizontalOptions" Value="Start" />
+                <Setter Property="LineBreakMode" Value="TailTruncation" />
+            </Style>
+
+            <!-- Section header label -->
+            <Style x:Key="SectionHeader" TargetType="Label">
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+                <Setter Property="Margin" Value="0,12,0,4" />
+            </Style>
+
+            <!-- Sensor card style -->
+            <Style x:Key="SensorCardBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppSensorCardBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="10" />
+            </Style>
+
+            <!-- Sensor value label -->
+            <Style x:Key="SensorValueLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <!-- Sensor name label -->
+            <Style x:Key="SensorNameLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <!-- ── Shared sensor card sub-styles ── -->
+            <Style x:Key="SensorCardHeader" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="LineBreakMode" Value="TailTruncation" />
+            </Style>
+
+            <Style x:Key="SensorPrimaryValue" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="SensorFieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelSubtle}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="SensorSecondaryLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="SensorSecondaryValue" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelPrimary}" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="SensorDivider" TargetType="BoxView">
+                <Setter Property="HeightRequest" Value="1" />
+                <Setter Property="Margin" Value="0,6" />
+                <Setter Property="Color" Value="{DynamicResource AppCardStroke}" />
+            </Style>
+
+            <!-- ── Sensor DataTemplates ── -->
+            <ResourceDictionary.MergedDictionaries>
+                <templates:Dht11SensorTemplate />
+                <templates:GpsSensorTemplate />
+                <templates:LightSensorTemplate />
+                <templates:VoltageSensorTemplate />
+                <templates:WaterSensorTemplate />
+                <templates:SystemSensorTemplate />
+                <templates:BinaryPresenceSensorTemplate />
+                <templates:GenericSensorTemplate />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- ── Template selector ── -->
+            <templates:SensorTemplateSelector x:Key="SensorSelector"
+                Dht11Template="{StaticResource Dht11SensorTemplate}"
+                GpsTemplate="{StaticResource GpsSensorTemplate}"
+                LightTemplate="{StaticResource LightSensorTemplate}"
+                VoltageTemplate="{StaticResource VoltageSensorTemplate}"
+                WaterTemplate="{StaticResource WaterSensorTemplate}"
+                SystemTemplate="{StaticResource SystemSensorTemplate}"
+                BinaryPresenceTemplate="{StaticResource BinaryPresenceSensorTemplate}"
+                GenericTemplate="{StaticResource GenericSensorTemplate}" />
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <!-- ── Top toolbar ── -->
+        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="*,Auto"
+              BackgroundColor="{DynamicResource AppBarBg}">
+            <Label Grid.Column="0"
+                   Text="⚡ PowerControlHub"
+                   TextColor="{DynamicResource AppBarText}"
+                   FontSize="17"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="⚙"
+                    FontSize="18"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource AppBarText}"
+                    Padding="6,0"
+                    Clicked="OnSettingsClicked" />
+        </Grid>
+
+        <!-- ── Firmware update banner (hidden when no update) ── -->
+        <Grid Grid.Row="1"
+              IsVisible="{Binding ShowOtaBanner}"
+              BackgroundColor="{Binding OtaBannerColor}"
+              Padding="12,7"
+              ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0"
+                   Text="{Binding OtaBannerLabel}"
+                   TextColor="White"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   LineBreakMode="TailTruncation" />
+            <Button Grid.Column="1"
+                    Text="Install"
+                    IsVisible="{Binding UpdateAvailable}"
+                    IsEnabled="{Binding CanInstallUpdate}"
+                    Command="{Binding InstallUpdateCommand}"
+                    FontSize="12"
+                    FontAttributes="Bold"
+                    BackgroundColor="White"
+                    TextColor="{Binding OtaBannerColor}"
+                    CornerRadius="6"
+                    Padding="10,4"
+                    VerticalOptions="Center" />
+        </Grid>
+
+        <!-- ── Main scrollable content ── -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="12,8" Spacing="4">
+
+                <!-- ── Relays section (hidden when disconnected) ── -->
+                <Label Text="CONTROLS"
+                       Style="{StaticResource SectionHeader}"
+                       IsVisible="{Binding HasRelays}" />
+
+                <CollectionView ItemsSource="{Binding Relays}"
+                                IsVisible="{Binding HasRelays}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="6" VerticalItemSpacing="6" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:RelayModel">
+                            <Border Style="{StaticResource RelayCardBorder}">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                    <Label Grid.Row="0" Grid.Column="0"
+                                           Text="{Binding DisplayName}"
+                                           Style="{StaticResource RelayLabel}"
+                                           FontAttributes="Bold" />
+                                    <Label Grid.Row="1" Grid.Column="0"
+                                           Text="{Binding ShortName}"
+                                           TextColor="{DynamicResource AppLabelMuted}"
+                                           FontSize="11" />
+                                    <Switch Grid.Row="0" Grid.RowSpan="2"
+                                            Grid.Column="1"
+                                            IsToggled="{Binding IsOn}"
+                                            ThumbColor="White"
+                                            OnColor="{DynamicResource AppSwitchOn}"
+                                            VerticalOptions="Center"
+                                            Toggled="OnRelayToggled" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="No relays configured"
+                       TextColor="{DynamicResource AppLabelSubtle}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,8"
+                       IsVisible="{Binding HasNoRelays}" />
+
+                <!-- ── Sensors section (hidden when disconnected) ── -->
+                <Label Text="SENSORS"
+                       Style="{StaticResource SectionHeader}"
+                       IsVisible="{Binding HasSensors}" />
+
+                <CollectionView ItemsSource="{Binding Sensors}"
+                                IsVisible="{Binding HasSensors}"
+                                SelectionMode="None"
+                                ItemTemplate="{StaticResource SensorSelector}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="6" VerticalItemSpacing="6" />
+                    </CollectionView.ItemsLayout>
+                </CollectionView>
+
+                <Label Text="No sensors configured"
+                       TextColor="{DynamicResource AppLabelSubtle}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,8"
+                       IsVisible="{Binding HasNoSensors}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+            <!-- ── Status bar ── -->
+            <Grid Grid.Row="3" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"
+                  ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                <!-- Spinning indicator while fetching -->
+                <ActivityIndicator Grid.Column="0"
+                                   IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{DynamicResource AppBarText}"
+                                   WidthRequest="18" HeightRequest="18"
+                                   VerticalOptions="Center"
+                                   Margin="0,0,6,0" />
+                <!-- Coloured status dot (green = connected, red = disconnected) -->
+                <BoxView Grid.Column="1"
+                         Color="{Binding StatusColor}"
+                         WidthRequest="9" HeightRequest="9"
+                         CornerRadius="5"
+                         VerticalOptions="Center"
+                         Margin="0,0,6,0" />
+                <!-- Status / URL message -->
+                <Label Grid.Column="2"
+                       Text="{Binding StatusMessage}"
+                       TextColor="{Binding StatusColor}"
+                       FontSize="11"
+                       VerticalOptions="Center"
+                       LineBreakMode="TailTruncation" />
+                <!-- Manual refresh button -->
+                <Button Grid.Column="3"
+                        Text="↻"
+                        FontSize="16"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource AppBarText}"
+                        Padding="4,0"
+                        Command="{Binding RefreshCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        ToolTipProperties.Text="Refresh now" />
+                <!-- Log panel toggle -->
+                <Button Grid.Column="4"
+                        Text="📋"
+                        FontSize="14"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource AppBarText}"
+                        Padding="4,0"
+                        Clicked="OnToggleLogClicked" />
+            </Grid>
+
+            <!-- ── Log panel (hidden by default, toggled by 📋 button) ── -->
+            <Grid x:Name="LogPanel"
+                  Grid.Row="4"
+                  IsVisible="False"
+                  BackgroundColor="{DynamicResource AppLogPanelBg}"
+                  RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" Padding="12,6" ColumnDefinitions="*,Auto"
+                      BackgroundColor="{DynamicResource AppBarBg}">
+                    <Label Grid.Column="0"
+                           Text="LOG"
+                           TextColor="{DynamicResource AppBarText}"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Clear"
+                            FontSize="11"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource AppBarText}"
+                            Padding="6,0"
+                            Clicked="OnClearLogClicked" />
+                </Grid>
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding LogEntries}"
+                                SelectionMode="None"
+                                HeightRequest="160">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:LogEntry">
+                            <Grid ColumnDefinitions="Auto,Auto,*" Padding="10,3">
+                                <Label Grid.Column="0"
+                                       Text="{Binding FormattedTime}"
+                                       TextColor="{DynamicResource AppLogTimestamp}"
+                                       FontSize="10"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding Level}"
+                                       TextColor="{Binding LevelColor}"
+                                       FontSize="10"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Column="2"
+                                       Text="{Binding Message}"
+                                       TextColor="{DynamicResource AppLogText}"
+                                       FontSize="10"
+                                       LineBreakMode="TailTruncation"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+    </Grid>
+</ContentPage>
