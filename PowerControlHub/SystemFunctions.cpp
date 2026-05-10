@@ -608,3 +608,18 @@ void SystemFunctions::formatTimeParts(char* buffer, size_t bufferSize, const Tim
         (unsigned)timeparts.minutes,
         (unsigned)timeparts.seconds);
 }
+
+void SystemFunctions::safeJsonFloat(float value, char* output, size_t outputSize, uint8_t decimals)
+{
+    if (!output || outputSize == 0)
+        return;
+
+    if (isnan(value) || isinf(value))
+    {
+        strncpy(output, "null", outputSize);
+        output[outputSize - 1] = '\0';
+        return;
+    }
+
+    dtostrf(value, 1, decimals, output);
+}

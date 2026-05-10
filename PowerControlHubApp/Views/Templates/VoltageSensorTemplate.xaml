@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    x:Class="PowerControlHubApp.Views.Templates.VoltageSensorTemplate">
+
+    <DataTemplate x:Key="VoltageSensorTemplate" x:DataType="models:SensorModel">
+        <Border Style="{StaticResource SensorCardBorder}" Margin="0">
+            <VerticalStackLayout Spacing="0">
+
+                <Label Text="{Binding Name}" Style="{StaticResource SensorCardHeader}" />
+
+                <VerticalStackLayout Spacing="2" Margin="0,6,0,6" HorizontalOptions="Center">
+                    <Label Text="⚡" FontSize="28" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding Voltage}"
+                           Style="{StaticResource SensorPrimaryValue}"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="Instant" Style="{StaticResource SensorFieldLabel}"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <BoxView Style="{StaticResource SensorDivider}" />
+
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="Rolling avg" Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Column="1" Text="{Binding VoltageAvg}" Style="{StaticResource SensorSecondaryValue}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

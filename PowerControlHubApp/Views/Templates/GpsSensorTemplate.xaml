@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    x:Class="PowerControlHubApp.Views.Templates.GpsSensorTemplate">
+
+    <DataTemplate x:Key="GpsSensorTemplate" x:DataType="models:SensorModel">
+        <Border Style="{StaticResource SensorCardBorder}" Margin="0">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="{Binding Name}"
+                           Style="{StaticResource SensorCardHeader}" />
+                    <Label Grid.Column="1" Text="{Binding GpsFixLabel}"
+                           FontSize="12" VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Primary: speed + course -->
+                <Grid ColumnDefinitions="*,*" Margin="0,6,0,0">
+                    <VerticalStackLayout Grid.Column="0" Spacing="1" HorizontalOptions="Center">
+                        <Label Text="🚢" FontSize="20" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding GpsSpeed}"
+                               Style="{StaticResource SensorPrimaryValue}" />
+                        <Label Text="Speed"
+                               Style="{StaticResource SensorFieldLabel}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="1" HorizontalOptions="Center">
+                        <Label Text="🧭" FontSize="20" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding GpsCourse}"
+                               Style="{StaticResource SensorPrimaryValue}" />
+                        <Label Text="Course"
+                               Style="{StaticResource SensorFieldLabel}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Divider -->
+                <BoxView Style="{StaticResource SensorDivider}" />
+
+                <!-- Secondary rows -->
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="3" ColumnSpacing="8">
+                    <Label Grid.Row="0" Grid.Column="0" Text="Latitude"   Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding GpsLatitude}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Longitude"  Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding GpsLongitude}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Altitude"   Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding GpsAltitude}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="3" Grid.Column="0" Text="Satellites" Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding GpsSatellites}" Style="{StaticResource SensorSecondaryValue}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

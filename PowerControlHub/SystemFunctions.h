@@ -354,6 +354,20 @@ public:
     static void sanitizeJsonString(const char* input, char* output, size_t outputSize);
 
     /**
+     * @brief Format a float as a JSON number, emitting null for non-finite values.
+     *
+     * IEEE 754 special values (NaN, +Inf, -Inf) are not valid JSON numbers.
+     * This helper emits the literal `null` for any non-finite value so that
+     * the output is always valid JSON.
+     *
+     * @param value      The float value to format.
+     * @param output     Destination buffer.
+     * @param outputSize Size of destination buffer including null terminator.
+     * @param decimals   Number of decimal places (passed to dtostrf).
+     */
+    static void safeJsonFloat(float value, char* output, size_t outputSize, uint8_t decimals = 2);
+
+    /**
      * @brief Escape a string for safe embedding in HTML content.
      *
      * Applies HTML entity escaping for the five special characters:

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    x:Class="PowerControlHubApp.Views.Templates.Dht11SensorTemplate">
+
+    <DataTemplate x:Key="Dht11SensorTemplate" x:DataType="models:SensorModel">
+        <Border Style="{StaticResource SensorCardBorder}" Margin="0">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- Header -->
+                <Label Text="{Binding Name}"
+                       Style="{StaticResource SensorCardHeader}" />
+
+                <!-- Primary row: temp + humidity -->
+                <Grid ColumnDefinitions="*,*" Margin="0,6,0,0">
+                    <VerticalStackLayout Grid.Column="0" Spacing="1" HorizontalOptions="Center">
+                        <Label Text="🌡" FontSize="20" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding Temperature}"
+                               Style="{StaticResource SensorPrimaryValue}" />
+                        <Label Text="Temperature"
+                               Style="{StaticResource SensorFieldLabel}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="1" HorizontalOptions="Center">
+                        <Label Text="💧" FontSize="20" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding Humidity}"
+                               Style="{StaticResource SensorPrimaryValue}" />
+                        <Label Text="Humidity"
+                               Style="{StaticResource SensorFieldLabel}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Divider -->
+                <BoxView Style="{StaticResource SensorDivider}" />
+
+                <!-- Secondary rows -->
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="3" ColumnSpacing="8">
+                    <Label Grid.Row="0" Grid.Column="0" Text="Dew point"  Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding DewPoint}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Comfort"    Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Comfort}" Style="{StaticResource SensorSecondaryValue}" />
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Condensation" Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding CondensationRisk}" Style="{StaticResource SensorSecondaryValue}" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

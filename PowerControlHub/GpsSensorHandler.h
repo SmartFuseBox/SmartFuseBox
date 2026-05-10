@@ -28,6 +28,7 @@
 #include "BaseSensor.h"
 #include "DateTimeManager.h"
 #include "SensorCommandHandler.h"
+#include "SystemFunctions.h"
 
 constexpr unsigned long GpsCheckMs = 10;
 constexpr unsigned long StatusUpdateMs = 1000UL;
@@ -422,17 +423,17 @@ public:
 	{
 		char lat[16];
 		char lon[16];
-		char alt[12];
-		char speed[12];
-		char course[12];
-		
-		dtostrf(_latitude, 1, 6, lat);
-		dtostrf(_longitude, 1, 6, lon);
-		dtostrf(_altitude, 1, 2, alt);
-		dtostrf(_speedKmh, 1, 2, speed);
-		dtostrf(_courseDeg, 1, 2, course);
+		char alt[16];
+		char speed[16];
+		char course[16];
 
-		snprintf_P(buffer, size, 
+		SystemFunctions::safeJsonFloat(static_cast<float>(_latitude),  lat,    sizeof(lat),    6);
+		SystemFunctions::safeJsonFloat(static_cast<float>(_longitude), lon,    sizeof(lon),    6);
+		SystemFunctions::safeJsonFloat(static_cast<float>(_altitude),  alt,    sizeof(alt),    2);
+		SystemFunctions::safeJsonFloat(static_cast<float>(_speedKmh),  speed,  sizeof(speed),  2);
+		SystemFunctions::safeJsonFloat(static_cast<float>(_courseDeg), course, sizeof(course), 2);
+
+		snprintf_P(buffer, size,
 			PSTR("\"gps\":{\"lat\":%s,\"lon\":%s,\"alt\":%s,\"speed\":%s,\"course\":%s,\"sats\":%lu,\"valid\":%s}"),
 			lat, lon, alt, speed, course, _satellites, _hasValidFix ? "true" : "false");
 	}
