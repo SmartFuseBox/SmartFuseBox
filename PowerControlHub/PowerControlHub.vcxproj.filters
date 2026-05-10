@@ -699,17 +699,11 @@
     <ClInclude Include="PowerControlHubConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Wifi.md" />
-    <None Include="Docs\Sensors.md" />
-    <None Include="Docs\Commands.md" />
-    <None Include="Docs\Local.md" />
-    <None Include="Docs\Warnings.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="TestData\config-commands.txt" />
-    <Text Include="TestData\test-commands.txt" />
-    <Text Include="TestData\test-commands-wifi.txt" />
+    <ClInclude Include="PinGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoltageSensorHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -845,7 +845,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	}
 	else if (SystemFunctions::commandMatches(command, ExternalSensorRemove))
 	{
-		// E3:<idx>
+		// E3:v=<idx>
 		Config* config = ConfigManager::getConfigPtr();
 		if (config == nullptr)
 		{
@@ -857,10 +857,19 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		}
 		else
 		{
-			uint8_t idx = static_cast<uint8_t>(atoi(params[0].value));
-			if (idx >= ConfigMaxSensors || idx >= config->remoteSensors.count)
+			uint8_t idx;
+			if (!getParamValueU8t(params, paramCount, "v", idx))
 			{
 				result = ConfigResult::InvalidParameter;
+			}
+			else if (idx >= ConfigMaxSensors)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else if (idx >= config->remoteSensors.count)
+			{
+				// Already absent — treat as success
+				result = ConfigResult::Success;
 			}
 			else
 			{

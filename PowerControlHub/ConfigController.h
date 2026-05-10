@@ -36,7 +36,8 @@ enum class ConfigResult : uint8_t
 	InvalidCommand = 6,
 	InvalidParameter = 7,
 	BluetoothInitFailed = 8,
-	WifiInitFailed = 9
+	WifiInitFailed = 9,
+	InvalidPin = 10
 };
 
 class ConfigController

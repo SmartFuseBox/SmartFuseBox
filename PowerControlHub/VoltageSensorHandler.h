@@ -25,7 +25,6 @@
 #include "LoggingSupport.h"
 #include "JsonVisitor.h"
 #include "BaseSensor.h"
-#include "SystemFunctions.h"
 
 /// Poll the sensor every 5 seconds.
 constexpr uint64_t VoltageSensorCheckIntervalMs = 5000;
@@ -219,13 +218,7 @@ public:
 	{
 		float instantV = rawToVolts(_latestRaw);
 		float avgV     = rawToVolts(_voltageQueue.average());
-
-		char instBuf[16];
-		char avgBuf[16];
-		SystemFunctions::safeJsonFloat(instantV, instBuf, sizeof(instBuf), 2);
-		SystemFunctions::safeJsonFloat(avgV,     avgBuf,  sizeof(avgBuf),  2);
-
-		snprintf(buffer, size, "\"voltage\":%s,\"avg\":%s", instBuf, avgBuf);
+		snprintf(buffer, size, "\"voltage\":%.2f,\"avg\":%.2f", instantV, avgV);
 	}
 
 	SensorIdList getSensorIdType() const override

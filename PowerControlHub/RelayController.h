@@ -29,7 +29,8 @@ enum class RelayResult : uint8_t
 	Reserved = 2,
 	InvalidConfig = 3,
 	InvalidParameter = 4,
-	Failed = 5
+	Failed = 5,
+	InvalidPin = 6
 };
 
 
@@ -343,6 +344,9 @@ public:
 
 		if (pin == 0)
 			return RelayResult::InvalidParameter;
+
+		if (PinGuard::isBlocked(PinGuard::validate(pin, PinUse::Relay)))
+			return RelayResult::InvalidPin;
 
 		config->relay.relays[relayIndex].pin = pin;
 		return RelayResult::Success;

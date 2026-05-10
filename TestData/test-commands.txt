@@ -819,15 +819,15 @@ E2:i=0;mt=binary_sensor;md=motion;mu=;bin=1 -> ACK:E2=ok:reboot=1
 E4:0=Outside Temp -> ACK:E4=ok:reboot=1
 
 # E3: Remove sensor at index 1
-E3:1 -> ACK:E3=ok:reboot=1
+E3:v=1 -> ACK:E3=ok:reboot=1
 
 # E3: Remove sensor at index 0
-E3:0 -> ACK:E3=ok:reboot=1
+E3:v=0 -> ACK:E3=ok:reboot=1
 
 # Error cases - invalid sensor index
 E1:i=8;id=7;n=TooMany;mn=x;ms=x -> ACK:E1=Invalid sensor index:*|ACK:E1=Invalid parameter:*
 E2:i=8;mt=sensor;md=temperature;mu=C;bin=0 -> ACK:E2=Invalid sensor index:*|ACK:E2=Invalid parameter:*
-E3:8 -> ACK:E3=Invalid sensor index:*
+E3:v=8 -> ACK:E3=Invalid sensor index:*
 E4:8=NewName -> ACK:E4=Invalid sensor index:*
 
 # Error cases - missing parameters

@@ -453,6 +453,9 @@ ConfigResult ConfigController::setSdCardCsPin(const uint8_t csPin)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
+	if (PinGuard::isBlocked(PinGuard::validate(csPin, PinUse::SpiCs)))
+		return ConfigResult::InvalidPin;
+
 	_config->sdCard.csPin = csPin;
 	return ConfigResult::Success;
 }
@@ -462,6 +465,13 @@ ConfigResult ConfigController::setSpiPins(const uint8_t sckPin, const uint8_t mo
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
+
+	if (PinGuard::isBlocked(PinGuard::validate(sckPin, PinUse::SpiSck)) ||
+		PinGuard::isBlocked(PinGuard::validate(mosiPin, PinUse::SpiMosi)) ||
+		PinGuard::isBlocked(PinGuard::validate(misoPin, PinUse::SpiMiso)))
+	{
+		return ConfigResult::InvalidPin;
+	}
 
 	_config->spiPins.sckPin = sckPin;
 	_config->spiPins.mosiPin = mosiPin;
@@ -488,6 +498,9 @@ ConfigResult ConfigController::setXpdzTonePin(const uint8_t pin)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
+	if (PinGuard::isBlocked(PinGuard::validate(pin, PinUse::Output)))
+		return ConfigResult::InvalidPin;
+
 	_config->xpdzTone.pin = pin;
 	return ConfigResult::Success;
 }
@@ -497,6 +510,13 @@ ConfigResult ConfigController::setHw479RgbPins(const uint8_t rPin, const uint8_t
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
+
+	if (PinGuard::isBlocked(PinGuard::validate(rPin, PinUse::Output)) ||
+		PinGuard::isBlocked(PinGuard::validate(gPin, PinUse::Output)) ||
+		PinGuard::isBlocked(PinGuard::validate(bPin, PinUse::Output)))
+	{
+		return ConfigResult::InvalidPin;
+	}
 
 	_config->hw479Rgb.rPin = rPin;
 	_config->hw479Rgb.gPin = gPin;
@@ -509,6 +529,13 @@ ConfigResult ConfigController::setRtcPins(const uint8_t dataPin, const uint8_t c
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
+
+	if (PinGuard::isBlocked(PinGuard::validate(dataPin, PinUse::Output)) ||
+		PinGuard::isBlocked(PinGuard::validate(clockPin, PinUse::Output)) ||
+		PinGuard::isBlocked(PinGuard::validate(resetPin, PinUse::Output)))
+	{
+		return ConfigResult::InvalidPin;
+	}
 
 	_config->rtc.dataPin = dataPin;
 	_config->rtc.clockPin = clockPin;
@@ -540,6 +567,9 @@ ConfigResult ConfigController::setNextionRxPin(const uint8_t rxPin)
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
+	if (PinGuard::isBlocked(PinGuard::validate(rxPin, PinUse::Input)))
+		return ConfigResult::InvalidPin;
+
 	_config->nextion.rxPin = rxPin;
 	return ConfigResult::Success;
 }
@@ -548,6 +578,9 @@ ConfigResult ConfigController::setNextionTxPin(const uint8_t txPin)
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
+
+	if (PinGuard::isBlocked(PinGuard::validate(txPin, PinUse::Output)))
+		return ConfigResult::InvalidPin;
 
 	_config->nextion.txPin = txPin;
 	return ConfigResult::Success;

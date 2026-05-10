@@ -346,6 +346,14 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			else
 			{
 				result = _configController->setXpdzTonePin(pin);
+
+				if (result == ConfigResult::InvalidPin)
+				{
+					char dbg[40];
+					snprintf(dbg, sizeof(dbg), "XpdzTone pin %u blocked: %s", pin,
+						reinterpret_cast<const char*>(PinGuard::reasonString(PinGuard::validate(pin, PinUse::Output))));
+					sender->sendDebug(dbg, "C6");
+				}
 			}
 		}
 		else
@@ -367,6 +375,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			else
 			{
 				result = _configController->setSpiPins(sckPin, mosiPin, misoPin);
+
+				if (result == ConfigResult::InvalidPin)
+				{
+					char dbg[64];
+					snprintf(dbg, sizeof(dbg), "SPI pin blocked: sck=%u mosi=%u miso=%u", sckPin, mosiPin, misoPin);
+					sender->sendDebug(dbg, "C4");
+				}
 			}
 		}
 		else
@@ -403,6 +418,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			else
 			{
 				result = _configController->setHw479RgbPins(rPin, gPin, bPin);
+
+				if (result == ConfigResult::InvalidPin)
+				{
+					char dbg[56];
+					snprintf(dbg, sizeof(dbg), "RGB pin blocked: r=%u g=%u b=%u", rPin, gPin, bPin);
+					sender->sendDebug(dbg, "C8");
+				}
 			}
 		}
 		else
@@ -541,6 +563,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			else
 			{
 				result = _configController->setRtcPins(dataPin, clockPin, resetPin);
+
+				if (result == ConfigResult::InvalidPin)
+				{
+					char dbg[64];
+					snprintf(dbg, sizeof(dbg), "RTC pin blocked: dat=%u clk=%u rst=%u", dataPin, clockPin, resetPin);
+					sender->sendDebug(dbg, "C18");
+				}
 			}
 		}
 		else
@@ -791,6 +820,14 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		{
 			uint8_t csPin = static_cast<uint8_t>(atoi(params[0].value));
 			result = _configController->setSdCardCsPin(csPin);
+
+			if (result == ConfigResult::InvalidPin)
+			{
+				char dbg[40];
+				snprintf(dbg, sizeof(dbg), "SD CS pin %u blocked: %s", csPin,
+					reinterpret_cast<const char*>(PinGuard::reasonString(PinGuard::validate(csPin, PinUse::SpiCs))));
+				sender->sendDebug(dbg, "C32");
+			}
 		}
 		else
 		{
@@ -978,6 +1015,9 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		return true;
 	case ConfigResult::InvalidParameter:
 		sendAckErr(sender, command, F("Invalid parameter"), &params[0]);
+		return true;
+	case ConfigResult::InvalidPin:
+		sendAckErr(sender, command, F("Invalid pin"), &params[0]);
 		return true;
 	case ConfigResult::BluetoothInitFailed:
 		sendAckErr(sender, command, F("Bluetooth init failed"), &params[0]);

@@ -20,6 +20,7 @@
 #include "SystemCpuMonitor.h"
 #include "DateTimeManager.h"
 #include "ConfigManager.h"
+#include "PinGuard.h"
 #include "SensorFactory.h"
 
 #if defined(NEXTION_DISPLAY_DEVICE)
@@ -128,6 +129,26 @@ void PowerControlHubApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSenso
 
     if (!ConfigManager::load())
     {
+        _warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
+    }
+
+    // Increment crash counter immediately after load, before any hardware init.
+    // If the board watchdog-resets during setup() this counter will never be cleared,
+    // so it will keep rising.  Once it hits the threshold we know we are in a crash
+    // loop caused by the current config and we reset to safe defaults.
+    ConfigManager::incrementCrashCounter();
+    SystemHeader* hdr = ConfigManager::getHeaderPtr();
+
+    // Apply persisted PinGuard mode before any hardware init
+    if (hdr)
+        PinGuard::setMode(hdr->pinGuardFlags);
+
+    if (hdr->crashCounter >= CrashCounterThreshold)
+    {
+        _commandMgrComputer->sendError("Crash loop detected — resetting config to defaults", "PowerControlHubApp");
+        ConfigManager::resetToDefaults();
+        ConfigManager::save();
+        PinGuard::setMode(PinGuardMode::None);  // strict mode after defaults reset
         _warningManager.raiseWarning(WarningType::DefaultConfigurationFuseBox);
     }
 
@@ -353,6 +374,9 @@ void PowerControlHubApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSenso
     // indicate system initialized
     _commandMgrComputer->sendCommand(SystemInitialized, "");
     _scheduleController.begin();
+
+    // Full initialisation completed without a watchdog reset — clear the crash counter.
+    ConfigManager::resetCrashCounter();
 }
 
 void PowerControlHubApp::loop()

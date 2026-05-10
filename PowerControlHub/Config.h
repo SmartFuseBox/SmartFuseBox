@@ -57,7 +57,7 @@ struct SystemHeader {
     uint8_t  headerVersion;       // offset 10 — for future header migrations
     uint8_t  crashCounter;        // offset 11
     uint8_t  lastResetReason;     // offset 12
-    uint8_t  safeModeFlagsf;      // offset 13
+    uint8_t  pinGuardFlags;       // offset 13 — PinGuardMode bitmask (see PinGuard.h)
     uint8_t  reserved[16];        // offset 14 — reserved[0] = OTA flags (see OtaFlagAutoApply)
     uint16_t checksum;            // offset 30 — always last
 } __attribute__((packed));        // = 32 bytes
