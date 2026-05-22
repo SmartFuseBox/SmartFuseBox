@@ -22,13 +22,39 @@ PinGuard catches these problems at the point the pin is *set*, not when the boar
 
 PinGuard is included automatically via `BoardConfig.h` — no include is needed in consumer files. The correct pin table is selected at compile time using the IDF-provided macros `CONFIG_IDF_TARGET_ESP32S3` and `CONFIG_IDF_TARGET_ESP32`, which are emitted by the Arduino-ESP32 toolchain based on the board selected in the IDE. No manual defines are required in `Local.h`.
 
-When a pin-setting command is received (e.g. `C4` SPI pins, `C32` SD card CS, `R11` relay pin), the firmware calls:
+When a guarded pin-setting command is received, the setter calls:
 
 ```cpp
 PinGuardResult result = PinGuard::validate(pin, PinUse::SpiSck);
 ```
 
 If the result is `HardBlocked` or `AdvisoryBlocked` the setter returns `ConfigResult::InvalidPin` / `RelayResult::InvalidPin`, the command handler sends back `ACK:<cmd>=Invalid pin:<params>`, and a serial debug message names the blocked pin and the reason.
+
+Not all pin-setting commands call PinGuard — see [Guarded Commands](#guarded-commands) below for the exact coverage.
+
+---
+
+## Guarded Commands
+
+PinGuard checks are applied at the setter level for the following commands only.
+
+| Command | Description | Pins validated | `PinUse` |
+|---|---|---|---|
+| `C4` | SPI bus pins | SCK, MOSI | `SpiSck`, `SpiMosi` |
+| `C4` | SPI bus pins | MISO | `SpiMiso` |
+| `C6` | XpdzTone buzzer pin | pin | `Output` |
+| `C8` | HW-479 RGB LED pins | R, G, B | `Output` |
+| `C18` | RTC DS1302 pins | data, clock, reset | `Output` |
+| `C32` | SD card chip-select pin | CS | `SpiCs` |
+| `N3` | Nextion display RX pin | RX | `Input` |
+| `N4` | Nextion display TX pin | TX | `Output` |
+| `R11` | Relay output pin | pin | `Relay` |
+
+### Unguarded pin setters
+
+| Command | Description | Status |
+|---|---|---|
+| `S4` | Sensor pin slot assignment | No PinGuard check — any GPIO value is accepted |
 
 ---
 
@@ -42,6 +68,17 @@ If the result is `HardBlocked` or `AdvisoryBlocked` the setter returns `ConfigRe
 | **Disabled** | `Disabled` | Pin == `0xFF` (`PinDisabled`) — not fitted, no check performed | — |
 
 The advisory and bypass behaviour is controlled by the persistent `pinGuardFlags` system setting — see [PinGuard System Mode](#pinGuard-system-mode) below.
+
+---
+
+## Input-Only Pin Handling
+
+Input-only GPIOs (e.g. ESP32 GPIO 34–39, ESP32-S3 GPIO 45–46) are handled as follows:
+
+- When the requested `PinUse` **requires output** (see table below): the pin is **hard-blocked** regardless of PinGuard mode — this is a silicon-level limitation.
+- When the requested `PinUse` **does not require output**: the advisory gate is bypassed and `validate()` returns `Safe`.
+
+Input-only GPIOs are stored as `PinCategory::Advisory` in the pin table. The promotion to `HardBlocked` for output uses is applied inside `validate()` via the `_inputOnlyMin`/`_inputOnlyMax` range check. For non-output uses the pin is returned directly as `Safe` without consulting the advisory mode flag.
 
 ---
 
@@ -208,5 +245,5 @@ The user can also send `C2` (Config Reset) over serial to reset to defaults at a
 
 - [`PinGuard.h`](../PowerControlHub/PinGuard.h) — implementation
 - [`ConfigManager.h`](../PowerControlHub/ConfigManager.h) — `CrashCounterThreshold`, `incrementCrashCounter`, `resetCrashCounter`
-- [`Docs/Commands.md`](Commands.md) — `C4`, `C32`, `R11` pin-setting commands
+- [`Docs/Commands.md`](Commands.md) — `C4`, `C6`, `C8`, `C18`, `C32`, `N3`, `N4`, `R11`, `S4` pin-setting commands
 - [`Docs/Warnings.md`](Warnings.md) — `SpiPinConfigError`, `DefaultConfigurationFuseBox`

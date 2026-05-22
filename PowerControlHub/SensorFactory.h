@@ -159,6 +159,14 @@ private:
         {
             case SensorIdList::WaterSensor:
             {
+                if (entry.pins[0] == PinDisabled || entry.pins[1] == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::WaterSensorFailure);
+
+                    return nullptr;
+                }
+
                 // pins[0] = sensor pin, pins[1] = active/power pin
                 uint8_t sensorPin = entry.pins[0];
                 uint8_t activePin = entry.pins[1];
@@ -173,6 +181,14 @@ private:
 
             case SensorIdList::Dht11Sensor:
             {
+                if (entry.pins[0] == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::TemperatureSensorFailure);
+
+                    return nullptr;
+                }
+
                 // pins[0] = data pin
                 uint8_t sensorPin = entry.pins[0];
 				float humidityOffset = static_cast<float>(entry.options2[0]) / 10.0f; // e.g. -5..+5% in steps of 0.1
@@ -190,9 +206,17 @@ private:
 
             case SensorIdList::LightSensor:
             {
+                if (entry.pins[0] == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::LightSensorFailure);
+
+                    return nullptr;
+                }
+
                 // pins[0] = sensor pin, options1[0] != 0 means digital mode
                 uint8_t sensorPin = entry.pins[0];
-                bool    isDigital = (entry.options1[0] != 0);
+                bool isDigital = (entry.options1[0] != 0);
 
                 return new LightSensorHandler(
                     ctx.messageBus,
@@ -206,33 +230,41 @@ private:
 
 			case SensorIdList::BinaryPresenceSensor:
 			{
-				// pins[0] = sensor pin
-					// options1[0] = active state (non-zero = HIGH, 0 = LOW)
-					// options1[1] = onDetected action (ExecutionActionType)
-					// pins[1] = onDetected action payload byte 0 (e.g. relay index)
-					// options2[0] = onClear action (ExecutionActionType)
-					// pins[2] = onClear action payload byte 0 (e.g. relay index)
-					// options2[1] = pulse duration in seconds (shared; used when either action is RelayPulse)
-					uint8_t sensorPin = entry.pins[0];
-					int activeState = (entry.options1[0] != 0) ? HIGH : LOW;
-					ExecutionActionType onDetectedAction = static_cast<ExecutionActionType>(entry.options1[1]);
-					uint8_t onDetectedPayload = entry.pins[1];
-					ExecutionActionType onClearAction = static_cast<ExecutionActionType>(static_cast<uint8_t>(entry.options2[0]));
-					uint8_t onClearPayload = entry.pins[2];
-					uint16_t pulseDurationSec = static_cast<uint16_t>(entry.options2[1]);
-					return new BinaryPresenceSensor(
-						ctx.messageBus,
-						ctx.broadcastManager,
-						ctx.sensorCommandHandler,
-						ctx.relayController,
-						sensorPin,
-						activeState,
-						entry.name,
-						onDetectedAction,
-						onDetectedPayload,
-						onClearAction,
-						onClearPayload,
-						pulseDurationSec);
+                if (entry.pins[0] == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::BinarySensorFailure);
+
+                    return nullptr;
+                }
+
+                // pins[0] = sensor pin
+				// options1[0] = active state (non-zero = HIGH, 0 = LOW)
+				// options1[1] = onDetected action (ExecutionActionType)
+				// pins[1] = onDetected action payload byte 0 (e.g. relay index)
+				// options2[0] = onClear action (ExecutionActionType)
+				// pins[2] = onClear action payload byte 0 (e.g. relay index)
+				// options2[1] = pulse duration in seconds (shared; used when either action is RelayPulse)
+				uint8_t sensorPin = entry.pins[0];
+				int activeState = (entry.options1[0] != 0) ? HIGH : LOW;
+				ExecutionActionType onDetectedAction = static_cast<ExecutionActionType>(entry.options1[1]);
+				uint8_t onDetectedPayload = entry.pins[1];
+				ExecutionActionType onClearAction = static_cast<ExecutionActionType>(static_cast<uint8_t>(entry.options2[0]));
+				uint8_t onClearPayload = entry.pins[2];
+				uint16_t pulseDurationSec = static_cast<uint16_t>(entry.options2[1]);
+				return new BinaryPresenceSensor(
+					ctx.messageBus,
+					ctx.broadcastManager,
+					ctx.sensorCommandHandler,
+					ctx.relayController,
+					sensorPin,
+					activeState,
+					entry.name,
+					onDetectedAction,
+					onDetectedPayload,
+					onClearAction,
+					onClearPayload,
+					pulseDurationSec);
 			}
 
             case SensorIdList::GpsSensor:
@@ -246,6 +278,7 @@ private:
                 {
                     if (ctx.warningManager != nullptr)
                         ctx.warningManager->raiseWarning(WarningType::GpsInvalidConfig);
+
                     return nullptr;
                 }
 
@@ -282,7 +315,15 @@ private:
 
             case SensorIdList::VoltageSensor:
             {
-                // pins[0]     = analog sensor pin
+                if (entry.pins[0] == PinDisabled)
+                {
+                    if (ctx.warningManager != nullptr)
+                        ctx.warningManager->raiseWarning(WarningType::VoltageSensorFailure);
+
+                    return nullptr;
+                }
+                
+                // pins[0] = analog sensor pin
                 // options1[0] = ADC Vref in tenths of a volt (e.g. 50 = 5.0 V); 0 = default (5.0 V)
                 // options1[1] = R2 in tenths of kΩ (e.g. 75 = 7.5 kΩ);          0 = default (7.5 kΩ)
                 // options2[0] = R1 in whole kΩ (e.g. 30 = 30 kΩ);               0 = default (30 kΩ)

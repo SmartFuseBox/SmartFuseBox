@@ -28,7 +28,6 @@
  * block below. Local.h does not need to change.
  */
 
-
 // ─── Board Conflict Guards ────────────────────────────────────────────────────
 #if defined(ARDUINO_UNO_R4)
   #if defined(ESP32) || defined(ARDUINO_R4_MINIMA)
@@ -66,6 +65,27 @@
 
 #if !defined(MAXIMUM_EVENTS)
   #define MAXIMUM_EVENTS 20
+#endif
+
+
+ // ─── ADC Resolution Table ─────────────────────────────────────────────────────
+ // ADC_RESOLUTION_BITS  – native bit depth used by analogRead() on this board.
+ // ADC_FULL_SCALE       – exclusive upper bound (2^bits); use as the divisor in
+ //                        voltage calculations.
+ // CONFIGURE_ADC        – defined when analogReadResolution() must be called at
+ //                        boot to match ADC_RESOLUTION_BITS (not available on AVR).
+#if defined(ESP32)
+    #define ADC_RESOLUTION_BITS 12
+    #define ADC_FULL_SCALE 4096
+    #define CONFIGURE_ADC
+#elif defined(ARDUINO_UNO_R4) || defined(ARDUINO_R4_MINIMA)
+    #define ADC_RESOLUTION_BITS 14
+    #define ADC_FULL_SCALE 16384
+    #define CONFIGURE_ADC
+#else
+    // AVR (Mega 2560 etc.) — fixed 10-bit, analogReadResolution() not available
+    #define ADC_RESOLUTION_BITS 10
+    #define ADC_FULL_SCALE 1024
 #endif
 
 

@@ -55,6 +55,8 @@ void setup()
 	// from DateTimeManager or ConfigManager during initialization are properly output.
 	SystemFunctions::initializeSerial(COMPUTER_SERIAL, 115200, true);
 
+	SystemFunctions::configureAdc();
+
 	// configure app
 	app.setup(nullptr, 0);
 }

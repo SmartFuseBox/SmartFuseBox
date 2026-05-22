@@ -32,11 +32,16 @@ constexpr uint64_t VoltageSensorCheckIntervalMs = 5000;
 /// Rolling average depth (10 readings).
 constexpr uint8_t VoltageSensorQueueSize = 10;
 
-/// ADC full-scale count (10-bit ADC on both Arduino and ESP32 by default).
-constexpr uint16_t VoltageSensorAdcFullScale = 1024;
+constexpr uint16_t VoltageSensorAdcFullScale = ADC_FULL_SCALE;
 
-/// Default ADC reference voltage in tenths of a volt (50 = 5.0 V).
+#if defined(ESP32)
+/// ESP32 ADC reference is ~3.3V with default attenuation (DB_11)
+/// Note: Actual voltage depends on attenuation setting
+constexpr int8_t VoltageSensorDefaultVrefTenths = 33;
+#else
+/// Arduino boards typically use 5.0V reference
 constexpr int8_t VoltageSensorDefaultVrefTenths = 50;
+#endif
 
 /// Default R1 in kΩ — matches the 30k/7.5k module variant.
 constexpr int16_t VoltageSensorDefaultR1kOhm = 30;
@@ -72,6 +77,7 @@ class VoltageSensorHandler : public BaseSensor, public BroadcastLoggerSupport
 private:
 	WarningManager* _warningManager;
 	const uint8_t _sensorPin;
+	bool _initialized;
 
 	/// Pre-computed divisor: R2 / (R1 + R2), avoids float division every tick.
 	float _voltageDivisor;
@@ -111,15 +117,25 @@ private:
 protected:
 	void initialize() override
 	{
-		pinMode(_sensorPin, INPUT);
+		if (_sensorPin == PinDisabled)
+		{
+			// invalid pin configuration; raise a warning and disable this sensor
+			if (_warningManager != nullptr)
+				_warningManager->raiseWarning(WarningType::VoltageSensorFailure);
 
-		char buf[56];
-		snprintf(buf, sizeof(buf), "pin=%d vref=%.1f warn=%.1fV", _sensorPin, _vref, _warnThresholdV);
-		sendDebug(buf, _name);
+			_initialized = false; 
+			return;
+		}
+
+		pinMode(_sensorPin, INPUT);
+		_initialized = true;
 	}
 
 	uint64_t update() override
 	{
+		if (!_initialized)
+			return VoltageSensorCheckIntervalMs;
+
 		_latestRaw = static_cast<uint16_t>(analogRead(_sensorPin));
 
 		if (_voltageQueue.isFull())
@@ -207,9 +223,9 @@ public:
 			: 0.0f;
 
 #if defined(MQTT_SUPPORT)
-		snprintf(_slugVoltage,    sizeof(_slugVoltage),    "%s_voltage",     _safeSlug);
+		snprintf(_slugVoltage, sizeof(_slugVoltage), "%s_voltage", _safeSlug);
 		snprintf(_slugAvgVoltage, sizeof(_slugAvgVoltage), "%s_avg_voltage", _safeSlug);
-		snprintf(_nameVoltage,    sizeof(_nameVoltage),    "%s Voltage",     _name);
+		snprintf(_nameVoltage, sizeof(_nameVoltage), "%s Voltage", _name);
 		snprintf(_nameAvgVoltage, sizeof(_nameAvgVoltage), "%s Avg Voltage", _name);
 #endif
 	}
@@ -217,7 +233,7 @@ public:
 	void formatStatusJson(char* buffer, size_t size) override
 	{
 		float instantV = rawToVolts(_latestRaw);
-		float avgV     = rawToVolts(_voltageQueue.average());
+		float avgV = rawToVolts(_voltageQueue.average());
 		snprintf(buffer, size, "\"voltage\":%.2f,\"avg\":%.2f", instantV, avgV);
 	}
 
@@ -240,6 +256,9 @@ public:
 
 	uint8_t getMqttChannelCount() const override
 	{
+		if (!_initialized)
+			return 0;
+
 		return 2;
 	}
 
@@ -247,8 +266,10 @@ public:
 	{
 		switch (channelIndex)
 		{
-			case 0:  return { _nameVoltage,    _slugVoltage,    "voltage", "voltage", "V", false };
-			default: return { _nameAvgVoltage, _slugAvgVoltage, "voltage", "voltage", "V", false };
+			case 0:
+				return { _nameVoltage, _slugVoltage, "voltage", "voltage", "V", false };
+			default:
+				return { _nameAvgVoltage, _slugAvgVoltage, "voltage", "voltage", "V", false };
 		}
 	}
 
