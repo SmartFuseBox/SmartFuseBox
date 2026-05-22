@@ -140,6 +140,13 @@ void SystemFunctions::initializeSerial(HardwareSerial& serialPort, unsigned long
 	}
 }
 
+void SystemFunctions::configureAdc()
+{
+#if defined(CONFIGURE_ADC)
+    analogReadResolution(ADC_RESOLUTION_BITS);
+#endif
+}
+
 bool SystemFunctions::parseBooleanValue(const char* value)
 {
     if (!value)
@@ -621,5 +628,5 @@ void SystemFunctions::safeJsonFloat(float value, char* output, size_t outputSize
         return;
     }
 
-    dtostrf(value, 1, decimals, output);
+    snprintf(output, outputSize, "%.*f", decimals, (double)value);
 }

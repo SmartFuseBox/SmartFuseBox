@@ -248,6 +248,12 @@ public:
                 return true;
             }
 
+            if (PinGuard::isBlocked(PinGuard::validate(pin, PinUse::Sensor)))
+            {
+                sendAckErr(sender, command, F("Invalid pin"));
+                return true;
+            }
+
             config->sensors.sensors[idx].pins[slot] = pin;
 
             StringKeyValue reboot = makeParam("reboot", 1);

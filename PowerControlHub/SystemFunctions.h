@@ -89,6 +89,14 @@ public:
 	 */
     static void initializeSerial(HardwareSerial& serialPort, unsigned long baudRate, bool waitForConnection);
 
+    
+    /**
+     * @brief Call once during setup() on boards that support runtime ADC resolution selection.
+     * On AVR boards this is a no-op (CONFIGURE_ADC is not defined).
+     *
+     */
+    static void configureAdc();
+
     /**
      * @brief Parse a string value as a boolean.
      *

@@ -37,7 +37,7 @@ enum class WarningType : uint32_t
 
     // System warnings (bits 0-19)
     DefaultConfigurationFuseBox = 1UL << 0,           // 0x00000001 - Using default config
-    DefaultConfigurationControlPanel = 1UL << 1,      // 0x00000002 - Using default config
+    DefaultConfigurationControlPanel = 1UL << 1,      // 0x00000002 - Using default config (deprecated)
     ConnectionLost = 1UL << 2,                        // 0x00000004 - Connection lost warning
     HighCompassTemperature = 1UL << 3,                // 0x00000008 - Compass temperature threshold exceeded
     LowBattery = 1UL << 4,                            // 0x00000010 - Battery voltage low
@@ -58,7 +58,11 @@ enum class WarningType : uint32_t
     TemperatureSensorFailure = 1UL << 21,             // 0x00200000 - Temperature sensor failure
     CompassFailure = 1UL << 22,                       // 0x00400000 - Compass failed to initialize
 	GpsFailure = 1UL << 23,                           // 0x00800000 - GPS sensor failure
-	LowVoltage = 1UL << 24,                            // 0x01000000 - Voltage below configured threshold
+	LowVoltage = 1UL << 24,                           // 0x01000000 - Voltage below configured threshold
+	VoltageSensorFailure = 1UL << 25,                 // 0x02000000 - Voltage sensor failure
+	BinarySensorFailure = 1UL << 26,                  // 0x04000000 - Binary presence sensor failure
+	LightSensorFailure = 1UL << 27,                   // 0x08000000 - Light sensor failure
+	WaterSensorFailure = 1UL << 28,                   // 0x10000000 - Water sensor failure
 };
 
 // Warning type display strings - keep in sync with WarningType enum
@@ -88,10 +92,10 @@ static const char WT_21[] PROGMEM = "Temperature Sensor Failure";
 static const char WT_22[] PROGMEM = "Compass Failure";
 static const char WT_23[] PROGMEM = "GPS Module Failure";
 static const char WT_24[] PROGMEM = "Low Voltage";
-static const char WT_25[] PROGMEM = "";
-static const char WT_26[] PROGMEM = "";
-static const char WT_27[] PROGMEM = "";
-static const char WT_28[] PROGMEM = "";
+static const char WT_25[] PROGMEM = "Voltage Sensor Failure";
+static const char WT_26[] PROGMEM = "Binary Sensor Failure";
+static const char WT_27[] PROGMEM = "Light Sensor Failure";
+static const char WT_28[] PROGMEM = "Water Sensor Failure";
 static const char WT_29[] PROGMEM = "";
 static const char WT_30[] PROGMEM = "";
 static const char WT_31[] PROGMEM = "";

@@ -145,10 +145,9 @@ static const PinTableEntry _pinTable[] PROGMEM = {
 };
 static constexpr uint8_t _pinTableSize = sizeof(_pinTable) / sizeof(_pinTable[0]);
 
-// Input-only GPIOs on S3 (45, 46) — no contiguous range, handled via table entries
-static constexpr uint8_t _inputOnlyMin = 255;
-static constexpr uint8_t _inputOnlyMax = 254;   // min > max → range never matches
-
+// Input-only GPIOs on S3: GPIO 45 and 46 form a contiguous range
+static constexpr uint8_t _inputOnlyMin = 45;
+static constexpr uint8_t _inputOnlyMax = 46;
 #elif defined(CONFIG_IDF_TARGET_ESP32)
 
 // ── Classic ESP32 (NodeMCU-32S, DevKitC, and all other ESP32 boards) ─────────
@@ -254,10 +253,16 @@ public:
 
 			if (cat == PinCategory::Advisory)
 			{
-				// Input-only pins are hard-blocked for output uses regardless of mode
-				if (needsOutput && pin >= _inputOnlyMin && pin <= _inputOnlyMax)
+				// Input-only pins: hard-block for output, transparent for input
+				const bool isInputOnly = (pin >= _inputOnlyMin && pin <= _inputOnlyMax);
+
+				if (isInputOnly && needsOutput)
 					return PinGuardResult::HardBlocked;
 
+				if (isInputOnly && !needsOutput)
+					return PinGuardResult::Safe;   // input-only is fine here
+
+				// Ordinary advisory pin (strapping / UART0)
 				if (!allowAdvisory)
 					return PinGuardResult::AdvisoryBlocked;
 			}
