@@ -99,7 +99,7 @@ private:
 
 	// Multi-client helper functions
 	int8_t findFreeClientSlot();
-	uint8_t getPersistentClientCount();
+	uint8_t getPersistentClientCount(uint8_t excludeIndex = 255);
 	void cleanupClient(uint8_t index);
 	void handleClientState(uint8_t index, uint64_t now);
 	bool acceptNewClient(IWifiClient* client, uint64_t now);

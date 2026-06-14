@@ -302,6 +302,19 @@ public:
     static bool startsWith(const char* str, const __FlashStringHelper* prefix);
 
     /**
+     * @brief Decode a percent-encoded URI component per RFC 3986.
+     *
+     * Converts %HH hex escapes to their literal byte values and decodes '+'
+     * to space (the application/x-www-form-urlencoded convention).
+     * Safe to call with input == dest (in-place decode).
+     *
+     * @param input  Percent-encoded input string (null-terminated).
+     * @param dest   Destination buffer for decoded output.
+     * @param destSize Size of destination buffer (includes null terminator).
+     */
+    static void urlDecode(const char* input, char* dest, size_t destSize);
+
+    /**
      * @brief Calculate the length of a string (PROGMEM or RAM).
      * 
      * @param str String to measure

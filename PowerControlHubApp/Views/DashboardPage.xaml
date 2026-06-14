@@ -11,7 +11,6 @@
         <ResourceDictionary>
             <!-- Relay card style -->
             <Style x:Key="RelayCardBorder" TargetType="Border">
-                <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
                 <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
                 <Setter Property="StrokeShape" Value="RoundRectangle 10" />
                 <Setter Property="Padding" Value="12" />
@@ -97,6 +96,17 @@
                 <Setter Property="Color" Value="{DynamicResource AppCardStroke}" />
             </Style>
 
+            <!-- ── Template selector ── -->
+            <templates:SensorTemplateSelector x:Key="SensorSelector"
+                Dht11Template="{StaticResource Dht11SensorTemplate}"
+                GpsTemplate="{StaticResource GpsSensorTemplate}"
+                LightTemplate="{StaticResource LightSensorTemplate}"
+                VoltageTemplate="{StaticResource VoltageSensorTemplate}"
+                WaterTemplate="{StaticResource WaterSensorTemplate}"
+                SystemTemplate="{StaticResource SystemSensorTemplate}"
+                BinaryPresenceTemplate="{StaticResource BinaryPresenceSensorTemplate}"
+                GenericTemplate="{StaticResource GenericSensorTemplate}" />
+
             <!-- ── Sensor DataTemplates ── -->
             <ResourceDictionary.MergedDictionaries>
                 <templates:Dht11SensorTemplate />
@@ -109,21 +119,10 @@
                 <templates:GenericSensorTemplate />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- ── Template selector ── -->
-            <templates:SensorTemplateSelector x:Key="SensorSelector"
-                Dht11Template="{StaticResource Dht11SensorTemplate}"
-                GpsTemplate="{StaticResource GpsSensorTemplate}"
-                LightTemplate="{StaticResource LightSensorTemplate}"
-                VoltageTemplate="{StaticResource VoltageSensorTemplate}"
-                WaterTemplate="{StaticResource WaterSensorTemplate}"
-                SystemTemplate="{StaticResource SystemSensorTemplate}"
-                BinaryPresenceTemplate="{StaticResource BinaryPresenceSensorTemplate}"
-                GenericTemplate="{StaticResource GenericSensorTemplate}" />
-
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- ── Top toolbar ── -->
         <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="*,Auto"
@@ -186,8 +185,14 @@
                         <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="6" VerticalItemSpacing="6" />
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:RelayModel">
-                            <Border Style="{StaticResource RelayCardBorder}">
+                        <DataTemplate x:DataType="vm:RelayViewModel">
+                            <Border Style="{StaticResource RelayCardBorder}"
+                                    BackgroundColor="{Binding PanelColor}">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding PanelColor}" Value="Transparent">
+                                        <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
                                 <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                                     <Label Grid.Row="0" Grid.Column="0"
                                            Text="{Binding DisplayName}"
@@ -241,9 +246,19 @@
             </VerticalStackLayout>
         </ScrollView>
 
-            <!-- ── Status bar ── -->
-            <Grid Grid.Row="3" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"
-                  ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+        <!-- ── System status bar (memory/cpu/time/fw) ── -->
+        <Grid Grid.Row="3" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto, *">
+            <Label Grid.Column="0" Text="System" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" FontAttributes="Bold" />
+            <Label Grid.Column="1" Text="Mem:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+            <Label Grid.Column="2" Text="{Binding SystemFreeMemory}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
+            <Label Grid.Column="3" Text="CPU:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+            <Label Grid.Column="4" Text="{Binding SystemCpuUsage}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
+            <Label Grid.Column="5" Text="{Binding SystemFirmwareAndTime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" HorizontalOptions="End" />
+        </Grid>
+
+        <!-- ── Status bar ── -->
+        <Grid Grid.Row="4" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"
+              ColumnDefinitions="Auto,Auto,*,Auto,Auto">
                 <!-- Spinning indicator while fetching -->
                 <ActivityIndicator Grid.Column="0"
                                    IsRunning="{Binding IsBusy}"
@@ -288,7 +303,7 @@
 
             <!-- ── Log panel (hidden by default, toggled by 📋 button) ── -->
             <Grid x:Name="LogPanel"
-                  Grid.Row="4"
+                  Grid.Row="5"
                   IsVisible="False"
                   BackgroundColor="{DynamicResource AppLogPanelBg}"
                   RowDefinitions="Auto,*">

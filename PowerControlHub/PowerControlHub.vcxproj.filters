@@ -705,5 +705,8 @@
     <ClInclude Include="VoltageSensorHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ChunkedWifiClient.h">
+      <Filter>Header Files\Wifi</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

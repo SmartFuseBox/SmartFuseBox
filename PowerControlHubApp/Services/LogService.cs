@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using PowerControlHubApp.Models;
+using PowerControlHubApp.ViewModels;
 
 namespace PowerControlHubApp.Services;
 
@@ -13,13 +13,15 @@ public class LogService
 
     private readonly object _lock = new();
 
-    public ObservableCollection<LogEntry> Entries { get; } = new();
+    public ObservableCollection<LogEntryViewModel> Entries { get; } = [];
 
-    public event EventHandler<LogEntry>? EntryAdded;
+    public object Lock => _lock;
+
+    public event EventHandler<LogEntryViewModel> EntryAdded;
 
     public void Log(LogLevel level, string message)
     {
-        var entry = new LogEntry
+        var entry = new LogEntryViewModel
         {
             Timestamp = DateTime.Now,
             Level     = level,
@@ -40,9 +42,9 @@ public class LogService
         });
     }
 
-    public void Info(string message)    => Log(LogLevel.Info,    message);
+    public void Info(string message) => Log(LogLevel.Info, message);
     public void Warning(string message) => Log(LogLevel.Warning, message);
-    public void Error(string message)   => Log(LogLevel.Error,   message);
+    public void Error(string message) => Log(LogLevel.Error, message);
 
     public void Clear()
     {

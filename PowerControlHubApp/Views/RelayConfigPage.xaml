@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:models="clr-namespace:PowerControlHubApp.Models"
+             xmlns:converters="clr-namespace:PowerControlHubApp.Converters"
+             x:Class="PowerControlHubApp.Views.RelayConfigPage"
+             Title="Relay Config"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+            <Style x:Key="RelayConfigCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="14,12" />
+                <Setter Property="Margin" Value="0,0,0,8" />
+            </Style>
+
+            <Style x:Key="RelayNameLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelPrimary}" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="LineBreakMode" Value="TailTruncation" />
+            </Style>
+
+            <Style x:Key="RelaySubLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="BadgeLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Padding" Value="6,2" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <!-- ── Top bar ── -->
+        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="*,Auto"
+              BackgroundColor="{DynamicResource AppBarBg}">
+            <Label Grid.Column="0"
+                   Text="⚡ Relay Configuration"
+                   TextColor="{DynamicResource AppBarText}"
+                   FontSize="17"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="↻"
+                    FontSize="18"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource AppBarText}"
+                    Padding="6,0"
+                    Command="{Binding LoadCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+        </Grid>
+
+        <!-- ── Content ── -->
+        <Grid Grid.Row="1">
+
+            <!-- Loading indicator -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{DynamicResource AppAccent}"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center" />
+
+            <!-- Status / error message -->
+            <Label Text="{Binding StatusMessage}"
+                   IsVisible="{Binding HasStatus}"
+                   TextColor="{DynamicResource AppAccent}"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center"
+                   VerticalOptions="Center"
+                   Margin="20,0" />
+
+            <!-- Relay list -->
+            <CollectionView ItemsSource="{Binding Relays}"
+                            IsVisible="{Binding IsNotBusy}"
+                            Margin="16,12">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RelayViewModel">
+                        <Border Style="{StaticResource RelayConfigCard}"
+                                Opacity="{Binding IsEnabled, Converter={x:StaticResource BoolToOpacityConverter}}">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                                  ColumnSpacing="10">
+
+                                <!-- Index circle -->
+                                <Border Grid.Column="0"
+                                        BackgroundColor="{DynamicResource AppCardStroke}"
+                                        StrokeShape="RoundRectangle 14"
+                                        WidthRequest="28"
+                                        HeightRequest="28"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                                    <Label Text="{Binding Index}"
+                                           FontSize="13"
+                                           FontAttributes="Bold"
+                                           TextColor="{DynamicResource AppAccent}"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center" />
+                                </Border>
+
+                                <!-- Name + pin -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding DisplayName}"
+                                           Style="{StaticResource RelayNameLabel}" />
+                                    <Label Style="{StaticResource RelaySubLabel}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="Pin {0}">
+                                                <Binding Path="Pin" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsEnabled}" Value="False">
+                                                <Setter Property="Text" Value="Not configured" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+
+                                <!-- Action type badge -->
+                                <Border Grid.Column="2"
+                                        StrokeShape="RoundRectangle 6"
+                                        Padding="0"
+                                        VerticalOptions="Center">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding ActionType}" Value="0">
+                                            <Setter Property="BackgroundColor" Value="#1a3a5c" />
+                                            <Setter Property="Stroke" Value="#0f3460" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding ActionType}" Value="1">
+                                            <Setter Property="BackgroundColor" Value="#3a1a1a" />
+                                            <Setter Property="Stroke" Value="#7a2222" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding ActionType}" Value="2">
+                                            <Setter Property="BackgroundColor" Value="#1a2a3a" />
+                                            <Setter Property="Stroke" Value="#335577" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Style="{StaticResource BadgeLabel}"
+                                           TextColor="{DynamicResource AppLabelMuted}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="0">
+                                                <Setter Property="Text" Value="Default" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="1">
+                                                <Setter Property="Text" Value="🔊 Horn" />
+                                                <Setter Property="TextColor" Value="#cc6666" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="2">
+                                                <Setter Property="Text" Value="🌙 Night" />
+                                                <Setter Property="TextColor" Value="#6699cc" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- Chevron tap target -->
+                                <Label Grid.Column="3"
+                                       Text="›"
+                                       FontSize="22"
+                                       TextColor="{DynamicResource AppLabelMuted}"
+                                       VerticalOptions="Center" />
+
+                            </Grid>
+
+                            <!-- Tap gesture over whole card -->
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RelayConfigViewModel}}, Path=NavigateToRelayCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+
+</ContentPage>

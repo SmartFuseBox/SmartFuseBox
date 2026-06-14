@@ -44,7 +44,7 @@ public:
     virtual IPAddress localIP() = 0;
     virtual bool hasModule() = 0;
 
-    virtual void beginServer(uint16_t port) = 0;
+    virtual void beginServer(uint16_t port, uint8_t maxClients = 4) = 0;
     virtual void endServer() = 0;
     virtual IWifiClient* available() = 0;
     virtual IWifiClient* createClient() = 0;

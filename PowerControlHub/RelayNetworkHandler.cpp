@@ -100,7 +100,165 @@ CommandResult RelayNetworkHandler::handleRequest(const char* method,
 			return CommandResult::error(InvalidCommandParameters);
 		}
 	}
-	
+	else if (SystemFunctions::commandMatches(command, RelayGetAllConfig))
+	{
+		formatStatusJson(responseBuffer, bufferSize);
+		return CommandResult::ok();
+	}
+	else if (SystemFunctions::commandMatches(command, RelayRename))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+
+			if (idx >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+
+			int pipeIdx = SystemFunctions::indexOf(params[0].value, '|', 0);
+			char shortName[ConfigShortRelayNameLength] = "";
+			char longName[ConfigLongRelayNameLength] = "";
+
+			if (pipeIdx >= 0)
+			{
+				SystemFunctions::substr(shortName, sizeof(shortName), params[0].value, 0, pipeIdx);
+				SystemFunctions::substr(longName, sizeof(longName), params[0].value, pipeIdx + 1);
+			}
+			else
+			{
+				strncpy(shortName, params[0].value, sizeof(shortName) - 1);
+			}
+
+			_relayController->renameRelay(idx, shortName, longName);
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+	else if (SystemFunctions::commandMatches(command, RelaySetButtonColor))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t color = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+			if (relayIndex >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+			if (color < DefaultValue)
+				color += 2;
+			_relayController->setButtonColor(relayIndex, color);
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+	else if (SystemFunctions::commandMatches(command, RelaySetDefaultState))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			bool state = atoi(params[0].value) > 0;
+			if (relayIndex >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+			_relayController->setRelayDefaultState(relayIndex, state);
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+	else if (SystemFunctions::commandMatches(command, RelayLink))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t linkedIndex = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+			if (relayIndex >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+
+			if (linkedIndex == DefaultValue)
+			{
+				_relayController->unlinkRelay(relayIndex);
+			}
+			else
+			{
+				RelayResult linkResult = _relayController->linkRelays(relayIndex, linkedIndex);
+				if (linkResult == RelayResult::Failed)
+				{
+					formatJsonResponse(responseBuffer, bufferSize, false, "No available link slots");
+					return CommandResult::error(InvalidCommandParameters);
+				}
+			}
+
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+	else if (SystemFunctions::commandMatches(command, RelaySetActionType))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t actionType = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+			if (relayIndex >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+
+			_relayController->setRelayActionType(relayIndex, static_cast<RelayActionType>(actionType));
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+	else if (SystemFunctions::commandMatches(command, RelaySetPin))
+	{
+		if (paramCount >= 1)
+		{
+			uint8_t relayIndex = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			uint8_t pin = static_cast<uint8_t>(strtoul(params[0].value, nullptr, 0));
+
+			if (relayIndex >= _relayController->getRelayCount())
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+			RelayResult pinResult = _relayController->setRelayPin(relayIndex, pin);
+			if (pinResult == RelayResult::InvalidPin)
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid pin");
+				return CommandResult::error(InvalidCommandParameters);
+			}
+
+			formatJsonResponse(responseBuffer, bufferSize, true);
+			return CommandResult::ok();
+		}
+
+		formatJsonResponse(responseBuffer, bufferSize, false, "Invalid parameters");
+		return CommandResult::error(InvalidCommandParameters);
+	}
+
 	return CommandResult::error(InvalidCommandParameters);
 }
 
@@ -128,9 +286,10 @@ void RelayNetworkHandler::formatStatusJson(char* buffer, size_t size)
 		{
 			const RelayEntry& relay = config->relay.relays[i];
 			n = snprintf(buffer + written, size - written,
-				"%s{\"sn\":\"%s\",\"pn\":%u,\"bt\":%u,\"df\":%u,\"at\":%u,\"st\":%u}",
+				"%s{\"shortName\":\"%s\",\"longName\":\"%s\",\"pin\":%u,\"img\":%u,\"defaultState\":%u,\"actionType\":%u,\"state\":%u}",
 				(i > 0) ? "," : "",
 				relay.shortName,
+				relay.longName,
 				relay.pin,
 				relay.buttonImage,
 				relay.defaultState ? 1u : 0u,
@@ -209,6 +368,12 @@ void RelayNetworkHandler::formatStatusJson(char* buffer, size_t size)
 
 void RelayNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
+	if (!_relayController)
+	{
+		client->print("\"relays\":[]");
+		return;
+	}
+
 	Config* config = ConfigManager::getConfigPtr();
 	uint8_t relayCount = _relayController->getRelayCount();
 

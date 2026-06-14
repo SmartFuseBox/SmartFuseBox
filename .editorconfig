@@ -1,0 +1,17 @@
+﻿[*.cs]
+
+# CC0004: If statement should have exactly one blank line above it
+dotnet_diagnostic.CC0004.severity = error
+dotnet_diagnostic.CC0005.severity = error
+dotnet_diagnostic.CC0006.severity = none
+dotnet_diagnostic.CC0008.severity = error
+dotnet_diagnostic.CC0009.severity = error
+dotnet_diagnostic.CC0010.severity = error
+
+dotnet_diagnostic.IDE0028.severity = error
+dotnet_diagnostic.IDE0305.severity = error
+dotnet_diagnostic.CS8632.severity = error
+
+dotnet_diagnostic.CA1822.severity = error
+
+dotnet_diagnostic.IDE0290.severity = none

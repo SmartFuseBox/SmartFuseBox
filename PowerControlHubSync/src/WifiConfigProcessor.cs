@@ -254,7 +254,7 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
         }
     }
 
-    private string PostCommand(string baseUrl, string commandName, string body, int timeoutSeconds = 10)
+    private static string PostCommand(string baseUrl, string commandName, string body, int timeoutSeconds = 10)
     {
         using HttpClient client = new() { Timeout = TimeSpan.FromSeconds(timeoutSeconds) };
         string url = $"{baseUrl}/api/command/{commandName}";
