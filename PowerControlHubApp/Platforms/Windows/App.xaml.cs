@@ -21,5 +21,4 @@ namespace PowerControlHubApp.WinUI
 
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
-
 }

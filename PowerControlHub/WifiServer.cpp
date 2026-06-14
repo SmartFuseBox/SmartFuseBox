@@ -18,6 +18,7 @@
 #include "Local.h"
 #include "WifiServer.h"
 #include "SystemFunctions.h"
+#include "ChunkedWifiClient.h"
 
 
 constexpr char response400[] = "\"error\":\"Bad Request\",\"message\":\"The request will not process due to client error\"";
@@ -174,7 +175,7 @@ void WifiServer::startServer()
 
 	if (!_serverActive)
 	{
-		_radio->beginServer(_port);
+		_radio->beginServer(_port, MaxConcurrentClients);
 		_serverActive = true;
 		_initialized = true;
 
@@ -236,11 +237,16 @@ int8_t WifiServer::findFreeClientSlot()
 	return -1;
 }
 
-uint8_t WifiServer::getPersistentClientCount()
+uint8_t WifiServer::getPersistentClientCount(uint8_t excludeIndex)
 {
 	uint8_t count = 0;
 	for (uint8_t i = 0; i < MaxConcurrentClients; i++)
 	{
+		if (i == excludeIndex)
+		{
+			continue;
+		}
+
 		if (_activeClients[i].isPersistent && 
 			_activeClients[i].state != ClientHandlingState::Idle)
 		{
@@ -518,7 +524,7 @@ void WifiServer::processClientRequest(uint8_t index)
 			}
 
 			// Check if User-Agent matches "PowerControlHub/1.0"
-			if (strncmp(userAgent, "PowerControlHub/1.0", 16) != 0)
+			if (strncmp(userAgent, "PowerControlHub/1.0", 19) != 0)
 			{
 				// Not authorized for persistent connection
 				isPersistent = false;
@@ -527,7 +533,7 @@ void WifiServer::processClientRequest(uint8_t index)
 			else
 			{
 				// Check if we already have max persistent connections
-				if (getPersistentClientCount() >= MaxPersistentClients)
+				if (getPersistentClientCount(index) >= MaxPersistentClients)
 				{
 					isPersistent = false;
 					sendDebug(F("Persistent denied (quota full)"), F("WifiServer"));
@@ -668,6 +674,18 @@ void WifiServer::processClientRequest(uint8_t index)
 		// Copy query (skip the '?')
 		strncpy(query, queryStart + 1, sizeof(query) - 1);
 		query[sizeof(query) - 1] = '\0';
+
+		// URL-decode path and query per RFC 3986
+		{
+			char decodedPath[96];
+			char decodedQuery[96];
+			SystemFunctions::urlDecode(path, decodedPath, sizeof(decodedPath));
+			SystemFunctions::urlDecode(query, decodedQuery, sizeof(decodedQuery));
+			strncpy(path, decodedPath, sizeof(path) - 1);
+			path[sizeof(path) - 1] = '\0';
+			strncpy(query, decodedQuery, sizeof(query) - 1);
+			query[sizeof(query) - 1] = '\0';
+		}
 	}
 	else
 	{
@@ -675,6 +693,9 @@ void WifiServer::processClientRequest(uint8_t index)
 		strncpy(path, fullPath, sizeof(path) - 1);
 		path[sizeof(path) - 1] = '\0';
 		query[0] = '\0';
+
+		// URL-decode path per RFC 3986
+		SystemFunctions::urlDecode(path, path, sizeof(path));
 	}
 
 	// Early rejection of static asset requests (CSS, JS, images, etc.)
@@ -793,7 +814,7 @@ void WifiServer::sendResponse(IWifiClient& client, int statusCode, const char* c
 	client.print(F("HTTP/1.1 "));
 	client.print(statusCode);
 	client.print(F(" "));
-	
+
 	switch (statusCode)
 	{
 		case 200:
@@ -809,30 +830,32 @@ void WifiServer::sendResponse(IWifiClient& client, int statusCode, const char* c
 			client.println(F("Unknown"));
 			break;
 	}
-	
+
 	client.print(F("Content-Type: "));
 	client.println(contentType);
 
-	// Conditionally set Connection header based on persistent flag
+	client.println(F("Transfer-Encoding: chunked"));
+
 	if (isPersistent)
 	{
 		client.println(F("Connection: keep-alive"));
 		client.print(F("Keep-Alive: timeout="));
 		uint64_t seconds = PersistentTimeoutMs / 1000ULL;
 		unsigned long seconds32 = static_cast<unsigned long>(seconds);
-		client.println(seconds32);  // Send timeout in seconds
+		client.println(seconds32);
 	}
 	else
 	{
 		client.println(F("Connection: close"));
 	}
-	
-	client.print(F("Content-Length: "));
-	client.println(SystemFunctions::calculateLength(body) + 2); // 2 = {}
+
 	client.println();
-	client.print(F("{"));
-	client.print(body);
-	client.print(F("}"));
+
+	ChunkedWifiClient chunkedClient(&client);
+	chunkedClient.print(F("{"));
+	chunkedClient.print(body);
+	chunkedClient.print(F("}"));
+	chunkedClient.finalize();
 }
 
 bool WifiServer::isConnected() const
@@ -891,7 +914,7 @@ int WifiServer::getSignalStrength() const
 	{
 		return 0;
 	}
-	
+
 	return _radio->rssi();
 }
 
@@ -902,6 +925,7 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 	// Send HTTP headers first
 	client.print(F("HTTP/1.1 200 OK\r\n"));
 	client.print(F("Content-Type: application/json\r\n"));
+	client.print(F("Transfer-Encoding: chunked\r\n"));
 
 	if (isPersistent)
 	{
@@ -909,7 +933,7 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 		client.print(F("Keep-Alive: timeout="));
 		uint64_t seconds = PersistentTimeoutMs / 1000ULL;
 		unsigned long seconds32 = static_cast<unsigned long>(seconds);
-		client.print(seconds32);  // Send timeout in seconds
+		client.print(seconds32);
 		client.print(F("\r\n"));
 	}
 	else
@@ -919,9 +943,11 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 
 	client.print(F("\r\n"));
 
-	// Stream JSON response
-	client.print(F("{"));
+	// Create chunked wrapper for response body
+	ChunkedWifiClient chunkedClient(&client);
 
+	// Stream JSON response through chunked wrapper
+	chunkedClient.print(F("{"));
 
 	bool firstEntry = true;
 
@@ -929,18 +955,20 @@ bool WifiServer::handleIndex(IWifiClient& client, bool isPersistent, const char*
 	{
 		if (_jsonVisitors[i])
 		{
-			// Add comma separator (except before first entry)
 			if (!firstEntry)
 			{
-				client.print(F(","));
+				chunkedClient.print(F(","));
 			}
 
-			_jsonVisitors[i]->formatWifiStatusJson(&client);
+			_jsonVisitors[i]->formatWifiStatusJson(&chunkedClient);
 			firstEntry = false;
 		}
 	}
 
-	client.print(F("}"));
+	chunkedClient.print(F("}"));
+
+	// Send terminating chunk
+	chunkedClient.finalize();
 
 	return true;
 }
@@ -1048,7 +1076,7 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 					ampIdx = queryLength;
 				}
 
-				char param[DefaultMaxParamKeyLength];
+				char param[DefaultMaxParamKeyLength + DefaultMaxParamValueLength + 2];
 				SystemFunctions::substr(param, sizeof(param), query, startIdx, ampIdx - startIdx);
 
 				int32_t equalsIdx = SystemFunctions::indexOf(param, '=', 0);
@@ -1081,8 +1109,24 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 	// Send response based on result
 	if (result.success)
 	{
+		// Log response buffer for debugging
+		if (responseBuffer[0] != '\0')
+		{
+			char dbg[256];
+			snprintf(dbg, sizeof(dbg), "Handler success response: %s", responseBuffer);
+			sendDebug(dbg, F("WifiServer"));
+		}
+
+		// Log parameters passed to handler
+		char paramDbg[128];
+		for (uint8_t p = 0; p < paramCount; p++)
+		{
+			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+			sendDebug(paramDbg, F("WifiServer"));
+		}
+
 		sendResponse(client, 200, "application/json", responseBuffer, isPersistent);
-		sendDebug(F("Handler success: "), F("WifiServer"));
+		sendDebug(F("Handler success"), F("WifiServer"));
 		return true;
 	}
 	else
@@ -1090,8 +1134,35 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 		// Check if buffer has error message
 		if (responseBuffer[0] != '\0')
 		{
+			// Log error response for debugging
+			char dbg[256];
+			snprintf(dbg, sizeof(dbg), "Handler error response: %s", responseBuffer);
+			sendDebug(dbg, F("WifiServer"));
+
+			// Also log parameters to help reproduce the error
+			char paramDbg[128];
+			for (uint8_t p = 0; p < paramCount; p++)
+			{
+				snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+				sendDebug(paramDbg, F("WifiServer"));
+			}
+
 			sendResponse(client, 400, "application/json", responseBuffer, isPersistent);
 			return true;
+		}
+
+		// No response buffer provided; log context for debugging
+		sendDebug(F("Handler error (no response buffer)"), F("WifiServer"));
+		// Log method and command
+		char ctx[128];
+		snprintf(ctx, sizeof(ctx), "Method=%s, Command=%s, ParamCount=%d", method, command, paramCount);
+		sendDebug(ctx, F("WifiServer"));
+
+		for (uint8_t p = 0; p < paramCount; p++)
+		{
+			char paramDbg[128];
+			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+			sendDebug(paramDbg, F("WifiServer"));
 		}
 
 		sendError(F("Handler error"), F("WifiServer"));

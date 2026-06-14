@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.RelayDetailPage"
+             Title="{Binding PageTitle}"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Section group card -->
+            <Style x:Key="SectionCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="14,12" />
+                <Setter Property="Margin" Value="0,0,0,12" />
+            </Style>
+
+            <!-- Section heading inside a card -->
+            <Style x:Key="SectionTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+
+            <!-- Field label above an entry -->
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="Margin" Value="0,0,0,3" />
+            </Style>
+
+            <!-- Styled entry / picker border -->
+            <Style x:Key="FieldBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppEntryBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppEntryStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <!-- Entry inside a field border -->
+            <Style x:Key="FieldEntry" TargetType="Entry">
+                <Setter Property="TextColor" Value="{DynamicResource AppEntryText}" />
+                <Setter Property="PlaceholderColor" Value="{DynamicResource AppPlaceholderText}" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="Margin" Value="10,0" />
+            </Style>
+
+            <!-- Picker inside a field border -->
+            <Style x:Key="FieldPicker" TargetType="Picker">
+                <Setter Property="TextColor" Value="{DynamicResource AppEntryText}" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TitleColor" Value="{DynamicResource AppPlaceholderText}" />
+                <Setter Property="Margin" Value="10,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <!-- ── Top bar ── -->
+        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="Auto,*"
+              BackgroundColor="{DynamicResource AppBarBg}">
+            <Button Grid.Column="0"
+                    Text="‹"
+                    FontSize="20"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource AppBarText}"
+                    Padding="0,0,8,0"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   Text="{Binding PageTitle}"
+                   TextColor="{DynamicResource AppBarText}"
+                   FontSize="17"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- ── Scrollable form ── -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding IsNotBusy}">
+            <VerticalStackLayout Padding="16,14" Spacing="0">
+
+                <!-- ── Identity ── -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="IDENTITY" Style="{StaticResource SectionTitle}" />
+
+                        <!-- Short name -->
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Short Name (max 5 chars)" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding ShortName}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="e.g. Bilge"
+                                       MaxLength="5"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Long name -->
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Long Name (max 20 chars)" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding LongName}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="e.g. Bilge Pump"
+                                       MaxLength="20"
+                                       ReturnType="Done" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Hardware ── -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="HARDWARE" Style="{StaticResource SectionTitle}" />
+
+                        <!-- GPIO pin -->
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="GPIO Pin  (blank or 255 = disabled)" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding PinDisplay}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="255 = disabled"
+                                       Keyboard="Numeric"
+                                       ReturnType="Done" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Behaviour ── -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="BEHAVIOUR" Style="{StaticResource SectionTitle}" />
+
+                        <!-- Default state -->
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Default State at Power-On" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Picker ItemsSource="{Binding DefaultStateOptions}"
+                                        SelectedIndex="{Binding DefaultStateIndex}"
+                                        Style="{StaticResource FieldPicker}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Action type -->
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Action Type" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Picker ItemsSource="{Binding ActionOptions}"
+                                        SelectedIndex="{Binding SelectedActionIndex}"
+                                        Style="{StaticResource FieldPicker}" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Button colour -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Button Colour" Style="{StaticResource FieldLabel}" />
+                            <!-- Colour swatches -->
+                            <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center">
+                                <!-- Blue -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#2255cc"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="0">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="0" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Green -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#22aa44"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="1">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="1" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Orange -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#dd7722"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="2">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="2" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Purple -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#8833cc"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="3">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="3" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Red -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#cc3333"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="4">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="4" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Yellow -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#ccbb22"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="5">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="5" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- None/Clear -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="{DynamicResource AppCardStroke}"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="6">
+                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="✕"
+                                           FontSize="14"
+                                           TextColor="{DynamicResource AppLabelMuted}"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="6" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </FlexLayout>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Linking ── -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="LINKING" Style="{StaticResource SectionTitle}" />
+                        <Label Text="Toggling this relay will also toggle the linked relay."
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="12"
+                               Margin="0,0,0,4" />
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Linked Relay" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Picker ItemsSource="{Binding LinkedRelayOptions}"
+                                        SelectedIndex="{Binding SelectedLinkedIndex}"
+                                        Style="{StaticResource FieldPicker}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Spacer -->
+                <BoxView HeightRequest="8" Color="Transparent" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading overlay -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{DynamicResource AppAccent}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center" />
+
+        <!-- ── Bottom bar: status + save ── -->
+        <Grid Grid.Row="2" Padding="16,10" ColumnDefinitions="*,Auto"
+              BackgroundColor="{DynamicResource AppBarBg}">
+
+            <!-- Status message -->
+            <Label Grid.Column="0"
+                   Text="{Binding StatusMessage}"
+                   IsVisible="{Binding HasStatus}"
+                   FontSize="13"
+                   VerticalOptions="Center"
+                   LineBreakMode="TailTruncation">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsError}" Value="True">
+                        <Setter Property="TextColor" Value="#cc6666" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsError}" Value="False">
+                        <Setter Property="TextColor" Value="#44cc44" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <!-- Save button -->
+            <Button Grid.Column="1"
+                    Text="Save"
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="8"
+                    FontAttributes="Bold"
+                    Padding="20,10" />
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

@@ -6,12 +6,12 @@ namespace PowerControlHubApp.Models;
 /// </summary>
 public enum SensorType : byte
 {
-    Water          = 0x0,
-    Dht11          = 0x1,
-    Light          = 0x2,
-    Gps            = 0x3,
-    System         = 0x4,
+    Water = 0x0,
+    Dht11 = 0x1,
+    Light = 0x2,
+    Gps = 0x3,
+    System = 0x4,
     BinaryPresence = 0x5,
-    Voltage        = 0x6,
-    Unknown        = 0xFF
+    Voltage = 0x6,
+    Unknown = 0xFF
 }

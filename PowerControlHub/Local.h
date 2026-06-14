@@ -117,4 +117,4 @@ constexpr uint8_t ConfigRelayCount = 8;
 
 // ─── Network Config ───────────────────────────────────────────────────────────
 constexpr uint8_t MaxConcurrentClients = 8;
-constexpr uint8_t MaxPersistentClients = 1;
+constexpr uint8_t MaxPersistentClients = 2;

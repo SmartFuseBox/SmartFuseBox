@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using PowerControlHubApp.Services;
+using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -10,31 +11,47 @@ public class SettingsViewModel : INotifyPropertyChanged
     private readonly PowerHubService _service;
     private readonly ThemeService _themeService;
     private string _ipAddress = string.Empty;
-    private string _port = "80";
+    private string _port = DefaultDeviceIpPort;
     private string _statusMessage = string.Empty;
     private string _selectedTheme;
 
     public string IpAddress
     {
         get => _ipAddress;
-        set { _ipAddress = value; OnPropertyChanged(); }
+
+        set 
+        { _ipAddress = value;
+            OnPropertyChanged(); 
+        }
     }
 
     public string Port
     {
         get => _port;
-        set { _port = value; OnPropertyChanged(); }
+
+        set 
+        { 
+            _port = value; 
+            OnPropertyChanged(); 
+        }
     }
 
     public string StatusMessage
     {
         get => _statusMessage;
-        set { _statusMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasStatusMessage)); }
+
+        set 
+        { 
+            _statusMessage = value; 
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(HasStatusMessage)); 
+        }
     }
 
     public bool HasStatusMessage => !string.IsNullOrEmpty(_statusMessage);
 
     /// <summary>Options shown in the theme Picker: "System", "Light", "Dark".</summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Exposed to XAML bindings as instance property")]
     public string[] ThemeOptions => ThemeService.ThemeOptions;
 
     /// <summary>Applying theme immediately so the user sees a live preview.</summary>
@@ -43,10 +60,12 @@ public class SettingsViewModel : INotifyPropertyChanged
         get => _selectedTheme;
         set
         {
-            if (_selectedTheme == value) return;
+            if (_selectedTheme == value)
+                return;
+
             _selectedTheme = value;
             OnPropertyChanged();
-            _themeService.Apply(value);
+            ThemeService.Apply(value);
         }
     }
 
@@ -58,35 +77,36 @@ public class SettingsViewModel : INotifyPropertyChanged
         _themeService = themeService;
         SaveCommand = new Command(Save);
 
-        IpAddress = Preferences.Get("device_ip", string.Empty);
-        Port = Preferences.Get("device_port", "80");
-        _selectedTheme = _themeService.Current;
+        IpAddress = Preferences.Get(KeyDeviceIpAddress, string.Empty);
+        Port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
+            _selectedTheme = ThemeService.Current;
     }
 
     private void Save()
     {
         string ip = IpAddress.Trim();
+
         if (string.IsNullOrEmpty(ip))
         {
-            StatusMessage = "IP address is required.";
+            StatusMessage = MsgIpRequired;
             return;
         }
 
-        if (!int.TryParse(Port.Trim(), out int port) || port < 1 || port > 65535)
+        if (!int.TryParse(Port.Trim(), out int port) || port < PortMin || port > PortMax)
         {
-            StatusMessage = "Enter a valid port number (1–65535).";
+            StatusMessage = MsgInvalidPort;
             return;
         }
 
-        Preferences.Set("device_ip", ip);
-        Preferences.Set("device_port", port.ToString());
+        Preferences.Set(KeyDeviceIpAddress, ip);
+        Preferences.Set(KeyDeviceIpPort, port.ToString());
 
         _service.Configure(ip, port);
         StatusMessage = $"Saved. Connecting to {ip}:{port}";
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    protected void OnPropertyChanged([CallerMemberName] string name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

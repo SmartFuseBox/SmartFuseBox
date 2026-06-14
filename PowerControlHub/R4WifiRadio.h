@@ -102,7 +102,7 @@ public:
         return WiFi.status() != WL_NO_MODULE;
     }
 
-    void beginServer(uint16_t port) override
+    void beginServer(uint16_t port, uint8_t maxClients = 4) override
     {
         _server = WiFiServer(port);
         _server.begin();

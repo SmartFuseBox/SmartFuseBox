@@ -1,3 +1,5 @@
+using static PowerControlHubApp.Internal.Constants;
+
 namespace PowerControlHubApp.Services;
 
 /// <summary>
@@ -10,9 +12,6 @@ namespace PowerControlHubApp.Services;
 /// </summary>
 public class ThemeService
 {
-    private const string PreferenceKey = "app_theme";
-    private const string ThemeLight    = "Light";
-    private const string ThemeDark     = "Dark";
 
     public static readonly string[] ThemeOptions = [ThemeLight, ThemeDark];
 
@@ -20,67 +19,67 @@ public class ThemeService
     // Order matches AppColorsLight.xaml / AppColorsDark.xaml.
     private static readonly Dictionary<string, string> LightPalette = new()
     {
-        ["AppPageBg"]        = "#f0f4f8",
-        ["AppBarBg"]         = "#1a73e8",
-        ["AppLogPanelBg"]    = "#f8f8ff",
-        ["AppCardBg"]        = "#ffffff",
-        ["AppCardStroke"]    = "#c8d8e8",
-        ["AppSensorCardBg"]  = "#eaf2ff",
-        ["AppHelpCardBg"]    = "#eef2ff",
-        ["AppHelpCardStroke"]= "#c0ccee",
-        ["AppAccent"]        = "#1a73e8",
-        ["AppLabelPrimary"]  = "#1a1a2a",
-        ["AppLabelMuted"]    = "#555555",
-        ["AppLabelSubtle"]   = "#888888",
-        ["AppBarText"]       = "#ffffff",
-        ["AppLogTimestamp"]  = "#8888aa",
-        ["AppLogText"]       = "#444444",
-        ["AppSwitchOn"]      = "#1a73e8",
-        ["AppEntryBg"]       = "#e8f0fe",
-        ["AppEntryStroke"]   = "#aabbd4",
-        ["AppEntryText"]     = "#1a1a2a",
-        ["AppPlaceholderText"]= "#8899aa",
+        [ThemeKey_AppPageBg] = ThemeColor_PageBg_Light,
+        [ThemeKey_AppBarBg] = ThemeColor_Accent,
+        [ThemeKey_AppLogPanelBg] = ThemeColor_LogPanelBg_Light,
+        [ThemeKey_AppCardBg] = ThemeColor_White,
+        [ThemeKey_AppCardStroke] = ThemeColor_CardStrokeLight,
+        [ThemeKey_AppSensorCardBg] = ThemeColor_SensorCardBg_Light,
+        [ThemeKey_AppHelpCardBg] = ThemeColor_HelpCardBg_Light,
+        [ThemeKey_AppHelpCardStroke] = ThemeColor_HelpCardStroke_Light,
+        [ThemeKey_AppAccent] = ThemeColor_Accent,
+        [ThemeKey_AppLabelPrimary] = ThemeColor_PrimaryText,
+        [ThemeKey_AppLabelMuted] = ThemeColor_LabelMuted,
+        [ThemeKey_AppLabelSubtle] = ThemeColor_LabelSubtle,
+        [ThemeKey_AppBarText] = ThemeColor_White,
+        [ThemeKey_AppLogTimestamp] = ThemeColor_LogTimestamp_Light,
+        [ThemeKey_AppLogText] = ThemeColor_LogText_Light,
+        [ThemeKey_AppSwitchOn] = ThemeColor_Accent,
+        [ThemeKey_AppEntryBg] = ThemeColor_EntryBgLight,
+        [ThemeKey_AppEntryStroke] = ThemeColor_EntryStrokeLight,
+        [ThemeKey_AppEntryText] = ThemeColor_PrimaryText,
+        [ThemeKey_AppPlaceholderText] = ThemeColor_Placeholder_Light,
     };
 
     private static readonly Dictionary<string, string> DarkPalette = new()
     {
-        ["AppPageBg"]        = "#0a0a1a",
-        ["AppBarBg"]         = "#16213e",
-        ["AppLogPanelBg"]    = "#0d0d1f",
-        ["AppCardBg"]        = "#1a1a2e",
-        ["AppCardStroke"]    = "#0f3460",
-        ["AppSensorCardBg"]  = "#0d1b2a",
-        ["AppHelpCardBg"]    = "#111122",
-        ["AppHelpCardStroke"]= "#333355",
-        ["AppAccent"]        = "#00d4ff",
-        ["AppLabelPrimary"]  = "#ffffff",
-        ["AppLabelMuted"]    = "#888888",
-        ["AppLabelSubtle"]   = "#666666",
-        ["AppBarText"]       = "#00d4ff",
-        ["AppLogTimestamp"]  = "#555577",
-        ["AppLogText"]       = "#aaaaaa",
-        ["AppSwitchOn"]      = "#00d4ff",
-        ["AppEntryBg"]       = "#16213e",
-        ["AppEntryStroke"]   = "#0f3460",
-        ["AppEntryText"]     = "#ffffff",
-        ["AppPlaceholderText"]= "#555555",
+        [ThemeKey_AppPageBg] = ThemeColor_PageBg_Dark,
+        [ThemeKey_AppBarBg] = ThemeColor_AppBarDark,
+        [ThemeKey_AppLogPanelBg] = ThemeColor_LogPanelBg_Dark,
+        [ThemeKey_AppCardBg] = ThemeColor_CardBg_Dark,
+        [ThemeKey_AppCardStroke] = ThemeColor_EntryStrokeDark,
+        [ThemeKey_AppSensorCardBg] = ThemeColor_SensorCardBg_Dark,
+        [ThemeKey_AppHelpCardBg] = ThemeColor_HelpCardBg_Dark,
+        [ThemeKey_AppHelpCardStroke] = ThemeColor_HelpCardStroke_Dark,
+        [ThemeKey_AppAccent] = ThemeColor_AccentAlt,
+        [ThemeKey_AppLabelPrimary] = ThemeColor_White,
+        [ThemeKey_AppLabelMuted] = ThemeColor_LabelMuted,
+        [ThemeKey_AppLabelSubtle] = ThemeColor_LabelSubtle_Dark,
+        [ThemeKey_AppBarText] = ThemeColor_AccentAlt,
+        [ThemeKey_AppLogTimestamp] = ThemeColor_LogTimestamp_Dark,
+        [ThemeKey_AppLogText] = ThemeColor_LogText_Dark,
+        [ThemeKey_AppSwitchOn] = ThemeColor_AccentAlt,
+        [ThemeKey_AppEntryBg] = ThemeColor_AppBarDark,
+        [ThemeKey_AppEntryStroke] = ThemeColor_EntryStrokeDark,
+        [ThemeKey_AppEntryText] = ThemeColor_White,
+        [ThemeKey_AppPlaceholderText] = ThemeColor_Placeholder_Dark,
     };
 
     /// <summary>Current display name of the active theme ("Light" or "Dark").</summary>
-    public string Current => Preferences.Get(PreferenceKey, ThemeLight);
+    public static string Current => Preferences.Get(PreferenceKey, ThemeLight);
 
     /// <summary>
     /// Reads the saved preference and applies it.
     /// Call once from App constructor after InitializeComponent.
     /// </summary>
-    public void ApplySaved()
+    public static void ApplySaved()
     {
         //string saved = Preferences.Get(PreferenceKey, ThemeLight);
         //ApplyInternal(saved, persist: false);
     }
 
     /// <summary>Apply and persist a theme by display name.</summary>
-    public void Apply(string themeName)
+    public static void Apply(string themeName)
         => ApplyInternal(themeName, persist: true);
 
     private static void ApplyInternal(string themeName, bool persist)

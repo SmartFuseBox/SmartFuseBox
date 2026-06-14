@@ -1,9 +1,14 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Windows.Input;
 using PowerControlHubApp.Models;
+using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
+using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -11,19 +16,20 @@ public class DashboardViewModel : INotifyPropertyChanged
 {
     private readonly PowerHubService _service;
     private readonly LogService _log;
-    private CancellationTokenSource? _refreshCts;
+    private readonly RelayStore _relayStore;
+    private CancellationTokenSource _refreshCts;
     private bool _isBusy;
     private bool _isConnected;
     private string _statusMessage = string.Empty;
     private string _deviceUrl = string.Empty;
 
     // OTA
-    private OtaStatusModel? _otaStatus;
+    private OtaStatusModel _otaStatus;
     private bool _otaSupported;
 
-    public ObservableCollection<RelayModel> Relays { get; } = new();
-    public ObservableCollection<SensorModel> Sensors { get; } = new();
-    public ObservableCollection<LogEntry> LogEntries => _log.Entries;
+    public ObservableCollection<RelayViewModel> Relays => _relayStore.Relays;
+    public ObservableCollection<SensorsModel> Sensors { get; } = [];
+    public ObservableCollection<LogEntryViewModel> LogEntries => _log.Entries;
 
     public bool HasRelays => _isConnected && Relays.Count > 0;
     public bool HasNoRelays => _isConnected && Relays.Count == 0;
@@ -33,8 +39,6 @@ public class DashboardViewModel : INotifyPropertyChanged
     public ICommand RefreshCommand { get; }
     public ICommand ToggleRelayCommand { get; }
     public ICommand InstallUpdateCommand { get; }
-
-    // ── OTA properties ────────────────────────────────────────────────────────
 
     /// <summary>True when the firmware reported an update is available.</summary>
     public bool UpdateAvailable => _otaStatus?.UpdateAvailable == true;
@@ -46,8 +50,69 @@ public class DashboardViewModel : INotifyPropertyChanged
     public bool OtaSupported
     {
         get => _otaSupported;
-        private set { _otaSupported = value; OnPropertyChanged(); }
+        private set
+        {
+            _otaSupported = value;
+            OnPropertyChanged();
+        }
     }
+
+    // ── System status properties (displayed in the dashboard status bar) ───
+    private string _systemFreeMemory = DoubleDash;
+    private string _systemCpuUsage = DoubleDash;
+    private string _systemTime = DoubleDash;
+    private string _systemFirmware = DoubleDash;
+
+    public string SystemFreeMemory
+    {
+        get => _systemFreeMemory;
+
+        private set
+        {
+            _systemFreeMemory = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SystemCpuUsage
+    {
+        get => _systemCpuUsage;
+
+        private set
+        {
+            _systemCpuUsage = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string SystemTime
+    {
+        get => _systemTime;
+
+        private set
+        {
+            _systemTime = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SystemFirmwareAndTime));
+        }
+    }
+
+    public string SystemFirmware
+    {
+        get => _systemFirmware;
+
+        private set
+        {
+            _systemFirmware = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SystemFirmwareAndTime));
+        }
+    }
+
+    /// <summary>
+    /// Combined firmware and time display used by the status bar.
+    /// </summary>
+    public string SystemFirmwareAndTime => $"FW: {SystemFirmware}  •  {SystemTime}";
 
     /// <summary>Label shown in the update banner.</summary>
     public string OtaBannerLabel => _otaStatus?.BannerLabel ?? string.Empty;
@@ -62,10 +127,10 @@ public class DashboardViewModel : INotifyPropertyChanged
     /// <summary>Accent colour for the banner (amber = available, red = failed, blue = busy).</summary>
     public Color OtaBannerColor => _otaStatus switch
     {
-        { HasFailed: true }      => Color.FromArgb("#cc4444"),
-        { IsBusy: true }         => Color.FromArgb("#4488cc"),
-        { UpdateAvailable: true } => Color.FromArgb("#e8a020"),
-        _                        => Color.FromArgb("#e8a020")
+        { HasFailed: true } => Color.FromArgb(ColorError),
+        { IsBusy: true } => Color.FromArgb(ColorBusy),
+        { UpdateAvailable: true } => Color.FromArgb(ColorWarning),
+        _ => Color.FromArgb(ColorWarning)
     };
 
     /// <summary>Install button is active only when an update is available and nothing is in progress.</summary>
@@ -74,7 +139,12 @@ public class DashboardViewModel : INotifyPropertyChanged
     public bool IsBusy
     {
         get => _isBusy;
-        set { _isBusy = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsNotBusy)); }
+        set
+        {
+            _isBusy = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsNotBusy));
+        }
     }
 
     public bool IsNotBusy => !_isBusy;
@@ -82,46 +152,68 @@ public class DashboardViewModel : INotifyPropertyChanged
     public bool IsConnected
     {
         get => _isConnected;
-        set { _isConnected = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsDisconnected)); OnPropertyChanged(nameof(StatusColor)); OnPropertyChanged(nameof(HasRelays)); OnPropertyChanged(nameof(HasNoRelays)); OnPropertyChanged(nameof(HasSensors)); OnPropertyChanged(nameof(HasNoSensors)); }
+        set
+        { 
+            _isConnected = value; 
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(IsDisconnected)); 
+            OnPropertyChanged(nameof(StatusColor)); 
+            OnPropertyChanged(nameof(HasRelays)); 
+            OnPropertyChanged(nameof(HasNoRelays)); 
+            OnPropertyChanged(nameof(HasSensors)); 
+            OnPropertyChanged(nameof(HasNoSensors)); 
+        }
     }
 
     public bool IsDisconnected => !_isConnected;
 
-    public Color StatusColor => _isConnected ? Color.FromArgb("#44cc44") : Color.FromArgb("#cc4444");
+    public Color StatusColor => _isConnected ? Color.FromArgb(ColorAsHex1) : Color.FromArgb(ColorError);
 
     public string StatusMessage
     {
         get => _statusMessage;
-        set { _statusMessage = value; OnPropertyChanged(); }
+        set 
+        { 
+            _statusMessage = value; 
+            OnPropertyChanged(); 
+        }
     }
 
     public string DeviceUrl
     {
         get => _deviceUrl;
-        set { _deviceUrl = value; OnPropertyChanged(); }
+        set 
+        {
+            _deviceUrl = value;
+            OnPropertyChanged(); 
+        }
     }
 
-    public DashboardViewModel(PowerHubService service, LogService log)
+    // When true the view should ignore Switch.Toggled events because the
+    // viewmodel is applying authoritative state from the remote device.
+    public bool IsApplyingRemoteState { get; private set; } = true;
+
+    public DashboardViewModel(PowerHubService service, LogService log, RelayStore relayStore)
     {
         _service = service;
-        _log     = log;
+        _log = log;
+        _relayStore = relayStore;
         RefreshCommand = new Command(async () => await RefreshAsync());
-        ToggleRelayCommand = new Command<RelayModel>(async relay => await ToggleRelayAsync(relay));
+        ToggleRelayCommand = new Command<RelayViewModel>(async relay => await ToggleRelayAsync(relay));
         InstallUpdateCommand = new Command(async () => await InstallUpdateAsync(), () => CanInstallUpdate);
 
-        Relays.CollectionChanged += (_, _) =>
+        _relayStore.Relays.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasRelays));
             OnPropertyChanged(nameof(HasNoRelays));
         };
+
         Sensors.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasSensors));
             OnPropertyChanged(nameof(HasNoSensors));
         };
     }
-
-    // ── Public methods ────────────────────────────────────────────────────────
 
     public void ClearLog() => _log.Clear();
 
@@ -143,7 +235,7 @@ public class DashboardViewModel : INotifyPropertyChanged
     {
         if (!_service.IsConfigured)
         {
-            StatusMessage = "Not configured — tap ⚙ to set device IP";
+            StatusMessage = MessageNotConfigured;
             IsConnected = false;
             return;
         }
@@ -156,14 +248,27 @@ public class DashboardViewModel : INotifyPropertyChanged
 
         try
         {
-            var (relays, sensors) = await _service.GetDashboardDataAsync();
+            IndexModel index = await _service.GetDashboardDataAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                UpdateRelays(relays);
-                UpdateSensors(sensors);
-                IsConnected = true;
-                StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
+                // When applying authoritative state from the device we want to
+                // ignore any Switch.Toggled events raised by the UI as a result
+                // of the programmatic property updates. Mark a short-lived flag
+                // so the view can drop those events.
+                IsApplyingRemoteState = true;
+                try
+                {
+                    UpdateSystem(index.System);
+                    UpdateRelays(index.Relays);
+                    UpdateSensors(index.Sensors);
+                    IsConnected = true;
+                    StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
+                }
+                finally
+                {
+                    IsApplyingRemoteState = false;
+                }
             });
 
             // Poll OTA status as a true fire-and-forget so any failure or timeout
@@ -174,7 +279,7 @@ public class DashboardViewModel : INotifyPropertyChanged
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     OtaSupported = ota != null;
-                    _otaStatus   = ota;
+                    _otaStatus = ota;
                     NotifyOtaProperties();
                 });
             });
@@ -195,7 +300,7 @@ public class DashboardViewModel : INotifyPropertyChanged
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 IsConnected = false;
-                StatusMessage = "Device unreachable";
+                StatusMessage = MessageDeviceUnreachable;
             });
         }
         finally
@@ -204,19 +309,23 @@ public class DashboardViewModel : INotifyPropertyChanged
         }
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
     private async Task AutoRefreshLoopAsync(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
         {
             await RefreshAsync();
-            try { await Task.Delay(TimeSpan.FromSeconds(5), ct); }
-            catch (TaskCanceledException) { break; }
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1), ct);
+            }
+            catch (TaskCanceledException)
+            { 
+                break;
+            }
         }
     }
 
-    private async Task ToggleRelayAsync(RelayModel relay)
+    private async Task ToggleRelayAsync(RelayViewModel relay)
     {
         if (!_service.IsConfigured || relay == null)
             return;
@@ -226,6 +335,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         try
         {
             bool success = await _service.SetRelayStateAsync(relay.Index, newState);
+
             if (success)
             {
                 relay.State = newState ? 1 : 0;
@@ -236,7 +346,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             _log.Error($"Toggle relay {relay.Index} failed: {ex.Message}");
-            StatusMessage = "Toggle failed — see log";
+            StatusMessage = MessageToggleFailed;
         }
     }
 
@@ -247,11 +357,11 @@ public class DashboardViewModel : INotifyPropertyChanged
 
         try
         {
-            _log.Info("OTA: triggering firmware install…");
+            _log.Info(LogOtaTrigger);
             await _service.TriggerOtaInstallAsync();
 
             // Give the device a moment then poll for updated status
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromSeconds(SecondsTwo));
             var ota = await _service.GetOtaStatusAsync();
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -276,56 +386,24 @@ public class DashboardViewModel : INotifyPropertyChanged
         ((Command)InstallUpdateCommand).ChangeCanExecute();
     }
 
-    private void UpdateRelays(List<RelayModel> incoming)
+    private void UpdateSystem(SystemModel system)
     {
-        var enabled = incoming.Where(r => r.IsEnabled).ToList();
-
-        // Update state on items that already exist in the collection
-        foreach (var existing in Relays)
-        {
-            var updated = enabled.FirstOrDefault(r => r.Index == existing.Index);
-            if (updated != null)
-                existing.State = updated.State;
-        }
-
-        // Remove items no longer present
-        var removedIndices = Relays
-            .Where(r => !enabled.Any(e => e.Index == r.Index))
-            .ToList();
-        foreach (var r in removedIndices)
-            Relays.Remove(r);
-
-        // Append genuinely new items
-        foreach (var r in enabled.Where(e => !Relays.Any(x => x.Index == e.Index)))
-            Relays.Add(r);
+        SystemFreeMemory = $"{Math.Round((double)system.Mem / KilobyteBytes, DefaultDecimalPlaces)} kb";
+        SystemCpuUsage = $"{system.Cpu}%";
     }
 
-    private void UpdateSensors(List<SensorModel> incoming)
+    private void UpdateRelays(IReadOnlyList<RelayModel> incoming)
     {
-        // Update extra fields on items that already exist
-        foreach (var existing in Sensors)
-        {
-            var updated = incoming.FirstOrDefault(s => s.Name == existing.Name);
-            if (updated != null)
-                existing.ExtraFields = updated.ExtraFields;
-        }
-
-        // Remove stale items
-        var removed = Sensors
-            .Where(s => !incoming.Any(i => i.Name == s.Name))
-            .ToList();
-        foreach (var s in removed)
-            Sensors.Remove(s);
-
-        // Append new items
-        foreach (var s in incoming.Where(i => !Sensors.Any(x => x.Name == i.Name)))
-            Sensors.Add(s);
+        var vms = RelayStore.FromModels(incoming ?? []);
+        _relayStore.ReplaceAll(vms);
     }
 
-    // ── INotifyPropertyChanged ────────────────────────────────────────────────
+    private static void UpdateSensors(SensorsModel incoming)
+    {
+    }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string? name = null)
+    protected void OnPropertyChanged([CallerMemberName] string name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

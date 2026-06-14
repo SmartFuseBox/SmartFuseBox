@@ -254,6 +254,49 @@ bool SystemFunctions::startsWith(const char* str, const __FlashStringHelper* pre
     }
 }
 
+void SystemFunctions::urlDecode(const char* input, char* dest, size_t destSize)
+{
+    if (!dest || destSize == 0) return;
+
+    if (!input)
+    {
+        dest[0] = '\0';
+        return;
+    }
+
+    size_t out = 0;
+
+    for (size_t i = 0; input[i] != '\0' && out < destSize - 1; i++)
+    {
+        char c = input[i];
+
+        if (c == '+')
+        {
+            // application/x-www-form-urlencoded: '+' decodes to space
+            dest[out++] = ' ';
+        }
+        else if (c == '%' && isxdigit(static_cast<unsigned char>(input[i + 1]))
+                        && isxdigit(static_cast<unsigned char>(input[i + 2])))
+        {
+            auto hexVal = [](char h) -> uint8_t {
+                if (h >= '0' && h <= '9') return static_cast<uint8_t>(h - '0');
+                if (h >= 'a' && h <= 'f') return static_cast<uint8_t>(10 + (h - 'a'));
+                if (h >= 'A' && h <= 'F') return static_cast<uint8_t>(10 + (h - 'A'));
+                return 0;
+            };
+
+            dest[out++] = static_cast<char>((hexVal(input[i + 1]) << 4) | hexVal(input[i + 2]));
+            i += 2; // skip the two hex digits
+        }
+        else
+        {
+            dest[out++] = c;
+        }
+    }
+
+    dest[out] = '\0';
+}
+
 // Implementation
 size_t SystemFunctions::appendString(char* dest, size_t destSize, size_t offset, const char* src)
 {
