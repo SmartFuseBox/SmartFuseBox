@@ -149,8 +149,6 @@ CommandResult RelayNetworkHandler::handleRequest(const char* method,
 				formatJsonResponse(responseBuffer, bufferSize, false, "Invalid relay index");
 				return CommandResult::error(InvalidCommandParameters);
 			}
-			if (color < DefaultValue)
-				color += 2;
 			_relayController->setButtonColor(relayIndex, color);
 			formatJsonResponse(responseBuffer, bufferSize, true);
 			return CommandResult::ok();

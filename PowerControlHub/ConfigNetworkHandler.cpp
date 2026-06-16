@@ -161,8 +161,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 			}
 			else
 			{
-				if (color < DefaultValue)
-					color += 2;
 				result = (_relayController->setButtonColor(relayIndex, color) == RelayResult::Success)
 					? ConfigResult::Success : ConfigResult::Failed;
 			}
@@ -704,6 +702,257 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		else
 		{
 			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigGetAll))
+	{
+		// S0 — return all local sensor config entries as JSON array
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else
+		{
+			int written = snprintf(responseBuffer, bufferSize,
+				"\"count\":%u,\"sensors\":[", config->sensors.count);
+
+			for (uint8_t i = 0; i < config->sensors.count && i < ConfigMaxSensors; i++)
+			{
+				const SensorEntry& e = config->sensors.sensors[i];
+				int n = snprintf(responseBuffer + written, bufferSize - written,
+					"%s{\"i\":%u,\"t\":%u,\"n\":\"%s\",\"p0\":%u,\"p1\":%u,"
+					"\"u0\":%d,\"u1\":%d,\"o0\":%d,\"o1\":%d,\"en\":%u}",
+					i > 0 ? "," : "",
+					i,
+					static_cast<uint8_t>(e.sensorType),
+					e.name,
+					e.pins[0],
+					e.pins[1],
+					e.options1[0],
+					e.options1[1],
+					e.options2[0],
+					e.options2[1],
+					e.enabled ? 1u : 0u);
+				if (n < 0 || written + n >= static_cast<int>(bufferSize))
+					break;
+				written += n;
+			}
+
+			snprintf(responseBuffer + written, bufferSize - written, "]");
+			result = ConfigResult::Success;
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigAddUpdate))
+	{
+		// S1:i=<idx>;t=<type>;o0=<opt0>;o1=<opt1>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else
+		{
+			uint8_t idx, type;
+			int8_t opt0, opt1;
+			if (!getParamValueU8t(params, paramCount, "i", idx) ||
+				!getParamValueU8t(params, paramCount, "t", type) ||
+				!getParamValue8t(params, paramCount, "o0", opt0) ||
+				!getParamValue8t(params, paramCount, "o1", opt1) ||
+				idx >= ConfigMaxSensors)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				SensorEntry& entry = config->sensors.sensors[idx];
+				entry.enabled = true;
+				entry.sensorType = static_cast<SensorIdList>(type);
+				entry.options1[0] = opt0;
+				entry.options1[1] = opt1;
+
+				if (idx >= config->sensors.count)
+					config->sensors.count = idx + 1;
+
+				result = ConfigResult::Success;
+			}
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigRemove))
+	{
+		// S2:v=<idx>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else if (paramCount < 1)
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+		else
+		{
+			uint8_t idx;
+			if (!getParamValueU8t(params, paramCount, "v", idx))
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else if (idx >= ConfigMaxSensors)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else if (idx >= config->sensors.count)
+			{
+				// Already absent — treat as success
+				result = ConfigResult::Success;
+			}
+			else
+			{
+				SensorEntry& entry = config->sensors.sensors[idx];
+				entry.enabled = false;
+				entry.sensorType = static_cast<SensorIdList>(0);
+				entry.name[0] = '\0';
+				memset(entry.pins, PinDisabled, sizeof(entry.pins));
+				memset(entry.options1, 0, sizeof(entry.options1));
+				memset(entry.options2, 0, sizeof(entry.options2));
+
+				result = ConfigResult::Success;
+			}
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigRename))
+	{
+		// S3:<idx>=<name>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else if (paramCount < 1)
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+		else
+		{
+			uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			if (idx >= ConfigMaxSensors || idx >= config->sensors.count || params[0].value[0] == '\0')
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				SensorEntry& entry = config->sensors.sensors[idx];
+				strncpy(entry.name, params[0].value, sizeof(entry.name) - 1);
+				entry.name[sizeof(entry.name) - 1] = '\0';
+				result = ConfigResult::Success;
+			}
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigSetPin))
+	{
+		// S4:i=<idx>;s=<slot>;v=<pin>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else
+		{
+			uint8_t idx, slot, pin;
+			if (!getParamValueU8t(params, paramCount, "i", idx) ||
+				!getParamValueU8t(params, paramCount, "s", slot) ||
+				!getParamValueU8t(params, paramCount, "v", pin) ||
+				idx >= ConfigMaxSensors ||
+				slot >= ConfigMaxSensorPins)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				config->sensors.sensors[idx].pins[slot] = pin;
+				result = ConfigResult::Success;
+			}
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigSetEnabled))
+	{
+		// S5:<idx>=<0|1>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else if (paramCount < 1)
+		{
+			result = ConfigResult::InvalidParameter;
+		}
+		else
+		{
+			uint8_t idx = static_cast<uint8_t>(strtoul(params[0].key, nullptr, 0));
+			bool enabled = SystemFunctions::parseBooleanValue(params[0].value);
+
+			if (idx >= ConfigMaxSensors || idx >= config->sensors.count)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				config->sensors.sensors[idx].enabled = enabled;
+				result = ConfigResult::Success;
+			}
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SensorConfigSetOptions))
+	{
+		// S6:i=<idx>;s=<slot>;o=<group>;v=<value>
+		Config* config = ConfigManager::getConfigPtr();
+		if (config == nullptr)
+		{
+			result = ConfigResult::InvalidConfig;
+		}
+		else
+		{
+			uint8_t idx, slot, group;
+			if (!getParamValueU8t(params, paramCount, "i", idx) ||
+				!getParamValueU8t(params, paramCount, "s", slot) ||
+				!getParamValueU8t(params, paramCount, "o", group) ||
+				idx >= ConfigMaxSensors)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				if (group == 0 && slot < 2)
+				{
+					int8_t val8;
+					if (!getParamValue8t(params, paramCount, "v", val8))
+					{
+						result = ConfigResult::InvalidParameter;
+					}
+					else
+					{
+						config->sensors.sensors[idx].options1[slot] = val8;
+						result = ConfigResult::Success;
+					}
+				}
+				else if (group == 1 && slot < 2)
+				{
+					int16_t val16;
+					if (!getParamValue16t(params, paramCount, "v", val16))
+					{
+						result = ConfigResult::InvalidParameter;
+					}
+					else
+					{
+						config->sensors.sensors[idx].options2[slot] = val16;
+						result = ConfigResult::Success;
+					}
+				}
+				else
+				{
+					result = ConfigResult::InvalidParameter;
+				}
+			}
 		}
 	}
 	else if (SystemFunctions::commandMatches(command, ExternalSensorGetAll))

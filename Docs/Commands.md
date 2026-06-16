@@ -239,6 +239,8 @@ WiFi commands return JSON (`{"success":true}` or `{"success":false,"message":"�
 | `R5` — Get All Relay Config | `R5` | Returns full relay config as a series of `R6`–`R11` responses. No params. |
 | `R6` — Relay Rename | `R6:2=Bilge` or `R6:2=Bilge\|Bilge Pump` | Rename relay `idx`. Param: `<idx>=<shortName>` or `<idx>=<short\|long>`. Short ≤5 chars (home page), long ≤20 chars (buttons page). |
 | `R7` — Set Button Color | `R7:2=4` or `R7:2=255` (clear) | Set active (on) button colour for relay `idx`. `0`=Blue, `1`=Green, `2`=Orange, `3`=Purple, `4`=Red, `5`=Yellow, `255`=clear. |
+
+| `R7` — Set Button Color | `R7:2=4` or `R7:2=255` (clear) | Set active (on) button colour for relay `idx`. Accepts Nextion picture IDs (as stored on the device): `2`=Blue, `3`=Green, `4`=Grey, `5`=Orange, `6`=Red, `7`=Yellow, `255`=clear. |
 | `R8` — Set Default State | `R8:3=1` | Power-on default state for relay `idx`: `0`=off, `1`=on. |
 | `R9` — Link Relays | `R9:3=4` (link) — `R9:3=255` (unlink) | Link two relays so toggling one toggles the other. `255` to unlink. |
 | `R10` — Set Action Type | `R10:2=0` / `R10:2=1` / `R10:2=2` | Set relay action type: `0`=Default, `1`=Horn (activates sound system), `2`=NightRelay (activates at night per light sensor). Only one relay per type at a time. |
