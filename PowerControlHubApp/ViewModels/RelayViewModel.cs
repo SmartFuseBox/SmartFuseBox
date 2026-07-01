@@ -65,17 +65,19 @@ namespace PowerControlHubApp.ViewModels
         public string DisplayName => !string.IsNullOrWhiteSpace(LongName) ? LongName : ShortName;
 
         /// <summary>
-        /// Translates <see cref="ButtonImage"/> (0-5, 255) into the corresponding
-        /// panel accent colour. Returns <c>Colors.Transparent</c> when unconfigured (255).
+        /// Translates <see cref="ButtonImage"/> into the corresponding panel accent colour.
+        /// Accepts both 0-based indices (0-5) and raw Nextion picture IDs (2-7) to
+        /// handle values loaded directly from the device before any save normalisation.
+        /// Returns <c>Colors.Transparent</c> when unconfigured (255) or unknown.
         /// </summary>
         public Color PanelColor => ButtonImage switch
         {
-            RelayColorBlue => Color.FromArgb(ColorRelayPanelBlue),
-            RelayColorGreen => Color.FromArgb(ColorRelayPanelGreen),
-            RelayColorOrange => Color.FromArgb(ColorRelayPanelOrange),
-            RelayColorPurple => Color.FromArgb(ColorRelayPanelPurple),
-            RelayColorRed => Color.FromArgb(ColorRelayPanelRed),
-            RelayColorYellow => Color.FromArgb(ColorRelayPanelYellow),
+            RelayColorBlue or NextionImageIdBlue => Color.FromArgb(ColorRelayPanelBlue),
+            RelayColorGreen or NextionImageIdGreen => Color.FromArgb(ColorRelayPanelGreen),
+            RelayColorGrey or NextionImageIdGrey => Color.FromArgb(ColorRelayPanelGrey),
+            RelayColorOrange or NextionImageIdOrange => Color.FromArgb(ColorRelayPanelOrange),
+            RelayColorRed or NextionImageIdRed => Color.FromArgb(ColorRelayPanelRed),
+            RelayColorYellow or NextionImageIdYellow => Color.FromArgb(ColorRelayPanelYellow),
             _ => Colors.Transparent,
         };
 

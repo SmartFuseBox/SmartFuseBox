@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PowerControlHubApp.Internal
+﻿namespace PowerControlHubApp.Internal
 {
     internal static class Constants
     {
@@ -45,6 +41,7 @@ namespace PowerControlHubApp.Internal
         public const string LogDeviceInvalidJson = "Device returned invalid JSON while polling index";
         public const string LogUnexpectedPollingError = "Unexpected error while polling index";
         public const string LogDashboardStopping = "DashboardPoller stopping";
+        public const string LogMetaRefreshFailed = "Failed to refresh sensor meta cache at startup";
 
         // Theme keys
         public const string ThemeKey_AppPageBg = "AppPageBg";
@@ -110,23 +107,32 @@ namespace PowerControlHubApp.Internal
         public const string SavedOk = "✓ Saved successfully";
         public const string SavedFailed = "⚠ One or more commands failed";
         public const int ColorOptionNoneIndex = 6;
-        public static readonly string[] ColorOptionNames = new[] { ColorName_Blue, ColorName_Green, ColorName_Orange, ColorName_Purple, ColorName_Red, ColorName_Yellow, NoneString };
+        public static readonly string[] ColorOptionNames = new[] { ColorName_Blue, ColorName_Green, ColorName_Grey, ColorName_Orange, ColorName_Red, ColorName_Yellow, NoneString };
         public static readonly string[] ActionOptionNames = new[] { ActionName_Default, ActionName_Horn, ActionName_NightRelay };
         public static readonly string[] DefaultStateOptionNames = new[] { DefaultState_Off, DefaultState_On };
         public const string NavBack = "..";
         public const string RelayPageTitle = "Relay";
         public const string CheckMark = "✓";
-        // Relay panel colours
+        // Relay panel colours (order matches Nextion picture IDs with +2 offset)
         public const int RelayColorBlue = 0;
         public const int RelayColorGreen = 1;
-        public const int RelayColorOrange = 2;
-        public const int RelayColorPurple = 3;
+        public const int RelayColorGrey = 2;
+        public const int RelayColorOrange = 3;
         public const int RelayColorRed = 4;
         public const int RelayColorYellow = 5;
+        // Nextion picture IDs for button colours (stored on device)
+        public const int NextionImageIdBlue = 2;
+        public const int NextionImageIdGreen = 3;
+        public const int NextionImageIdGrey = 4;
+        public const int NextionImageIdOrange = 5;
+        public const int NextionImageIdRed = 6;
+        public const int NextionImageIdYellow = 7;
+        public const int NextionImageIdMin = NextionImageIdBlue;
+        public const int NextionImageIdMax = NextionImageIdYellow;
         public const string ColorRelayPanelBlue = "#2255cc";
         public const string ColorRelayPanelGreen = "#22aa44";
+        public const string ColorRelayPanelGrey = "#888888";
         public const string ColorRelayPanelOrange = "#dd7722";
-        public const string ColorRelayPanelPurple = "#8833cc";
         public const string ColorRelayPanelRed = "#cc3333";
         public const string ColorRelayPanelYellow = "#ccbb22";
         public const string WarningMark = "⚠";
@@ -134,8 +140,8 @@ namespace PowerControlHubApp.Internal
         // Color option names
         public const string ColorName_Blue = "Blue";
         public const string ColorName_Green = "Green";
+        public const string ColorName_Grey = "Grey";
         public const string ColorName_Orange = "Orange";
-        public const string ColorName_Purple = "Purple";
         public const string ColorName_Red = "Red";
         public const string ColorName_Yellow = "Yellow";
 
@@ -194,5 +200,111 @@ namespace PowerControlHubApp.Internal
 
         public const int KilobyteBytes = 1024;
         public const int DefaultDecimalPlaces = 2;
+
+        // External sensor API route and JSON property names
+        public const string RouteExternalSensor = "api/externalsensor/";
+        public const string RouteLocalSensorConfig = "api/sensor/";
+        public const string JsonSensors = "sensors";
+        public const string JsonSensorIndex = "i";
+        public const string JsonSensorId = "id";
+        public const string JsonSensorName = "n";
+        public const string JsonSensorMqttName = "mn";
+        public const string JsonSensorMqttSlug = "ms";
+        public const string JsonSensorMqttType = "mt";
+        public const string JsonSensorMqttDeviceClass = "md";
+        public const string JsonSensorMqttUnit = "mu";
+        public const string JsonSensorMqttBinary = "bin";
+
+        public const string ErrRemoveCommandFailed = "⚠ Remove command failed";
+
+        // Local sensor config JSON property names
+        public const string JsonLocalSensorIndex = "i";
+        public const string JsonLocalSensorType = "t";
+        public const string JsonLocalSensorName = "n";
+        public const string JsonLocalSensorPin0 = "p0";
+        public const string JsonLocalSensorPin1 = "p1";
+        public const string JsonLocalSensorOpt1_0 = "u0";
+        public const string JsonLocalSensorOpt1_1 = "u1";
+        public const string JsonLocalSensorOpt2_0 = "o0";
+        public const string JsonLocalSensorOpt2_1 = "o1";
+        public const string JsonLocalSensorEnabled = "en";
+
+        // Sensor config command strings
+        public const string SensorConfigGetAll = "S0";
+
+        // Sensor meta JSON property names (S0?meta=1 response)
+        public const string JsonMeta = "meta";
+        public const string JsonMetaCount = "count";
+        public const string JsonMetaDescriptors = "descriptors";
+
+        // JSON key for sensor type in the dashboard /api/index response
+        public const string SensorTypeJsonKey = "type";
+
+        // Sensor type display names
+        public const string SensorTypeWater = "Water";
+        public const string SensorTypeDht11 = "DHT11";
+        public const string SensorTypeLight = "Light";
+        public const string SensorTypeGps = "GPS";
+        public const string SensorTypeSystem = "System";
+        public const string SensorTypeBinaryPresence = "Binary Presence";
+        public const string SensorTypeVoltage = "Voltage";
+        public const string SensorTypeUnknown = "Unknown";
+        public const string SensorTypeMetaDataUnavailable = "Sensor type metadata unavailable.";
+
+        // Sensor type display names with enum values for picker
+        public const string SensorTypeWaterPicker = "Water (0)";
+        public const string SensorTypeDht11Picker = "DHT11 (1)";
+        public const string SensorTypeLightPicker = "Light (2)";
+        public const string SensorTypeGpsPicker = "GPS (3)";
+        public const string SensorTypeSystemPicker = "System (4)";
+        public const string SensorTypeBinaryPresencePicker = "Binary Presence (5)";
+        public const string SensorTypeVoltagePicker = "Voltage (6)";
+
+        // Sensor page UI
+        public const string SensorPageTitle = "Sensor";
+        public const string SensorNotConfigured = "Not configured";
+        public const string MsgRemoveSensor = "Remove Sensor";
+        public const string MsgRemove = "Remove";
+        public const string MsgCancel = "Cancel";
+        public const string MsgPinSummaryFormat = "Pin {0}, {1}";
+        public const string MsgPinFormat = "Pin {0}";
+
+        // Sensor type enum values
+        public const int SensorEnumWater = 0;
+        public const int SensorEnumDht11 = 1;
+        public const int SensorEnumLight = 2;
+        public const int SensorEnumGps = 3;
+        public const int SensorEnumSystem = 4;
+        public const int SensorEnumBinaryPresence = 5;
+        public const int SensorEnumVoltage = 6;
+
+        // Sensor detail page default label strings
+        public const string LabelPin0Default = "GPIO Pin 0 (blank or 255 = disabled)";
+        public const string LabelPin1Default = "GPIO Pin 1 (blank or 255 = disabled)";
+        public const string LabelOpt1_0Default = "Option 1 (int8)";
+        public const string LabelOpt1_1Default = "Option 2 (int8)";
+        public const string LabelOpt2_0Default = "Option 3 (int16)";
+        public const string LabelOpt2_1Default = "Option 4 (int16)";
+
+        // ConfigConnection constants
+        public const int ConfigConnectionQueueCapacity = 64;
+        public const string LogConfigExecuting = "ConfigConnection executing: {Description}";
+        public const string LogConfigSucceeded = "ConfigConnection succeeded: {Description}";
+        public const string LogConfigFailed = "ConfigConnection failed: {Description}";
+        public const string LogConfigFailureResponse = "Device returned failure response";
+        public const string LogConfigConsumerError = "ConfigConnection consumer error";
+        public const string LogPublishSuccessFailed = "Failed to publish success message for: {Description}";
+        public const string LogPublishFailureFailed = "Failed to publish failure message for: {Description}";
+        public const string ConfigSuccessRelay = "RelayConfigSucceeded";
+        public const string ConfigSuccessSensor = "SensorConfigSucceeded";
+
+        // ConfigPoller log messages
+        public const string LogConfigMetaRefreshed = "ConfigPoller: SensorMetaCache refreshed after connection.";
+        public const string LogConfigHealthCheckFailed = "ConfigPoller: Connection health check failed.";
+
+        // MauiProgram startup orchestration
+        public const string LogStartupMetaFetch = "Startup: first dashboard data received, fetching sensor meta on connection 2.";
+        public const string LogStartupMetaPopulated = "Startup: sensor meta cache populated.";
+        public const string LogStartupMetaAlready = "Startup: dashboard data already available, fetching sensor meta on connection 2.";
     }
 }

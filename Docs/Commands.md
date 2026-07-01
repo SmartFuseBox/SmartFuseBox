@@ -239,6 +239,8 @@ WiFi commands return JSON (`{"success":true}` or `{"success":false,"message":"�
 | `R5` — Get All Relay Config | `R5` | Returns full relay config as a series of `R6`–`R11` responses. No params. |
 | `R6` — Relay Rename | `R6:2=Bilge` or `R6:2=Bilge\|Bilge Pump` | Rename relay `idx`. Param: `<idx>=<shortName>` or `<idx>=<short\|long>`. Short ≤5 chars (home page), long ≤20 chars (buttons page). |
 | `R7` — Set Button Color | `R7:2=4` or `R7:2=255` (clear) | Set active (on) button colour for relay `idx`. `0`=Blue, `1`=Green, `2`=Orange, `3`=Purple, `4`=Red, `5`=Yellow, `255`=clear. |
+
+| `R7` — Set Button Color | `R7:2=4` or `R7:2=255` (clear) | Set active (on) button colour for relay `idx`. Accepts Nextion picture IDs (as stored on the device): `2`=Blue, `3`=Green, `4`=Grey, `5`=Orange, `6`=Red, `7`=Yellow, `255`=clear. |
 | `R8` — Set Default State | `R8:3=1` | Power-on default state for relay `idx`: `0`=off, `1`=on. |
 | `R9` — Link Relays | `R9:3=4` (link) — `R9:3=255` (unlink) | Link two relays so toggling one toggles the other. `255` to unlink. |
 | `R10` — Set Action Type | `R10:2=0` / `R10:2=1` / `R10:2=2` | Set relay action type: `0`=Default, `1`=Horn (activates sound system), `2`=NightRelay (activates at night per light sensor). Only one relay per type at a time. |
@@ -336,7 +338,7 @@ Route: `/api/config/{command}` (shares the config route)
 
 | Command | Example | Purpose |
 |---|---|---|
-| `S0` — Get All Sensor Config | `S0` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;u0=<opt1_0>;u1=<opt1_1>;o0=<opt2_0>;o1=<opt2_1>;en=<0\|1>`. The labels in the response are read-only aliases: `p0`/`p1` = `pins[0]`/`pins[1]`; `u0`/`u1` = `options1[0]`/`options1[1]` (signed byte); `o0`/`o1` = `options2[0]`/`options2[1]` (signed 16-bit). No params. |
+| `S0` — Get All Sensor Config | `S0` or `S0?meta=1` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;u0=<opt1_0>;u1=<opt1_1>;o0=<opt2_0>;o1=<opt2_1>;en=<0\|1>`. The labels in the response are read-only aliases: `p0`/`p1` = `pins[0]`/`pins[1]`; `u0`/`u1` = `options1[0]`/`options1[1]` (signed byte); `o0`/`o1` = `options2[0]`/`options2[1]` (signed 16-bit). **WiFi only:** Append `?meta=1` to include a `"meta"` block with sensor type descriptors (field labels, types, ranges, defaults) for self-describing dynamic UI. No serial params. |
 | `S1` — Add / Update Sensor | `S1:i=<idx>;t=<type>;o0=<val>;o1=<val>` | Add or update sensor at index `i`. **Only four params are accepted:** `i` (sensor index), `t` (type — `SensorIdList` enum value), `o0` (writes `options1[0]`), `o1` (writes `options1[1]`). Pins and all other options must be set separately via `S4` and `S6` **after** `S1`. All four params are required. ACK carries `reboot=1`. |
 | `S2` — Remove Sensor | `S2:v=0` | Remove (clear) sensor at index. Param: `v=<idx>`. ACK carries `reboot=1`. |
 | `S3` — Rename Sensor | `S3:0=Bilge Pump` | Rename sensor at index. Param: `<idx>=<name>`. ACK carries `reboot=1`. |

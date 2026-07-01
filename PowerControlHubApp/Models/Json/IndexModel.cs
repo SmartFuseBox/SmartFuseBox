@@ -29,6 +29,13 @@ namespace PowerControlHubApp.Models.Json
         [JsonPropertyName("sensors")]
         public SensorsModel Sensors { get; set; }
 
+        /// <summary>
+        /// Populated from the sensors JSON object — contains one entry per sensor
+        /// with Name, SensorType, and ExtraFields set.
+        /// </summary>
+        [JsonIgnore]
+        public List<SensorsModel> SensorsList { get; set; } = [];
+
         [JsonPropertyName("schedule")]
         public ScheduleModel Schedule { get; set; }
 

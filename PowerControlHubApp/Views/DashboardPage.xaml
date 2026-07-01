@@ -259,14 +259,6 @@
         <!-- ── Status bar ── -->
         <Grid Grid.Row="4" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"
               ColumnDefinitions="Auto,Auto,*,Auto,Auto">
-                <!-- Spinning indicator while fetching -->
-                <ActivityIndicator Grid.Column="0"
-                                   IsRunning="{Binding IsBusy}"
-                                   IsVisible="{Binding IsBusy}"
-                                   Color="{DynamicResource AppBarText}"
-                                   WidthRequest="18" HeightRequest="18"
-                                   VerticalOptions="Center"
-                                   Margin="0,0,6,0" />
                 <!-- Coloured status dot (green = connected, red = disconnected) -->
                 <BoxView Grid.Column="1"
                          Color="{Binding StatusColor}"

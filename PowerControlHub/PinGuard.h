@@ -122,9 +122,13 @@ struct PinTableEntry
 // ── ESP32-S3 Dev Module ───────────────────────────────────────────────────────
 // Hard blocks
 //   GPIO 26–32 : connected to internal Octal flash/PSRAM — hard for ALL uses
+//   GPIO 35–37 : Octal PSRAM control pins (CS, CK, DQS) — hard for ALL uses
+//                only when PSRAM is fitted (BOARD_HAS_PSRAM / CONFIG_SPIRAM_SUPPORT)
 //   GPIO 45–46 : input-only on S3 silicon (promoted to Hard for output uses)
 // Advisory
 //   GPIO 0,3,19,20,45,46 : strapping / USB / UART0
+//   GPIO 39–42 : USB JTAG (TMS, TCK, TDI, TDO) — usable as GPIO if JTAG is
+//                disabled in eFuse, but risky otherwise
 static const PinTableEntry _pinTable[] PROGMEM = {
 	// Flash/PSRAM-reserved — hard for ALL uses
 	{ 26, PinCategory::Hard },
@@ -134,6 +138,12 @@ static const PinTableEntry _pinTable[] PROGMEM = {
 	{ 30, PinCategory::Hard },
 	{ 31, PinCategory::Hard },
 	{ 32, PinCategory::Hard },
+	// Octal PSRAM control pins (CS, CK, DQS) — hard for ALL uses when PSRAM fitted
+#if defined(BOARD_HAS_PSRAM) || defined(CONFIG_SPIRAM_SUPPORT)
+	{ 35, PinCategory::Hard },
+	{ 36, PinCategory::Hard },
+	{ 37, PinCategory::Hard },
+#endif
 	// Input-only on S3 — Advisory here; validate() promotes to Hard for output
 	{ 45, PinCategory::Advisory },
 	{ 46, PinCategory::Advisory },
@@ -142,6 +152,11 @@ static const PinTableEntry _pinTable[] PROGMEM = {
 	{  3, PinCategory::Advisory },   // UART0 RX
 	{ 19, PinCategory::Advisory },   // USB D-
 	{ 20, PinCategory::Advisory },   // USB D+
+	// USB JTAG — advisory for all uses (can be repurposed if JTAG fused out)
+	{ 39, PinCategory::Advisory },   // JTAG TMS
+	{ 40, PinCategory::Advisory },   // JTAG TCK
+	{ 41, PinCategory::Advisory },   // JTAG TDI
+	{ 42, PinCategory::Advisory },   // JTAG TDO
 };
 static constexpr uint8_t _pinTableSize = sizeof(_pinTable) / sizeof(_pinTable[0]);
 

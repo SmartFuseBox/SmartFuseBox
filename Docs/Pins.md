@@ -124,6 +124,20 @@ GPIO34, 35, 36 (SVP), and 39 (SVN) are **input-only** — they have no output dr
 | **1, 3**   | UART0 TX/RX — used by `Serial` (the USB-UART debug port). Do not reassign unless `Serial` is not in use. |
 | **34–39**  | Input-only — cannot drive outputs. Safe for analog/digital sensor reads only.                   |
 
+> **ESP32-S3 note:** GPIO 34–38 are output-capable on the S3. However, if PSRAM is fitted (N8 variant), GPIO **35, 36, 37** are consumed by the Octal PSRAM interface and must not be used for any purpose — see the S3-specific rows below.
+
+#### ESP32-S3 only — PSRAM (conditionally blocked)
+
+| GPIO(s) | Reason |
+|---|---|
+| **35, 36, 37** | ⛔ Octal PSRAM control pins (CS, CK, DQS). Only blocked when PSRAM is enabled at compile time (`BOARD_HAS_PSRAM` / `CONFIG_SPIRAM_SUPPORT`). On non-PSRAM S3 boards these pins are safe. |
+
+#### ESP32-S3 only — JTAG (advisory)
+
+| GPIO(s) | Reason |
+|---|---|
+| **39, 40, 41, 42** | ⚠️ USB JTAG (TMS, TCK, TDI, TDO). Can be used as GPIO if JTAG is disabled in eFuse, but risky otherwise. |
+
 ---
 
 ## 5. Porting Caveats

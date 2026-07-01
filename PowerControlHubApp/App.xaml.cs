@@ -1,7 +1,8 @@
-﻿using PowerControlHubApp.Services;
+﻿using Microsoft.Extensions.Logging;
+using PowerControlHubApp.Services;
+using static PowerControlHubApp.Internal.Constants;
 
 #if WINDOWS
-using static PowerControlHubApp.Internal.Constants;
 using WinRT.Interop;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -12,9 +13,27 @@ namespace PowerControlHubApp
 {
     public partial class App : Application
     {
-        public App(ThemeService themeService)
+        private readonly DashboardPoller _dashboardPoller;
+        private readonly ConfigPoller _configPoller;
+        private readonly SensorMetaCache _sensorMetaCache;
+        private readonly IConfigConnection _configConnection;
+        private readonly ILogger<App> _log;
+
+        public App(
+            ThemeService themeService,
+            DashboardPoller dashboardPoller,
+            ConfigPoller configPoller,
+            SensorMetaCache sensorMetaCache,
+            IConfigConnection configConnection,
+            ILogger<App> log)
         {
             InitializeComponent();
+            _dashboardPoller = dashboardPoller;
+            _configPoller = configPoller;
+            _sensorMetaCache = sensorMetaCache;
+            _configConnection = configConnection;
+            _log = log;
+
             // Apply after InitializeComponent so Application.Resources is populated.
             ThemeService.ApplySaved();
         }
@@ -28,6 +47,83 @@ namespace PowerControlHubApp
 #endif
 
             return window;
+        }
+
+        protected override void OnStart()
+        {
+            base.OnStart();
+
+            // Start background pollers
+            _dashboardPoller.Start();
+            _configPoller.Start();
+
+            // Startup orchestration: after first successful dashboard poll,
+            // fetch sensor meta data over the config connection so config pages are ready.
+            AttachStartupOrchestration();
+        }
+
+        protected override void OnSleep()
+        {
+            base.OnSleep();
+            _ = StopPollersAsync();
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            // Restart pollers when the app comes back to foreground
+            _dashboardPoller.Start();
+            _configPoller.Start();
+        }
+
+        private async Task StopPollersAsync()
+        {
+            await Task.WhenAll(
+                _dashboardPoller.StopAsync(),
+                _configPoller.StopAsync());
+        }
+
+        private void AttachStartupOrchestration()
+        {
+            EventHandler handler = null;
+            handler = async (sender, args) =>
+            {
+                _dashboardPoller.DataUpdated -= handler;
+
+                try
+                {
+                    _log.LogDebug(LogStartupMetaFetch);
+                    await _sensorMetaCache.RefreshAsync(_configConnection);
+                    _log.LogDebug(LogStartupMetaPopulated);
+                }
+                catch (Exception ex)
+                {
+                    _log.LogWarning(ex, LogMetaRefreshFailed);
+                }
+            };
+
+            if (_dashboardPoller.CurrentIndex != null)
+            {
+                _dashboardPoller.DataUpdated -= handler;
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        _log.LogDebug(LogStartupMetaAlready);
+                        await _sensorMetaCache.RefreshAsync(_configConnection);
+                        _log.LogDebug(LogStartupMetaPopulated);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.LogWarning(ex, LogMetaRefreshFailed);
+                    }
+                });
+            }
+            else
+            {
+                _dashboardPoller.DataUpdated += handler;
+            }
         }
 
 #if WINDOWS

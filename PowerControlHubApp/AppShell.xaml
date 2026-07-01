@@ -20,6 +20,18 @@
         ContentTemplate="{DataTemplate views:RelayConfigPage}" />
 
     <ShellContent
+        x:Name="SensorConfigPage"
+        Title="Local Sens."
+        Route="SensorConfigPage"
+        ContentTemplate="{DataTemplate views:LocalSensorConfigPage}" />
+
+    <ShellContent
+        x:Name="ExternalSensorConfigPage"
+        Title="Ext. Sens."
+        Route="ExternalSensorConfigPage"
+        ContentTemplate="{DataTemplate views:ExternalSensorConfigPage}" />
+
+    <ShellContent
         x:Name="SettingsPage"
         Title="Settings"
         Route="SettingsPage"

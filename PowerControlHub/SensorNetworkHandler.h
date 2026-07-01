@@ -19,9 +19,10 @@
 
 #include "INetworkCommandHandler.h"
 #include "SensorController.h"
+#include "BaseConfigCommandHandler.h"
 
 
-class SensorNetworkHandler : public INetworkCommandHandler
+class SensorNetworkHandler : public INetworkCommandHandler, public BaseConfigCommandHandler
 {
 private:
     SensorController* _sensorController;

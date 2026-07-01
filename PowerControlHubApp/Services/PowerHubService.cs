@@ -1,9 +1,5 @@
-using System.Net.Http.Json;
-using System.Net.Sockets;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
-using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Services;
 
@@ -26,287 +22,145 @@ public class DeviceResponseException : Exception
 /// </summary>
 public class PowerHubService
 {
+    private readonly IDashboardConnection _dashboardConnection;
+    private readonly IConfigConnection _configConnection;
 
-    private HttpClient _client;
-    private SocketsHttpHandler _handler;
-    private string _baseUrl = string.Empty;
+    public PowerHubService(IDashboardConnection dashboardConnection, IConfigConnection configConnection)
+    {
+        _dashboardConnection = dashboardConnection ?? throw new ArgumentNullException(nameof(dashboardConnection));
+        _configConnection = configConnection ?? throw new ArgumentNullException(nameof(configConnection));
+    }
 
-    public string BaseUrl => _baseUrl;
+    public bool IsConfigured => _dashboardConnection.IsConfigured;
+
+    public string BaseUrl => _dashboardConnection is DashboardConnection dc ? dc.BaseUrl : string.Empty;
 
     public void Configure(string ipAddress, int port)
     {
-        _client?.Dispose();
-        _handler?.Dispose();
+        if (_dashboardConnection is DashboardConnection dc)
+            dc.Configure(ipAddress, port);
 
-        _baseUrl = $"http://{ipAddress}:{port}";
-        _handler = CreateHandler();
-        _client  = new HttpClient(_handler, disposeHandler: false)
-        {
-            Timeout     = TimeSpan.FromSeconds(SecondsTen),
-            BaseAddress = new Uri(_baseUrl + ForwardSlash)
-        };
-
-        // Tell the firmware to keep the TCP socket open after each response.
-        // WifiServer.cpp checks for both of these headers before granting a
-        // persistent slot (MaxPersistentClients = 1, PersistentTimeoutMs = 30 s).
-        _client.DefaultRequestHeaders.ConnectionClose = false;
-        _client.DefaultRequestHeaders.TryAddWithoutValidation(UserAgentKey, UserAgentValue);
-        _client.DefaultRequestHeaders.TryAddWithoutValidation(ConnectionTypeKey, ConnectionTypePersistent);
+        if (_configConnection is ConfigConnection cc)
+            cc.Configure(ipAddress, port);
     }
 
-    public bool IsConfigured => _client != null;
-
-    /// <summary>
-    /// Creates a <see cref="SocketsHttpHandler"/> that maintains a persistent
-    /// TCP connection to the device.  A callback
-    /// enables OS-level TCP keep-alive probes so the connection survives the
-    /// idle gap between poll cycles without being silently dropped by the device
-    /// or any intermediate NAT/router.
-    /// </summary>
-    private static SocketsHttpHandler CreateHandler()
+    public Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
     {
-        var handler = new SocketsHttpHandler
-        {
-            // Must exceed the firmware's PersistentTimeoutMs (30 s) so the .NET pool
-            // never races to close the socket before the device's keep-alive window expires.
-            PooledConnectionIdleTimeout = TimeSpan.FromSeconds(SecondsSixty),
-            PooledConnectionLifetime = Timeout.InfiniteTimeSpan,
-            ConnectTimeout = TimeSpan.FromSeconds(SecondsFive),
-            MaxConnectionsPerServer = MaximumPermanentConnections,
-            ConnectCallback = async (context, ct) =>
-                {
-                    var socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
-                    {
-                        // Disable Nagle — send small command packets immediately
-                        NoDelay = true
-                    };
-
-                    // Enable TCP keep-alive so the OS detects a silently-dropped link
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, SecondsTen);  // first probe after 10 s idle
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, SecondsFive);  // re-probe every 5 s
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, SecondsThree); // drop after 3 missed probes
-
-                    await socket.ConnectAsync(context.DnsEndPoint, ct);
-                    return new NetworkStream(socket, ownsSocket: true);
-                }
-        };
-
-        return handler;
+        return _dashboardConnection.GetDashboardDataAsync(ct);
     }
 
-    /// <summary>
-    /// Fetches relay and sensor data from GET /api/index.
-    /// Returns (relays, sensors) or throws on network / parse failure.
-    /// </summary>
-    public async Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
+    public Task<List<SensorTypeDescriptorModel>> GetSensorMetaAsync(CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string json = await _client!.GetStringAsync(RouteApiIndex, ct);
-
-        try
-        {
-            IndexModel result = JsonSerializer.Deserialize<IndexModel>(json, JsonOptions);
-
-            for (int i = 0; i < result.Relays.Count; i++)
-            {
-                // Populate the RelayModel's IsOn property based on the bitfield in SystemModel.RelayState
-                result.Relays[i].Index = i;
-            }
-
-            return result;
-        }
-        catch (JsonException ex)
-        {
-            throw new DeviceResponseException(
-                $"Device returned invalid JSON: {ex.Message}", ex);
-        }
+        return _configConnection.GetSensorMetaAsync(ct);
     }
 
-    /// <summary>
-    /// Sends GET /api/relay/R3?{index}={state} to toggle a relay.
-    /// Returns true when the device acknowledges success.
-    /// </summary>
-    public async Task<bool> SetRelayStateAsync(int relayIndex, bool on, CancellationToken ct = default)
+    public Task<bool> SetRelayStateAsync(int relayIndex, bool on, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        int state = on ? 1 : 0;
-        string url = $"api/relay/R3?{relayIndex}={state}";
-        HttpResponseMessage response = await _client!.GetAsync(url, ct);
-
-        return response.IsSuccessStatusCode;
+        return _configConnection.SetRelayStateAsync(relayIndex, on, ct);
     }
 
-    /// <summary>
-    /// Renames relay at <paramref name="index"/> via POST /api/relay/R6.
-    /// <paramref name="shortName"/> max 5 chars; <paramref name="longName"/> max 20 chars.
-    /// </summary>
-    public async Task<bool> RenameRelayAsync(int index, string shortName, string longName, CancellationToken ct = default)
+    public Task<bool> RenameRelayAsync(int index, string shortName, string longName, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string value = string.IsNullOrWhiteSpace(longName) ? shortName : $"{shortName}|{longName}";
-        string url = $"api/relay/R6?{index}={Uri.EscapeDataString(value)}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.RenameRelayAsync(index, shortName, longName, ct);
     }
 
-    /// <summary>
-    /// Sets the active button colour for relay at <paramref name="index"/> via POST /api/relay/R7.
-    /// 0=Blue 1=Green 2=Orange 3=Purple 4=Red 5=Yellow 255=clear.
-    /// </summary>
-    public async Task<bool> SetRelayColorAsync(int index, int colorIndex, CancellationToken ct = default)
+    public Task<bool> SetRelayColorAsync(int index, int colorIndex, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string url = $"api/relay/R7?{index}={colorIndex}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.SetRelayColorAsync(index, colorIndex, ct);
     }
 
-    /// <summary>
-    /// Sets the power-on default state for relay at <paramref name="index"/> via POST /api/relay/R8.
-    /// </summary>
-    public async Task<bool> SetRelayDefaultStateAsync(int index, int defaultState, CancellationToken ct = default)
+    public Task<bool> SetRelayDefaultStateAsync(int index, int defaultState, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string url = $"api/relay/R8?{index}={defaultState}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.SetRelayDefaultStateAsync(index, defaultState, ct);
     }
 
-    /// <summary>
-    /// Links relay at <paramref name="index"/> to <paramref name="linkedIndex"/> via POST /api/relay/R9.
-    /// Pass 255 to unlink.
-    /// </summary>
-    public async Task<bool> LinkRelayAsync(int index, int linkedIndex, CancellationToken ct = default)
+    public Task<bool> LinkRelayAsync(int index, int linkedIndex, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string url = $"api/relay/R9?{index}={linkedIndex}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.LinkRelayAsync(index, linkedIndex, ct);
     }
 
-    /// <summary>
-    /// Sets the action type for relay at <paramref name="index"/> via POST /api/relay/R10.
-    /// 0=Default 1=Horn 2=NightRelay.
-    /// </summary>
-    public async Task<bool> SetRelayActionTypeAsync(int index, int actionType, CancellationToken ct = default)
+    public Task<bool> SetRelayActionTypeAsync(int index, int actionType, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string url = $"api/relay/R10?{index}={actionType}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.SetRelayActionTypeAsync(index, actionType, ct);
     }
 
-    /// <summary>
-    /// Sets the GPIO pin for relay at <paramref name="index"/> via POST /api/relay/R11.
-    /// Pass 255 to disable.
-    /// </summary>
-    public async Task<bool> SetRelayPinAsync(int index, int pin, CancellationToken ct = default)
+    public Task<bool> SetRelayPinAsync(int index, int pin, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        string url = $"api/relay/R11?{index}={pin}";
-        HttpResponseMessage response = await _client!.PostAsync(url, null, ct);
-        return await IsSuccessResponseAsync(response, ct);
+        return _configConnection.SetRelayPinAsync(index, pin, ct);
     }
 
-    /// <summary>
-    /// Persists all in-memory config to EEPROM via POST /api/config/C0.
-    /// </summary>
-    public async Task<bool> SaveSettingsAsync(CancellationToken ct = default)
+    public Task<List<ExternalSensorConfigModel>> GetExternalSensorsAsync(CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        HttpResponseMessage response = await _client!.PostAsync(RouteSaveConfig, null, ct);
-        return response.IsSuccessStatusCode;
+        return _configConnection.GetExternalSensorsAsync(ct);
     }
 
-    private static async Task<bool> IsSuccessResponseAsync(HttpResponseMessage response, CancellationToken ct)
+    public Task<bool> SetExternalSensorCoreAsync(int index, int sensorId, string name, string mqttName, string mqttSlug, CancellationToken ct = default)
     {
-        if (!response.IsSuccessStatusCode)
-            return false;
-
-        string body = await response.Content.ReadAsStringAsync(ct);
-
-        try
-        {
-            using JsonDocument doc = JsonDocument.Parse(body);
-            return doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement s) && s.GetBoolean();
-        }
-        catch
-        {
-            return response.IsSuccessStatusCode;
-        }
+        return _configConnection.SetExternalSensorCoreAsync(index, sensorId, name, mqttName, mqttSlug, ct);
     }
 
-    /// <summary>
-    /// Queries the device OTA status via GET /api/system/F13.
-    /// Returns null when OTA is not supported by this firmware build.
-    /// </summary>
-    public async Task<OtaStatusModel> GetOtaStatusAsync(CancellationToken ct = default)
+    public Task<bool> SetExternalSensorMqttAsync(int index, string typeSlug, string deviceClass, string unit, bool isBinary, CancellationToken ct = default)
     {
-        try
-        {
-            EnsureConfigured();
-
-            HttpResponseMessage response = await _client!.GetAsync(RouteOtaUpdate, ct);
-
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            string body = await response.Content.ReadAsStringAsync(ct);
-            using JsonDocument doc = JsonDocument.Parse(body);
-
-            // Device returns {"error":…} when OTA is compiled out
-            if (doc.RootElement.TryGetProperty(ErrorKey, out _))
-                return null;
-
-            return JsonSerializer.Deserialize<OtaStatusModel>(body, JsonOptions);
-        }
-        catch
-        {
-            return null;
-        }
+        return _configConnection.SetExternalSensorMqttAsync(index, typeSlug, deviceClass, unit, isBinary, ct);
     }
 
-    /// <summary>
-    /// Triggers an OTA check (and optionally install) via POST /api/system/F12.
-    /// The device starts checking in the background; poll GetOtaStatusAsync for progress.
-    /// </summary>
-    public async Task<bool> TriggerOtaInstallAsync(CancellationToken ct = default)
+    public Task<bool> RemoveExternalSensorAsync(int index, CancellationToken ct = default)
     {
-        EnsureConfigured();
-
-        try
-        {
-            // F12 is a POST with no body; pass apply=1 so the device installs immediately
-            HttpResponseMessage response = await _client!.PostAsync(
-                RouteUpdateOta, null, ct);
-            return response.IsSuccessStatusCode;
-        }
-        catch
-        {
-            return false;
-        }
+        return _configConnection.RemoveExternalSensorAsync(index, ct);
     }
 
-    private void EnsureConfigured()
+    public Task<bool> RenameExternalSensorAsync(int index, string name, CancellationToken ct = default)
     {
-        if (_client == null)
-            throw new InvalidOperationException(PowerHubNotConfigured);
+        return _configConnection.RenameExternalSensorAsync(index, name, ct);
     }
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public Task<List<LocalSensorConfigModel>> GetLocalSensorsAsync(CancellationToken ct = default)
     {
-        PropertyNameCaseInsensitive = true,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
+        return _configConnection.GetLocalSensorsAsync(ct);
+    }
+
+    public Task<bool> AddUpdateLocalSensorAsync(int index, int type, sbyte opt0, sbyte opt1, CancellationToken ct = default)
+    {
+        return _configConnection.AddUpdateLocalSensorAsync(index, type, opt0, opt1, ct);
+    }
+
+    public Task<bool> RemoveLocalSensorAsync(int index, CancellationToken ct = default)
+    {
+        return _configConnection.RemoveLocalSensorAsync(index, ct);
+    }
+
+    public Task<bool> RenameLocalSensorAsync(int index, string name, CancellationToken ct = default)
+    {
+        return _configConnection.RenameLocalSensorAsync(index, name, ct);
+    }
+
+    public Task<bool> SetLocalSensorPinAsync(int index, int slot, byte pin, CancellationToken ct = default)
+    {
+        return _configConnection.SetLocalSensorPinAsync(index, slot, pin, ct);
+    }
+
+    public Task<bool> SetLocalSensorEnabledAsync(int index, bool enabled, CancellationToken ct = default)
+    {
+        return _configConnection.SetLocalSensorEnabledAsync(index, enabled, ct);
+    }
+
+    public Task<bool> SetLocalSensorOptionAsync(int index, int slot, int group, int value, CancellationToken ct = default)
+    {
+        return _configConnection.SetLocalSensorOptionAsync(index, slot, group, value, ct);
+    }
+
+    public Task<bool> SaveSettingsAsync(CancellationToken ct = default)
+    {
+        return _configConnection.SaveSettingsAsync(ct);
+    }
+
+    public Task<OtaStatusModel> GetOtaStatusAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetOtaStatusAsync(ct);
+    }
+
+    public Task<bool> TriggerOtaInstallAsync(CancellationToken ct = default)
+    {
+        return _configConnection.TriggerOtaInstallAsync(ct);
+    }
 }

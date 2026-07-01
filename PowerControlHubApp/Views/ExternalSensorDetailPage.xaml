@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.ExternalSensorDetailPage"
+             Title="External Sensor"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="Auto,*" BackgroundColor="{DynamicResource AppBarBg}">
+            <Button Grid.Column="0" Text="‹" BackgroundColor="Transparent" TextColor="{DynamicResource AppBarText}" Clicked="OnBackClicked" />
+            <Label Grid.Column="1" Text="External Sensor" TextColor="{DynamicResource AppBarText}" FontSize="17" FontAttributes="Bold" VerticalOptions="Center" />
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Label Text="IDENTITY" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
+                <Entry Placeholder="Name" Text="{Binding Name}" />
+                <Label Text="Sensor Type" FontAttributes="Bold" FontSize="12" TextColor="{DynamicResource AppAccent}" />
+                <Picker ItemsSource="{Binding SensorTypeOptions}"
+                        SelectedIndex="{Binding SelectedSensorTypeIndex}"
+                        Title="Select sensor type" />
+
+                <Label Text="MQTT" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
+                <Entry Placeholder="MQTT Name" Text="{Binding MqttName}" />
+                <Entry Placeholder="MQTT Slug" Text="{Binding MqttSlug}" />
+                <Entry Placeholder="MQTT Type" Text="{Binding MqttType}" />
+                <Entry Placeholder="MQTT Device Class" Text="{Binding MqttDeviceClass}" />
+                <Entry Placeholder="MQTT Unit" Text="{Binding MqttUnit}" />
+                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                    <Label Text="Binary" VerticalOptions="Center" />
+                    <Switch IsToggled="{Binding MqttIsBinary}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" Padding="16,0,16,12" ColumnDefinitions="*,*" ColumnSpacing="10">
+            <Button Grid.Column="0" Text="🗑 Remove" Command="{Binding RemoveCommand}" IsEnabled="{Binding IsNotBusy}" BackgroundColor="{DynamicResource AppCardStroke}" TextColor="{DynamicResource AppLabelPrimary}" />
+            <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding IsNotBusy}" />
+        </Grid>
+    </Grid>
+</ContentPage>

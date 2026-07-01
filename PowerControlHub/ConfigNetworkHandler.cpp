@@ -161,8 +161,6 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 			}
 			else
 			{
-				if (color < DefaultValue)
-					color += 2;
 				result = (_relayController->setButtonColor(relayIndex, color) == RelayResult::Success)
 					? ConfigResult::Success : ConfigResult::Failed;
 			}

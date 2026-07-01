@@ -151,6 +151,7 @@ Selected when `CONFIG_IDF_TARGET_ESP32S3` is defined by the toolchain.
 | GPIO | Reason |
 |---|---|
 | 26, 27, 28, 29, 30, 31, 32 | Connected to internal Octal flash/PSRAM — any access causes immediate crash |
+| 35, 36, 37 | Octal PSRAM control pins (CS, CK, DQS) — only blocked when `BOARD_HAS_PSRAM` or `CONFIG_SPIRAM_SUPPORT` is defined (i.e. PSRAM is fitted) |
 
 #### Hard-blocked for output uses only (safe for input)
 
@@ -166,6 +167,10 @@ Selected when `CONFIG_IDF_TARGET_ESP32S3` is defined by the toolchain.
 | 3 | UART0 RX |
 | 19 | USB D− |
 | 20 | USB D+ |
+| 39 | JTAG TMS — usable as GPIO if JTAG disabled in eFuse |
+| 40 | JTAG TCK — usable as GPIO if JTAG disabled in eFuse |
+| 41 | JTAG TDI — usable as GPIO if JTAG disabled in eFuse |
+| 42 | JTAG TDO — usable as GPIO if JTAG disabled in eFuse |
 | 45 | Boot-mode strapping |
 | 46 | Boot-mode strapping |
 
