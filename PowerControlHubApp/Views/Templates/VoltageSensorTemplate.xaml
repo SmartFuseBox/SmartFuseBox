@@ -5,7 +5,11 @@
     xmlns:models="clr-namespace:PowerControlHubApp.Models"
     x:Class="PowerControlHubApp.Views.Templates.VoltageSensorTemplate">
 
-    <DataTemplate x:Key="VoltageSensorTemplate" x:DataType="models:SensorModel">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Resources/Styles/SensorCardStyles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <DataTemplate x:Key="VoltageSensorTemplate">
         <Border Style="{StaticResource SensorCardBorder}" Margin="0">
             <VerticalStackLayout Spacing="0">
 

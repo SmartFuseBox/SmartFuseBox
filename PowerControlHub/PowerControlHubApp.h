@@ -42,6 +42,7 @@
 #include "NextionConfigCommandHandler.h"
 #include "ExternalSensorConfigCommandHandler.h"
 #include "ExternalSensorNetworkHandler.h"
+#include "SensorConfigNetworkHandler.h"
 #include "BluetoothRadioBridge.h"
 #include "IBluetoothRadio.h"
 #include "WifiController.h"
@@ -156,6 +157,7 @@ private:
 	SchedulerCommandHandler _schedulerCommandHandler;
 	SchedulerNetworkHandler _schedulerNetworkHandler;
 	ExternalSensorNetworkHandler _externalSensorNetworkHandler;
+	SensorConfigNetworkHandler _sensorConfigNetworkHandler;
 	WifiCommandBridge _wifiCommandBridge;
 
 	// Persistent storage for the serial handler array so WifiCommandBridge

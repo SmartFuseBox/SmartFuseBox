@@ -322,6 +322,9 @@
       <Filter>Header Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="PowerControlHub.ino" />
+    <ClCompile Include="SensorConfigNetworkHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SoundCommandHandler.h">
@@ -707,6 +710,12 @@
     </ClInclude>
     <ClInclude Include="ChunkedWifiClient.h">
       <Filter>Header Files\Wifi</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorConfigNetworkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorConfig.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

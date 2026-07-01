@@ -338,7 +338,7 @@ Route: `/api/config/{command}` (shares the config route)
 
 | Command | Example | Purpose |
 |---|---|---|
-| `S0` — Get All Sensor Config | `S0` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;u0=<opt1_0>;u1=<opt1_1>;o0=<opt2_0>;o1=<opt2_1>;en=<0\|1>`. The labels in the response are read-only aliases: `p0`/`p1` = `pins[0]`/`pins[1]`; `u0`/`u1` = `options1[0]`/`options1[1]` (signed byte); `o0`/`o1` = `options2[0]`/`options2[1]` (signed 16-bit). No params. |
+| `S0` — Get All Sensor Config | `S0` or `S0?meta=1` | Returns one `S0` frame per configured sensor: `i=<idx>;t=<type>;n=<name>;p0=<pin>;p1=<pin>;u0=<opt1_0>;u1=<opt1_1>;o0=<opt2_0>;o1=<opt2_1>;en=<0\|1>`. The labels in the response are read-only aliases: `p0`/`p1` = `pins[0]`/`pins[1]`; `u0`/`u1` = `options1[0]`/`options1[1]` (signed byte); `o0`/`o1` = `options2[0]`/`options2[1]` (signed 16-bit). **WiFi only:** Append `?meta=1` to include a `"meta"` block with sensor type descriptors (field labels, types, ranges, defaults) for self-describing dynamic UI. No serial params. |
 | `S1` — Add / Update Sensor | `S1:i=<idx>;t=<type>;o0=<val>;o1=<val>` | Add or update sensor at index `i`. **Only four params are accepted:** `i` (sensor index), `t` (type — `SensorIdList` enum value), `o0` (writes `options1[0]`), `o1` (writes `options1[1]`). Pins and all other options must be set separately via `S4` and `S6` **after** `S1`. All four params are required. ACK carries `reboot=1`. |
 | `S2` — Remove Sensor | `S2:v=0` | Remove (clear) sensor at index. Param: `v=<idx>`. ACK carries `reboot=1`. |
 | `S3` — Rename Sensor | `S3:0=Bilge Pump` | Rename sensor at index. Param: `<idx>=<name>`. ACK carries `reboot=1`. |

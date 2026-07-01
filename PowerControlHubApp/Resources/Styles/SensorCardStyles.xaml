@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Sensor card container -->
+    <Style x:Key="SensorCardBorder" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{DynamicResource AppSensorCardBg}" />
+        <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+        <Setter Property="Padding" Value="10" />
+    </Style>
+
+    <!-- Sensor card header (sensor name) -->
+    <Style x:Key="SensorCardHeader" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{DynamicResource AppLabelPrimary}" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="LineBreakMode" Value="TailTruncation" />
+    </Style>
+
+    <!-- Primary sensor value (large) -->
+    <Style x:Key="SensorPrimaryValue" TargetType="Label">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <!-- Secondary field label -->
+    <Style x:Key="SensorFieldLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
+
+    <!-- Secondary label in grid row -->
+    <Style x:Key="SensorSecondaryLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+        <Setter Property="HorizontalTextAlignment" Value="End" />
+    </Style>
+
+    <!-- Secondary value in grid row -->
+    <Style x:Key="SensorSecondaryValue" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{DynamicResource AppLabelPrimary}" />
+        <Setter Property="HorizontalTextAlignment" Value="Start" />
+    </Style>
+
+    <!-- Thin divider line -->
+    <Style x:Key="SensorDivider" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Color" Value="{DynamicResource AppCardStroke}" />
+        <Setter Property="Opacity" Value="0.4" />
+        <Setter Property="Margin" Value="0,6" />
+    </Style>
+</ResourceDictionary>

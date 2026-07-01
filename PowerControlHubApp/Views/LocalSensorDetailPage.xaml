@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.LocalSensorDetailPage"
+             Title="Sensor"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="SectionCard" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppCardBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppCardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="14,12" />
+                <Setter Property="Margin" Value="0,0,0,12" />
+            </Style>
+
+            <Style x:Key="SectionTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource AppAccent}" />
+                <Setter Property="Margin" Value="0,0,0,10" />
+            </Style>
+
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="{DynamicResource AppLabelMuted}" />
+                <Setter Property="Margin" Value="0,0,0,3" />
+            </Style>
+
+            <Style x:Key="FieldBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{DynamicResource AppEntryBg}" />
+                <Setter Property="Stroke" Value="{DynamicResource AppEntryStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="FieldEntry" TargetType="Entry">
+                <Setter Property="TextColor" Value="{DynamicResource AppEntryText}" />
+                <Setter Property="PlaceholderColor" Value="{DynamicResource AppPlaceholderText}" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="Margin" Value="10,0" />
+            </Style>
+
+            <Style x:Key="FieldPicker" TargetType="Picker">
+                <Setter Property="TextColor" Value="{DynamicResource AppEntryText}" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TitleColor" Value="{DynamicResource AppPlaceholderText}" />
+                <Setter Property="Margin" Value="10,0" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <!-- Top bar -->
+        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="Auto,*"
+              BackgroundColor="{DynamicResource AppBarBg}">
+            <Button Grid.Column="0"
+                    Text="‹"
+                    FontSize="20"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource AppBarText}"
+                    Padding="0,0,8,0"
+                    Clicked="OnBackClicked" />
+            <Label Grid.Column="1"
+                   Text="{Binding PageTitle}"
+                   TextColor="{DynamicResource AppBarText}"
+                   FontSize="17"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Scrollable form -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding IsNotBusy}">
+            <VerticalStackLayout Padding="16,14" Spacing="0">
+
+                <!-- Identity -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="IDENTITY" Style="{StaticResource SectionTitle}" />
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Name}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="e.g. Bilge Pump"
+                                       MaxLength="20"
+                                       ReturnType="Done" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Sensor Type" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Picker ItemsSource="{Binding SensorTypeOptions}"
+                                        SelectedIndex="{Binding SelectedTypeIndex}"
+                                        Style="{StaticResource FieldPicker}" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Hardware -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="HARDWARE" Style="{StaticResource SectionTitle}" />
+
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Pin0Visible}">
+                            <Label Text="{Binding Pin0Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Pin0Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Pin0Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Pin1Visible}">
+                            <Label Text="{Binding Pin1Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Pin1Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Pin1Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Done" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Options (visible based on sensor type) -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="OPTIONS" Style="{StaticResource SectionTitle}" />
+
+                        <!-- Option 1-0 -->
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Opt1_0Visible}">
+                            <Label Text="{Binding Opt1_0Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Opt1_0Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Opt1_0Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Option 1-1 -->
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Opt1_1Visible}">
+                            <Label Text="{Binding Opt1_1Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Opt1_1Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Opt1_1Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Option 2-0 -->
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Opt2_0Visible}">
+                            <Label Text="{Binding Opt2_0Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Opt2_0Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Opt2_0Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Option 2-1 -->
+                        <VerticalStackLayout Spacing="3"
+                                         IsVisible="{Binding Opt2_1Visible}">
+                            <Label Text="{Binding Opt2_1Label}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource FieldBorder}">
+                                <Entry Text="{Binding Opt2_1Display}"
+                                       Style="{StaticResource FieldEntry}"
+                                       Placeholder="{Binding Opt2_1Placeholder}"
+                                       Keyboard="Numeric"
+                                       ReturnType="Next" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Enabled -->
+                <Border Style="{StaticResource SectionCard}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="ENABLED" Style="{StaticResource SectionTitle}" />
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                            <Label Text="Sensor Enabled" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                            <Switch IsToggled="{Binding IsEnabled}" OnColor="{DynamicResource AppSwitchOn}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom bar: status + remove + save -->
+        <Grid Grid.Row="2" Padding="16,0,16,12" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10"
+              IsVisible="{Binding IsNotBusy}">
+
+            <!-- Status message -->
+            <Label Grid.Column="0"
+                   Text="{Binding StatusMessage}"
+                   IsVisible="{Binding HasStatus}"
+                   FontSize="13"
+                   VerticalOptions="Center"
+                   LineBreakMode="TailTruncation">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsError}" Value="True">
+                        <Setter Property="TextColor" Value="#cc6666" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsError}" Value="False">
+                        <Setter Property="TextColor" Value="#44cc44" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <Button Grid.Column="1" Text="🗑 Remove" Command="{Binding RemoveCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="{DynamicResource AppCardStroke}"
+                    TextColor="{DynamicResource AppLabelPrimary}" />
+            <Button Grid.Column="2" Text="Save" Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+        </Grid>
+    </Grid>
+</ContentPage>

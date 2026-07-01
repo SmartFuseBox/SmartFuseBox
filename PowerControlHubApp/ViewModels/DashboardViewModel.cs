@@ -1,13 +1,10 @@
-using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Windows.Input;
 using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
@@ -57,7 +54,6 @@ public class DashboardViewModel : INotifyPropertyChanged
         }
     }
 
-    // ── System status properties (displayed in the dashboard status bar) ───
     private string _systemFreeMemory = DoubleDash;
     private string _systemCpuUsage = DoubleDash;
     private string _systemTime = DoubleDash;
@@ -153,15 +149,15 @@ public class DashboardViewModel : INotifyPropertyChanged
     {
         get => _isConnected;
         set
-        { 
-            _isConnected = value; 
-            OnPropertyChanged(); 
-            OnPropertyChanged(nameof(IsDisconnected)); 
-            OnPropertyChanged(nameof(StatusColor)); 
-            OnPropertyChanged(nameof(HasRelays)); 
-            OnPropertyChanged(nameof(HasNoRelays)); 
-            OnPropertyChanged(nameof(HasSensors)); 
-            OnPropertyChanged(nameof(HasNoSensors)); 
+        {
+            _isConnected = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsDisconnected));
+            OnPropertyChanged(nameof(StatusColor));
+            OnPropertyChanged(nameof(HasRelays));
+            OnPropertyChanged(nameof(HasNoRelays));
+            OnPropertyChanged(nameof(HasSensors));
+            OnPropertyChanged(nameof(HasNoSensors));
         }
     }
 
@@ -172,20 +168,20 @@ public class DashboardViewModel : INotifyPropertyChanged
     public string StatusMessage
     {
         get => _statusMessage;
-        set 
-        { 
-            _statusMessage = value; 
-            OnPropertyChanged(); 
+        set
+        {
+            _statusMessage = value;
+            OnPropertyChanged();
         }
     }
 
     public string DeviceUrl
     {
         get => _deviceUrl;
-        set 
+        set
         {
             _deviceUrl = value;
-            OnPropertyChanged(); 
+            OnPropertyChanged();
         }
     }
 
@@ -261,7 +257,7 @@ public class DashboardViewModel : INotifyPropertyChanged
                 {
                     UpdateSystem(index.System);
                     UpdateRelays(index.Relays);
-                    UpdateSensors(index.Sensors);
+                    UpdateSensors(index);
                     IsConnected = true;
                     StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
                 }
@@ -319,7 +315,7 @@ public class DashboardViewModel : INotifyPropertyChanged
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
             }
             catch (TaskCanceledException)
-            { 
+            {
                 break;
             }
         }
@@ -398,8 +394,14 @@ public class DashboardViewModel : INotifyPropertyChanged
         _relayStore.ReplaceAll(vms);
     }
 
-    private static void UpdateSensors(SensorsModel incoming)
+    private void UpdateSensors(IndexModel index)
     {
+        Sensors.Clear();
+
+        foreach (SensorsModel sensor in index.SensorsList)
+        {
+            Sensors.Add(sensor);
+        }
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

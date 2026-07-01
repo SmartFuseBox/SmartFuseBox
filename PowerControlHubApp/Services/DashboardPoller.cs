@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using System.Threading.Channels;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PowerControlHubApp.Models.Json;
 using static PowerControlHubApp.Internal.Constants;
@@ -11,22 +9,27 @@ namespace PowerControlHubApp.Services;
 /// Background poller that keeps a single copy of the latest IndexModel and
 /// notifies consumers via INotifyPropertyChanged / DataUpdated event.
 /// </summary>
-public class DashboardPoller : BackgroundService, IDashboardProvider
+public class DashboardPoller : IDashboardProvider, IDisposable
 {
-    private readonly PowerHubService _service;
+    private readonly IDashboardConnection _connection;
     private readonly ILogger<DashboardPoller> _log;
     private readonly TimeSpan _interval;
     private IndexModel _currentIndex;
+    private CancellationTokenSource _cts;
+    private Task _pollerTask;
+    private readonly object _lock = new();
 
-    public DashboardPoller(PowerHubService service, ILogger<DashboardPoller> log)
-        : this(service, log, TimeSpan.FromMilliseconds(DefaultIntervalMs)) { }
+    public DashboardPoller(IDashboardConnection connection, ILogger<DashboardPoller> log)
+        : this(connection, log, TimeSpan.FromMilliseconds(DefaultIntervalMs)) { }
 
-    public DashboardPoller(PowerHubService service, ILogger<DashboardPoller> log, TimeSpan interval)
+    public DashboardPoller(IDashboardConnection connection, ILogger<DashboardPoller> log, TimeSpan interval)
     {
-        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _log = log ?? throw new ArgumentNullException(nameof(log));
         _interval = interval;
     }
+
+    public bool IsRunning => _pollerTask is { IsCompleted: false };
 
     public IndexModel CurrentIndex
     {
@@ -48,18 +51,57 @@ public class DashboardPoller : BackgroundService, IDashboardProvider
     protected void OnPropertyChanged(string name)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    /// <summary>
+    /// Starts the polling loop. Safe to call multiple times; subsequent calls are no-ops.
+    /// </summary>
+    public void Start()
     {
-        _log.LogDebug(LogDashboardStarted, _interval.TotalMilliseconds);
+        lock (_lock)
+        {
+            if (IsRunning)
+                return;
 
+            _cts = new CancellationTokenSource();
+            _pollerTask = RunLoopAsync(_cts.Token);
+        }
+
+        _log.LogDebug(LogDashboardStarted, _interval.TotalMilliseconds);
+    }
+
+    /// <summary>
+    /// Signals the polling loop to stop and awaits completion.
+    /// </summary>
+    public async Task StopAsync()
+    {
+        Task task;
+
+        lock (_lock)
+        {
+            if (_cts == null)
+                return;
+
+            _cts.Cancel();
+            task = _pollerTask ?? Task.CompletedTask;
+            _cts.Dispose();
+            _cts = null;
+            _pollerTask = null;
+        }
+
+        await task;
+        _log.LogDebug(LogDashboardStopping);
+    }
+
+    private async Task RunLoopAsync(CancellationToken stoppingToken)
+    {
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                if (_service.IsConfigured)
+                if (_connection.IsConfigured)
                 {
-                    IndexModel index = await _service.GetDashboardDataAsync(stoppingToken);
+                    IndexModel index = await _connection.GetDashboardDataAsync(stoppingToken);
                     CurrentIndex = index;
+
                     _log.LogDebug(LogDashboardFetched, DateTimeOffset.Now);
                 }
                 else
@@ -69,7 +111,6 @@ public class DashboardPoller : BackgroundService, IDashboardProvider
             }
             catch (DeviceResponseException ex)
             {
-                // Firmware responded but payload was invalid — keep last known data
                 _log.LogWarning(ex, LogDeviceInvalidJson);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -90,7 +131,18 @@ public class DashboardPoller : BackgroundService, IDashboardProvider
                 break;
             }
         }
+    }
 
-        _log.LogDebug(LogDashboardStopping);
+    public void Dispose()
+    {
+        if (_cts != null)
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
+        }
+
+        _pollerTask = null;
+        GC.SuppressFinalize(this);
     }
 }

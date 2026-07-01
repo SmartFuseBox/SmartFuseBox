@@ -135,6 +135,7 @@ constexpr char WarningStatus[] = "W2";
 constexpr char WarningsClear[] = "W3";
 constexpr char WarningsAdd[] = "W4";
 
+constexpr char SensorConfigMeta[] = "meta";
 constexpr char SensorConfigGetAll[] = "S0";
 constexpr char SensorConfigAddUpdate[] = "S1";
 constexpr char SensorConfigRemove[] = "S2";
@@ -237,6 +238,7 @@ enum class SensorIdList : uint8_t
     BinaryPresenceSensor = 0x5,
     VoltageSensor = 0x6,
 
+    Count,
     None = 0xFF
 };
 

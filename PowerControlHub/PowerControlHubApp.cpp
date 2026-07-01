@@ -470,7 +470,7 @@ void PowerControlHubApp::configureWifiSupport(Config* config)
     // network command handlers
     INetworkCommandHandler* networkHandlers[] = { &_relayNetworkHandler, &_soundNetworkHandler, &_warningNetworkHandler,
         &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler, &_schedulerNetworkHandler,
-        &_externalSensorNetworkHandler, _webIndexNetworkHandler,
+        &_externalSensorNetworkHandler, &_sensorConfigNetworkHandler, _webIndexNetworkHandler,
         &_wifiCommandBridge
     };
     size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
@@ -486,6 +486,7 @@ void PowerControlHubApp::configureWifiSupport(Config* config)
         _sensorNetworkHandler,
         &_schedulerNetworkHandler,
         &_externalSensorNetworkHandler,
+        &_sensorConfigNetworkHandler,
     };
     uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);
     _wifiController.registerJsonVisitors(jsonVisitors, jsonVisitorCount);

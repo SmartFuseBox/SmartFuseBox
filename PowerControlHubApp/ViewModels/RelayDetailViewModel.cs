@@ -257,7 +257,10 @@ public class RelayDetailViewModel : INotifyPropertyChanged
             LongName = relay.LongName;
             Pin = relay.Pin;
             DefaultStateIndex = relay.DefaultState;
-            _colorIndex = relay.ButtonImage;
+            // Device stores Nextion picture IDs (2-7); convert to 0-based index for the UI
+            _colorIndex = relay.ButtonImage is >= NextionImageIdMin and <= NextionImageIdMax
+                ? relay.ButtonImage - NextionImageIdMin
+                : UnconfiguredPin;
             _actionType = relay.ActionType;
             _linkedIndex = relay.LinkedIndex;
 
@@ -315,7 +318,7 @@ public class RelayDetailViewModel : INotifyPropertyChanged
             if (_original == null || _original.DefaultState != DefaultStateIndex)
                 ok &= await _service.SetRelayDefaultStateAsync(_relayIndex, DefaultStateIndex);
 
-            if (_original == null || _original.ButtonImage != _colorIndex)
+            if (_original == null || NormalizedButtonImage(_original.ButtonImage) != _colorIndex)
                 ok &= await _service.SetRelayColorAsync(_relayIndex, _colorIndex);
 
             if (_original == null || _original.ActionType != _actionType)
@@ -352,6 +355,11 @@ public class RelayDetailViewModel : INotifyPropertyChanged
             IsBusy = false;
         }
     }
+
+    private static int NormalizedButtonImage(int deviceValue)
+        => deviceValue is >= NextionImageIdMin and <= NextionImageIdMax
+            ? deviceValue - NextionImageIdMin
+            : UnconfiguredPin;
 
     public event PropertyChangedEventHandler PropertyChanged;
 

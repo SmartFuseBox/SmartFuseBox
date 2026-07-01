@@ -55,6 +55,13 @@
                 <Setter Property="TitleColor" Value="{DynamicResource AppPlaceholderText}" />
                 <Setter Property="Margin" Value="10,0" />
             </Style>
+
+            <!-- Shadow used on the selected colour swatch for a subtle glow -->
+            <Shadow x:Key="ColorSwatchGlow"
+                    Brush="Black"
+                    Offset="0,0"
+                    Radius="8"
+                    Opacity="0.4" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -168,8 +175,9 @@
                                         Stroke="Transparent">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="0">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
@@ -182,12 +190,28 @@
                                         Stroke="Transparent">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="1">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="1" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                                <!-- Grey -->
+                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
+                                        StrokeShape="RoundRectangle 6" BackgroundColor="#888888"
+                                        Stroke="Transparent">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="2">
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="2" />
                                     </Border.GestureRecognizers>
                                 </Border>
                                 <!-- Orange -->
@@ -195,23 +219,10 @@
                                         StrokeShape="RoundRectangle 6" BackgroundColor="#dd7722"
                                         Stroke="Transparent">
                                     <Border.Triggers>
-                                        <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="2">
-                                            <Setter Property="Stroke" Value="White" />
-                                            <Setter Property="StrokeThickness" Value="2" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding SetColorCommand}" CommandParameter="2" />
-                                    </Border.GestureRecognizers>
-                                </Border>
-                                <!-- Purple -->
-                                <Border WidthRequest="38" HeightRequest="38" Margin="0,0,6,6"
-                                        StrokeShape="RoundRectangle 6" BackgroundColor="#8833cc"
-                                        Stroke="Transparent">
-                                    <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="3">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
@@ -224,8 +235,9 @@
                                         Stroke="Transparent">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="4">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
@@ -238,8 +250,9 @@
                                         Stroke="Transparent">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="5">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Border.GestureRecognizers>
@@ -252,8 +265,9 @@
                                         Stroke="Transparent">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding SelectedColorIndex}" Value="6">
-                                            <Setter Property="Stroke" Value="White" />
+                                            <Setter Property="Stroke" Value="Black" />
                                             <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="Shadow" Value="{StaticResource ColorSwatchGlow}" />
                                         </DataTrigger>
                                     </Border.Triggers>
                                     <Label Text="✕"
