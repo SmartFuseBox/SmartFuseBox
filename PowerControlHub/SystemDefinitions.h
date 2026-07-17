@@ -220,7 +220,7 @@ constexpr const char* compassDirections[16] = {
     "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"
 };
 
-constexpr uint16_t MaximumJsonResponseBufferSize = 1024;
+constexpr uint16_t MaximumJsonResponseBufferSize = 4096;
 
 /*
 * Unique IDs for different sensor types in the system.

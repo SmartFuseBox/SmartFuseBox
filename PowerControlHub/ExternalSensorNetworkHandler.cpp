@@ -217,7 +217,10 @@ CommandResult ExternalSensorNetworkHandler::handleRequest(const char* method,
     }
 
     if (result == ConfigResult::Success)
+    {
+        formatJsonResponse(responseBuffer, bufferSize, true);
         return CommandResult::ok();
+    }
 
     return CommandResult::error(static_cast<uint8_t>(result));
 }

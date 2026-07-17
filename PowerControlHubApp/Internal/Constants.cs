@@ -278,6 +278,70 @@
         public const int SensorEnumBinaryPresence = 5;
         public const int SensorEnumVoltage = 6;
 
+        // Sensor telemetry JSON property names (firmware sensor keys in /api/index)
+        public const string JsonSensorIdType = "idType";
+        public const string JsonSensorUid = "uid";
+        public const string JsonSensorTemperature = "temperature";
+        public const string JsonSensorHumidity = "humidity";
+        public const string JsonSensorDewPoint = "dew_point";
+        public const string JsonSensorComfort = "comfort";
+        public const string JsonSensorCondensationRisk = "condensation_risk";
+        public const string JsonSensorIsDaytime = "isDaytime";
+        public const string JsonSensorLightLevel = "lightLevel";
+        public const string JsonSensorAvgLightLevel = "avgLightLevel";
+        public const string JsonSensorGps = "gps";
+        public const string JsonSensorGpsLat = "lat";
+        public const string JsonSensorGpsLon = "lon";
+        public const string JsonSensorGpsAlt = "alt";
+        public const string JsonSensorGpsSpeed = "speed";
+        public const string JsonSensorGpsCourse = "course";
+        public const string JsonSensorGpsSats = "sats";
+        public const string JsonSensorGpsValid = "valid";
+        public const string JsonSensorFreeMemory = "freeMemory";
+        public const string JsonSensorCpuUsage = "cpuUsage";
+        public const string JsonSensorState = "state";
+        public const string JsonSensorVoltage = "voltage";
+        public const string JsonSensorVoltageAvg = "avg";
+        public const string JsonSensorWaterLevel = "level";
+        public const string JsonSensorWaterLevelAvg = "average";
+        public const string JsonSensorType = "type";
+
+        // Sensor telemetry format strings
+        public const string SensorFmtTempDouble = "0.0";
+        public const string SensorFmtDouble1 = "0.0";
+        public const string SensorFmtDouble2 = "0.00";
+        public const string SensorFmtGpsCoord = "0.000000";
+
+        // Sensor telemetry unit suffixes
+        public const string SensorSuffixCelsius = "°C";
+        public const string SensorSuffixPercent = "%";
+        public const string SensorSuffixKb = " kb";
+        public const string SensorSuffixKmh = " km/h";
+        public const string SensorSuffixVolt = " V";
+        public const string SensorSuffixMetre = " m";
+        public const string SensorSuffixDegree = "°";
+
+        // Sensor telemetry binary presence states
+        public const string SensorStateDetected = "detected";
+        public const string SensorStateClear = "clear";
+
+        // Sensor telemetry display labels
+        public const string SensorLabelDay = "Day";
+        public const string SensorLabelNight = "Night";
+        public const string SensorLabelFix = "Fix";
+        public const string SensorLabelNoFix = "No Fix";
+        public const string SensorLabelDetected = "Detected";
+        public const string SensorLabelClear = "Clear";
+
+        // Sensor telemetry icon literals
+        public const string SensorIconSun = "☀";
+        public const string SensorIconMoon = "🌙";
+        public const string SensorIconRedCircle = "🔴";
+        public const string SensorIconGreenCircle = "🟢";
+
+        // Sensor telemetry generic fallback separator
+        public const string SensorSummarySeparator = "; ";
+
         // Sensor detail page default label strings
         public const string LabelPin0Default = "GPIO Pin 0 (blank or 255 = disabled)";
         public const string LabelPin1Default = "GPIO Pin 1 (blank or 255 = disabled)";

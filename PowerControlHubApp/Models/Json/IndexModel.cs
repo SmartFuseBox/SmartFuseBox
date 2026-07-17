@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PowerControlHubApp.Models.Json
 {
@@ -27,7 +28,7 @@ namespace PowerControlHubApp.Models.Json
         public WarningModel Warning { get; set; }
 
         [JsonPropertyName("sensors")]
-        public SensorsModel Sensors { get; set; }
+        public JsonElement? SensorsRaw { get; set; }
 
         /// <summary>
         /// Populated from the sensors JSON object — contains one entry per sensor

@@ -59,14 +59,29 @@ namespace PowerControlHubApp.Services
                 {
                     string sensorName = sensorProp.Name;
 
-                    if (sensorProp.Value.TryGetProperty(SensorTypeJsonKey, out var typeEl) &&
-                        typeEl.ValueKind == JsonValueKind.Number)
+                    // The firmware emits both "idType" (sensor id: Dht11=1, Light=2, ...) and
+                    // "type" (SensorType: Local=0, Remote=1). We must use idType for template selection.
+                    if (sensorProp.Value.TryGetProperty(JsonSensorIdType, out var idTypeEl) &&
+                        idTypeEl.ValueKind == JsonValueKind.Number)
                     {
+                        byte idType = idTypeEl.GetByte();
+                        int uid = 0;
+
+                        if (sensorProp.Value.TryGetProperty(JsonSensorUid, out var uidEl) && uidEl.ValueKind == JsonValueKind.Number)
+                        {
+                            uid = uidEl.GetInt32();
+                        }
+
+                        // Clone the JsonElement so it is independent of the
+                        // using (JsonDocument doc) block and can be read later
+                        // by the computed telemetry properties on SensorsModel.
                         sensorList.Add(new SensorsModel
                         {
                             Name = sensorName,
-                            SensorType = (SensorType)typeEl.GetByte(),
-                            ExtraFields = sensorProp.Value
+                            Uid = uid,
+                            IdType = idType,
+                            SensorType = (SensorType)idType,
+                            ExtraFields = sensorProp.Value.Clone()
                         });
                     }
                 }

@@ -21,13 +21,13 @@
 
     <ShellContent
         x:Name="SensorConfigPage"
-        Title="Local Sens."
+        Title="Local Sensors"
         Route="SensorConfigPage"
         ContentTemplate="{DataTemplate views:LocalSensorConfigPage}" />
 
     <ShellContent
         x:Name="ExternalSensorConfigPage"
-        Title="Ext. Sens."
+        Title="External Sensors"
         Route="ExternalSensorConfigPage"
         ContentTemplate="{DataTemplate views:ExternalSensorConfigPage}" />
 

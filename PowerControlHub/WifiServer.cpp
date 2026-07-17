@@ -1112,16 +1112,14 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 		// Log response buffer for debugging
 		if (responseBuffer[0] != '\0')
 		{
-			char dbg[1051];
-			snprintf(dbg, sizeof(dbg), "Handler success response: %s", responseBuffer);
-			sendDebug(dbg, F("WifiServer"));
+			sendDebug("Handler success response", F("WifiServer"));
 		}
 
 		// Log parameters passed to handler
-		char paramDbg[512];
+		char paramDbg[128];
 		for (uint8_t p = 0; p < paramCount; p++)
 		{
-			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %*s=%*s", p, (int)sizeof(params[p].key) - 1, params[p].key, (int)sizeof(params[p].value) - 1, params[p].value);
 			sendDebug(paramDbg, F("WifiServer"));
 		}
 
@@ -1135,15 +1133,13 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 		if (responseBuffer[0] != '\0')
 		{
 			// Log error response for debugging
-			char dbg[1050];
-			snprintf(dbg, sizeof(dbg), "Handler error response: %s", responseBuffer);
-			sendDebug(dbg, F("WifiServer"));
+			sendDebug("Handler error response", F("WifiServer"));
 
 			// Also log parameters to help reproduce the error
-			char paramDbg[1024];
+			char paramDbg[128];
 			for (uint8_t p = 0; p < paramCount; p++)
 			{
-				snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+				snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %*s=%*s", p, (int)sizeof(params[p].key) - 1, params[p].key, (int)sizeof(params[p].value) - 1, params[p].value);
 				sendDebug(paramDbg, F("WifiServer"));
 			}
 
@@ -1160,8 +1156,8 @@ bool WifiServer::dispatchToHandler(IWifiClient& client, INetworkCommandHandler* 
 
 		for (uint8_t p = 0; p < paramCount; p++)
 		{
-			char paramDbg[400];
-			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %s=%s", p, params[p].key, params[p].value);
+			char paramDbg[128];
+			snprintf(paramDbg, sizeof(paramDbg), "Param[%d] %*s=%*s", p, (int)sizeof(params[p].key) - 1, params[p].key, (int)sizeof(params[p].value) - 1	, params[p].value);
 			sendDebug(paramDbg, F("WifiServer"));
 		}
 

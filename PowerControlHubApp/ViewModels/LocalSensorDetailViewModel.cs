@@ -752,10 +752,8 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
                 return;
             }
 
-            bool ok = true;
-
             // Add/update the sensor entry (S1)
-            ok &= await _service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1);
+            bool ok = await _service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1);
 
             // Rename (S3) if changed
             if (_original == null || _original.Name != Name)

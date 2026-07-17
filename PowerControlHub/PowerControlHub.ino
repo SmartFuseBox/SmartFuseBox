@@ -49,6 +49,16 @@ SerialCommandManager commandMgrComputer(&COMPUTER_SERIAL, onComputerCommandRecei
 
 PowerControlHubApp app(&commandMgrComputer);
 
+void powerControlHubTask(void* pvParameters)
+{
+	PowerControlHubApp* app = (PowerControlHubApp*)pvParameters;
+	while (true)
+	{
+		app->loop();
+		vTaskDelay(1);
+	}
+}
+
 void setup()
 {
 	// Serial initialization is performed first to ensure that any logging or error messages
@@ -59,11 +69,22 @@ void setup()
 
 	// configure app
 	app.setup(nullptr, 0);
+
+	// Create a dedicated task with 16KB stack
+	xTaskCreatePinnedToCore(
+		powerControlHubTask,
+		"PowerControlHub",
+		16384,           // stack size
+		&app,            // parameters
+		1,               // priority
+		NULL,            // task handle
+		1                // core 1
+	);
 }
 
 void loop()
 {
-	app.loop();
+	vTaskDelay(portMAX_DELAY);
 }
 
 // Called when a command arrives on COMPUTER_SERIAL that no registered handler
