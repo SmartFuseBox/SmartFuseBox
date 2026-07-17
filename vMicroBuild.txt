@@ -1,0 +1,486 @@
+Ignoring source code that is included in the project but can not be located: C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h
+Ignoring source code that is included in the project but can not be located: C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h
+Ignoring source code that is included in the project but can not be located: C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h
+
+Compiling debug version of 'PowerControlHub' for 'ESP32S3 Dev Module(esp32_esp32s3)'
+Visual Studio Version: 2022 [18.0]
+Build Folder: "file:///C:/Users/Simon/AppData/Local/Temp/VMBuilds/PowerControlHub/esp32_esp32s3/Debug"
+Additional Defines: VM_DBT_HARDWARESERIAL 0;VM_DBT_SOFTWARESERIAL 1;VM_DBT_FASTSERIAL 2;VM_DBT_USB 3;VM_DBT_TEENSY 4;VM_DBT_UART 5;VM_DBT_USART 6;VM_DBT_USBSERIAL 7;VM_DBT_TTYUART 8;VM_DBT_NET_CONSOLE 9;VM_DBT_Uart 10;VM_DBT_COSA 11;VM_DBT_CDCSerialClass 12;VM_DBT_HARDWARESERIAL1 13;VM_DBT_HARDWARESERIAL2 14;VM_DBT_HARDWARESERIAL3 15;VM_DBT_NET_UDP 16;VM_DBT_USBAPI 17;VM_DBT_SERIALUSB 18;VM_DBT_MS430_SERIAL_ 19;VM_DBT_NO_SERIAL 20;VM_DBT_GENERIC_OBJECT 21;VM_DEBUG_ENABLE 1;VM_DEBUG;VM_DEBUGGER_SOFT_TRANSPORT Serial;VM_DEBUGGER_SOFT_TRANSPORT_WRITER Serial;VM_DBT VM_DBT_GENERIC_OBJECT;VM_DEBUG_BREAKPAUSE;
+Architecture Tools: "file:///C://Users//Simon//AppData//Local//arduino15//packages//esp32//tools//esp-x32//2601/bin/"
+Api: 2.2026.0422-1
+Sketch Book: "file:///C:/Users/Simon/Documents/Arduino"
+User Libraries: "file:///C:/Users/Simon/Documents/Arduino/libraries"
+Build Temp: "file:///C:/Users/Simon/AppData/Local/Temp/VMBuilds/PowerControlHub/esp32_esp32s3/Debug"
+Board Support Urls: ""
+DefaultCodePage:                      1252
+DefaultCharWidth:                     W
+Encoding.Default.CodePage:            1252
+Console.OutputEncoding.CodePage:      1252
+Console.InputEncoding.CodePage:       1252
+CurrentCulture TextInfo.ANSICodePage: 1252
+CurrentCulture TextInfo.OEMCodePage:  850
+
+Core Include Paths
+Include Path "file:///C:/Users/Simon/AppData/Local/arduino15/packages/esp32/hardware/esp32/3.3.8/cores/esp32"
+Include Path "file:///C:/Users/Simon/AppData/Local/arduino15/packages/esp32/hardware/esp32/3.3.8/variants/esp32s3"
+
+# recipe.hooks.prebuild.0.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" del /f "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" del /f "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" 
+
+# recipe.hooks.prebuild.1.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if exist "C:\GitProjects\PowerControlHub\PowerControlHub\partitions.csv" COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\partitions.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if exist "C:\GitProjects\PowerControlHub\PowerControlHub\partitions.csv" COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\partitions.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" 
+
+# recipe.hooks.prebuild.2.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" if exist "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\partitions.csv" COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\partitions.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" if exist "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\partitions.csv" COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\partitions.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" 
+
+# recipe.hooks.prebuild.3.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\tools\partitions\min_spiffs.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\tools\partitions\min_spiffs.csv" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\partitions.csv" 
+        1 file(s) copied.
+
+# recipe.hooks.prebuild.4.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+IF EXIST "C:\GitProjects\PowerControlHub\PowerControlHub\bootloader.bin" ( COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\bootloader.bin" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin" ) ELSE ( IF EXIST "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\bootloader.bin" ( COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\bootloader.bin" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin" ) ELSE ( "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esptool_py\5.2.0\esptool.exe" --chip esp32s3 elf2image --flash-mode dio --flash-freq 80m --flash-size 4MB -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin" "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8\bin\bootloader_dio_80m.elf" ) )
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>IF EXIST "C:\GitProjects\PowerControlHub\PowerControlHub\bootloader.bin" (COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\bootloader.bin" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin"  )  ELSE (IF EXIST "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\bootloader.bin" (COPY "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3\bootloader.bin" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin"  )  ELSE ("C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esptool_py\5.2.0\esptool.exe" --chip esp32s3 elf2image --flash-mode dio --flash-freq 80m --flash-size 4MB -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.ino.bootloader.bin" "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8\bin\bootloader_dio_80m.elf"  ) ) 
+esptool v5.2.0
+Creating ESP32-S3 image...
+Merged 2 ELF sections.
+Successfully created ESP32-S3 image.
+
+# recipe.hooks.prebuild.5.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if exist "C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h" COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if exist "C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h" COPY /y "C:\GitProjects\PowerControlHub\PowerControlHub\build_opt.h" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h" 
+
+# recipe.hooks.prebuild.6.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h" type nul > "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>if not exist "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h" type nul  1>"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h" 
+
+# recipe.hooks.prebuild.7.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+type nul > "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>type nul  1>"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" 
+
+# recipe.hooks.prebuild.8.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+COPY /y "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8\sdkconfig" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\sdkconfig"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>COPY /y "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8\sdkconfig" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\sdkconfig" 
+        1 file(s) copied.
+		Pre-build discovered additional source: 'file:///C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\build_opt.h'
+ 
+Deep search for libraries ...
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager\src\BaseCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager\src\SerialCommandManager.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FreeStack.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\MinimumSerial.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FmtNumber.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FsCache.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FsDateTime.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FsName.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FsStructs.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\FsUtf.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\PrintBasic.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\common\upcase.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatDbg.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatFile.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatFilePrint.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatFileWrite.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatFormatter.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatName.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatPartition.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\ExFatLib\ExFatVolume.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatDbg.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatFile.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatFileLFN.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatFilePrint.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatFileSFN.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatFormatter.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatName.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatPartition.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FatLib\FatVolume.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FsLib\FsFile.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FsLib\FsNew.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\FsLib\FsVolume.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\iostream\istream.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\iostream\ostream.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\iostream\StdioStream.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\iostream\StreamBaseClass.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SdCard\SdCardInfo.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SdCard\SdSpiCard.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SdCard\Rp2040Sdio\PioSdioCard.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SdCard\TeensySdio\TeensySdio.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiArtemis.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiChipSelect.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiDue.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiParticle.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiSTM32.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiSTM32Core.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\SdFat\src\SpiDriver\SdSpiTeensy3.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\SPI\src\SPI.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\AP.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\STA.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFi.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFiAP.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFiGeneric.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFiMulti.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFiScan.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src\WiFiSTA.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkClient.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkEvents.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkInterface.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkServer.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src\NetworkUdp.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\NextionControl\src\NextionControl.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\TinyGPSPlus\src\TinyGPS++.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\AckCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BaseNextionCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BasePage.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BinaryPresenceSensor.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothRelayService.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothSensorService.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothSystemService.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BroadcastManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigController.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\EEPROM\src\EEPROM.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\DateTimeManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ExternalSensorNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\LedMatrixManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MicroSdDriver.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTClient.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTConfigCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTController.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTRelayHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTSensorHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTSystemHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\NavigationController.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\OtaManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\OtaManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\OtaManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\OtaManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\HTTPClient\src\HTTPClient.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure\src\NetworkClientSecure.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure\src\ssl_client.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src\HttpsOTAUpdate.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src\Updater.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src\Updater_Signing.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageAbout.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageBuoys.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageCardinalMarkers.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageEnvironment.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageFlags.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageHome.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageMoonPhase.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageRelay.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageRelaySettings.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSettings.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundEmergency.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundFog.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundManeuvering.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundOther.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundOvertaking.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundSignals.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSystem.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfChannels.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfDistress.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfRadio.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageWarning.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Phonetic.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHubApp.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RelayCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RelayNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RtcDS1302Driver.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RtcDS1302Driver.cpp
+   Using previous search results: C:\Users\Simon\Documents\Arduino\libraries\Ds1302\src\Ds1302.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ScheduleController.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SchedulerCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SchedulerNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SDCardConfigLoader.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdCardLogger.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SensorCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SensorNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundController.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SunCalculator.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemCpuMonitor.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemFunctions.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ToneManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningCommandHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningManager.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningNetworkHandler.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WifiCommandBridge.cpp
+   Using previous search results: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WifiServer.cpp
+ 
+
+ 
+Extracting .ino prototypes ...
+"c:\program files\microsoft visual studio\18\insiders\common7\ide\extensions\hti01q5k.0wk\Micro Platforms\visualmicro\tools\ctags/ctags" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/sketch-gcc-e-clean.cpp.filtered.cpp"
+onComputerCommandReceived	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^void onComputerCommandReceived(SerialCommandManager* mgr);$/;"	kind:prototype	line:36	signature:(SerialCommandManager* mgr)	returntype:void
+commandMgrComputer	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^SerialCommandManager commandMgrComputer(&Serial0, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64);$/;"	kind:variable	line:48
+commandMgrComputer	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^PowerControlHubApp app(&commandMgrComputer);$/;"	kind:variable	line:50
+setup	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^void setup(){ MicroDebug.init(3000); MicroDebug.begin(115200);if (MicroDebug.outPacketStart(true)) {Serial0.print("VMDPV_1|1_VMDPV\n");MicroDebug.DBG_YieldAndWait(10);MicroDebug.outPacketEnd();} MicroDebug.start(false,true);if (MicroDebug.outPacketStart(true)) {Serial0.print("VMDPR_");MicroDebug.outPacketEnd();}$/;"	kind:function	line:52	signature:()	returntype:void
+loop	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^void loop(){$/;"	kind:function	line:64	signature:()	returntype:void
+onComputerCommandReceived	C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/.vmpreproc/C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino	/^void onComputerCommandReceived(SerialCommandManager* mgr)$/;"	kind:function	line:72	signature:(SerialCommandManager* mgr)	returntype:void
+
+	Required: False, Prototype: void onComputerCommandReceived(SerialCommandManager* mgr);, Function: onComputerCommandReceived, Kind: prototype, Line: 36, Signature: (SerialCommandManager* mgr),  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: void onComputerCommandReceived(SerialCommandManager* mgr); 
+	Required: False, Prototype:  commandMgrComputer;, Function: commandMgrComputer, Kind: variable, Line: 48, Signature: ,  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: SerialCommandManager commandMgrComputer(&Serial0, onComputerCommandReceived, '\n', ':', ';', '=', 500, 64); 
+	Required: False, Prototype:  commandMgrComputer;, Function: commandMgrComputer, Kind: variable, Line: 50, Signature: ,  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: PowerControlHubApp app(&commandMgrComputer); 
+	Required: True, Prototype: void setup();, Function: setup, Kind: function, Line: 52, Signature: (),  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: void setup(){ MicroDebug.init(3000); MicroDebug.begin(115200);if (MicroDebug.outPacketStart(true)) {Serial0.print("VMDPV_1|1_VMDPV\n");MicroDebug.DBG_YieldAndWait(10);MicroDebug.outPacketEnd();} MicroDebug.start(false,true);if (MicroDebug.outPacketStart(true)) {Serial0.print("VMDPR_");MicroDebug.outPacketEnd();} 
+	Required: True, Prototype: void loop();, Function: loop, Kind: function, Line: 64, Signature: (),  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: void loop(){ 
+	Required: False, Prototype: void onComputerCommandReceived(SerialCommandManager* mgr);, Function: onComputerCommandReceived, Kind: function, Line: 72, Signature: (SerialCommandManager* mgr),  File: C:\GitProjects\PowerControlHub\PowerControlHub\PowerControlHub.ino, Code: void onComputerCommandReceived(SerialCommandManager* mgr) 
+
+    # Warning: This core uses references to a current project folder. The shared core cache will accumlate once for each project. 
+    # Tip: Periodically clear redundant cores by using 'Build>Clean Solution' to clear all shared cores from cache.
+
+# recipe.hooks.core.prebuild.1.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+echo "-DARDUINO_CORE_BUILD" > "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>echo "-DARDUINO_CORE_BUILD"  1>"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" 
+ 
+Building variant ...
+  Using previously compiled variant
+ 
+Building core ...
+
+# recipe.hooks.core.postbuild.1.pattern
+Exec: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat
+type nul > "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts"
+"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\.vm_sys\cmd_exec.bat"
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>chcp 65001  1>NUL 2>NUL 
+C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug>type nul  1>"C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" 
+ 
+Building libraries ...
+"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp-x32\2601/bin/xtensa-esp32s3-elf-g++" -MMD -c "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/cpp_flags" -w -Os -Werror=return-type -DF_CPU=240000000L -DARDUINO=108010 -DARDUINO_ESP32S3_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32S3_DEV\"" "-DARDUINO_VARIANT=\"esp32s3\"" -DARDUINO_PARTITION_min_spiffs "-DARDUINO_HOST_OS=\"windows\"" "-DARDUINO_FQBN=\"esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=default,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default\"" -DESP32=ESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=0 -DARDUINO_USB_MSC_ON_BOOT=0 -DARDUINO_USB_DFU_ON_BOOT=0 "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/defines" "-IC:\GitProjects\PowerControlHub\PowerControlHub" -iprefix "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/include/" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/includes" "-IC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/dio_qspi/include" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\cores\esp32" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3" -I"C:\ProgramData\vMicro\SerialDebug\VM_DBG" -I"C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SensorManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SdFat\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\SPI\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src" -I"C:\Users\Simon\Documents\Arduino\libraries\NextionControl\src" -I"C:\Users\Simon\Documents\Arduino\libraries\TinyGPSPlus\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\EEPROM\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\HTTPClient\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src"  -Wall -Wextra -DVM_DEBUG_BREAKPAUSE -DVM_DBT=VM_DBT_GENERIC_OBJECT -DVM_DEBUGGER_SOFT_TRANSPORT_WRITER=Serial -DVM_DEBUGGER_SOFT_TRANSPORT=Serial -DVM_DEBUG -DVM_DEBUG_ENABLE=1 -DVM_DBT_GENERIC_OBJECT=21 -DVM_DBT_NO_SERIAL=20 -DVM_DBT_MS430_SERIAL_=19 -DVM_DBT_SERIALUSB=18 -DVM_DBT_USBAPI=17 -DVM_DBT_NET_UDP=16 -DVM_DBT_HARDWARESERIAL3=15 -DVM_DBT_HARDWARESERIAL2=14 -DVM_DBT_HARDWARESERIAL1=13 -DVM_DBT_CDCSerialClass=12 -DVM_DBT_COSA=11 -DVM_DBT_Uart=10 -DVM_DBT_NET_CONSOLE=9 -DVM_DBT_TTYUART=8 -DVM_DBT_USBSERIAL=7 -DVM_DBT_USART=6 -DVM_DBT_UART=5 -DVM_DBT_TEENSY=4 -DVM_DBT_USB=3 -DVM_DBT_FASTSERIAL=2 -DVM_DBT_SOFTWARESERIAL=1 -DVM_DBT_HARDWARESERIAL=0 -I"C:\Users\Simon\Documents\Arduino\libraries\Ds1302\src" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/build_opt.h" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" "C:\ProgramData\vMicro\SerialDebug\VM_DBG\VM_DBG.cpp" -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\VM_DBG\VM_DBG.cpp.o"
+"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp-x32\2601/bin/xtensa-esp32s3-elf-g++" -MMD -c "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/cpp_flags" -w -Os -Werror=return-type -DF_CPU=240000000L -DARDUINO=108010 -DARDUINO_ESP32S3_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32S3_DEV\"" "-DARDUINO_VARIANT=\"esp32s3\"" -DARDUINO_PARTITION_min_spiffs "-DARDUINO_HOST_OS=\"windows\"" "-DARDUINO_FQBN=\"esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=default,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default\"" -DESP32=ESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=0 -DARDUINO_USB_MSC_ON_BOOT=0 -DARDUINO_USB_DFU_ON_BOOT=0 "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/defines" "-IC:\GitProjects\PowerControlHub\PowerControlHub" -iprefix "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/include/" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/includes" "-IC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/dio_qspi/include" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\cores\esp32" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3" -I"C:\ProgramData\vMicro\SerialDebug\VM_DBG" -I"C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SensorManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SdFat\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\SPI\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src" -I"C:\Users\Simon\Documents\Arduino\libraries\NextionControl\src" -I"C:\Users\Simon\Documents\Arduino\libraries\TinyGPSPlus\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\EEPROM\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\HTTPClient\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src"  -Wall -Wextra -DVM_DEBUG_BREAKPAUSE -DVM_DBT=VM_DBT_GENERIC_OBJECT -DVM_DEBUGGER_SOFT_TRANSPORT_WRITER=Serial -DVM_DEBUGGER_SOFT_TRANSPORT=Serial -DVM_DEBUG -DVM_DEBUG_ENABLE=1 -DVM_DBT_GENERIC_OBJECT=21 -DVM_DBT_NO_SERIAL=20 -DVM_DBT_MS430_SERIAL_=19 -DVM_DBT_SERIALUSB=18 -DVM_DBT_USBAPI=17 -DVM_DBT_NET_UDP=16 -DVM_DBT_HARDWARESERIAL3=15 -DVM_DBT_HARDWARESERIAL2=14 -DVM_DBT_HARDWARESERIAL1=13 -DVM_DBT_CDCSerialClass=12 -DVM_DBT_COSA=11 -DVM_DBT_Uart=10 -DVM_DBT_NET_CONSOLE=9 -DVM_DBT_TTYUART=8 -DVM_DBT_USBSERIAL=7 -DVM_DBT_USART=6 -DVM_DBT_UART=5 -DVM_DBT_TEENSY=4 -DVM_DBT_USB=3 -DVM_DBT_FASTSERIAL=2 -DVM_DBT_SOFTWARESERIAL=1 -DVM_DBT_HARDWARESERIAL=0 -I"C:\Users\Simon\Documents\Arduino\libraries\Ds1302\src" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/build_opt.h" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" "C:\ProgramData\vMicro\SerialDebug\VM_DBG\VM_mem_check_sam.cpp" -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\VM_DBG\VM_mem_check_sam.cpp.o"
+
+Using library SerialCommandManager version 3.0.0 by Si Carter <s1cart3r@gmail.com> in folder "C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SerialCommandManager\BaseCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SerialCommandManager\SerialCommandManager.cpp.o
+
+Using library SensorManager version 1.1.0 by Si Carter <s1cart3r@gmail.com> in folder "C:\Users\Simon\Documents\Arduino\libraries\SensorManager"
+
+Using library SdFat version 2.3.0 by Bill Greiman <fat16lib@sbcglobal.net> in folder "C:\Users\Simon\Documents\Arduino\libraries\SdFat"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FreeStack.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\MinimumSerial.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FmtNumber.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FsCache.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FsDateTime.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FsName.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FsStructs.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\FsUtf.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\PrintBasic.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\common\upcase.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatDbg.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatFile.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatFilePrint.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatFileWrite.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatFormatter.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatName.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatPartition.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\ExFatLib\ExFatVolume.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatDbg.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatFile.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatFileLFN.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatFilePrint.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatFileSFN.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatFormatter.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatName.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatPartition.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FatLib\FatVolume.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FsLib\FsFile.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FsLib\FsNew.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\FsLib\FsVolume.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\iostream\istream.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\iostream\ostream.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\iostream\StdioStream.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\iostream\StreamBaseClass.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SdCard\SdCardInfo.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SdCard\SdSpiCard.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SdCard\Rp2040Sdio\PioSdioCard.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SdCard\TeensySdio\TeensySdio.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiArtemis.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiChipSelect.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiDue.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiParticle.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiSTM32.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiSTM32Core.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdFat\SpiDriver\SdSpiTeensy3.cpp.o
+
+Using library SPI version 3.3.8 by Hristo Gochkov <hristo@espressif.com> in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\SPI"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SPI\SPI.cpp.o
+
+Using library WiFi version 3.3.8 by Hristo Gochkov <hristo@espressif.com> in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\AP.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\STA.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFi.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFiAP.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFiGeneric.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFiMulti.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFiScan.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WiFi\WiFiSTA.cpp.o
+
+Using library Network version 3.3.8 by Hristo Gochkov <hristo@espressif.com> in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkClient.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkEvents.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkInterface.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkServer.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Network\NetworkUdp.cpp.o
+
+Using library NextionControl version 1.7.0 by Si Carter <s1cart3r@gmail.com> in folder "C:\Users\Simon\Documents\Arduino\libraries\NextionControl"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\NextionControl\NextionControl.cpp.o
+
+Using library TinyGPSPlus version 1.0.3 by Mikal Hart<mikal@arduniana.org> in folder "C:\Users\Simon\Documents\Arduino\libraries\TinyGPSPlus"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\TinyGPSPlus\TinyGPS++.cpp.o
+
+Using library EEPROM version 3.3.8 by Paolo Becchi <pbecchi@aerobusiness.it> in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\EEPROM"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\EEPROM\EEPROM.cpp.o
+
+Using library HTTPClient version 3.3.8 by Markus Sattler in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\HTTPClient"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\HTTPClient\HTTPClient.cpp.o
+
+Using library NetworkClientSecure version 3.3.8 by Github Community in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\NetworkClientSecure\NetworkClientSecure.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\NetworkClientSecure\ssl_client.cpp.o
+
+Using library Update version 3.3.8 by Hristo Gochkov <hristo@espressif.com> in folder "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Update\HttpsOTAUpdate.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Update\Updater.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Update\Updater_Signing.cpp.o
+
+Using library Ds1302 version 1.1.0 by Rafa Couto <caligari@treboada.net> in folder "C:\Users\Simon\Documents\Arduino\libraries\Ds1302"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Ds1302\Ds1302.cpp.o
+ 
+Building project code ...
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHub.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\AckCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BaseNextionCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BasePage.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BinaryPresenceSensor.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothRelayService.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothSensorService.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BluetoothSystemService.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\BroadcastManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigController.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ConfigNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\DateTimeManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ExternalSensorNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\LedMatrixManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MicroSdDriver.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTClient.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTConfigCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTController.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTRelayHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTSensorHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\MQTTSystemHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\NavigationController.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\OtaManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageAbout.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageBuoys.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageCardinalMarkers.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageEnvironment.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageFlags.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageHome.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageMoonPhase.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageRelay.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageRelaySettings.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSettings.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundEmergency.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundFog.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundManeuvering.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundOther.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundOvertaking.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSoundSignals.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageSystem.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfChannels.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfDistress.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageVhfRadio.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PageWarning.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\Phonetic.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\PowerControlHubApp.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RelayCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RelayNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\RtcDS1302Driver.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ScheduleController.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SchedulerCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SchedulerNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SDCardConfigLoader.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SdCardLogger.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SensorCommandHandler.cpp.o
+"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp-x32\2601/bin/xtensa-esp32s3-elf-g++" -MMD -c "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/cpp_flags" -Wall -Os -Werror=return-type -DF_CPU=240000000L -DARDUINO=108010 -DARDUINO_ESP32S3_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32S3_DEV\"" "-DARDUINO_VARIANT=\"esp32s3\"" -DARDUINO_PARTITION_min_spiffs "-DARDUINO_HOST_OS=\"windows\"" "-DARDUINO_FQBN=\"esp32:esp32:esp32s3:UploadSpeed=921600,USBMode=hwcdc,CDCOnBoot=default,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,CPUFreq=240,FlashMode=qio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default\"" -DESP32=ESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=0 -DARDUINO_USB_MSC_ON_BOOT=0 -DARDUINO_USB_DFU_ON_BOOT=0 "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/defines" "-IC:\GitProjects\PowerControlHub\PowerControlHub" -iprefix "C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/include/" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/includes" "-IC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/dio_qspi/include" -I"C:\GitProjects\PowerControlHub\PowerControlHub" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\cores\esp32" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\variants\esp32s3" -I"C:\ProgramData\vMicro\SerialDebug\VM_DBG" -I"C:\Users\Simon\Documents\Arduino\libraries\SerialCommandManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SensorManager\src" -I"C:\Users\Simon\Documents\Arduino\libraries\SdFat\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\SPI\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\WiFi\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Network\src" -I"C:\Users\Simon\Documents\Arduino\libraries\NextionControl\src" -I"C:\Users\Simon\Documents\Arduino\libraries\TinyGPSPlus\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\EEPROM\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\HTTPClient\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\NetworkClientSecure\src" -I"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\hardware\esp32\3.3.8\libraries\Update\src"  -Wall -Wextra -DVM_DEBUG_BREAKPAUSE -DVM_DBT=VM_DBT_GENERIC_OBJECT -DVM_DEBUGGER_SOFT_TRANSPORT_WRITER=Serial -DVM_DEBUGGER_SOFT_TRANSPORT=Serial -DVM_DEBUG -DVM_DEBUG_ENABLE=1 -DVM_DBT_GENERIC_OBJECT=21 -DVM_DBT_NO_SERIAL=20 -DVM_DBT_MS430_SERIAL_=19 -DVM_DBT_SERIALUSB=18 -DVM_DBT_USBAPI=17 -DVM_DBT_NET_UDP=16 -DVM_DBT_HARDWARESERIAL3=15 -DVM_DBT_HARDWARESERIAL2=14 -DVM_DBT_HARDWARESERIAL1=13 -DVM_DBT_CDCSerialClass=12 -DVM_DBT_COSA=11 -DVM_DBT_Uart=10 -DVM_DBT_NET_CONSOLE=9 -DVM_DBT_TTYUART=8 -DVM_DBT_USBSERIAL=7 -DVM_DBT_USART=6 -DVM_DBT_UART=5 -DVM_DBT_TEENSY=4 -DVM_DBT_USB=3 -DVM_DBT_FASTSERIAL=2 -DVM_DBT_SOFTWARESERIAL=1 -DVM_DBT_HARDWARESERIAL=0 -I"C:\Users\Simon\Documents\Arduino\libraries\Ds1302\src" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/build_opt.h" "@C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/file_opts" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SensorNetworkHandler.cpp" -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SensorNetworkHandler.cpp.o"
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundController.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SoundNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SunCalculator.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemCpuMonitor.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemFunctions.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\SystemNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\ToneManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningCommandHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningManager.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WarningNetworkHandler.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WifiCommandBridge.cpp.o
+  Using previously compiled file: C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\WifiServer.cpp.o
+ 
+Linking it all together ...
+# Coping cached core C:\Users\Simon\AppData\Local\Temp\VMBCore\arduino20x\1fe2f24ae03749f2ec8fd1dcec6b1151\core.a to C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\core.a
+
+"C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp-x32\2601/bin/xtensa-esp32s3-elf-g++" "-Wl,--Map=C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/PowerControlHub.ino.map" "-LC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/lib" "-LC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/ld" "-LC:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/dio_qspi" "-Wl,--wrap=esp_panic_handler" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/ld_flags" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/ld_scripts" -Wl,--start-group "PowerControlHub.cpp.o" "AckCommandHandler.cpp.o" "BaseNextionCommandHandler.cpp.o" "BasePage.cpp.o" "BinaryPresenceSensor.cpp.o" "BluetoothManager.cpp.o" "BluetoothRelayService.cpp.o" "BluetoothSensorService.cpp.o" "BluetoothSystemService.cpp.o" "BroadcastManager.cpp.o" "ConfigCommandHandler.cpp.o" "ConfigController.cpp.o" "ConfigManager.cpp.o" "ConfigNetworkHandler.cpp.o" "DateTimeManager.cpp.o" "ExternalSensorNetworkHandler.cpp.o" "LedMatrixManager.cpp.o" "MicroSdDriver.cpp.o" "MQTTClient.cpp.o" "MQTTConfigCommandHandler.cpp.o" "MQTTController.cpp.o" "MQTTHandler.cpp.o" "MQTTRelayHandler.cpp.o" "MQTTSensorHandler.cpp.o" "MQTTSystemHandler.cpp.o" "NavigationController.cpp.o" "OtaManager.cpp.o" "PageAbout.cpp.o" "PageBuoys.cpp.o" "PageCardinalMarkers.cpp.o" "PageEnvironment.cpp.o" "PageFlags.cpp.o" "PageHome.cpp.o" "PageMoonPhase.cpp.o" "PageRelay.cpp.o" "PageRelaySettings.cpp.o" "PageSettings.cpp.o" "PageSoundEmergency.cpp.o" "PageSoundFog.cpp.o" "PageSoundManeuvering.cpp.o" "PageSoundOther.cpp.o" "PageSoundOvertaking.cpp.o" "PageSoundSignals.cpp.o" "PageSystem.cpp.o" "PageVhfChannels.cpp.o" "PageVhfDistress.cpp.o" "PageVhfRadio.cpp.o" "PageWarning.cpp.o" "Phonetic.cpp.o" "PowerControlHubApp.cpp.o" "RelayCommandHandler.cpp.o" "RelayNetworkHandler.cpp.o" "RtcDS1302Driver.cpp.o" "ScheduleController.cpp.o" "SchedulerCommandHandler.cpp.o" "SchedulerNetworkHandler.cpp.o" "SDCardConfigLoader.cpp.o" "SdCardLogger.cpp.o" "SensorCommandHandler.cpp.o" "SensorNetworkHandler.cpp.o" "SoundCommandHandler.cpp.o" "SoundController.cpp.o" "SoundNetworkHandler.cpp.o" "SunCalculator.cpp.o" "SystemCommandHandler.cpp.o" "SystemCpuMonitor.cpp.o" "SystemFunctions.cpp.o" "SystemNetworkHandler.cpp.o" "ToneManager.cpp.o" "WarningCommandHandler.cpp.o" "WarningManager.cpp.o" "WarningNetworkHandler.cpp.o" "WifiCommandBridge.cpp.o" "WifiServer.cpp.o" "VM_DBG\VM_DBG.cpp.o" "VM_DBG\VM_mem_check_sam.cpp.o" "SerialCommandManager\BaseCommandHandler.cpp.o" "SerialCommandManager\SerialCommandManager.cpp.o" "SdFat\FreeStack.cpp.o" "SdFat\MinimumSerial.cpp.o" "SdFat\common\FmtNumber.cpp.o" "SdFat\common\FsCache.cpp.o" "SdFat\common\FsDateTime.cpp.o" "SdFat\common\FsName.cpp.o" "SdFat\common\FsStructs.cpp.o" "SdFat\common\FsUtf.cpp.o" "SdFat\common\PrintBasic.cpp.o" "SdFat\common\upcase.cpp.o" "SdFat\ExFatLib\ExFatDbg.cpp.o" "SdFat\ExFatLib\ExFatFile.cpp.o" "SdFat\ExFatLib\ExFatFilePrint.cpp.o" "SdFat\ExFatLib\ExFatFileWrite.cpp.o" "SdFat\ExFatLib\ExFatFormatter.cpp.o" "SdFat\ExFatLib\ExFatName.cpp.o" "SdFat\ExFatLib\ExFatPartition.cpp.o" "SdFat\ExFatLib\ExFatVolume.cpp.o" "SdFat\FatLib\FatDbg.cpp.o" "SdFat\FatLib\FatFile.cpp.o" "SdFat\FatLib\FatFileLFN.cpp.o" "SdFat\FatLib\FatFilePrint.cpp.o" "SdFat\FatLib\FatFileSFN.cpp.o" "SdFat\FatLib\FatFormatter.cpp.o" "SdFat\FatLib\FatName.cpp.o" "SdFat\FatLib\FatPartition.cpp.o" "SdFat\FatLib\FatVolume.cpp.o" "SdFat\FsLib\FsFile.cpp.o" "SdFat\FsLib\FsNew.cpp.o" "SdFat\FsLib\FsVolume.cpp.o" "SdFat\iostream\istream.cpp.o" "SdFat\iostream\ostream.cpp.o" "SdFat\iostream\StdioStream.cpp.o" "SdFat\iostream\StreamBaseClass.cpp.o" "SdFat\SdCard\SdCardInfo.cpp.o" "SdFat\SdCard\SdSpiCard.cpp.o" "SdFat\SdCard\Rp2040Sdio\PioSdioCard.cpp.o" "SdFat\SdCard\TeensySdio\TeensySdio.cpp.o" "SdFat\SpiDriver\SdSpiArtemis.cpp.o" "SdFat\SpiDriver\SdSpiChipSelect.cpp.o" "SdFat\SpiDriver\SdSpiDue.cpp.o" "SdFat\SpiDriver\SdSpiParticle.cpp.o" "SdFat\SpiDriver\SdSpiSTM32.cpp.o" "SdFat\SpiDriver\SdSpiSTM32Core.cpp.o" "SdFat\SpiDriver\SdSpiTeensy3.cpp.o" "SPI\SPI.cpp.o" "WiFi\AP.cpp.o" "WiFi\STA.cpp.o" "WiFi\WiFi.cpp.o" "WiFi\WiFiAP.cpp.o" "WiFi\WiFiGeneric.cpp.o" "WiFi\WiFiMulti.cpp.o" "WiFi\WiFiScan.cpp.o" "WiFi\WiFiSTA.cpp.o" "Network\NetworkClient.cpp.o" "Network\NetworkEvents.cpp.o" "Network\NetworkInterface.cpp.o" "Network\NetworkManager.cpp.o" "Network\NetworkServer.cpp.o" "Network\NetworkUdp.cpp.o" "NextionControl\NextionControl.cpp.o" "TinyGPSPlus\TinyGPS++.cpp.o" "EEPROM\EEPROM.cpp.o" "HTTPClient\HTTPClient.cpp.o" "NetworkClientSecure\NetworkClientSecure.cpp.o" "NetworkClientSecure\ssl_client.cpp.o" "Update\HttpsOTAUpdate.cpp.o" "Update\Updater.cpp.o" "Update\Updater_Signing.cpp.o" "Ds1302\Ds1302.cpp.o" "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug\core.a" "@C:\Users\Simon\AppData\Local\arduino15\packages\esp32\tools\esp32s3-libs\3.3.8/flags/ld_libs" -Wl,--end-group -Wl,-EL -o "C:\Users\Simon\AppData\Local\Temp\VMBuilds\PowerControlHub\esp32_esp32s3\Debug/PowerControlHub.ino.elf"
+ld.exe: PowerControlHubApp.cpp.o:(.literal._ZN18PowerControlHubAppC2EP20SerialCommandManager+0x1c): undefined reference to vtable for SensorConfigNetworkHandler
+collect2.exe*: error: ld returned 1 exit status
+
+Error linking for board ESP32S3 Dev Module(esp32_esp32s3)
+ 
+Debug build failed for project 'PowerControlHub'

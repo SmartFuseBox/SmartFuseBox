@@ -68,8 +68,10 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 					e.options2[0],
 					e.options2[1],
 					e.enabled ? 1u : 0u);
+				
 				if (n < 0 || written + n >= static_cast<int>(bufferSize))
 					break;
+
 				written += n;
 			}
 		}
@@ -83,11 +85,13 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 			int n = snprintf(responseBuffer + written, bufferSize - written,
 				",\"meta\":{\"count\":%u,\"descriptors\":[",
 				static_cast<unsigned>(SensorIdList::Count));
+
 			if (n < 0 || written + n >= static_cast<int>(bufferSize))
 			{
 				responseBuffer[bufferSize - 1] = '\0';
 				return CommandResult::ok();
 			}
+
 			written += n;
 
 			for (unsigned di = 0; di < static_cast<unsigned>(SensorIdList::Count); di++)
@@ -97,63 +101,91 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 					"%s{\"id\":%u,\"name\":\"%s\","
 					"\"pins\":[",
 					di > 0 ? "," : "", di, d.name);
-				if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
-				written += n;
 
+				if (n < 0 || written + n >= static_cast<int>(bufferSize))
+					break;
+
+				written += n;
 				bool firstPin = true;
+
 				for (unsigned p = 0; p < ConfigMaxSensorPins; p++)
 				{
-					if (strcmp(d.pins[p].type, "none") == 0) continue;
+					if (strcmp(d.pins[p].type, "none") == 0)
+						continue;
+
 					n = snprintf(responseBuffer + written, bufferSize - written,
 						"%s{\"label\":\"%s\",\"type\":\"%s\",\"min\":%d,\"max\":%d,\"default\":%d}",
 						firstPin ? "" : ",",
 						d.pins[p].label, d.pins[p].type,
 						d.pins[p].minVal, d.pins[p].maxVal, d.pins[p].defaultValue);
-					if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
+					
+					if (n < 0 || written + n >= static_cast<int>(bufferSize))
+						break;
+
 					written += n;
 					firstPin = false;
 				}
 
 				n = snprintf(responseBuffer + written, bufferSize - written,
 					"],\"options1\":[");
-				if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
+				
+				if (n < 0 || written + n >= static_cast<int>(bufferSize))
+					break;
+
 				written += n;
 
 				bool firstOpt1 = true;
+
 				for (unsigned o = 0; o < 2; o++)
 				{
-					if (strcmp(d.options1[o].type, "none") == 0) continue;
+					if (strcmp(d.options1[o].type, "none") == 0)
+						continue;
+
 					n = snprintf(responseBuffer + written, bufferSize - written,
 						"%s{\"label\":\"%s\",\"type\":\"%s\",\"min\":%d,\"max\":%d,\"default\":%d}",
 						firstOpt1 ? "" : ",",
 						d.options1[o].label, d.options1[o].type,
 						d.options1[o].minVal, d.options1[o].maxVal, d.options1[o].defaultValue);
-					if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
+					
+					if (n < 0 || written + n >= static_cast<int>(bufferSize))
+						break;
+
 					written += n;
 					firstOpt1 = false;
 				}
 
 				n = snprintf(responseBuffer + written, bufferSize - written,
 					"],\"options2\":[");
-				if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
-				written += n;
+				
+				if (n < 0 || written + n >= static_cast<int>(bufferSize))
+					break;
 
+				written += n;
 				bool firstOpt2 = true;
+
 				for (unsigned o = 0; o < 2; o++)
 				{
-					if (strcmp(d.options2[o].type, "none") == 0) continue;
+					if (strcmp(d.options2[o].type, "none") == 0)
+						continue;
+
 					n = snprintf(responseBuffer + written, bufferSize - written,
 						"%s{\"label\":\"%s\",\"type\":\"%s\",\"min\":%d,\"max\":%d,\"default\":%d}",
 						firstOpt2 ? "" : ",",
 						d.options2[o].label, d.options2[o].type,
 						d.options2[o].minVal, d.options2[o].maxVal, d.options2[o].defaultValue);
-					if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
+					
+					if (n < 0 || written + n >= static_cast<int>(bufferSize))
+						break;
+
 					written += n;
 					firstOpt2 = false;
 				}
 
 				n = snprintf(responseBuffer + written, bufferSize - written, "]}");
-				if (n < 0 || written + n >= static_cast<int>(bufferSize)) break;
+				
+				if (n < 0 || written + n >= static_cast<int>(bufferSize))
+					break;
+
 				written += n;
 			}
 
@@ -193,6 +225,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 		if (idx >= config->sensors.count)
 			config->sensors.count = idx + 1;
 
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 
@@ -228,6 +261,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 			memset(&config->sensors.sensors[config->sensors.count], 0, sizeof(SensorEntry));
 		}
 
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 
@@ -255,6 +289,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 		SensorEntry& entry = config->sensors.sensors[idx];
 		strncpy(entry.name, params[0].value, sizeof(entry.name) - 1);
 		entry.name[sizeof(entry.name) - 1] = '\0';
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 
@@ -279,6 +314,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 		}
 
 		config->sensors.sensors[idx].pins[slot] = pin;
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 
@@ -305,6 +341,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 		}
 
 		config->sensors.sensors[idx].enabled = enabled;
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 
@@ -358,6 +395,7 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 			config->sensors.sensors[idx].options2[slot] = val16;
 		}
 
+		formatJsonResponse(responseBuffer, bufferSize, true);
 		return CommandResult::ok();
 	}
 

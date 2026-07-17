@@ -58,6 +58,7 @@ public class DashboardViewModel : INotifyPropertyChanged
     private string _systemCpuUsage = DoubleDash;
     private string _systemTime = DoubleDash;
     private string _systemFirmware = DoubleDash;
+    private string _systemUptime = DoubleDash;
 
     public string SystemFreeMemory
     {
@@ -106,9 +107,23 @@ public class DashboardViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Uptime string reported by the device.
+    /// </summary>
+    public string SystemUptime
+    {
+        get => _systemUptime;
+        private set
+        {
+            _systemUptime = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SystemFirmwareAndTime));
+        }
+    }
+
+    /// <summary>
     /// Combined firmware and time display used by the status bar.
     /// </summary>
-    public string SystemFirmwareAndTime => $"FW: {SystemFirmware}  •  {SystemTime}";
+    public string SystemFirmwareAndTime => $"FW: {SystemFirmware}  •  {SystemUptime}";
 
     /// <summary>Label shown in the update banner.</summary>
     public string OtaBannerLabel => _otaStatus?.BannerLabel ?? string.Empty;
@@ -386,6 +401,9 @@ public class DashboardViewModel : INotifyPropertyChanged
     {
         SystemFreeMemory = $"{Math.Round((double)system.Mem / KilobyteBytes, DefaultDecimalPlaces)} kb";
         SystemCpuUsage = $"{system.Cpu}%";
+        // Populate firmware and uptime so the status bar can show them
+        SystemFirmware = string.IsNullOrEmpty(system.Fw) ? DoubleDash : system.Fw;
+        SystemUptime = string.IsNullOrEmpty(system.Uptime) ? DoubleDash : system.Uptime;
     }
 
     private void UpdateRelays(IReadOnlyList<RelayModel> incoming)

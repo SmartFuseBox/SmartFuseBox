@@ -28,6 +28,20 @@ public sealed class SensorMetaCache
     /// </summary>
     public event EventHandler CacheUpdated;
 
+    /// <summary>
+    /// Compares two descriptor lists by id only — if the set of sensor type ids
+    /// is the same, the data is considered identical and no event needs to fire.
+    /// </summary>
+    private static bool DescriptorsAreIdentical(List<SensorTypeDescriptorModel> current, List<SensorTypeDescriptorModel> incoming)
+    {
+        if (current.Count != incoming.Count)
+            return false;
+
+        var currentIds = current.Select(d => d.Id).OrderBy(id => id);
+        var incomingIds = incoming.Select(d => d.Id).OrderBy(id => id);
+        return currentIds.SequenceEqual(incomingIds);
+    }
+
     public SensorMetaCache(IMessageBus messageBus)
     {
         _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
@@ -42,7 +56,12 @@ public sealed class SensorMetaCache
         try
         {
             List<SensorTypeDescriptorModel> result = await service.GetSensorMetaAsync(ct);
-            _descriptors = result ?? [];
+            List<SensorTypeDescriptorModel> incoming = result ?? [];
+
+            if (DescriptorsAreIdentical(_descriptors, incoming))
+                return;
+
+            _descriptors = incoming;
             CacheUpdated?.Invoke(this, EventArgs.Empty);
             _messageBus.Publish(new MetaDataRefreshed());
         }
@@ -60,7 +79,12 @@ public sealed class SensorMetaCache
         try
         {
             List<SensorTypeDescriptorModel> result = await connection.GetSensorMetaAsync(ct);
-            _descriptors = result ?? [];
+            List<SensorTypeDescriptorModel> incoming = result ?? [];
+
+            if (DescriptorsAreIdentical(_descriptors, incoming))
+                return;
+
+            _descriptors = incoming;
             CacheUpdated?.Invoke(this, EventArgs.Empty);
             _messageBus.Publish(new MetaDataRefreshed());
         }
