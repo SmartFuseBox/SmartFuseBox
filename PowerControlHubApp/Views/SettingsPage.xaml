@@ -115,6 +115,54 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!-- GPIO Pins In Use card -->
+            <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
+                    StrokeShape="RoundRectangle 8" Padding="14"
+                    Margin="0,4,0,0">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="GPIOs In Use"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="↻"
+                                FontSize="14"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppLabelMuted}"
+                                Padding="4,0"
+                                HeightRequest="28"
+                                Command="{Binding RefreshPinsCommand}" />
+                    </Grid>
+
+                    <!-- Loading indicator -->
+                    <ActivityIndicator IsRunning="{Binding IsPinsRefreshing}"
+                                       IsVisible="{Binding IsPinsRefreshing}"
+                                       Color="{DynamicResource AppAccent}"
+                                       HeightRequest="20" />
+
+                    <!-- Pins list (hidden while refreshing) -->
+                    <Label Text="{Binding PinsInUseText}"
+                           TextColor="{DynamicResource AppEntryText}"
+                           FontSize="14"
+                           FontFamily="OpenSansRegular"
+                           IsVisible="{Binding IsNotPinsRefreshing}"
+                           LineBreakMode="WordWrap" />
+
+                    <!-- Count -->
+                    <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="11"
+                           IsVisible="{Binding HasPins}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding PinsCount, StringFormat='{0} pin(s) currently assigned'}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </VerticalStackLayout>
+            </Border>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

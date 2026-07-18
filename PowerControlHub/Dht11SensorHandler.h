@@ -61,46 +61,46 @@ private:
 
 protected:
 	// ── Return codes ─────────────────────────────────────────────────────────
-	static constexpr int Dht11Ok       =  0;
-	static constexpr int Dht11Timeout  = -1;
+	static constexpr int Dht11Ok =  0;
+	static constexpr int Dht11Timeout = -1;
 	static constexpr int Dht11Checksum = -2;
 
 	// ── DHT11 one-wire protocol constants ────────────────────────────────────
 
 	// Spec: host pulls bus LOW for a minimum of 18 ms to trigger the sensor.
-	static constexpr uint8_t Dht11StartLowMs        = 18;
+	static constexpr uint8_t Dht11StartLowMs = 18;
 
 	// Spec: host drives HIGH for 20–40 µs before releasing to INPUT so the
 	// sensor can detect the rising edge.  40 µs satisfies the upper bound.
-	static constexpr uint8_t Dht11StartHighUs        = 40;
+	static constexpr uint8_t Dht11StartHighUs = 40;
 
 	// Spec: 40 bits (5 bytes) per reading, transmitted MSB-first within each byte.
-	static constexpr uint8_t Dht11BitCount           = 40;
-	static constexpr uint8_t Dht11ByteCount          = 5;
-	static constexpr uint8_t Dht11BitsPerByte        = 8;
+	static constexpr uint8_t Dht11BitCount = 40;
+	static constexpr uint8_t Dht11ByteCount = 5;
+	static constexpr uint8_t Dht11BitsPerByte = 8;
 
 	// Spec: each bit is preceded by a 50 µs LOW separator, then a HIGH pulse:
 	//   bit '0' → 26–28 µs HIGH
 	//   bit '1' → 70 µs HIGH
 	// 40 µs sits unambiguously between the two ranges and is the standard threshold.
-	static constexpr uint8_t Dht11BitOneThresholdUs  = 40;
+	static constexpr uint8_t Dht11BitOneThresholdUs = 40;
 
 	// Spec: byte layout of the 5 transmitted data bytes.
-	static constexpr uint8_t Dht11HumIntIdx          = 0; // humidity    integer part
-	static constexpr uint8_t Dht11HumDecIdx          = 1; // humidity    decimal part (always 0 on DHT11)
-	static constexpr uint8_t Dht11TmpIntIdx          = 2; // temperature integer part
-	static constexpr uint8_t Dht11TmpDecIdx          = 3; // temperature decimal part (always 0 on DHT11)
-	static constexpr uint8_t Dht11ChecksumIdx        = 4; // checksum = (byte0+byte1+byte2+byte3) & 0xFF
+	static constexpr uint8_t Dht11HumIntIdx = 0; // humidity    integer part
+	static constexpr uint8_t Dht11HumDecIdx = 1; // humidity    decimal part (always 0 on DHT11)
+	static constexpr uint8_t Dht11TmpIntIdx = 2; // temperature integer part
+	static constexpr uint8_t Dht11TmpDecIdx = 3; // temperature decimal part (always 0 on DHT11)
+	static constexpr uint8_t Dht11ChecksumIdx = 4; // checksum = (byte0+byte1+byte2+byte3) & 0xFF
 
 	// Spec: decimal byte encodes tenths (e.g. decimal byte 5 → +0.5 °C / +0.5 %).
-	static constexpr float   Dht11DecimalScale       = 0.1f;
+	static constexpr float Dht11DecimalScale = 0.1f;
 
 	// Iteration cap for every bounded spin-wait in readDht11().
 	// digitalRead() on ESP32 at 240 MHz takes ~0.5–1 µs, so 10 000 iterations
 	// gives a ~5–10 ms hard ceiling per transition — well above any legitimate
 	// DHT11 signal period (max 80 µs response, 70 µs bit-HIGH) yet fast enough
 	// to recover from a fault without stalling the main loop.
-	static constexpr unsigned int Dht11MaxLoopCount  = 10000;
+	static constexpr unsigned int Dht11MaxLoopCount = 10000;
 
 	/**
 	 * @brief Read temperature and humidity from a DHT11 sensor.
@@ -140,18 +140,23 @@ protected:
 		loopCnt = Dht11MaxLoopCount;
 
 		while (digitalRead(pin) == HIGH)
-			if (loopCnt-- == 0) return Dht11Timeout;
+		{
+			if (loopCnt-- == 0)
+				return Dht11Timeout;
+		}
 
 		// Read Dht11BitCount bits; each bit = 50 µs LOW separator + variable-width HIGH
 		for (int i = 0; i < Dht11BitCount; i++)
 		{
 			loopCnt = Dht11MaxLoopCount;
+
 			while (digitalRead(pin) == LOW)
 				if (loopCnt-- == 0) return Dht11Timeout;
 
 			unsigned long t = micros();
 
 			loopCnt = Dht11MaxLoopCount;
+
 			while (digitalRead(pin) == HIGH)
 				if (loopCnt-- == 0) return Dht11Timeout;
 
@@ -168,14 +173,14 @@ protected:
 		}
 
 		// Verify checksum: low byte of the sum of the four data bytes
-		uint8_t sum = (bits[Dht11HumIntIdx] + bits[Dht11HumDecIdx]
-					 + bits[Dht11TmpIntIdx]  + bits[Dht11TmpDecIdx]) & 0xFF;
+		uint8_t sum = (bits[Dht11HumIntIdx] + bits[Dht11HumDecIdx] +
+			bits[Dht11TmpIntIdx]  + bits[Dht11TmpDecIdx]) & 0xFF;
 
 		if (bits[Dht11ChecksumIdx] != sum)
 			return Dht11Checksum;
 
-		outHumidity    = bits[Dht11HumIntIdx] + (bits[Dht11HumDecIdx] * Dht11DecimalScale);
-		outTemperature = bits[Dht11TmpIntIdx]  + (bits[Dht11TmpDecIdx] * Dht11DecimalScale);
+		outHumidity = bits[Dht11HumIntIdx] + (bits[Dht11HumDecIdx] * Dht11DecimalScale);
+		outTemperature = bits[Dht11TmpIntIdx] + (bits[Dht11TmpDecIdx] * Dht11DecimalScale);
 
 		return Dht11Ok;
 	}
@@ -200,6 +205,7 @@ protected:
 				snprintf(buffer, sizeof(buffer), "DHT11 read error: %s", errStr);
 				sendError(buffer, "DHT11 Error");
 			}
+
 			return TempHumidityCheckMs;
 		}
 

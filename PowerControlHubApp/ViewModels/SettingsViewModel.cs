@@ -14,6 +14,9 @@ public class SettingsViewModel : INotifyPropertyChanged
     private string _port = DefaultDeviceIpPort;
     private string _statusMessage = string.Empty;
     private string _selectedTheme;
+    private string _pinsInUseText = string.Empty;
+    private bool _isPinsRefreshing;
+    private int _pinsCount;
 
     public string IpAddress
     {
@@ -69,17 +72,87 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    public string PinsInUseText
+    {
+        get => _pinsInUseText;
+        set
+        {
+            _pinsInUseText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int PinsCount
+    {
+        get => _pinsCount;
+        set
+        {
+            _pinsCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsPinsRefreshing
+    {
+        get => _isPinsRefreshing;
+        set
+        {
+            _isPinsRefreshing = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsNotPinsRefreshing));
+        }
+    }
+
+    public bool IsNotPinsRefreshing => !_isPinsRefreshing;
+
+    public bool HasPins => PinsCount > 0;
+
     public ICommand SaveCommand { get; }
+    public ICommand RefreshPinsCommand { get; }
 
     public SettingsViewModel(PowerHubService service, ThemeService themeService)
     {
         _service = service;
         _themeService = themeService;
         SaveCommand = new Command(Save);
+        RefreshPinsCommand = new Command(async () => await RefreshPinsAsync());
 
         IpAddress = Preferences.Get(KeyDeviceIpAddress, string.Empty);
         Port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
-            _selectedTheme = ThemeService.Current;
+        _selectedTheme = ThemeService.Current;
+    }
+
+    public async Task RefreshPinsAsync()
+    {
+        if (!_service.IsConfigured || _isPinsRefreshing)
+            return;
+
+        IsPinsRefreshing = true;
+
+        try
+        {
+            var result = await _service.GetSystemPinsAsync();
+
+            if (result?.Success == true && result.Pins?.Count > 0)
+            {
+                PinsCount = result.Pins.Count;
+                PinsInUseText = string.Join(CommaSpace, result.Pins);
+            }
+            else
+            {
+                PinsCount = 0;
+                PinsInUseText = DoubleDash;
+            }
+        }
+        catch
+        {
+            PinsCount = 0;
+            PinsInUseText = MessageDeviceUnreachable;
+        }
+        finally
+        {
+            IsPinsRefreshing = false;
+        }
     }
 
     private void Save()

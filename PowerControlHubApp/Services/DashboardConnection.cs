@@ -38,6 +38,12 @@ namespace PowerControlHubApp.Services
 
         public bool IsConfigured => !string.IsNullOrEmpty(_baseUrl);
 
+        public async Task<SystemPinsResponseModel> GetSystemPinsAsync(CancellationToken ct = default)
+        {
+            string json = await _client.GetStringAsync(RouteSystemPins, ct);
+            return JsonSerializer.Deserialize<SystemPinsResponseModel>(json, JsonOptions);
+        }
+
         public async Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
         {
             string json = await _client.GetStringAsync(RouteApiIndex, ct);

@@ -21,6 +21,7 @@
         public const string ColorLogError = "#ff4444";
         public const string ColorLogDefault = "#888888";
         public const string DoubleDash = "--";
+        public const string CommaSpace = ", ";
         public const string FontOpenSansRegular = "OpenSans-Regular.ttf";
         public const string FontSansSemiBold = "OpenSans-Semibold.ttf";
         public const string FontSansSemiBoldName = "OpenSansSemibold";
@@ -177,6 +178,7 @@
         public const string RouteSaveConfig = "api/config/C0";
         public const string RouteOtaUpdate = "api/system/F13";
         public const string RouteUpdateOta = "api/system/F12?apply=1";
+        public const string RouteSystemPins = "api/system/F15";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
         public const string RouteDashboardPage = "//DashboardPage";
@@ -250,6 +252,11 @@
         public const string SensorTypeVoltage = "Voltage";
         public const string SensorTypeUnknown = "Unknown";
         public const string SensorTypeMetaDataUnavailable = "Sensor type metadata unavailable.";
+        public const string FailAddUpdateSensor = "add/update sensor entry";
+        public const string FailEnableDisableSensor = "change enabled state";
+        public const string FailSaveSettings = "save settings to disk";
+        public const string FailSeparator = "; ";
+        public const string FailPrefix = "⚠ Failed to: ";
 
         // Sensor type display names with enum values for picker
         public const string SensorTypeWaterPicker = "Water (0)";

@@ -5,5 +5,6 @@ namespace PowerControlHubApp.Services
     {
         bool IsConfigured { get; }
         Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default);
+        Task<SystemPinsResponseModel> GetSystemPinsAsync(CancellationToken ct = default);
     }
 }

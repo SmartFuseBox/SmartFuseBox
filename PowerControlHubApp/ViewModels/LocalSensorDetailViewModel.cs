@@ -752,41 +752,80 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
                 return;
             }
 
-            // Add/update the sensor entry (S1)
-            bool ok = await _service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1);
+            // Collect failures with descriptive labels
+            List<string> failures = [];
+
+            // Add/update the sensor entry (S1) — label only if it fails
+            if (!await _service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1))
+                failures.Add(FailAddUpdateSensor);
 
             // Rename (S3) if changed
             if (_original == null || _original.Name != Name)
-                ok &= await _service.RenameLocalSensorAsync(_sensorIndex, Name ?? string.Empty);
+            {
+                if (!await _service.RenameLocalSensorAsync(_sensorIndex, Name ?? string.Empty))
+                    failures.Add($"rename to \"{Name}\"");
+            }
 
             // Set pins (S4)
             if (_original == null || _original.Pin0 != Pin0)
-                ok &= await _service.SetLocalSensorPinAsync(_sensorIndex, 0, (byte)Pin0);
+            {
+                if (!await _service.SetLocalSensorPinAsync(_sensorIndex, 0, (byte)Pin0))
+                    failures.Add($"set pin 0 to {Pin0Display}");
+            }
 
             if (_original == null || _original.Pin1 != Pin1)
-                ok &= await _service.SetLocalSensorPinAsync(_sensorIndex, 1, (byte)Pin1);
+            {
+                if (!await _service.SetLocalSensorPinAsync(_sensorIndex, 1, (byte)Pin1))
+                    failures.Add($"set pin 1 to {Pin1Display}");
+            }
 
             // Set options (S6)
             if (_original == null || _original.Opt1_0 != Opt1_0)
-                ok &= await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 0, Opt1_0);
+            {
+                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 0, Opt1_0))
+                    failures.Add($"set option {Opt1_0Label} to {Opt1_0}");
+            }
 
             if (_original == null || _original.Opt1_1 != Opt1_1)
-                ok &= await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 0, Opt1_1);
+            {
+                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 0, Opt1_1))
+                    failures.Add($"set option {Opt1_1Label} to {Opt1_1}");
+            }
 
             if (_original == null || _original.Opt2_0 != Opt2_0)
-                ok &= await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 1, Opt2_0);
+            {
+                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 1, Opt2_0))
+                    failures.Add($"set option {Opt2_0Label} to {Opt2_0}");
+            }
 
             if (_original == null || _original.Opt2_1 != Opt2_1)
-                ok &= await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 1, Opt2_1);
+            {
+                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 1, Opt2_1))
+                    failures.Add($"set option {Opt2_1Label} to {Opt2_1}");
+            }
 
             // Set enabled (S5)
             if (_original == null || _original.Enabled != IsEnabled)
-                ok &= await _service.SetLocalSensorEnabledAsync(_sensorIndex, IsEnabled);
+            {
+                if (!await _service.SetLocalSensorEnabledAsync(_sensorIndex, IsEnabled))
+                    failures.Add(FailEnableDisableSensor);
+            }
 
-            if (ok)
-                ok &= await _service.SaveSettingsAsync();
+            // Save changes to disk
+            if (failures.Count == 0)
+            {
+                if (!await _service.SaveSettingsAsync())
+                    failures.Add(FailSaveSettings);
+            }
+            else
+            {
+                // Still attempt to save even if some commands failed
+                await _service.SaveSettingsAsync();
+            }
 
-            StatusMessage = ok ? SavedOk : SavedFailed;
+            StatusMessage = failures.Count == 0
+                ? SavedOk
+                : $"{FailPrefix}{string.Join(FailSeparator, failures)}";
         }
         catch (Exception ex)
         {

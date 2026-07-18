@@ -44,6 +44,11 @@ public class PowerHubService
             cc.Configure(ipAddress, port);
     }
 
+    public Task<SystemPinsResponseModel> GetSystemPinsAsync(CancellationToken ct = default)
+    {
+        return _dashboardConnection.GetSystemPinsAsync(ct);
+    }
+
     public Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
     {
         return _dashboardConnection.GetDashboardDataAsync(ct);
