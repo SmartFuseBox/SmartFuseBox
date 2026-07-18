@@ -21,6 +21,7 @@
 #include "SystemFunctions.h"
 #include "ConfigManager.h"
 #include "SensorConfig.h"
+#include "PinGuard.h"
 
 
 SensorNetworkHandler::SensorNetworkHandler(SensorController* sensorController)
@@ -311,6 +312,28 @@ CommandResult SensorNetworkHandler::handleRequest(const char* method,
 			slot >= ConfigMaxSensorPins)
 		{
 			return CommandResult::error(InvalidCommandParameters);
+		}
+
+		// Validate pin through PinGuard — only GPIO slots represent actual hardware pins
+		{
+			const uint8_t sensorType = static_cast<uint8_t>(config->sensors.sensors[idx].sensorType);
+			bool isGpioSlot = false;
+			PinUse intendedUse = PinUse::Sensor;
+
+			if (sensorType < static_cast<uint8_t>(SensorIdList::Count))
+			{
+				const SensorFieldDescriptor& field = SensorDescriptors[sensorType].pins[slot];
+				isGpioSlot = (strcmp(field.type, "gpio") == 0);
+				intendedUse = field.pinUse;
+			}
+
+			// Always validate GPIO slots through PinGuard (covers hard-blocks, advisory, and InUse).
+			// Non-GPIO slots store payload bytes (relay indices, action types) — skip PinGuard.
+			if (isGpioSlot && PinGuard::isBlocked(PinGuard::validate(pin, intendedUse)))
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Pin blocked by PinGuard");
+				return CommandResult::error(InvalidCommandParameters);
+			}
 		}
 
 		config->sensors.sensors[idx].pins[slot] = pin;
