@@ -46,6 +46,7 @@
 
 #include <stdint.h>
 #include "SystemDefinitions.h"
+#include "SystemFunctions.h"
 
 // ─── Pin Use ─────────────────────────────────────────────────────────────────
 // Describes the intended use of a pin.  Input-only GPIO are fine for Input,
@@ -65,18 +66,19 @@ enum class PinUse : uint8_t
 // ─── Pin Category ─────────────────────────────────────────────────────────────
 enum class PinCategory : uint8_t
 {
-	Safe     = 0,   // unrestricted
+	Safe = 0,   // unrestricted
 	Advisory = 1,   // risky; behaviour governed by PinGuardMode
-	Hard     = 2,   // always rejected for the given use
+	Hard = 2,   // always rejected for the given use
 };
 
 // ─── Validation Result ────────────────────────────────────────────────────────
 enum class PinGuardResult : uint8_t
 {
-	Safe            = 0,    // pin is fine for the requested use
+	Safe = 0,    // pin is fine for the requested use
 	AdvisoryBlocked = 1,    // advisory pin blocked (mode does not permit advisory)
-	HardBlocked     = 2,    // hard-blocked — must not be used for this purpose
-	Disabled        = 3,    // pin == PinDisabled (0xFF) — treated as not fitted
+	HardBlocked = 2,    // hard-blocked — must not be used for this purpose
+	Disabled = 3,    // pin == PinDisabled (0xFF) — treated as not fitted
+	InUse = 4,    // pin is already in use by another configured function
 };
 
 // ─── PinGuard Mode ────────────────────────────────────────────────────────────
@@ -84,9 +86,9 @@ enum class PinGuardResult : uint8_t
 // Configured via the F14 command.
 namespace PinGuardMode
 {
-	constexpr uint8_t None         = 0x00;  // strict — advisory pins are blocked
+	constexpr uint8_t None = 0x00;  // strict — advisory pins are blocked
 	constexpr uint8_t AllowAdvisory = 0x01; // advisory pins are permitted
-	constexpr uint8_t Bypass        = 0x02; // skip all checks — always returns Safe
+	constexpr uint8_t Bypass = 0x02; // skip all checks — always returns Safe
 }
 
 // ─── Internal helpers — not for direct use ───────────────────────────────────
@@ -113,8 +115,8 @@ namespace PinGuardInternal
 
 struct PinTableEntry
 {
-	uint8_t      gpio;
-	PinCategory  category;
+	uint8_t gpio;
+	PinCategory category;
 };
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
@@ -224,7 +226,7 @@ public:
 	 */
 	static bool isBlocked(PinGuardResult result)
 	{
-		return result == PinGuardResult::HardBlocked || result == PinGuardResult::AdvisoryBlocked;
+		return result == PinGuardResult::HardBlocked || result == PinGuardResult::AdvisoryBlocked || result == PinGuardResult::InUse;
 	}
 
 	/**
@@ -243,6 +245,10 @@ public:
 	{
 		if (pin == PinDisabled)
 			return PinGuardResult::Disabled;
+
+		// Check whether this pin is already assigned elsewhere in the configuration
+		if (SystemFunctions::pinInUse(pin))
+			return PinGuardResult::InUse;
 
 		// Bypass: skip all checks
 		if (_mode & PinGuardMode::Bypass)
@@ -309,6 +315,8 @@ public:
 				return F("advisory (strapping/UART pin)");
 			case PinGuardResult::Disabled:
 				return F("disabled (255)");
+			case PinGuardResult::InUse:
+				return F("in use (already configured)");
 			default:
 				return F("safe");
 		}

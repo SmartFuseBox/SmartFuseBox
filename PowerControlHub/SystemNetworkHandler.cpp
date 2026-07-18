@@ -53,6 +53,37 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
+	else if (SystemFunctions::commandMatches(command, SystemPinUsage))
+	{
+		uint8_t pins[64];
+		uint8_t count = SystemFunctions::getUsedPins(pins, sizeof(pins));
+
+		size_t pos = 0;
+		int written = snprintf(responseBuffer + pos, bufferSize - pos,
+			"\"success\":true,\"command\":\"%s\",\"pins\":[", command);
+
+		if (written > 0)
+			pos += (size_t)written;
+
+		for (uint8_t i = 0; i < count && pos < bufferSize; ++i)
+		{
+			written = snprintf(responseBuffer + pos, bufferSize - pos,
+				"%s%u", (i > 0) ? "," : "", (unsigned)pins[i]);
+
+			if (written > 0)
+				pos += (size_t)written;
+			else
+				break;
+		}
+
+		if (pos < bufferSize)
+		{
+			responseBuffer[pos++] = ']';
+			responseBuffer[pos] = '\0';
+		}
+
+		return CommandResult::ok();
+	}
 	else
 	{
 		return CommandResult::error(InvalidCommandParameters);

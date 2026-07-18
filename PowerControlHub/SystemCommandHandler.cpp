@@ -29,7 +29,7 @@
 
 
 SystemCommandHandler::SystemCommandHandler(BroadcastManager* broadcaster, WarningManager* warningManager)
-    : SharedBaseCommandHandler(broadcaster, warningManager)
+	: SharedBaseCommandHandler(broadcaster, warningManager)
 {
 }
 
@@ -39,389 +39,435 @@ SystemCommandHandler::~SystemCommandHandler()
 
 const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
 {
-    static const char* cmds[] = { 
-        SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
-        SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
-        SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime,
-        SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode
-    };
-    count = sizeof(cmds) / sizeof(cmds[0]);
-    return cmds;
+	static const char* cmds[] = {
+		SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
+		SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
+		SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime,
+		SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode, SystemPinUsage
+	};
+	count = sizeof(cmds) / sizeof(cmds[0]);
+	return cmds;
 }
 
 bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const char* command, const StringKeyValue params[], uint8_t paramCount)
 {
-    (void)params;
-    (void)paramCount;
+	(void)params;
+	(void)paramCount;
 
-    if (SystemFunctions::commandMatches(command, SystemHeartbeatCommand))
-    {
-        // Use BaseConfigCommandHandler helpers to read named params
-        const char* tStr = getParamValue(params, paramCount, "t");
-        if (tStr)
-        {
-            uint64_t timestamp = static_cast<uint64_t>(strtoull(tStr, nullptr, 0));
-            if (timestamp > 0)
-            {
-                DateTimeManager::setDateTime(timestamp);
-            }
-        }
+	if (SystemFunctions::commandMatches(command, SystemHeartbeatCommand))
+	{
+		// Use BaseConfigCommandHandler helpers to read named params
+		const char* tStr = getParamValue(params, paramCount, "t");
+		if (tStr)
+		{
+			uint64_t timestamp = static_cast<uint64_t>(strtoull(tStr, nullptr, 0));
+			if (timestamp > 0)
+			{
+				DateTimeManager::setDateTime(timestamp);
+			}
+		}
 
-        // Warnings parameter (w) is currently ignored but read here for completeness
-        const char* wStr = getParamValue(params, paramCount, "w");
-        (void)wStr;
+		// Warnings parameter (w) is currently ignored but read here for completeness
+		const char* wStr = getParamValue(params, paramCount, "w");
+		(void)wStr;
 
-        sendAckOk(sender, command);
-    }
-    else if (SystemFunctions::commandMatches(command, SystemInitialized))
-    {
-        sendAckOk(sender, command);
-    }
-    else if (SystemFunctions::commandMatches(command, SystemFreeMemory))
-    {
-        StringKeyValue param;
+		sendAckOk(sender, command);
+	}
+	else if (SystemFunctions::commandMatches(command, SystemInitialized))
+	{
+		sendAckOk(sender, command);
+	}
+	else if (SystemFunctions::commandMatches(command, SystemFreeMemory))
+	{
+		StringKeyValue param;
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemFunctions::freeMemory());
-        sendAckOk(sender, command, &param);
-    }
+		sendAckOk(sender, command, &param);
+	}
 	else if (SystemFunctions::commandMatches(command, SystemCpuUsage))
-    {
-        StringKeyValue param;
-        strncpy(param.key, ValueParamName, sizeof(param.key));
-        snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemCpuMonitor::getCpuUsage());
-        sendAckOk(sender, command, &param);
-    }
+	{
+		StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemCpuMonitor::getCpuUsage());
+		sendAckOk(sender, command, &param);
+	}
 	else if (SystemFunctions::commandMatches(command, SystemBluetoothStatus))
-    {
+	{
 		Config* config = ConfigManager::getConfigPtr();
 
-        bool enabled = false;
-        
-        if (config)
+		bool enabled = false;
+
+		if (config)
 			enabled = config->network.bluetoothEnabled;
-            
-        if (_broadcaster)
-        {
+
+		if (_broadcaster)
+		{
 			char value = enabled ? '1' : '0';
-            StringKeyValue param = makeParam(ValueParamName, value);
-            sendAckOk(sender, command, &param);
-        }
-    }
+			StringKeyValue param = makeParam(ValueParamName, value);
+			sendAckOk(sender, command, &param);
+		}
+	}
 #if defined(WIFI_SUPPORT)
-    else if (SystemFunctions::commandMatches(command, SystemWifiStatus))
-    {
-        Config* config = ConfigManager::getConfigPtr();
+	else if (SystemFunctions::commandMatches(command, SystemWifiStatus))
+	{
+		Config* config = ConfigManager::getConfigPtr();
 
-        bool enabled = false;
-        char ipAddress[MaxIpAddressLength] = "0.0.0.0";
+		bool enabled = false;
+		char ipAddress[MaxIpAddressLength] = "0.0.0.0";
 		char ssid[MaxSSIDLength] = "";
-        int rssi = 0;
+		int rssi = 0;
 
-        if (config)
-            enabled = config->network.wifiEnabled;
+		if (config)
+			enabled = config->network.wifiEnabled;
 
-        // Get IP address from WifiController if available
-        if (_wifiController && enabled && _wifiController->isEnabled())
-        {
+		// Get IP address from WifiController if available
+		if (_wifiController && enabled && _wifiController->isEnabled())
+		{
 
-            _wifiController->getServer()->getIpAddress(ipAddress, MaxIpAddressLength);
+			_wifiController->getServer()->getIpAddress(ipAddress, MaxIpAddressLength);
 			_wifiController->getServer()->getSSID(ssid, MaxSSIDLength);
 			rssi = _wifiController->getServer()->getSignalStrength();
-        }
+		}
 
-        if (_broadcaster)
-        {
-            constexpr uint8_t argCount = 4;
+		if (_broadcaster)
+		{
+			constexpr uint8_t argCount = 4;
 			char enabledValue = enabled ? '1' : '0';
-            StringKeyValue params[argCount] = {
-                makeParam(ValueParamName, enabledValue),
-                makeParam("ip", ipAddress),
+			StringKeyValue params[argCount] = {
+				makeParam(ValueParamName, enabledValue),
+				makeParam("ip", ipAddress),
 				makeParam("ssid", ssid),
-                makeParam("rssi", rssi)
-            };
-            sendAckOk(sender, command, params, argCount);
-        }
-    }
+				makeParam("rssi", rssi)
+			};
+			sendAckOk(sender, command, params, argCount);
+		}
+	}
 #endif
-    else if (SystemFunctions::commandMatches(command, SystemSetDateTime) && paramCount == 1)
-    {
-        bool success = false;
+	else if (SystemFunctions::commandMatches(command, SystemSetDateTime) && paramCount == 1)
+	{
+		bool success = false;
 
-        // Only supports Unix timestamp (all digits)
-        uint64_t timestamp = static_cast<uint64_t>(strtoull(params[0].value, nullptr, 0));
-        if (timestamp > 0)
-        {
-            DateTimeManager::setDateTime(timestamp);
-            success = true;
-        }
-        
-        if (success)
-        {
-            StringKeyValue param;
+		// Only supports Unix timestamp (all digits)
+		uint64_t timestamp = static_cast<uint64_t>(strtoull(params[0].value, nullptr, 0));
+		if (timestamp > 0)
+		{
+			DateTimeManager::setDateTime(timestamp);
+			success = true;
+		}
+
+		if (success)
+		{
+			StringKeyValue param;
 			strncpy(param.key, ValueParamName, sizeof(param.key));
-            DateTimeManager::formatDateTime(param.value, sizeof(param.value));
-            sendAckOk(sender, command, &param);
-        }
-        else
-        {
-            _broadcaster->getComputerSerial()->sendDebug(command, F("Invalid Datetime"));
-            sendAckErr(sender, command, F("Invalid datetime format"));
-        }
-        
-        return true;
-    }
+			DateTimeManager::formatDateTime(param.value, sizeof(param.value));
+			sendAckOk(sender, command, &param);
+		}
+		else
+		{
+			_broadcaster->getComputerSerial()->sendDebug(command, F("Invalid Datetime"));
+			sendAckErr(sender, command, F("Invalid datetime format"));
+		}
+
+		return true;
+	}
 	else if (SystemFunctions::commandMatches(command, SystemGetDateTime))
-    {
-        if (DateTimeManager::isTimeSet())
-        {
-            StringKeyValue param;
-            strncpy(param.key, ValueParamName, sizeof(param.key));
-            DateTimeManager::formatDateTime(param.value, sizeof(param.value));
-            sendAckOk(sender, command, &param);
-        }
-        else
-        {
-            sendAckErr(sender, command, F("Date/time not set"));
-        }
-        
-        return true;
-    }
-    else if (SystemFunctions::commandMatches(command, SystemSdCardPresent))
-    {
-        bool present = false;
+	{
+		if (DateTimeManager::isTimeSet())
+		{
+			StringKeyValue param;
+			strncpy(param.key, ValueParamName, sizeof(param.key));
+			DateTimeManager::formatDateTime(param.value, sizeof(param.value));
+			sendAckOk(sender, command, &param);
+		}
+		else
+		{
+			sendAckErr(sender, command, F("Date/time not set"));
+		}
+
+		return true;
+	}
+	else if (SystemFunctions::commandMatches(command, SystemSdCardPresent))
+	{
+		bool present = false;
 
 #if defined(SD_CARD_SUPPORT)
-        // Check SD card presence via MicroSdDriver
-        MicroSdDriver& sdDriver = MicroSdDriver::getInstance();
-        present = sdDriver.isCardPresent();
+		// Check SD card presence via MicroSdDriver
+		MicroSdDriver& sdDriver = MicroSdDriver::getInstance();
+		present = sdDriver.isCardPresent();
 #endif
 
-        char value = present ? '1' : '0';
-        StringKeyValue param = makeParam(ValueParamName, value);
-        sendAckOk(sender, command, &param);
-    }
-    else if (SystemFunctions::commandMatches(command, SystemSdCardLogFileSize))
-    {
-        uint32_t fileSize = 0;
+		char value = present ? '1' : '0';
+		StringKeyValue param = makeParam(ValueParamName, value);
+		sendAckOk(sender, command, &param);
+	}
+	else if (SystemFunctions::commandMatches(command, SystemSdCardLogFileSize))
+	{
+		uint32_t fileSize = 0;
 
 #if defined(SD_CARD_SUPPORT)
-        if (_sdCardLogger)
-        {
-            fileSize = _sdCardLogger->getCurrentLogFileSize();
-        }
+		if (_sdCardLogger)
+		{
+			fileSize = _sdCardLogger->getCurrentLogFileSize();
+		}
 #endif
 
-        StringKeyValue param;
-        strncpy(param.key, ValueParamName, sizeof(param.key));
-        snprintf_P(param.value, sizeof(param.value), PSTR("%lu"), (unsigned long)fileSize);
-        sendAckOk(sender, command, &param);
-    }
-    else if (SystemFunctions::commandMatches(command, SystemRtcDiagnostic))
-    {
-        char diagnosticMsg[64];
+		StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		snprintf_P(param.value, sizeof(param.value), PSTR("%lu"), (unsigned long)fileSize);
+		sendAckOk(sender, command, &param);
+	}
+	else if (SystemFunctions::commandMatches(command, SystemRtcDiagnostic))
+	{
+		char diagnosticMsg[64];
 
-        bool success = DateTimeManager::rtcDiagnostic(diagnosticMsg, sizeof(diagnosticMsg));
-        StringKeyValue param;
-        strncpy(param.key, ValueParamName, sizeof(param.key));
-        strncpy(param.value, diagnosticMsg, sizeof(param.value));
+		bool success = DateTimeManager::rtcDiagnostic(diagnosticMsg, sizeof(diagnosticMsg));
+		StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		strncpy(param.value, diagnosticMsg, sizeof(param.value));
 
-        if (success)
-        {
-            sendAckOk(sender, command, &param);
-        }
-        else
-        {
-            sendAckErr(sender, command, param.value);
-        }
-    }
-    else if (SystemFunctions::commandMatches(command, SystemUptime))
-    {
-        StringKeyValue param;
-        strncpy(param.key, ValueParamName, sizeof(param.key));
-        TimeParts tp = SystemFunctions::msToTimeParts(SystemFunctions::millis64());
-        SystemFunctions::formatTimeParts(param.value, sizeof(param.value), tp);
-        sendAckOk(sender, command, &param);
-        }
+		if (success)
+		{
+			sendAckOk(sender, command, &param);
+		}
+		else
+		{
+			sendAckErr(sender, command, param.value);
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SystemUptime))
+	{
+		StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		TimeParts tp = SystemFunctions::msToTimeParts(SystemFunctions::millis64());
+		SystemFunctions::formatTimeParts(param.value, sizeof(param.value), tp);
+		sendAckOk(sender, command, &param);
+	}
 #if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
-    else if (SystemFunctions::commandMatches(command, SystemCheckForUpdate))
-    {
-        if (_otaManager)
-        {
-            // apply=1 triggers a check and immediately applies the update if one is found.
-            const char* applyStr = getParamValue(params, paramCount, "apply");
-            bool applyNow = applyStr && (applyStr[0] == '1');
-            _otaManager->triggerCheck(applyNow);
+	else if (SystemFunctions::commandMatches(command, SystemCheckForUpdate))
+	{
+		if (_otaManager)
+		{
+			// apply=1 triggers a check and immediately applies the update if one is found.
+			const char* applyStr = getParamValue(params, paramCount, "apply");
+			bool applyNow = applyStr && (applyStr[0] == '1');
+			_otaManager->triggerCheck(applyNow);
 
-            // Respond with the current state — the async result will be broadcast later.
-            char current[16];
-            snprintf(current, sizeof(current), "v%u.%u.%u.%u",
-                FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild);
+			// Respond with the current state — the async result will be broadcast later.
+			char current[16];
+			snprintf(current, sizeof(current), "v%u.%u.%u.%u",
+				FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild);
 
-            const char* stateStr = "idle";
+			const char* stateStr = "idle";
 
-            switch (_otaManager->getState())
-            {
-                case OtaState::Idle:
-                    stateStr = "triggered";
-                    break;
-                case OtaState::Checking:
-                    stateStr = "checking";
-                    break;
-                case OtaState::UpdateAvailable:
-                    stateStr = "available";
-                    break;
-                case OtaState::Downloading:
-                    stateStr = "downloading";
-                    break;
-                case OtaState::Rebooting:
-                    stateStr = "rebooting";
-                    break;
-                case OtaState::Failed:
-                    stateStr = "failed";
-                    break;
-                case OtaState::UpToDate:
-                    stateStr = "uptodate";
-                    break;
-            }
+			switch (_otaManager->getState())
+			{
+			case OtaState::Idle:
+				stateStr = "triggered";
+				break;
+			case OtaState::Checking:
+				stateStr = "checking";
+				break;
+			case OtaState::UpdateAvailable:
+				stateStr = "available";
+				break;
+			case OtaState::Downloading:
+				stateStr = "downloading";
+				break;
+			case OtaState::Rebooting:
+				stateStr = "rebooting";
+				break;
+			case OtaState::Failed:
+				stateStr = "failed";
+				break;
+			case OtaState::UpToDate:
+				stateStr = "uptodate";
+				break;
+			}
 
-            constexpr uint8_t argCount = 3;
-            StringKeyValue respParams[argCount];
-            strncpy(respParams[0].key, "v", sizeof(respParams[0].key));
-            strncpy(respParams[0].value, current, sizeof(respParams[0].value));
-            strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
-            strncpy(respParams[1].value, _otaManager->getAvailableVersion(), sizeof(respParams[1].value));
-            strncpy(respParams[2].key, "s", sizeof(respParams[2].key));
-            strncpy(respParams[2].value, stateStr, sizeof(respParams[2].value));
-            sendAckOk(sender, command, respParams, argCount);
-        }
-        else
-        {
-            sendAckErr(sender, command, F("OTA not available"));
-        }
-    }
-    else if (SystemFunctions::commandMatches(command, SystemOtaStatus))
-    {
-        char current[16];
-        snprintf(current, sizeof(current), "v%u.%u.%u.%u",
-            FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild);
+			constexpr uint8_t argCount = 3;
+			StringKeyValue respParams[argCount];
+			strncpy(respParams[0].key, "v", sizeof(respParams[0].key));
+			strncpy(respParams[0].value, current, sizeof(respParams[0].value));
+			strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
+			strncpy(respParams[1].value, _otaManager->getAvailableVersion(), sizeof(respParams[1].value));
+			strncpy(respParams[2].key, "s", sizeof(respParams[2].key));
+			strncpy(respParams[2].value, stateStr, sizeof(respParams[2].value));
+			sendAckOk(sender, command, respParams, argCount);
+		}
+		else
+		{
+			sendAckErr(sender, command, F("OTA not available"));
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, SystemOtaStatus))
+	{
+		char current[16];
+		snprintf(current, sizeof(current), "v%u.%u.%u.%u",
+			FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild);
 
-        const char* stateStr   = "disabled";
-        const char* avVersion  = "";
-        char        autoApply  = '0';
+		const char* stateStr = "disabled";
+		const char* avVersion = "";
+		char        autoApply = '0';
 
-        if (_otaManager)
-        {
-            switch (_otaManager->getState())
-            {
-                case OtaState::Idle:             stateStr = "idle";        break;
-                case OtaState::Checking:         stateStr = "checking";    break;
-                case OtaState::UpdateAvailable:  stateStr = "available";   break;
-                case OtaState::Downloading:      stateStr = "downloading"; break;
-                case OtaState::Rebooting:        stateStr = "rebooting";   break;
-                case OtaState::Failed:           stateStr = "failed";      break;
-                case OtaState::UpToDate:         stateStr = "uptodate";    break;
-            }
-            avVersion = _otaManager->getAvailableVersion();
+		if (_otaManager)
+		{
+			switch (_otaManager->getState())
+			{
+				case OtaState::Idle:
+					stateStr = "idle";
+					break;
 
-            SystemHeader* hdr = ConfigManager::getHeaderPtr();
-            if (hdr && (hdr->reserved[0] & OtaFlagAutoApply))
-                autoApply = '1';
-        }
+				case OtaState::Checking:
+					stateStr = "checking";
+					break;
 
-        constexpr uint8_t argCount = 4;
-        StringKeyValue respParams[argCount];
-        strncpy(respParams[0].key, "v",  sizeof(respParams[0].key));
-        strncpy(respParams[0].value, current, sizeof(respParams[0].value));
-        strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
-        strncpy(respParams[1].value, avVersion, sizeof(respParams[1].value));
-        strncpy(respParams[2].key, "s",  sizeof(respParams[2].key));
-        strncpy(respParams[2].value, stateStr, sizeof(respParams[2].value));
-        strncpy(respParams[3].key, "auto", sizeof(respParams[3].key));
-        respParams[3].value[0] = autoApply;
-        respParams[3].value[1] = '\0';
-        sendAckOk(sender, command, respParams, argCount);
-    }
+				case OtaState::UpdateAvailable:
+					stateStr = "available";
+					break;
+
+				case OtaState::Downloading:
+					stateStr = "downloading";
+					break;
+
+				case OtaState::Rebooting:
+					stateStr = "rebooting";
+					break;
+
+				case OtaState::Failed:
+					stateStr = "failed";
+					break;
+
+				case OtaState::UpToDate:
+					stateStr = "uptodate";
+					break;
+			}
+
+			avVersion = _otaManager->getAvailableVersion();
+
+			SystemHeader* hdr = ConfigManager::getHeaderPtr();
+			if (hdr && (hdr->reserved[0] & OtaFlagAutoApply))
+				autoApply = '1';
+		}
+
+		constexpr uint8_t argCount = 4;
+		StringKeyValue respParams[argCount];
+		strncpy(respParams[0].key, "v", sizeof(respParams[0].key));
+		strncpy(respParams[0].value, current, sizeof(respParams[0].value));
+		strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
+		strncpy(respParams[1].value, avVersion, sizeof(respParams[1].value));
+		strncpy(respParams[2].key, "s", sizeof(respParams[2].key));
+		strncpy(respParams[2].value, stateStr, sizeof(respParams[2].value));
+		strncpy(respParams[3].key, "auto", sizeof(respParams[3].key));
+		respParams[3].value[0] = autoApply;
+		respParams[3].value[1] = '\0';
+		sendAckOk(sender, command, respParams, argCount);
+	}
 #endif // OTA_AUTO_UPDATE
-    else if (SystemFunctions::commandMatches(command, SystemPinGuardMode))
-    {
-        if (paramCount > 0)
-        {
-            // Write mode: a=<bool> for AllowAdvisory, b=<bool> for Bypass
-            SystemHeader* hdr = ConfigManager::getHeaderPtr();
-            if (hdr)
-            {
-                const char* aStr = getParamValue(params, paramCount, "a");
-                const char* bStr = getParamValue(params, paramCount, "b");
+	else if (SystemFunctions::commandMatches(command, SystemPinGuardMode))
+	{
+		if (paramCount > 0)
+		{
+			// Write mode: a=<bool> for AllowAdvisory, b=<bool> for Bypass
+			SystemHeader* hdr = ConfigManager::getHeaderPtr();
+			if (hdr)
+			{
+				const char* aStr = getParamValue(params, paramCount, "a");
+				const char* bStr = getParamValue(params, paramCount, "b");
 
-                if (aStr)
-                {
-                    bool allow = (strcmp(aStr, "true") == 0 || strcmp(aStr, "1") == 0);
+				if (aStr)
+				{
+					bool allow = (strcmp(aStr, "true") == 0 || strcmp(aStr, "1") == 0);
 
-                    if (allow)
-                        hdr->pinGuardFlags |= PinGuardMode::AllowAdvisory;
-                    else
-                        hdr->pinGuardFlags &= ~PinGuardMode::AllowAdvisory;
-                }
+					if (allow)
+						hdr->pinGuardFlags |= PinGuardMode::AllowAdvisory;
+					else
+						hdr->pinGuardFlags &= ~PinGuardMode::AllowAdvisory;
+				}
 
-                if (bStr)
-                {
-                    bool bypass = (strcmp(bStr, "true") == 0 || strcmp(bStr, "1") == 0);
+				if (bStr)
+				{
+					bool bypass = (strcmp(bStr, "true") == 0 || strcmp(bStr, "1") == 0);
 
-                    if (bypass)
-                        hdr->pinGuardFlags |= PinGuardMode::Bypass;
-                    else
-                        hdr->pinGuardFlags &= ~PinGuardMode::Bypass;
-                }
+					if (bypass)
+						hdr->pinGuardFlags |= PinGuardMode::Bypass;
+					else
+						hdr->pinGuardFlags &= ~PinGuardMode::Bypass;
+				}
 
-                ConfigManager::setPinGuardFlags(hdr->pinGuardFlags);
-                PinGuard::setMode(hdr->pinGuardFlags);
-            }
-        }
+				ConfigManager::setPinGuardFlags(hdr->pinGuardFlags);
+				PinGuard::setMode(hdr->pinGuardFlags);
+			}
+		}
 
-        // Read back current mode
-        SystemHeader* hdr = ConfigManager::getHeaderPtr();
-        constexpr uint8_t argCount = 2;
-        StringKeyValue respParams[argCount];
-        strncpy(respParams[0].key, "a", sizeof(respParams[0].key));
-        respParams[0].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::AllowAdvisory)) ? '1' : '0';
-        respParams[0].value[1] = '\0';
-        strncpy(respParams[1].key, "b", sizeof(respParams[1].key));
-        respParams[1].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::Bypass)) ? '1' : '0';
-        respParams[1].value[1] = '\0';
-        sendAckOk(sender, command, respParams, argCount);
-    }
-    else
-    {
-        sendAckErr(sender, command, F("Unknown system command"));
-    }
+		// Read back current mode
+		SystemHeader* hdr = ConfigManager::getHeaderPtr();
+		constexpr uint8_t argCount = 2;
+		StringKeyValue respParams[argCount];
+		strncpy(respParams[0].key, "a", sizeof(respParams[0].key));
+		respParams[0].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::AllowAdvisory)) ? '1' : '0';
+		respParams[0].value[1] = '\0';
+		strncpy(respParams[1].key, "b", sizeof(respParams[1].key));
+		respParams[1].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::Bypass)) ? '1' : '0';
+		respParams[1].value[1] = '\0';
+		sendAckOk(sender, command, respParams, argCount);
+	}
+	else if (SystemFunctions::commandMatches(command, SystemPinUsage))
+	{
+		uint8_t pins[64];
+		uint8_t count = SystemFunctions::getUsedPins(pins, sizeof(pins));
 
-    return true;
+		StringKeyValue param;
+		strncpy(param.key, ValueParamName, sizeof(param.key));
+		param.value[0] = '\0';
+
+		size_t pos = 0;
+
+		for (uint8_t i = 0; i < count; ++i)
+		{
+			int written = snprintf(param.value + pos, sizeof(param.value) - pos,
+				"%s%u", (i > 0) ? "," : "", (unsigned)pins[i]);
+
+			if (written <= 0 || (size_t)written >= sizeof(param.value) - pos)
+				break;
+
+			pos += (size_t)written;
+		}
+
+		sendAckOk(sender, command, &param);
+		return true;
+	}
+	else
+	{
+		sendAckErr(sender, command, F("Unknown system command"));
+	}
+
+	return true;
 }
 
 #if defined(SD_CARD_SUPPORT)
 void SystemCommandHandler::setSdCardLogger(SdCardLogger* sdCardLogger)
 {
-    _sdCardLogger = sdCardLogger;
+	_sdCardLogger = sdCardLogger;
 }
 #endif
 
 #if defined(WIFI_SUPPORT)
 void SystemCommandHandler::setWifiController(WifiController* wifiController)
-{ 
-    _wifiController = wifiController;
+{
+	_wifiController = wifiController;
 }
 #endif
 
 #if defined(MQTT_SUPPORT)
 void SystemCommandHandler::setMqttController(MQTTController* mqttController)
 {
-    _mqttController = mqttController;
+	_mqttController = mqttController;
 }
 #endif
 
 #if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
 void SystemCommandHandler::setOtaManager(OtaManager* otaManager)
 {
-    _otaManager = otaManager;
+	_otaManager = otaManager;
 }
 #endif

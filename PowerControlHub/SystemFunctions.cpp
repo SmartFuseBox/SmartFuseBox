@@ -18,6 +18,7 @@
 #include "Local.h"
 #include "SystemFunctions.h"
 #include "SystemDefinitions.h"
+#include "ConfigManager.h"
 
 #if !defined(WIFI_SUPPORT)
 #include <limits.h>
@@ -50,6 +51,97 @@ uint16_t SystemFunctions::stackAvailable()
     extern int __heap_start, * __brkval;
     unsigned int v;
     return (unsigned int)&v - (__brkval == 0 ? (unsigned int)&__heap_start : (unsigned int)__brkval);
+}
+
+uint8_t SystemFunctions::getUsedPins(uint8_t* pins, uint8_t maxCount)
+{
+    if (!pins || maxCount == 0)
+        return 0;
+
+    Config* cfg = ConfigManager::getConfigPtr();
+
+    if (!cfg)
+        return 0;
+
+    uint8_t count = 0;
+
+    auto addPin = [&](uint8_t p)
+    {
+        if (p == PinDisabled)
+            return;
+
+        // Avoid duplicates
+        for (uint8_t i = 0; i < count; ++i)
+        {
+            if (pins[i] == p)
+                return;
+        }
+
+        if (count < maxCount)
+            pins[count++] = p;
+    };
+
+    // Relay pins
+    for (uint8_t i = 0; i < ConfigRelayCount; ++i)
+    {
+        addPin(cfg->relay.relays[i].pin);
+    }
+
+    // Sensor pins
+    uint8_t sensorCount = cfg->sensors.count;
+    if (sensorCount > ConfigMaxSensors) sensorCount = ConfigMaxSensors;
+    for (uint8_t i = 0; i < sensorCount; ++i)
+    {
+        for (uint8_t j = 0; j < ConfigMaxSensorPins; ++j)
+        {
+            addPin(cfg->sensors.sensors[i].pins[j]);
+        }
+    }
+
+    // SD card CS pin
+    addPin(cfg->sdCard.csPin);
+
+    // SPI pins
+    addPin(cfg->spiPins.sckPin);
+    addPin(cfg->spiPins.misoPin);
+    addPin(cfg->spiPins.mosiPin);
+
+    // XpdzTone
+    addPin(cfg->xpdzTone.pin);
+
+    // Hw479Rgb (r/g/b)
+    addPin(cfg->hw479Rgb.rPin);
+    addPin(cfg->hw479Rgb.gPin);
+    addPin(cfg->hw479Rgb.bPin);
+
+    // RTC pins
+    addPin(cfg->rtc.dataPin);
+    addPin(cfg->rtc.clockPin);
+    addPin(cfg->rtc.resetPin);
+
+    // Nextion pins
+    addPin(cfg->nextion.rxPin);
+    addPin(cfg->nextion.txPin);
+
+    return count;
+}
+
+bool SystemFunctions::pinInUse(uint8_t pin)
+{
+    if (pin == PinDisabled)
+        return false;
+
+    // Buffer large enough to hold all possible configured pins
+    uint8_t usedPins[64];
+    uint8_t count = SystemFunctions::getUsedPins(usedPins, sizeof(usedPins));
+
+    for (uint8_t i = 0; i < count; ++i)
+    {
+        if (usedPins[i] == pin)
+            return true;
+    }
+
+    return false;
 }
 
 size_t SystemFunctions::freeMemory()

@@ -375,6 +375,28 @@ public:
     static void sanitizeJsonString(const char* input, char* output, size_t outputSize);
 
     /**
+     * @brief Collect all GPIO pins currently assigned in the persistent configuration.
+     *
+     * Walks the in-memory Config and writes non-disabled pin numbers into the
+     * caller-provided buffer. Duplicate pin numbers are only reported once.
+     *
+     * @param pins Pointer to caller-provided buffer of uint8_t
+     * @param maxCount Maximum number of entries that can be written into pins
+     * @return Number of pins written into the buffer
+     */
+    static uint8_t getUsedPins(uint8_t* pins, uint8_t maxCount);
+
+    /**
+     * @brief Check whether a given GPIO pin number is present in the current configuration.
+     *
+     * Uses getUsedPins internally to collect configured pins and searches the list.
+     *
+     * @param pin GPIO pin number to check
+     * @return true if pin is used in configuration, false otherwise
+     */
+    static bool pinInUse(uint8_t pin);
+
+    /**
      * @brief Format a float as a JSON number, emitting null for non-finite values.
      *
      * IEEE 754 special values (NaN, +Inf, -Inf) are not valid JSON numbers.
