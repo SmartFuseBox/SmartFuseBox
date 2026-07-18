@@ -247,13 +247,18 @@
         </ScrollView>
 
         <!-- ── System status bar (memory/cpu/time/fw) ── -->
-        <Grid Grid.Row="3" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto, *">
+        <Grid Grid.Row="3" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
             <Label Grid.Column="0" Text="System" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" FontAttributes="Bold" />
             <Label Grid.Column="1" Text="Mem:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
             <Label Grid.Column="2" Text="{Binding SystemFreeMemory}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
             <Label Grid.Column="3" Text="CPU:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
             <Label Grid.Column="4" Text="{Binding SystemCpuUsage}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
-            <Label Grid.Column="5" Text="{Binding SystemFirmwareAndTime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" HorizontalOptions="End" />
+            <Label Grid.Column="5" Text="{Binding SystemFirmware, StringFormat='FW: {0}'}" TextColor="{Binding SystemFirmwareColor}" VerticalOptions="Center" HorizontalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding FirmwareLabelTappedCommand}" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="6" Text="{Binding SystemUptime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
         </Grid>
 
         <!-- ── Status bar ── -->

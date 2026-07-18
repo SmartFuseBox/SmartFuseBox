@@ -25,6 +25,9 @@
 #include "SdCardLogger.h"
 #endif
 
+#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+class OtaManager;
+#endif
 
 class SystemNetworkHandler : public INetworkCommandHandler
 {
@@ -35,6 +38,10 @@ private:
 	SdCardLogger* _sdCardLogger;
 #endif
 
+#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+	OtaManager* _otaManager{ nullptr };
+#endif
+
 public:
 	explicit SystemNetworkHandler(WifiController* wifiController);
 
@@ -42,6 +49,13 @@ public:
 	void setSdCardLogger(SdCardLogger* sdCardLogger)
 	{
 		_sdCardLogger = sdCardLogger;
+	}
+#endif
+
+#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+	void setOtaManager(OtaManager* otaManager)
+	{
+		_otaManager = otaManager;
 	}
 #endif
 
