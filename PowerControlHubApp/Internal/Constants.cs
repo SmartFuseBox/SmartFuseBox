@@ -33,6 +33,10 @@
         public const string MessageDeviceUnreachable = "Device unreachable";
         public const string MessageToggleFailed = "Toggle failed — see log";
         public const string LogOtaTrigger = "OTA: triggering firmware install…";
+        public const string OtaTriggerFailed = "OTA trigger failed";
+        public const string OtaDialogTitle = "Install Firmware";
+        public const string OtaDialogMessage = "An OTA update to {0} is available. Download and install now?";
+        public const string OtaDialogAccept = "Install";
         public const int RelayCount = 8;
         public const int UnconfiguredPin = 255;
         // Dashboard poller log messages
@@ -195,6 +199,7 @@
         public const string UserAgentValue = "PowerControlHub/1.0";
         public const string PowerHubNotConfigured = "PowerHubService is not configured. Call Configure() first.";
         public const string ErrorKey = "error";
+        public const char QuoteChar = '"';
         public const string PreferenceKey = "app_theme";
         public const string ThemeLight = "Light";
         public const string ThemeDark = "Dark";

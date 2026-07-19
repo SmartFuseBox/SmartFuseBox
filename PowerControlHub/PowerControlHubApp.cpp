@@ -337,6 +337,7 @@ void PowerControlHubApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSenso
 
 #if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
     _systemCommandHandler.setOtaManager(&_otaManager);
+    _systemNetworkHandler.setOtaManager(&_otaManager);
     _otaManager.begin();
 #endif
 

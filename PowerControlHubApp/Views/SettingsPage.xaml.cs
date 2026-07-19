@@ -18,6 +18,12 @@ public partial class SettingsPage : ContentPage
     {
         base.OnAppearing();
         _ = _settingsViewModel.RefreshPinsAsync();
+        // Refresh OTA status when settings page appears
+        try
+        {
+            _settingsViewModel.CheckForUpdateCommand.Execute(null);
+        }
+        catch { }
     }
 
     private async void OnBackClicked(object sender, EventArgs e)

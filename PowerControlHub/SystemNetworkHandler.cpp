@@ -23,6 +23,10 @@
 #include "SystemFunctions.h"
 #include "FirmwareVersion.h"
 
+#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+#include "OtaManager.h"
+#endif
+
 #if defined(SD_CARD_SUPPORT)
 #include "MicroSdDriver.h"
 #endif
@@ -84,6 +88,128 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 
 		return CommandResult::ok();
 	}
+	#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+	else if (SystemFunctions::commandMatches(command, SystemCheckForUpdate))
+	{
+		if (!_otaManager)
+		{
+			snprintf(responseBuffer, bufferSize, "\"success\":false,\"error\":\"OTA not available\"");
+			return CommandResult::ok();
+		}
+
+		const char* applyStr = nullptr;
+
+		for (uint8_t i = 0; i < paramCount; ++i)
+		{
+			if (strcmp(params[i].key, "apply") == 0)
+			{
+				applyStr = params[i].value;
+				break;
+			}
+		}
+
+		bool applyNow = applyStr && (applyStr[0] == '1');
+		_otaManager->triggerCheck(applyNow);
+
+		const char* stateStr = "idle";
+
+		switch (_otaManager->getState())
+		{
+			case OtaState::Idle:
+				stateStr = "triggered";
+				break;
+
+			case OtaState::Checking:
+				stateStr = "checking";
+				break;
+
+			case OtaState::UpdateAvailable:
+				stateStr = "available";
+				break;
+
+			case OtaState::Downloading:
+				stateStr = "downloading";
+				break;
+
+			case OtaState::Rebooting:
+				stateStr = "rebooting";
+				break;
+
+			case OtaState::Failed:
+				stateStr = "failed";
+				break;
+
+			case OtaState::UpToDate:
+				stateStr = "uptodate";
+				break;
+		}
+
+		snprintf(responseBuffer, bufferSize,
+			"\"success\":true,\"command\":\"%s\",\"v\":\"v%u.%u.%u.%u\",\"av\":\"%s\",\"s\":\"%s\"",
+			command,
+			FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild,
+			_otaManager->getAvailableVersion(),
+			stateStr);
+
+		return CommandResult::ok();
+	}
+	else if (SystemFunctions::commandMatches(command, SystemOtaStatus))
+	{
+		const char* stateStr = "disabled";
+		const char* avVersion = "";
+		char autoApply = '0';
+
+		if (_otaManager)
+		{
+			switch (_otaManager->getState())
+			{
+				case OtaState::Idle:
+					stateStr = "idle";
+					break;
+
+				case OtaState::Checking:
+					stateStr = "checking";
+					break;
+
+				case OtaState::UpdateAvailable:
+					stateStr = "available";
+					break;
+
+				case OtaState::Downloading:
+					stateStr = "downloading";
+					break;
+
+				case OtaState::Rebooting:
+					stateStr = "rebooting";
+					break;
+
+				case OtaState::Failed:
+					stateStr = "failed";
+					break;
+
+				case OtaState::UpToDate:
+					stateStr = "uptodate";
+					break;
+			}
+
+			avVersion = _otaManager->getAvailableVersion();
+
+			SystemHeader* hdr = ConfigManager::getHeaderPtr();
+			if (hdr && (hdr->reserved[0] & OtaFlagAutoApply))
+				autoApply = '1';
+		}
+
+		snprintf(responseBuffer, bufferSize,
+			"\"success\":true,\"command\":\"%s\",\"v\":\"v%u.%u.%u.%u\",\"av\":\"%s\",\"s\":\"%s\",\"auto\":\"%c\"",
+			command,
+			FirmwareMajor, FirmwareMinor, FirmwarePatch, FirmwareBuild,
+			avVersion,
+			stateStr,
+			autoApply);
+
+		return CommandResult::ok();
+	}
+#endif // OTA_AUTO_UPDATE
 	else
 	{
 		return CommandResult::error(InvalidCommandParameters);

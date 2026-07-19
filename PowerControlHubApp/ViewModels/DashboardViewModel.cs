@@ -1,6 +1,7 @@
 using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
+using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -36,6 +37,7 @@ public class DashboardViewModel : INotifyPropertyChanged
     public ICommand RefreshCommand { get; }
     public ICommand ToggleRelayCommand { get; }
     public ICommand InstallUpdateCommand { get; }
+    public ICommand FirmwareLabelTappedCommand { get; }
 
     /// <summary>True when the firmware reported an update is available.</summary>
     public bool UpdateAvailable => _otaStatus?.UpdateAvailable == true;
@@ -90,7 +92,6 @@ public class DashboardViewModel : INotifyPropertyChanged
         {
             _systemTime = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(SystemFirmwareAndTime));
         }
     }
 
@@ -102,7 +103,6 @@ public class DashboardViewModel : INotifyPropertyChanged
         {
             _systemFirmware = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(SystemFirmwareAndTime));
         }
     }
 
@@ -116,14 +116,13 @@ public class DashboardViewModel : INotifyPropertyChanged
         {
             _systemUptime = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(SystemFirmwareAndTime));
         }
     }
 
     /// <summary>
-    /// Combined firmware and time display used by the status bar.
+    /// Colour for the firmware label in the status bar. Changes when update available.
     /// </summary>
-    public string SystemFirmwareAndTime => $"FW: {SystemFirmware}  •  {SystemUptime}";
+    public Color SystemFirmwareColor => UpdateAvailable ? Color.FromArgb(ColorWarning) : Color.FromArgb(ColorAsHex1);
 
     /// <summary>Label shown in the update banner.</summary>
     public string OtaBannerLabel => _otaStatus?.BannerLabel ?? string.Empty;
@@ -212,6 +211,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         RefreshCommand = new Command(async () => await RefreshAsync());
         ToggleRelayCommand = new Command<RelayViewModel>(async relay => await ToggleRelayAsync(relay));
         InstallUpdateCommand = new Command(async () => await InstallUpdateAsync(), () => CanInstallUpdate);
+        FirmwareLabelTappedCommand = new Command(async () => await Shell.Current.GoToAsync(RouteSettingsPage));
 
         _relayStore.Relays.CollectionChanged += (_, _) =>
         {
@@ -393,6 +393,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(OtaBannerLabel));
         OnPropertyChanged(nameof(ShowOtaBanner));
         OnPropertyChanged(nameof(OtaBannerColor));
+        OnPropertyChanged(nameof(SystemFirmwareColor));
         OnPropertyChanged(nameof(CanInstallUpdate));
         ((Command)InstallUpdateCommand).ChangeCanExecute();
     }
@@ -404,6 +405,7 @@ public class DashboardViewModel : INotifyPropertyChanged
         // Populate firmware and uptime so the status bar can show them
         SystemFirmware = string.IsNullOrEmpty(system.Fw) ? DoubleDash : system.Fw;
         SystemUptime = string.IsNullOrEmpty(system.Uptime) ? DoubleDash : system.Uptime;
+        OnPropertyChanged(nameof(SystemFirmwareColor));
     }
 
     private void UpdateRelays(IReadOnlyList<RelayModel> incoming)
