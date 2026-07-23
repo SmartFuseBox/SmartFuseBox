@@ -1,0 +1,244 @@
+using PowerControlHubApp.Models.Json;
+using PowerControlHubApp.Services;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using static PowerControlHubApp.Internal.Constants;
+
+namespace PowerControlHubApp.ViewModels;
+
+public class SystemViewModel : BaseViewModel
+{
+    private bool _isRefreshing;
+    private string _pinsInUseText = string.Empty;
+    private bool _isPinsRefreshing;
+    private int _pinsCount;
+
+    // OTA
+    private OtaStatusModel _otaStatus;
+    private bool _isCheckingOta;
+
+    public ObservableCollection<string> Warnings { get; } = [];
+
+    public string PinsInUseText
+    {
+        get => _pinsInUseText;
+        set
+        {
+            _pinsInUseText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int PinsCount
+    {
+        get => _pinsCount;
+        set
+        {
+            _pinsCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsPinsRefreshing
+    {
+        get => _isPinsRefreshing;
+        set
+        {
+            _isPinsRefreshing = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsNotPinsRefreshing));
+        }
+    }
+
+    public bool IsNotPinsRefreshing => !_isPinsRefreshing;
+
+    public bool HasPins => PinsCount > 0;
+
+    // StatusMessage, HasStatus, and OnPropertyChanged are provided by BaseViewModel
+
+    public bool HasStatusMessage => !string.IsNullOrEmpty(StatusMessage);
+
+    public ICommand CheckForUpdateCommand { get; }
+
+    public ICommand RefreshPinsCommand { get; }
+
+    public ICommand InstallFirmwareCommand { get; }
+
+    public SystemViewModel(PowerHubService service, LogService log)
+        : base(service, log)
+    {
+        CheckForUpdateCommand = new Command(async () => await CheckForUpdateAsync());
+        RefreshPinsCommand = new Command(async () => await RefreshPinsAsync());
+        InstallFirmwareCommand = new Command(async () => await InstallFirmwareAsync(), () => CanInstallFirmware);
+    }
+
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // System page uses its own RefreshAsync flow, not the dashboard auto-refresh
+    }
+
+    public async Task RefreshPinsAsync()
+    {
+        if (!Service.IsConfigured || _isPinsRefreshing)
+            return;
+
+        IsPinsRefreshing = true;
+
+        try
+        {
+            var result = await Service.GetSystemPinsAsync();
+
+            if (result?.Success == true && result.Pins?.Count > 0)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    PinsCount = result.Pins.Count;
+                    PinsInUseText = string.Join(CommaSpace, result.Pins);
+                });
+            }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    PinsCount = 0;
+                    PinsInUseText = DoubleDash;
+                });
+            }
+        }
+        catch
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                PinsCount = 0;
+                PinsInUseText = MessageDeviceUnreachable;
+            });
+        }
+        finally
+        {
+            IsPinsRefreshing = false;
+        }
+    }
+
+    public async Task RefreshAsync()
+    {
+        if (!Service.IsConfigured || _isRefreshing)
+            return;
+
+        _isRefreshing = true;
+
+        try
+        {
+            var list = await Service.GetWarningsAsync();
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Warnings.Clear();
+
+                if (list != null && list.Count > 0)
+                {
+                    foreach (var w in list) Warnings.Add(w);
+                    StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
+                }
+                else
+                {
+                    StatusMessage = MessageNoActiveWarnings;
+                }
+
+                OnPropertyChanged(nameof(HasStatusMessage));
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Fetching warnings failed: {ex.Message}");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Warnings.Clear();
+                StatusMessage = MessageDeviceUnreachable;
+                OnPropertyChanged(nameof(HasStatusMessage));
+            });
+        }
+        finally
+        {
+            _isRefreshing = false;
+        }
+    }
+
+    public string CurrentFirmwareVersion => _otaStatus?.CurrentVersion ?? DoubleDash;
+
+    public string AvailableFirmwareVersion => string.IsNullOrEmpty(_otaStatus?.AvailableVersion) ? DoubleDash : _otaStatus.AvailableVersion;
+
+    public bool IsUpdateAvailable => _otaStatus?.UpdateAvailable == true;
+
+    public bool IsOtaBusy => (_otaStatus?.IsBusy == true) || _isCheckingOta;
+
+    public bool CanInstallFirmware => _otaStatus?.UpdateAvailable == true && !_isCheckingOta;
+
+    public async Task CheckForUpdateAsync()
+    {
+        if (!Service.IsConfigured || _isCheckingOta)
+            return;
+
+        _isCheckingOta = true;
+        try
+        {
+            var ota = await Service.GetOtaStatusAsync();
+            _otaStatus = ota;
+            NotifyOtaProperties();
+        }
+        catch
+        {
+            StatusMessage = MessageDeviceUnreachable;
+        }
+        finally
+        {
+            _isCheckingOta = false;
+            OnPropertyChanged(nameof(IsOtaBusy));
+            ((Command)InstallFirmwareCommand).ChangeCanExecute();
+        }
+    }
+
+    public async Task InstallFirmwareAsync()
+    {
+        if (!CanInstallFirmware)
+            return;
+
+        string message = string.Format(OtaDialogMessage, AvailableFirmwareVersion);
+        bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(
+                OtaDialogTitle,
+                message,
+                OtaDialogAccept,
+                MsgCancel);
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            var ok = await Service.TriggerOtaInstallAsync();
+
+            if (ok)
+            {
+                // give the device a moment then refresh status
+                await Task.Delay(TimeSpan.FromSeconds(SecondsTwo));
+                await CheckForUpdateAsync();
+            }
+            else
+            {
+                StatusMessage = OtaTriggerFailed;
+            }
+        }
+        catch
+        {
+            StatusMessage = OtaTriggerFailed;
+        }
+    }
+
+    private void NotifyOtaProperties()
+    {
+        OnPropertyChanged(nameof(CurrentFirmwareVersion));
+        OnPropertyChanged(nameof(AvailableFirmwareVersion));
+        OnPropertyChanged(nameof(IsUpdateAvailable));
+        OnPropertyChanged(nameof(IsOtaBusy));
+        OnPropertyChanged(nameof(CanInstallFirmware));
+        ((Command)InstallFirmwareCommand).ChangeCanExecute();
+    }
+}

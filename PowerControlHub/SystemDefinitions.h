@@ -135,6 +135,7 @@ constexpr char WarningsList[] = "W1";
 constexpr char WarningStatus[] = "W2";
 constexpr char WarningsClear[] = "W3";
 constexpr char WarningsAdd[] = "W4";
+constexpr char WarningsListText[] = "W5";
 
 constexpr char SensorConfigMeta[] = "meta";
 constexpr char SensorConfigGetAll[] = "S0";

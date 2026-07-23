@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.StatusBarView">
+
+    <ContentView.Content>
+        <Grid RowDefinitions="Auto,Auto,Auto">
+            <!-- ── System status bar (memory/cpu/time/fw) ── -->
+            <Grid Grid.Row="0" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+                <Label Grid.Column="0" Text="Mem:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+                <Label Grid.Column="1" Text="{Binding SystemFreeMemory}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
+                <Label Grid.Column="2" Text="CPU:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+                <Label Grid.Column="3" Text="{Binding SystemCpuUsage}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
+                <Label Grid.Column="4" Text="⚠" TextColor="{Binding SystemStatusColor}" VerticalOptions="Center" FontSize="14" IsVisible="{Binding HasWarnings}" Margin="4,0,0,0" />
+                <Label Grid.Column="5" Text="System" TextColor="{Binding SystemStatusColor}" VerticalOptions="Center" FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SystemLabelTappedCommand}" NumberOfTapsRequired="1" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="6" Text="{Binding SystemFirmware, StringFormat='FW: {0}'}" TextColor="{Binding SystemFirmwareColor}" VerticalOptions="Center" HorizontalOptions="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding FirmwareLabelTappedCommand}" NumberOfTapsRequired="1" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="7" Text="{Binding SystemUptime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+            </Grid>
+
+            <Grid Grid.Row="1" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"
+                  ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                <BoxView Grid.Column="1"
+                         Color="{Binding StatusColor}"
+                         WidthRequest="9" HeightRequest="9"
+                         CornerRadius="5"
+                         VerticalOptions="Center"
+                         Margin="0,0,6,0" />
+                <Label Grid.Column="2"
+                       Text="{Binding StatusMessage}"
+                       TextColor="{Binding StatusColor}"
+                       FontSize="11"
+                       VerticalOptions="Center"
+                       LineBreakMode="TailTruncation" />
+                <Button Grid.Column="3"
+                        Text="↻"
+                        FontSize="16"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource AppBarText}"
+                        Padding="4,0"
+                        Command="{Binding RefreshCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        ToolTipProperties.Text="Refresh now" />
+                <Button Grid.Column="4"
+                        Text="📋"
+                        FontSize="14"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource AppBarText}"
+                        Padding="4,0"
+                        Clicked="OnToggleLogClicked" />
+            </Grid>
+
+            <Grid x:Name="LogPanel"
+                  Grid.Row="2"
+                  IsVisible="False"
+                  BackgroundColor="{DynamicResource AppLogPanelBg}"
+                  RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" Padding="12,6" ColumnDefinitions="*,Auto"
+                      BackgroundColor="{DynamicResource AppBarBg}">
+                    <Label Grid.Column="0"
+                           Text="LOG"
+                           TextColor="{DynamicResource AppBarText}"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center" />
+                    <Button Grid.Column="1"
+                            Text="Clear"
+                            FontSize="11"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource AppBarText}"
+                            Padding="6,0"
+                            Clicked="OnClearLogClicked" />
+                </Grid>
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding LogEntries}"
+                                SelectionMode="None"
+                                HeightRequest="160">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LogEntryViewModel">
+                            <Grid ColumnDefinitions="Auto,Auto,*" Padding="10,3">
+                                <Label Grid.Column="0"
+                                       Text="{Binding FormattedTime}"
+                                       TextColor="{DynamicResource AppLogTimestamp}"
+                                       FontSize="10"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding Level}"
+                                       TextColor="{Binding LevelColor}"
+                                       FontSize="10"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,8,0" />
+                                <Label Grid.Column="2"
+                                       Text="{Binding Message}"
+                                       TextColor="{DynamicResource AppLogText}"
+                                       FontSize="10"
+                                       LineBreakMode="TailTruncation"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Grid>
+    </ContentView.Content>
+
+</ContentView>

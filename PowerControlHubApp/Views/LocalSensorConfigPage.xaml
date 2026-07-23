@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
              xmlns:models="clr-namespace:PowerControlHubApp.Models"
              xmlns:converters="clr-namespace:PowerControlHubApp.Converters"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
              x:Class="PowerControlHubApp.Views.LocalSensorConfigPage"
              Title="Local Sensors"
              BackgroundColor="{DynamicResource AppPageBg}">
 
-    <ContentPage.Resources>
+    <views:BasePowerControlHubContentPage.Resources>
         <ResourceDictionary>
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
 
@@ -40,28 +41,15 @@
                 <Setter Property="VerticalOptions" Value="Center" />
             </Style>
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </views:BasePowerControlHubContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- Top bar -->
-        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="*,Auto"
-              BackgroundColor="{DynamicResource AppBarBg}">
-            <Label Grid.Column="0"
-                   Text="🔌 Local Sensors"
-                   TextColor="{DynamicResource AppBarText}"
-                   FontSize="17"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center" />
-            <Button Grid.Column="1"
-                    Text="↻"
-                    FontSize="18"
-                    BackgroundColor="Transparent"
-                    TextColor="{DynamicResource AppBarText}"
-                    Padding="6,0"
-                    Command="{Binding LoadCommand}"
-                    IsEnabled="{Binding IsNotBusy}" />
-        </Grid>
+        <views:TopBarView Grid.Row="0" Title="🔌 Local Sensors"
+                          RightButtonText="↻"
+                          RightButtonCommand="{Binding LoadCommand}"
+                          RightButtonIsEnabled="{Binding IsNotBusy}" />
 
         <!-- Content -->
         <Grid Grid.Row="1">
@@ -73,18 +61,8 @@
                                VerticalOptions="Center"
                                HorizontalOptions="Center" />
 
-            <!-- Status / error message -->
-            <Label Text="{Binding StatusMessage}"
-                   IsVisible="{Binding HasStatus}"
-                   TextColor="{DynamicResource AppAccent}"
-                   FontSize="14"
-                   HorizontalTextAlignment="Center"
-                   VerticalOptions="Center"
-                   Margin="20,0" />
-
             <!-- Sensor list (8 preconfigured slots) -->
             <CollectionView ItemsSource="{Binding Sensors}"
-                            IsVisible="{Binding IsNotBusy}"
                             Margin="16,12">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:LocalSensorConfigModel">
@@ -209,5 +187,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
+        <views:StatusBarView Grid.Row="2" />
     </Grid>
-</ContentPage>
+</views:BasePowerControlHubContentPage>

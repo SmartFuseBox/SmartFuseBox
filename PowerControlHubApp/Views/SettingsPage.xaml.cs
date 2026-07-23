@@ -1,16 +1,18 @@
 using PowerControlHubApp.ViewModels;
-using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Views;
 
-public partial class SettingsPage : ContentPage
+public partial class SettingsPage : BasePowerControlHubContentPage
 {
     private readonly SettingsViewModel _settingsViewModel;
+    private readonly SystemViewModel _systemViewModel;
 
-    public SettingsPage(SettingsViewModel viewModel)
+    public SettingsPage(SettingsViewModel viewModel, SystemViewModel systemViewModel)
+        : base(viewModel)
     {
         InitializeComponent();
         _settingsViewModel = viewModel;
+        _systemViewModel = systemViewModel;
         BindingContext = viewModel;
     }
 
@@ -18,16 +20,11 @@ public partial class SettingsPage : ContentPage
     {
         base.OnAppearing();
         _ = _settingsViewModel.RefreshPinsAsync();
-        // Refresh OTA status when settings page appears
+        // Refresh OTA status when settings page appears (moved to SystemViewModel)
         try
         {
-            _settingsViewModel.CheckForUpdateCommand.Execute(null);
+            _systemViewModel.CheckForUpdateCommand.Execute(null);
         }
         catch { }
-    }
-
-    private async void OnBackClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(RouteDashboardPage);
     }
 }

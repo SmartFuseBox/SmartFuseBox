@@ -87,6 +87,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<DashboardViewModel>();
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<RelayConfigViewModel>();
+            builder.Services.AddSingleton<SystemViewModel>();
             builder.Services.AddTransient<RelayDetailViewModel>();
             builder.Services.AddSingleton<ExternalSensorConfigViewModel>();
             builder.Services.AddTransient<ExternalSensorDetailViewModel>();
@@ -97,6 +98,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<DashboardPage>();
             builder.Services.AddSingleton<SettingsPage>();
             builder.Services.AddSingleton<RelayConfigPage>();
+            builder.Services.AddSingleton<SystemPage>();
             builder.Services.AddTransient<RelayDetailPage>();
             builder.Services.AddSingleton<ExternalSensorConfigPage>();
             builder.Services.AddTransient<ExternalSensorDetailPage>();

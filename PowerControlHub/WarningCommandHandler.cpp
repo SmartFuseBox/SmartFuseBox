@@ -44,6 +44,38 @@ bool WarningCommandHandler::handleCommand(SerialCommandManager* sender, const ch
         sendAckOk(sender, command, &param);
         return true;
     }
+    else if (SystemFunctions::commandMatches(command, WarningsListText) && paramCount == 0)
+    {
+        // Return list of active warnings as one frame per warning: W5:<hex_flag>=<text>
+        uint32_t activeWarnings = warningManager->getActiveWarningsMask();
+
+        for (uint8_t bit = 0; bit < 32; bit++)
+        {
+            if (activeWarnings & (1UL << bit))
+            {
+                const char* warningStr = getWarningString(bit);
+                if (warningStr != nullptr && warningStr[0] != '\0')
+                {
+                    char flagsHex[16];
+                    snprintf_P(flagsHex, sizeof(flagsHex), PSTR("0x%08lX"), (1UL << bit));
+
+                    // Build params as "<hex>=<text>" and send as a command frame
+                    char paramsBuf[128];
+                    snprintf(paramsBuf, sizeof(paramsBuf), "%s=%s", flagsHex, warningStr);
+
+                    // Send raw command frame to requester
+                    if (sender != nullptr)
+                    {
+                        sender->sendCommand(WarningsListText, paramsBuf);
+                    }
+                }
+            }
+        }
+
+        // Final ACK so callers know all lines have been sent
+        sendAckOk(sender, command);
+        return true;
+    }
     else if (SystemFunctions::commandMatches(command, WarningsList) && paramCount == 0)
     {
         // Return the complete bitmask of active warnings as a single value
@@ -156,7 +188,7 @@ bool WarningCommandHandler::convertWarningTypeFromString(const char* str, Warnin
 const char* const* WarningCommandHandler::supportedCommands(size_t& count) const
 {
     static const char* cmds[] = { WarningsActive, WarningsList, WarningStatus,
-        WarningsClear, WarningsAdd };
+        WarningsClear, WarningsAdd, WarningsListText };
     count = sizeof(cmds) / sizeof(cmds[0]);
     return cmds;
 }

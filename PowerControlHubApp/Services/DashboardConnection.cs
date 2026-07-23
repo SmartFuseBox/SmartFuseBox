@@ -98,6 +98,13 @@ namespace PowerControlHubApp.Services
             return result;
         }
 
+        public async Task<List<string>> GetWarningsAsync(CancellationToken ct = default)
+        {
+            string json = await _client.GetStringAsync(RouteWarnings, ct);
+            WarningsListResponseModel resp = JsonSerializer.Deserialize<WarningsListResponseModel>(json, JsonOptions);
+            return resp?.Warnings ?? [];
+        }
+
         private static SocketsHttpHandler CreateHandler()
         {
             var handler = new SocketsHttpHandler

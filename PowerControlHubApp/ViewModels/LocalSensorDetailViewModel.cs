@@ -1,17 +1,15 @@
 using PowerControlHubApp.Models;
+using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
 [QueryProperty(nameof(SensorIndex), "sensorIndex")]
-public class LocalSensorDetailViewModel : INotifyPropertyChanged
+public class LocalSensorDetailViewModel : BaseViewModel
 {
-    private readonly PowerHubService _service;
     private readonly SensorMetaCache _metaCache;
 
     private LocalSensorConfigModel _original;
@@ -26,8 +24,6 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
     private int _opt2_0;
     private int _opt2_1;
     private bool _isEnabled;
-    private bool _isBusy;
-    private string _statusMessage = string.Empty;
 
     private string _sensorTypeName = string.Empty;
     private string _pin0Label = string.Empty;
@@ -520,38 +516,13 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsBusy
+    // IsBusy, IsNotBusy, StatusMessage, and HasStatus are provided by BaseViewModel
+
+    public bool IsError => HasStatus && !StatusMessage.StartsWith(CheckMark);
+
+    public LocalSensorDetailViewModel(PowerHubService service, LogService log, SensorMetaCache metaCache)
+        : base(service, log)
     {
-        get => _isBusy;
-        set
-        {
-            _isBusy = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsNotBusy));
-        }
-    }
-
-    public bool IsNotBusy => !_isBusy;
-
-    public string StatusMessage
-    {
-        get => _statusMessage;
-        set
-        {
-            _statusMessage = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(HasStatus));
-            OnPropertyChanged(nameof(IsError));
-        }
-    }
-
-    public bool HasStatus => !string.IsNullOrEmpty(_statusMessage);
-
-    public bool IsError => HasStatus && !_statusMessage.StartsWith(CheckMark);
-
-    public LocalSensorDetailViewModel(PowerHubService service, SensorMetaCache metaCache)
-    {
-        _service = service;
         _metaCache = metaCache;
         SaveCommand = new Command(async () => await SaveAsync());
         RemoveCommand = new Command(async () => await RemoveAsync());
@@ -603,6 +574,11 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
             SensorTypeOptions.Add(SensorTypeSystemPicker);
             SensorTypeOptions.Add(SensorTypeBinaryPresencePicker);
         }
+    }
+
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // Local sensor detail page doesn't process dashboard data from auto-refresh
     }
 
     private void ApplyDescriptor(int sensorTypeId)
@@ -695,7 +671,7 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task LoadAsync(int index)
     {
-        if (!_service.IsConfigured || index < 0)
+        if (!Service.IsConfigured || index < 0)
             return;
 
         IsBusy = true;
@@ -703,7 +679,7 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
 
         try
         {
-            List<LocalSensorConfigModel> allSensors = await _service.GetLocalSensorsAsync();
+            List<LocalSensorConfigModel> allSensors = await Service.GetLocalSensorsAsync();
             _original = allSensors.FirstOrDefault(s => s.Index == index)
                 ?? new LocalSensorConfigModel { Index = index, Pin0 = UnconfiguredPin, Pin1 = UnconfiguredPin };
 
@@ -735,7 +711,7 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task SaveAsync()
     {
-        if (!_service.IsConfigured || _sensorIndex < 0)
+        if (!Service.IsConfigured || _sensorIndex < 0)
             return;
 
         IsBusy = true;
@@ -756,71 +732,71 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
             List<string> failures = [];
 
             // Add/update the sensor entry (S1) — label only if it fails
-            if (!await _service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1))
+            if (!await Service.AddUpdateLocalSensorAsync(_sensorIndex, SensorType, (sbyte)Opt1_0, (sbyte)Opt1_1))
                 failures.Add(FailAddUpdateSensor);
 
             // Rename (S3) if changed
             if (_original == null || _original.Name != Name)
             {
-                if (!await _service.RenameLocalSensorAsync(_sensorIndex, Name ?? string.Empty))
+                if (!await Service.RenameLocalSensorAsync(_sensorIndex, Name ?? string.Empty))
                     failures.Add($"rename to \"{Name}\"");
             }
 
             // Set pins (S4)
             if (_original == null || _original.Pin0 != Pin0)
             {
-                if (!await _service.SetLocalSensorPinAsync(_sensorIndex, 0, (byte)Pin0))
+                if (!await Service.SetLocalSensorPinAsync(_sensorIndex, 0, (byte)Pin0))
                     failures.Add($"set pin 0 to {Pin0Display}");
             }
 
             if (_original == null || _original.Pin1 != Pin1)
             {
-                if (!await _service.SetLocalSensorPinAsync(_sensorIndex, 1, (byte)Pin1))
+                if (!await Service.SetLocalSensorPinAsync(_sensorIndex, 1, (byte)Pin1))
                     failures.Add($"set pin 1 to {Pin1Display}");
             }
 
             // Set options (S6)
             if (_original == null || _original.Opt1_0 != Opt1_0)
             {
-                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 0, Opt1_0))
+                if (!await Service.SetLocalSensorOptionAsync(_sensorIndex, 0, 0, Opt1_0))
                     failures.Add($"set option {Opt1_0Label} to {Opt1_0}");
             }
 
             if (_original == null || _original.Opt1_1 != Opt1_1)
             {
-                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 0, Opt1_1))
+                if (!await Service.SetLocalSensorOptionAsync(_sensorIndex, 1, 0, Opt1_1))
                     failures.Add($"set option {Opt1_1Label} to {Opt1_1}");
             }
 
             if (_original == null || _original.Opt2_0 != Opt2_0)
             {
-                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 0, 1, Opt2_0))
+                if (!await Service.SetLocalSensorOptionAsync(_sensorIndex, 0, 1, Opt2_0))
                     failures.Add($"set option {Opt2_0Label} to {Opt2_0}");
             }
 
             if (_original == null || _original.Opt2_1 != Opt2_1)
             {
-                if (!await _service.SetLocalSensorOptionAsync(_sensorIndex, 1, 1, Opt2_1))
+                if (!await Service.SetLocalSensorOptionAsync(_sensorIndex, 1, 1, Opt2_1))
                     failures.Add($"set option {Opt2_1Label} to {Opt2_1}");
             }
 
             // Set enabled (S5)
             if (_original == null || _original.Enabled != IsEnabled)
             {
-                if (!await _service.SetLocalSensorEnabledAsync(_sensorIndex, IsEnabled))
+                if (!await Service.SetLocalSensorEnabledAsync(_sensorIndex, IsEnabled))
                     failures.Add(FailEnableDisableSensor);
             }
 
             // Save changes to disk
             if (failures.Count == 0)
             {
-                if (!await _service.SaveSettingsAsync())
+                if (!await Service.SaveSettingsAsync())
                     failures.Add(FailSaveSettings);
             }
             else
             {
                 // Still attempt to save even if some commands failed
-                await _service.SaveSettingsAsync();
+                await Service.SaveSettingsAsync();
             }
 
             StatusMessage = failures.Count == 0
@@ -839,7 +815,7 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task RemoveAsync()
     {
-        if (!_service.IsConfigured || _sensorIndex < 0)
+        if (!Service.IsConfigured || _sensorIndex < 0)
             return;
 
         bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(
@@ -856,10 +832,10 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
 
         try
         {
-            bool ok = await _service.RemoveLocalSensorAsync(_sensorIndex);
+            bool ok = await Service.RemoveLocalSensorAsync(_sensorIndex);
 
             if (ok)
-                ok &= await _service.SaveSettingsAsync();
+                ok &= await Service.SaveSettingsAsync();
 
             if (ok)
                 await Shell.Current.GoToAsync(NavBack);
@@ -875,9 +851,4 @@ public class LocalSensorDetailViewModel : INotifyPropertyChanged
             IsBusy = false;
         }
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

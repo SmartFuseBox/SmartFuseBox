@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
              x:Class="PowerControlHubApp.Views.RelayDetailPage"
              Title="{Binding PageTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
-    <ContentPage.Resources>
+    <views:BasePowerControlHubContentPage.Resources>
         <ResourceDictionary>
             <!-- Section group card -->
             <Style x:Key="SectionCard" TargetType="Border">
@@ -63,30 +64,15 @@
                     Radius="8"
                     Opacity="0.4" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </views:BasePowerControlHubContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- ── Top bar ── -->
-        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="Auto,*"
-              BackgroundColor="{DynamicResource AppBarBg}">
-            <Button Grid.Column="0"
-                    Text="‹"
-                    FontSize="20"
-                    BackgroundColor="Transparent"
-                    TextColor="{DynamicResource AppBarText}"
-                    Padding="0,0,8,0"
-                    Clicked="OnBackClicked" />
-            <Label Grid.Column="1"
-                   Text="{Binding PageTitle}"
-                   TextColor="{DynamicResource AppBarText}"
-                   FontSize="17"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center" />
-        </Grid>
+        <views:TopBarView Grid.Row="0" Title="{Binding PageTitle}" ShowBackButton="True" />
 
         <!-- ── Scrollable form ── -->
-        <ScrollView Grid.Row="1" IsVisible="{Binding IsNotBusy}">
+        <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="16,14" Spacing="0">
 
                 <!-- ── Identity ── -->
@@ -343,7 +329,6 @@
             <Button Grid.Column="1"
                     Text="Save"
                     Command="{Binding SaveCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
                     BackgroundColor="#512BD4"
                     TextColor="White"
                     CornerRadius="8"
@@ -353,4 +338,4 @@
 
     </Grid>
 
-</ContentPage>
+</views:BasePowerControlHubContentPage>

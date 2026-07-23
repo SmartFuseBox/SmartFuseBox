@@ -35,6 +35,8 @@ public:
 
 	void formatWifiStatusJson(IWifiClient* client) override;
 
+	void formatWarningsJsonList(char* buffer, size_t size);
+
 	void formatStatusJson(char* buffer, size_t size);
 
 	CommandResult handleRequest(const char* method,

@@ -1,62 +1,33 @@
-using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
-public class RelayConfigViewModel : INotifyPropertyChanged
+public class RelayConfigViewModel : BaseViewModel
 {
-    private readonly PowerHubService _service;
-    private bool _isBusy;
-    private string _statusMessage = string.Empty;
-
     public ObservableCollection<RelayViewModel> Relays { get; } = [];
+
+    // True after the initial explicit LoadAsync() has completed. Auto-refresh
+    // updates will only apply in-place once the initial collection is present.
+    private bool _initialLoadingComplete;
 
     public ICommand LoadCommand { get; }
 
     public ICommand NavigateToRelayCommand { get; }
 
-    public bool IsBusy
+    public RelayConfigViewModel(PowerHubService service, LogService log)
+        : base(service, log)
     {
-        get => _isBusy;
-        set
-        { 
-            _isBusy = value; 
-            OnPropertyChanged(); 
-            OnPropertyChanged(nameof(IsNotBusy));
-        }
-    }
-
-    public bool IsNotBusy => !_isBusy;
-
-    public string StatusMessage
-    {
-        get => _statusMessage;
-        set 
-        {
-            _statusMessage = value; 
-            OnPropertyChanged(); 
-            OnPropertyChanged(nameof(HasStatus)); 
-        }
-    }
-
-    public bool HasStatus => !string.IsNullOrEmpty(_statusMessage);
-
-    public RelayConfigViewModel(PowerHubService service)
-    {
-        _service = service;
         LoadCommand = new Command(async () => await LoadAsync());
         NavigateToRelayCommand = new Command<RelayViewModel>(async relay => await NavigateToRelayAsync(relay));
     }
 
     public async Task LoadAsync()
     {
-        if (!_service.IsConfigured)
+        if (!Service.IsConfigured)
         {
             StatusMessage = MessageNotConfigured;
             return;
@@ -67,7 +38,7 @@ public class RelayConfigViewModel : INotifyPropertyChanged
 
         try
         {
-            IndexModel index = await _service.GetDashboardDataAsync();
+            IndexModel index = await Service.GetDashboardDataAsync();
             List<RelayViewModel> relays = RelayStore.FromModels(index.Relays ?? []);
 
             // Ensure exactly 8 slots are represented, padding with empty unconfigured entries
@@ -87,14 +58,70 @@ public class RelayConfigViewModel : INotifyPropertyChanged
         finally
         {
             IsBusy = false;
+            _initialLoadingComplete = true;
         }
     }
 
     private static async Task NavigateToRelayAsync(RelayViewModel relay)
         => await Shell.Current.GoToAsync($"RelayDetailPage?relayIndex={relay.Index}");
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // Apply incoming dashboard data to the existing RelayViewModel instances
+        // in-place so the CollectionView doesn't recreate item views and the
+        // UI only updates when values actually change.
 
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        if (!_initialLoadingComplete)
+            return;
+
+        var incoming = RelayStore.FromModels(index.Relays ?? []);
+        var incomingByIndex = incoming.ToDictionary(r => r.Index);
+
+        // If our collection hasn't been initialised with the expected slot
+        // count, populate it once so we have stable instances to update.
+        if (Relays.Count != RelayCount)
+        {
+            Relays.Clear();
+
+            for (int i = 0; i < RelayCount; i++)
+            {
+                RelayViewModel relay = incomingByIndex.TryGetValue(i, out var m)
+                    ? m
+                    : new RelayViewModel { Index = i, Pin = UnconfiguredPin };
+
+                relay.Index = i;
+                Relays.Add(relay);
+            }
+
+            return;
+        }
+
+        // Update existing RelayViewModel instances in-place.
+        foreach (var existing in Relays)
+        {
+            if (incomingByIndex.TryGetValue(existing.Index, out var updated))
+            {
+                existing.ShortName = updated.ShortName;
+                existing.LongName = updated.LongName;
+                existing.Pin = updated.Pin;
+                existing.ButtonImage = updated.ButtonImage;
+                existing.DefaultState = updated.DefaultState;
+                existing.ActionType = updated.ActionType;
+                existing.State = updated.State;
+                existing.LinkedIndex = updated.LinkedIndex;
+            }
+            else
+            {
+                // Relay missing in incoming data => mark as unconfigured
+                existing.ShortName = string.Empty;
+                existing.LongName = string.Empty;
+                existing.Pin = UnconfiguredPin;
+                existing.ButtonImage = UnconfiguredPin;
+                existing.DefaultState = 0;
+                existing.ActionType = 0;
+                existing.State = 0;
+                existing.LinkedIndex = UnconfiguredPin;
+            }
+        }
+    }
 }

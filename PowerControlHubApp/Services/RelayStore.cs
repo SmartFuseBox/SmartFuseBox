@@ -1,8 +1,6 @@
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.ViewModels;
+using System.Collections.ObjectModel;
 
 namespace PowerControlHubApp.Services;
 

@@ -1,36 +1,20 @@
-using PowerControlHubApp.Models;
-using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.ViewModels;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Views;
 
-public partial class DashboardPage : ContentPage
+public partial class DashboardPage : BasePowerControlHubContentPage
 {
-    private readonly DashboardViewModel _vm;
+    private readonly DashboardViewModel _viewModel;
 
     public DashboardPage(DashboardViewModel viewModel)
+        : base(viewModel)
+
     {
         InitializeComponent();
-        _vm = viewModel;
-        BindingContext = _vm;
-    }
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _vm.StartAutoRefresh();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _vm.StopAutoRefresh();
-    }
-
-    private async void OnSettingsClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(RouteSettingsPage);
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+        DashboardTopBar.RightButtonClicked += (_, _) => _ = Shell.Current.GoToAsync(RouteSettingsPage);
     }
 
     private void OnRelayToggled(object sender, ToggledEventArgs e)
@@ -38,22 +22,22 @@ public partial class DashboardPage : ContentPage
         // Ignore toggled events raised while we are programmatically applying
         // authoritative state from the device — only handle genuine user
         // interactions.
-        if (_vm?.IsApplyingRemoteState == true)
+        if (_viewModel?.IsApplyingRemoteState == true)
             return;
 
         if (sender is Switch sw && sw.BindingContext is RelayViewModel relay)
         {
-            _vm.ToggleRelayCommand.Execute(relay);
+            _viewModel.ToggleRelayCommand.Execute(relay);
         }
     }
 
     private void OnToggleLogClicked(object sender, EventArgs e)
     {
-        LogPanel.IsVisible = !LogPanel.IsVisible;
+        // Handled by StatusBarView
     }
 
     private void OnClearLogClicked(object sender, EventArgs e)
     {
-        _vm.ClearLog();
+        // Handled by StatusBarView
     }
 }

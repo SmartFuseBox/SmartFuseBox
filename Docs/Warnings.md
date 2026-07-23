@@ -145,6 +145,7 @@ All warning commands are handled by `WarningCommandHandler`. Commands are availa
 | Warning Status | `W2` | `<hex_flag>=<ignored>` | Returns `1` (active) or `0` (inactive) for a specific warning flag |
 | Warnings Clear | `W3` | none | Clears all local and remote warnings |
 | Warning Add/Clear | `W4` | `<hex_flag>=<0\|1>` | Raises (`1`) or clears (`0`) a specific warning by its hex bit value |
+| Warning List Text | `W5` | none | Returns one `W5:<hex_flag>=<description>` frame per active warning, ending with `ACK:W5=ok`. Provides human-readable descriptions of all active warnings. |
 
 **Examples:**
 
@@ -154,6 +155,9 @@ W2:0x00000004=?         → ACK:W2=ok;0x00000004=0
 W4:0x00000008=1         → raises HighCompassTemperature
 W4:0x00000008=0         → clears HighCompassTemperature
 W3                      → clears all warnings
+W5                      → W5:0x00000004=Connection Lost To Fuse Box
+                          W5:0x00000010=Low Battery
+                          ACK:W5=ok
 ```
 
 Warning types are passed as **hex bit-flag values** (e.g. `0x4` for `ConnectionLost`). The value must be a single set bit (power of 2); multi-bit values are rejected.

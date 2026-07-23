@@ -1,5 +1,5 @@
-using System.Collections.ObjectModel;
 using PowerControlHubApp.ViewModels;
+using System.Collections.ObjectModel;
 
 namespace PowerControlHubApp.Services;
 
@@ -24,8 +24,8 @@ public class LogService
         var entry = new LogEntryViewModel
         {
             Timestamp = DateTime.Now,
-            Level     = level,
-            Message   = message
+            Level = level,
+            Message = message
         };
 
         MainThread.BeginInvokeOnMainThread(() =>
