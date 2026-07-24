@@ -1,17 +1,15 @@
 using PowerControlHubApp.Models;
+using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
 [QueryProperty(nameof(SensorIndex), "sensorIndex")]
-public class ExternalSensorDetailViewModel : INotifyPropertyChanged
+public class ExternalSensorDetailViewModel : BaseViewModel
 {
-    private readonly PowerHubService _service;
     private readonly SensorMetaCache _metaCache;
     private ExternalSensorConfigModel _original;
     private int _sensorIndex = -1;
@@ -23,8 +21,6 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
     private string _mqttDeviceClass = string.Empty;
     private string _mqttUnit = string.Empty;
     private bool _mqttIsBinary;
-    private bool _isBusy;
-    private string _statusMessage = string.Empty;
 
     public ObservableCollection<string> SensorTypeOptions { get; } = [];
 
@@ -135,38 +131,22 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
-        {
-            _isBusy = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsNotBusy));
-        }
-    }
+    // IsBusy, IsNotBusy, and StatusMessage are provided by BaseViewModel
 
-    public bool IsNotBusy => !_isBusy;
-
-    public string StatusMessage
+    public ExternalSensorDetailViewModel(PowerHubService service, LogService log, SensorMetaCache metaCache)
+        : base(service, log)
     {
-        get => _statusMessage;
-        set
-        {
-            _statusMessage = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public ExternalSensorDetailViewModel(PowerHubService service, SensorMetaCache metaCache)
-    {
-        _service = service;
         _metaCache = metaCache;
         SaveCommand = new Command(async () => await SaveAsync());
         RemoveCommand = new Command(async () => await RemoveAsync());
 
         BuildTypeOptions();
         _metaCache.CacheUpdated += (_, _) => BuildTypeOptions();
+    }
+
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // External sensor detail page doesn't process dashboard data from auto-refresh
     }
 
     private void BuildTypeOptions()
@@ -195,7 +175,7 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task LoadAsync(int index)
     {
-        if (!_service.IsConfigured || index < 0)
+        if (!Service.IsConfigured || index < 0)
             return;
 
         IsBusy = true;
@@ -203,7 +183,7 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
 
         try
         {
-            var list = await _service.GetExternalSensorsAsync();
+            var list = await Service.GetExternalSensorsAsync();
             _original = list?.FirstOrDefault(s => s.Index == index);
 
             if (_original != null)
@@ -232,7 +212,7 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task SaveAsync()
     {
-        if (!_service.IsConfigured || _sensorIndex < 0)
+        if (!Service.IsConfigured || _sensorIndex < 0)
             return;
 
         IsBusy = true;
@@ -242,11 +222,11 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
         {
             bool ok = true;
 
-            ok &= await _service.SetExternalSensorCoreAsync(_sensorIndex, SensorId, Name ?? string.Empty, MqttName ?? string.Empty, MqttSlug ?? string.Empty);
-            ok &= await _service.SetExternalSensorMqttAsync(_sensorIndex, MqttType ?? string.Empty, MqttDeviceClass ?? string.Empty, MqttUnit ?? string.Empty, MqttIsBinary);
+            ok &= await Service.SetExternalSensorCoreAsync(_sensorIndex, SensorId, Name ?? string.Empty, MqttName ?? string.Empty, MqttSlug ?? string.Empty);
+            ok &= await Service.SetExternalSensorMqttAsync(_sensorIndex, MqttType ?? string.Empty, MqttDeviceClass ?? string.Empty, MqttUnit ?? string.Empty, MqttIsBinary);
 
             if (ok)
-                ok &= await _service.SaveSettingsAsync();
+                ok &= await Service.SaveSettingsAsync();
 
             StatusMessage = ok ? SavedOk : SavedFailed;
         }
@@ -262,7 +242,7 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
 
     private async Task RemoveAsync()
     {
-        if (!_service.IsConfigured || _sensorIndex < 0)
+        if (!Service.IsConfigured || _sensorIndex < 0)
             return;
 
         bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(
@@ -279,10 +259,10 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
 
         try
         {
-            bool ok = await _service.RemoveExternalSensorAsync(_sensorIndex);
+            bool ok = await Service.RemoveExternalSensorAsync(_sensorIndex);
 
             if (ok)
-                ok &= await _service.SaveSettingsAsync();
+                ok &= await Service.SaveSettingsAsync();
 
             if (ok)
             {
@@ -302,9 +282,4 @@ public class ExternalSensorDetailViewModel : INotifyPropertyChanged
             IsBusy = false;
         }
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

@@ -1,18 +1,14 @@
-using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
 [QueryProperty(nameof(RelayIndex), "relayIndex")]
-public class RelayDetailViewModel : INotifyPropertyChanged
+public sealed class RelayDetailViewModel : BaseViewModel
 {
-    private readonly PowerHubService _service;
     private readonly IDashboardProvider _provider;
     private readonly RelayStore _relayStore;
 
@@ -26,8 +22,6 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     private int _colorIndex = UnconfiguredPin;
     private int _actionType;
     private int _linkedIndex = UnconfiguredPin;
-    private bool _isBusy;
-    private string _statusMessage = string.Empty;
 
     public ObservableCollection<string> ColorOptions { get; } = new(ColorOptionNames);
 
@@ -59,9 +53,10 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     {
         get => _shortName;
 
-        set 
-        { _shortName = value; 
-            OnPropertyChanged(); 
+        set
+        {
+            _shortName = value;
+            OnPropertyChanged();
         }
     }
 
@@ -69,10 +64,10 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     {
         get => _longName;
 
-        set 
-        { 
-            _longName = value; 
-            OnPropertyChanged(); 
+        set
+        {
+            _longName = value;
+            OnPropertyChanged();
         }
     }
 
@@ -80,10 +75,10 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     {
         get => _pin;
 
-        set 
-        { 
-            _pin = value; 
-            OnPropertyChanged(); 
+        set
+        {
+            _pin = value;
+            OnPropertyChanged();
             OnPropertyChanged(nameof(PinDisplay));
         }
     }
@@ -105,10 +100,10 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     public int DefaultStateIndex
     {
         get => _defaultState;
-        set 
-        { 
-            _defaultState = value; 
-            OnPropertyChanged(); 
+        set
+        {
+            _defaultState = value;
+            OnPropertyChanged();
         }
     }
 
@@ -142,7 +137,7 @@ public class RelayDetailViewModel : INotifyPropertyChanged
     {
         get
         {
-        if (_linkedIndex == UnconfiguredPin)
+            if (_linkedIndex == UnconfiguredPin)
                 return 0;
 
             // Account for the self-relay being absent from the list
@@ -165,86 +160,65 @@ public class RelayDetailViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool IsBusy
+    // IsBusy, IsNotBusy, StatusMessage, HasStatus, and OnPropertyChanged are provided by BaseViewModel
+
+    // Expose an error indicator using the inherited StatusMessage.
+    public bool IsError => HasStatus && !StatusMessage.StartsWith(CheckMark);
+
+    public RelayDetailViewModel(PowerHubService service, LogService log, IDashboardProvider provider, RelayStore relayStore)
+        : base(service, log)
     {
-        get => _isBusy;
-
-        set 
-        { 
-            _isBusy = value; 
-            OnPropertyChanged(); 
-            OnPropertyChanged(nameof(IsNotBusy)); 
-        }
-    }
-
-    public bool IsNotBusy => !_isBusy;
-
-    public string StatusMessage
-    {
-        get => _statusMessage;
-
-        set 
-        { 
-            _statusMessage = value; 
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(HasStatus));
-            OnPropertyChanged(nameof(IsError)); 
-        }
-    }
-
-    public bool HasStatus => !string.IsNullOrEmpty(_statusMessage);
-
-    public bool IsError => HasStatus && !_statusMessage.StartsWith(CheckMark);
-
-    public RelayDetailViewModel(PowerHubService service, IDashboardProvider provider, RelayStore relayStore)
-    {
-        _service = service;
         _provider = provider;
         _relayStore = relayStore;
         SaveCommand = new Command(async () => await SaveAsync(), () => IsNotBusy);
 
-        SetColorCommand = new Command<string>(idx => 
-        { 
+        SetColorCommand = new Command<string>(idx =>
+        {
             if (int.TryParse(idx, out int i))
-                SelectedColorIndex = i; 
+                SelectedColorIndex = i;
         });
 
         BuildLinkedRelayOptions(-1);
     }
 
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // Relay detail page doesn't process dashboard data from auto-refresh
+    }
+
     private async Task LoadRelayAsync(int index)
     {
-        if (!_service.IsConfigured || index < 0)
+        if (!Service.IsConfigured || index < 0)
             return;
 
         IsBusy = true;
         StatusMessage = string.Empty;
 
-            try
-            {
-                List<RelayViewModel> relays;
+        try
+        {
+            List<RelayViewModel> relays;
 
-                // Prefer the dashboard provider snapshot when available
-                if (_provider.CurrentIndex?.Relays != null)
+            // Prefer the dashboard provider snapshot when available
+            if (_provider.CurrentIndex?.Relays != null)
+            {
+                relays = RelayStore.FromModels(_provider.CurrentIndex.Relays);
+            }
+            else if (Service.IsConfigured)
+            {
+                try
                 {
-                    relays = RelayStore.FromModels(_provider.CurrentIndex.Relays);
+                    var idx = await Service.GetDashboardDataAsync();
+                    relays = RelayStore.FromModels(idx.Relays ?? []);
                 }
-                else if (_service.IsConfigured)
-                {
-                    try
-                    {
-                        var idx = await _service.GetDashboardDataAsync();
-                        relays = RelayStore.FromModels(idx.Relays ?? []);
-                    }
-                    catch
-                    {
-                        relays = [];
-                    }
-                }
-                else
+                catch
                 {
                     relays = [];
                 }
+            }
+            else
+            {
+                relays = [];
+            }
 
             RelayViewModel relay = index < relays.Count
                 ? relays[index]
@@ -297,7 +271,7 @@ public class RelayDetailViewModel : INotifyPropertyChanged
 
     private async Task SaveAsync()
     {
-        if (!_service.IsConfigured || _relayIndex < 0)
+        if (!Service.IsConfigured || _relayIndex < 0)
             return;
 
         IsBusy = true;
@@ -310,25 +284,25 @@ public class RelayDetailViewModel : INotifyPropertyChanged
             if (_original == null ||
                 _original.ShortName != ShortName ||
                 _original.LongName != LongName)
-                ok &= await _service.RenameRelayAsync(_relayIndex, ShortName, LongName);
+                ok &= await Service.RenameRelayAsync(_relayIndex, ShortName, LongName);
 
             if (_original == null || _original.Pin != Pin)
-                ok &= await _service.SetRelayPinAsync(_relayIndex, Pin);
+                ok &= await Service.SetRelayPinAsync(_relayIndex, Pin);
 
             if (_original == null || _original.DefaultState != DefaultStateIndex)
-                ok &= await _service.SetRelayDefaultStateAsync(_relayIndex, DefaultStateIndex);
+                ok &= await Service.SetRelayDefaultStateAsync(_relayIndex, DefaultStateIndex);
 
             if (_original == null || NormalizedButtonImage(_original.ButtonImage) != _colorIndex)
-                ok &= await _service.SetRelayColorAsync(_relayIndex, _colorIndex);
+                ok &= await Service.SetRelayColorAsync(_relayIndex, _colorIndex);
 
             if (_original == null || _original.ActionType != _actionType)
-                ok &= await _service.SetRelayActionTypeAsync(_relayIndex, _actionType);
+                ok &= await Service.SetRelayActionTypeAsync(_relayIndex, _actionType);
 
             if (_original == null || _original.LinkedIndex != _linkedIndex)
-                ok &= await _service.LinkRelayAsync(_relayIndex, _linkedIndex);
+                ok &= await Service.LinkRelayAsync(_relayIndex, _linkedIndex);
 
             if (ok)
-                ok &= await _service.SaveSettingsAsync();
+                ok &= await Service.SaveSettingsAsync();
 
             StatusMessage = ok ? SavedOk : SavedFailed;
 
@@ -360,9 +334,4 @@ public class RelayDetailViewModel : INotifyPropertyChanged
         => deviceValue is >= NextionImageIdMin and <= NextionImageIdMax
             ? deviceValue - NextionImageIdMin
             : UnconfiguredPin;
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

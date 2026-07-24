@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Models;
 

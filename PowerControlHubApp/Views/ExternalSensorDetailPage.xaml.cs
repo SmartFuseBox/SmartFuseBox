@@ -1,21 +1,16 @@
 using PowerControlHubApp.ViewModels;
-using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Views;
 
-public partial class ExternalSensorDetailPage : ContentPage
+public partial class ExternalSensorDetailPage : BasePowerControlHubContentPage
 {
-    private readonly ExternalSensorDetailViewModel _vm;
+    private readonly ExternalSensorDetailViewModel _viewModel;
 
     public ExternalSensorDetailPage(ExternalSensorDetailViewModel viewModel)
+        : base(viewModel)
     {
         InitializeComponent();
-        _vm = viewModel;
-        BindingContext = _vm;
-    }
-
-    private async void OnBackClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync(NavBack);
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
     }
 }

@@ -54,6 +54,11 @@ public class PowerHubService
         return _dashboardConnection.GetDashboardDataAsync(ct);
     }
 
+    public Task<List<string>> GetWarningsAsync(CancellationToken ct = default)
+    {
+        return _dashboardConnection.GetWarningsAsync(ct);
+    }
+
     public Task<List<SensorTypeDescriptorModel>> GetSensorMetaAsync(CancellationToken ct = default)
     {
         return _configConnection.GetSensorMetaAsync(ct);

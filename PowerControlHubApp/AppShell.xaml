@@ -37,4 +37,10 @@
         Route="SettingsPage"
         ContentTemplate="{DataTemplate views:SettingsPage}" />
 
+    <ShellContent
+        x:Name="SystemPage"
+        Title="System"
+        Route="SystemPage"
+        ContentTemplate="{DataTemplate views:SystemPage}" />
+
 </Shell>

@@ -1,6 +1,6 @@
-using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using PowerControlHubApp.Models.Json;
+using System.ComponentModel;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.Services;

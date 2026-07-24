@@ -1,54 +1,22 @@
 using PowerControlHubApp.Models;
+using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
 
 namespace PowerControlHubApp.ViewModels;
 
-public class ExternalSensorConfigViewModel : INotifyPropertyChanged
+public class ExternalSensorConfigViewModel : BaseViewModel
 {
-    private readonly PowerHubService _service;
-
-    private bool _isBusy;
-    private string _statusMessage = string.Empty;
-
     public ObservableCollection<ExternalSensorConfigModel> Sensors { get; } = [];
 
     public ICommand LoadCommand { get; }
     public ICommand NavigateToSensorCommand { get; }
 
-    public bool IsBusy
+    public ExternalSensorConfigViewModel(PowerHubService service, LogService log)
+        : base(service, log)
     {
-        get => _isBusy;
-        set
-        {
-            _isBusy = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsNotBusy));
-        }
-    }
-
-    public bool IsNotBusy => !_isBusy;
-
-    public string StatusMessage
-    {
-        get => _statusMessage;
-        set
-        {
-            _statusMessage = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(HasStatus));
-        }
-    }
-
-    public bool HasStatus => !string.IsNullOrEmpty(_statusMessage);
-
-    public ExternalSensorConfigViewModel(PowerHubService service)
-    {
-        _service = service;
         LoadCommand = new Command(async () => await LoadAsync());
         NavigateToSensorCommand = new Command<ExternalSensorConfigModel>(async s =>
         {
@@ -61,7 +29,7 @@ public class ExternalSensorConfigViewModel : INotifyPropertyChanged
 
     public async Task LoadAsync()
     {
-        if (!_service.IsConfigured)
+        if (!Service.IsConfigured)
         {
             StatusMessage = MessageNotConfigured;
             return;
@@ -72,7 +40,7 @@ public class ExternalSensorConfigViewModel : INotifyPropertyChanged
 
         try
         {
-            List<ExternalSensorConfigModel> configuredSensors = await _service.GetExternalSensorsAsync();
+            List<ExternalSensorConfigModel> configuredSensors = await Service.GetExternalSensorsAsync();
 
             Sensors.Clear();
 
@@ -94,8 +62,8 @@ public class ExternalSensorConfigViewModel : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    protected override void OnDataFetched(IndexModel index)
+    {
+        // External sensor config page doesn't process dashboard data
+    }
 }

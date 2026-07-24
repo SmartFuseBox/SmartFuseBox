@@ -2,11 +2,12 @@ using PowerControlHubApp.ViewModels;
 
 namespace PowerControlHubApp.Views;
 
-public partial class RelayConfigPage : ContentPage
+public partial class RelayConfigPage : BasePowerControlHubContentPage
 {
     private readonly RelayConfigViewModel _viewModel;
 
     public RelayConfigPage(RelayConfigViewModel viewModel)
+        : base(viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;

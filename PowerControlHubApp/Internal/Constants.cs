@@ -31,6 +31,7 @@
         public const string DefaultDeviceIpPort = "80";
         public const string MessageNotConfigured = "Not configured — tap ⚙ to set device IP";
         public const string MessageDeviceUnreachable = "Device unreachable";
+        public const string MessageNoActiveWarnings = "No active warnings";
         public const string MessageToggleFailed = "Toggle failed — see log";
         public const string LogOtaTrigger = "OTA: triggering firmware install…";
         public const string OtaTriggerFailed = "OTA trigger failed";
@@ -101,6 +102,7 @@
         public const string ThemeColor_LogTimestamp_Dark = "#555577";
         public const string ThemeColor_LogText_Dark = "#aaaaaa";
         public const string ThemeColor_Placeholder_Dark = "#555555";
+
         // Networking / settings
         public const int PortMin = 1;
         public const int PortMax = 65535;
@@ -134,7 +136,7 @@
         public const int NextionImageIdYellow = 7;
         public const int NextionImageIdMin = NextionImageIdBlue;
         public const int NextionImageIdMax = NextionImageIdYellow;
-        public const string ColorRelayPanelBlue = "#2255cc";
+        public const string ColorRelayPanelBlue = "#2255aa";
         public const string ColorRelayPanelGreen = "#22aa44";
         public const string ColorRelayPanelGrey = "#888888";
         public const string ColorRelayPanelOrange = "#dd7722";
@@ -183,10 +185,12 @@
         public const string RouteOtaUpdate = "api/system/F13";
         public const string RouteUpdateOta = "api/system/F12?apply=1";
         public const string RouteSystemPins = "api/system/F15";
+        public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
         public const string RouteDashboardPage = "//DashboardPage";
         public const string RouteSettingsPage = "//SettingsPage";
+        public const string RouteSystemPage = "//SystemPage";
         public const string ConnectionTypeKey = "X-Connection-Type";
         public const string ConnectionTypePersistent = "persistent";
         public const int MaximumPermanentConnections = 2;
@@ -382,5 +386,8 @@
         public const string LogStartupMetaFetch = "Startup: first dashboard data received, fetching sensor meta on connection 2.";
         public const string LogStartupMetaPopulated = "Startup: sensor meta cache populated.";
         public const string LogStartupMetaAlready = "Startup: dashboard data already available, fetching sensor meta on connection 2.";
+
+        public const string NullByte = "0x00";
+        public const string NibbleZero = "0x0";
     }
 }

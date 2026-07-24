@@ -58,6 +58,12 @@ CommandResult WarningNetworkHandler::handleRequest(const char* method,
 		return CommandResult::ok();
 	}
 
+	if (SystemFunctions::commandMatches(command, WarningsListText))
+	{
+		formatWarningsJsonList(responseBuffer, bufferSize);
+		return CommandResult::ok();
+	}
+
 	return CommandResult::error(InvalidCommandParameters);
 }
 
@@ -74,4 +80,50 @@ void WarningNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 
 	formatStatusJson(buffer, sizeof(buffer));
 	client->print(buffer);
+}
+
+void WarningNetworkHandler::formatWarningsJsonList(char* buffer, size_t size)
+{
+	uint32_t activeWarnings = _warningManager->getActiveWarningsMask();
+
+	size_t pos = 0;
+	int written = snprintf(buffer + pos, (pos < size ? size - pos : 0), "\"success\":true,\"warnings\":[");
+	if (written < 0) return;
+	pos += (size_t)written;
+	bool first = true;
+
+	for (uint8_t bit = 0; bit < 32; bit++)
+	{
+		if (activeWarnings & (1UL << bit))
+		{
+			const char* warningStr = getWarningString(bit);
+
+			if (warningStr != nullptr && warningStr[0] != '\0')
+			{
+				if (!first)
+				{
+					if (pos < size - 1) buffer[pos++] = ',';
+				}
+
+				first = false;
+
+				// append quoted string (warningStr may contain spaces)
+				written = snprintf(buffer + pos, (pos < size ? size - pos : 0), "\"%s\"", warningStr);
+
+				if (written < 0)
+					break;
+
+				pos += (size_t)written;
+
+				if (pos >= size)
+					break;
+			}
+		}
+	}
+
+	if (pos < size - 2)
+	{
+		buffer[pos++] = ']';
+		buffer[pos] = '\0';
+	}
 }

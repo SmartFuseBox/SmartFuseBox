@@ -9,14 +9,56 @@ namespace PowerControlHubApp.ViewModels
     {
         private int _state;
         private int _buttonImage;
+        private string _shortName;
+        private string _longName;
+        private int _pin;
+        private int _defaultState;
+        private int _actionType;
+        private int _linkedIndex;
 
         public int Index { get; set; }
 
-        public string ShortName { get; set; }
+        public string ShortName
+        {
+            get => _shortName;
+            set
+            {
+                if (_shortName == value)
+                    return;
 
-        public string LongName { get; set; }
+                _shortName = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ShortName));
+            }
+        }
 
-        public int Pin { get; set; }
+        public string LongName
+        {
+            get => _longName;
+            set
+            {
+                if (_longName == value)
+                    return;
+
+                _longName = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LongName));
+            }
+        }
+
+        public int Pin
+        {
+            get => _pin;
+            set
+            {
+                if (_pin == value)
+                    return;
+
+                _pin = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Pin));
+            }
+        }
 
         public int ButtonImage
         {
@@ -29,13 +71,35 @@ namespace PowerControlHubApp.ViewModels
 
                 _buttonImage = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(PanelColor));
+                OnPropertyChanged(nameof(ButtonImage));
             }
         }
 
-        public int DefaultState { get; set; }
+        public int DefaultState
+        {
+            get => _defaultState;
+            set
+            {
+                if (_defaultState == value)
+                    return;
 
-        public int ActionType { get; set; }
+                _defaultState = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int ActionType
+        {
+            get => _actionType;
+            set
+            {
+                if (_actionType == value)
+                    return;
+
+                _actionType = value;
+                OnPropertyChanged();
+            }
+        }
 
         public int State
         {
@@ -49,10 +113,22 @@ namespace PowerControlHubApp.ViewModels
                 _state = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsOn));
+                OnPropertyChanged(nameof(State));
             }
         }
 
-        public int LinkedIndex { get; internal set; }
+        public int LinkedIndex
+        {
+            get => _linkedIndex;
+            internal set
+            {
+                if (_linkedIndex == value)
+                    return;
+
+                _linkedIndex = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool IsOn => State == 1;
 

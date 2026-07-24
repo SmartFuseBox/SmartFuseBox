@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using PowerControlHubApp.Models.Json;
+using System.ComponentModel;
 
 namespace PowerControlHubApp.Services;
 

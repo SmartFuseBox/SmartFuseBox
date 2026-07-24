@@ -286,6 +286,7 @@ Example: `POST /api/sound/H3`
 | `W2` — Warning Status | `W2:0x05=1` | Status of a single warning type. Param: `<WarningType>=<0\|1>`. |
 | `W3` — Clear Warnings | `W3` | Clear all active warnings. No params. |
 | `W4` — Set Warning Status | `W4:0x06=1` | Raise (`1`) or clear (`0`) a specific warning. Param: `<WarningType>=<0\|1>`. |
+| `W5` — List Warning Text | `W5` | Returns one `W5:<hex>=<description>` frame per active warning and ends with `ACK:W5=ok`. Use this to get human-readable descriptions of all active warnings. No params. **WiFi response:** `{"success":true,"warnings":["desc1","desc2"]}`. |
 
 ### WiFi warning commands
 Route: `/api/warning/{command}`  

@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
              x:Class="PowerControlHubApp.Views.ExternalSensorDetailPage"
              Title="External Sensor"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
-        <Grid Grid.Row="0" Padding="12,10" ColumnDefinitions="Auto,*" BackgroundColor="{DynamicResource AppBarBg}">
-            <Button Grid.Column="0" Text="‹" BackgroundColor="Transparent" TextColor="{DynamicResource AppBarText}" Clicked="OnBackClicked" />
-            <Label Grid.Column="1" Text="External Sensor" TextColor="{DynamicResource AppBarText}" FontSize="17" FontAttributes="Bold" VerticalOptions="Center" />
-        </Grid>
+        <views:TopBarView Grid.Row="0" Title="External Sensor" ShowBackButton="True" />
 
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="16" Spacing="12">
@@ -39,4 +37,4 @@
             <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding IsNotBusy}" />
         </Grid>
     </Grid>
-</ContentPage>
+</views:BasePowerControlHubContentPage>
