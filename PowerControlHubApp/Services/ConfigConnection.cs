@@ -399,6 +399,44 @@ namespace PowerControlHubApp.Services
             }
         }
 
+        public async Task<DateTimeOffset?> GetDateTimeAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteSystemGetDateTime, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean() &&
+                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                {
+                    string dtStr = v.GetString();
+
+                    if (DateTimeOffset.TryParse(dtStr, out var dt))
+                        return dt;
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+            return null;
+        }
+
+        public async Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteSystemSetDateTime}?{JsonValueKey}={unixTimestamp}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static async Task<bool> IsSuccessResponseAsync(HttpResponseMessage response, CancellationToken ct)
         {
             if (!response.IsSuccessStatusCode)

@@ -7,7 +7,7 @@
     <ContentView.Content>
         <Grid RowDefinitions="Auto,Auto,Auto">
             <!-- ── System status bar (memory/cpu/time/fw) ── -->
-            <Grid Grid.Row="0" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto">
+            <Grid Grid.Row="0" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto">
                 <Label Grid.Column="0" Text="Mem:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
                 <Label Grid.Column="1" Text="{Binding SystemFreeMemory}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="6,0" />
                 <Label Grid.Column="2" Text="CPU:" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
@@ -23,7 +23,8 @@
                         <TapGestureRecognizer Command="{Binding FirmwareLabelTappedCommand}" NumberOfTapsRequired="1" />
                     </Label.GestureRecognizers>
                 </Label>
-                <Label Grid.Column="7" Text="{Binding SystemUptime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
+                <Label Grid.Column="7" Text="{Binding SystemTime, StringFormat='🕐 {0}'}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" FontSize="11" />
+                <Label Grid.Column="8" Text="{Binding SystemUptime}" TextColor="{DynamicResource AppBarText}" VerticalOptions="Center" Margin="12,0" />
             </Grid>
 
             <Grid Grid.Row="1" BackgroundColor="{DynamicResource AppBarBg}" Padding="12,6"

@@ -17,6 +17,7 @@ namespace PowerControlHubApp
         private readonly ConfigPoller _configPoller;
         private readonly SensorMetaCache _sensorMetaCache;
         private readonly IConfigConnection _configConnection;
+        private readonly TimeSyncService _timeSyncService;
         private readonly ILogger<App> _log;
 
         public App(
@@ -25,6 +26,7 @@ namespace PowerControlHubApp
             ConfigPoller configPoller,
             SensorMetaCache sensorMetaCache,
             IConfigConnection configConnection,
+            TimeSyncService timeSyncService,
             ILogger<App> log)
         {
             InitializeComponent();
@@ -32,6 +34,7 @@ namespace PowerControlHubApp
             _configPoller = configPoller;
             _sensorMetaCache = sensorMetaCache;
             _configConnection = configConnection;
+            _timeSyncService = timeSyncService;
             _log = log;
 
             // Apply after InitializeComponent so Application.Resources is populated.
@@ -56,6 +59,7 @@ namespace PowerControlHubApp
             // Start background pollers
             _dashboardPoller.Start();
             _configPoller.Start();
+            _timeSyncService.Start();
 
             // Startup orchestration: after first successful dashboard poll,
             // fetch sensor meta data over the config connection so config pages are ready.
@@ -75,13 +79,15 @@ namespace PowerControlHubApp
             // Restart pollers when the app comes back to foreground
             _dashboardPoller.Start();
             _configPoller.Start();
+            _timeSyncService.Start();
         }
 
         private async Task StopPollersAsync()
         {
             await Task.WhenAll(
                 _dashboardPoller.StopAsync(),
-                _configPoller.StopAsync());
+                _configPoller.StopAsync(),
+                _timeSyncService.StopAsync());
         }
 
         private void AttachStartupOrchestration()
