@@ -159,6 +159,9 @@
         <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="12,8" Spacing="4">
 
+                <!-- Not connected banner (visible when disconnected) -->
+                <views:NotConnectedBanner />
+
                 <!-- ── Relays section (hidden when disconnected) ── -->
                 <Label Text="CONTROLS"
                        Style="{StaticResource SectionHeader}"

@@ -43,7 +43,7 @@
         </ResourceDictionary>
     </views:BasePowerControlHubContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- Top bar -->
         <views:TopBarView Grid.Row="0" Title="🔌 Local Sensors"
@@ -51,8 +51,11 @@
                           RightButtonCommand="{Binding LoadCommand}"
                           RightButtonIsEnabled="{Binding IsNotBusy}" />
 
+        <!-- Not connected banner -->
+        <views:NotConnectedBanner Grid.Row="1" />
+
         <!-- Content -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2" IsVisible="{Binding IsConnected}">
 
             <!-- Loading indicator -->
             <ActivityIndicator IsRunning="{Binding IsBusy}"
@@ -187,6 +190,6 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-        <views:StatusBarView Grid.Row="2" />
+        <views:StatusBarView Grid.Row="3" />
     </Grid>
 </views:BasePowerControlHubContentPage>

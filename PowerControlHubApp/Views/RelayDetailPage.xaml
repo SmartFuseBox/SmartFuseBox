@@ -66,13 +66,16 @@
         </ResourceDictionary>
     </views:BasePowerControlHubContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- ── Top bar ── -->
         <views:TopBarView Grid.Row="0" Title="{Binding PageTitle}" ShowBackButton="True" />
 
+        <!-- Not connected banner -->
+        <views:NotConnectedBanner Grid.Row="1" />
+
         <!-- ── Scrollable form ── -->
-        <ScrollView Grid.Row="1">
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
             <VerticalStackLayout Padding="16,14" Spacing="0">
 
                 <!-- ── Identity ── -->
@@ -297,7 +300,7 @@
         </ScrollView>
 
         <!-- Loading overlay -->
-        <ActivityIndicator Grid.Row="1"
+        <ActivityIndicator Grid.Row="2"
                            IsRunning="{Binding IsBusy}"
                            IsVisible="{Binding IsBusy}"
                            Color="{DynamicResource AppAccent}"
@@ -305,7 +308,8 @@
                            HorizontalOptions="Center" />
 
         <!-- ── Bottom bar: status + save ── -->
-        <Grid Grid.Row="2" Padding="16,10" ColumnDefinitions="*,Auto"
+        <Grid Grid.Row="3" Padding="16,10" ColumnDefinitions="*,Auto"
+              IsVisible="{Binding IsConnected}"
               BackgroundColor="{DynamicResource AppBarBg}">
 
             <!-- Status message -->

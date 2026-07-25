@@ -7,10 +7,12 @@
              Title="External Sensor"
              BackgroundColor="{DynamicResource AppPageBg}">
 
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
         <views:TopBarView Grid.Row="0" Title="External Sensor" ShowBackButton="True" />
 
-        <ScrollView Grid.Row="1">
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
             <VerticalStackLayout Padding="16" Spacing="12">
                 <Label Text="IDENTITY" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
                 <Entry Placeholder="Name" Text="{Binding Name}" />
@@ -32,7 +34,8 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="2" Padding="16,0,16,12" ColumnDefinitions="*,*" ColumnSpacing="10">
+        <Grid Grid.Row="3" Padding="16,0,16,12" ColumnDefinitions="*,*" ColumnSpacing="10"
+              IsVisible="{Binding IsConnected}">
             <Button Grid.Column="0" Text="🗑 Remove" Command="{Binding RemoveCommand}" IsEnabled="{Binding IsNotBusy}" BackgroundColor="{DynamicResource AppCardStroke}" TextColor="{DynamicResource AppLabelPrimary}" />
             <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding IsNotBusy}" />
         </Grid>
