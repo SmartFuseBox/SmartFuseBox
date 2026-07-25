@@ -30,5 +30,7 @@ namespace PowerControlHubApp.Services
         Task<bool> SaveSettingsAsync(CancellationToken ct = default);
         Task<OtaStatusModel> GetOtaStatusAsync(CancellationToken ct = default);
         Task<bool> TriggerOtaInstallAsync(CancellationToken ct = default);
+        Task<DateTimeOffset?> GetDateTimeAsync(CancellationToken ct = default);
+        Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default);
     }
 }

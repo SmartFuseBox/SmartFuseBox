@@ -210,6 +210,59 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 		return CommandResult::ok();
 	}
 #endif // OTA_AUTO_UPDATE
+	else if (SystemFunctions::commandMatches(command, SystemGetDateTime))
+	{
+		char dateTimeStr[DateTimeBufferLength];
+		if (DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr)))
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
+				command, dateTimeStr);
+		}
+		else
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":false,\"error\":\"Date/time not set\"");
+		}
+		return CommandResult::ok();
+	}
+	else if (SystemFunctions::commandMatches(command, SystemSetDateTime))
+	{
+		const char* tsStr = nullptr;
+		for (uint8_t i = 0; i < paramCount; ++i)
+		{
+			if (strcmp(params[i].key, ValueParamName) == 0)
+			{
+				tsStr = params[i].value;
+				break;
+			}
+		}
+
+		if (tsStr)
+		{
+			uint64_t timestamp = static_cast<uint64_t>(strtoull(tsStr, nullptr, 0));
+			if (timestamp > 0)
+			{
+				DateTimeManager::setDateTime(timestamp);
+				char dateTimeStr[DateTimeBufferLength];
+				DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr));
+				snprintf(responseBuffer, bufferSize,
+					"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
+					command, dateTimeStr);
+			}
+			else
+			{
+				snprintf(responseBuffer, bufferSize,
+					"\"success\":false,\"error\":\"Invalid timestamp\"");
+			}
+		}
+		else
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":false,\"error\":\"Missing v parameter\"");
+		}
+		return CommandResult::ok();
+	}
 	else
 	{
 		return CommandResult::error(InvalidCommandParameters);

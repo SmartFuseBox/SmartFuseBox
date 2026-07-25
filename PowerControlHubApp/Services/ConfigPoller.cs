@@ -169,6 +169,10 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> TriggerOtaInstallAsync(CancellationToken ct = default) => _connection.TriggerOtaInstallAsync(ct);
 
+    public Task<DateTimeOffset?> GetDateTimeAsync(CancellationToken ct = default) => _connection.GetDateTimeAsync(ct);
+
+    public Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default) => _connection.SetDateTimeAsync(unixTimestamp, ct);
+
     public void Dispose()
     {
         if (_cts != null)

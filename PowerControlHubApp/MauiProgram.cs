@@ -82,6 +82,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<LogService>();
             builder.Services.AddSingleton<ThemeService>();
             builder.Services.AddSingleton<RelayStore>();
+            builder.Services.AddSingleton<TimeSyncService>();
 
             // ViewModels
             builder.Services.AddSingleton<DashboardViewModel>();

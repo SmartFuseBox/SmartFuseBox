@@ -180,11 +180,17 @@
         public const string OtaAuto_Off = "0";
 
         public const int DefaultIntervalMs = 750;
+        public const int TimeSyncIntervalMinutes = 60;
+        public const int TimeSyncDriftThresholdSeconds = 120;
+        public const int MinimumValidDateTimeYear = 2000;
+        public const string DeviceTimeFormat = "yyyy-MM-dd HH:mm:ss";
         public const string RouteApiIndex = "api/index";
         public const string RouteSaveConfig = "api/config/C0";
         public const string RouteOtaUpdate = "api/system/F13";
         public const string RouteUpdateOta = "api/system/F12?apply=1";
         public const string RouteSystemPins = "api/system/F15";
+        public const string RouteSystemGetDateTime = "api/system/F7";
+        public const string RouteSystemSetDateTime = "api/system/F6";
         public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
@@ -219,12 +225,15 @@
         public const string JsonSensorIndex = "i";
         public const string JsonSensorId = "id";
         public const string JsonSensorName = "n";
-        public const string JsonSensorMqttName = "mn";
+        public const string JsonSensorMqttName = "mn";  
         public const string JsonSensorMqttSlug = "ms";
         public const string JsonSensorMqttType = "mt";
         public const string JsonSensorMqttDeviceClass = "md";
         public const string JsonSensorMqttUnit = "mu";
         public const string JsonSensorMqttBinary = "bin";
+        public const string JsonValueKey = "v";
+        public const char JsonObjectOpen = '{';
+        public const char JsonObjectClose = '}';
 
         public const string ErrRemoveCommandFailed = "⚠ Remove command failed";
 
@@ -381,6 +390,15 @@
         // ConfigPoller log messages
         public const string LogConfigMetaRefreshed = "ConfigPoller: SensorMetaCache refreshed after connection.";
         public const string LogConfigHealthCheckFailed = "ConfigPoller: Connection health check failed.";
+
+        // TimeSyncService log messages
+        public const string LogTimeSyncStarted = "TimeSyncService started with interval {IntervalMin}min, drift threshold {DriftSec}s";
+        public const string LogTimeSyncDeviceTime = "TimeSyncService: device time is {DeviceTime}, delta {DeltaSec}s";
+        public const string LogTimeSyncSetting = "TimeSyncService: drift {DeltaSec}s exceeds threshold, setting device time to {LocalTime}";
+        public const string LogTimeSyncInSync = "TimeSyncService: device time is in sync (delta {DeltaSec}s)";
+        public const string LogTimeSyncNotSet = "TimeSyncService: device time not set, synchronizing";
+        public const string LogTimeSyncFailed = "TimeSyncService: time sync attempt failed";
+        public const string LogTimeSyncStopping = "TimeSyncService stopping";
 
         // MauiProgram startup orchestration
         public const string LogStartupMetaFetch = "Startup: first dashboard data received, fetching sensor meta on connection 2.";

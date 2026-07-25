@@ -302,6 +302,19 @@ public abstract class BaseViewModel : INotifyPropertyChanged
         SystemCpuUsage = $"{system.Cpu}%";
         SystemFirmware = string.IsNullOrEmpty(system.Fw) ? DoubleDash : system.Fw;
         SystemUptime = string.IsNullOrEmpty(system.Uptime) ? DoubleDash : system.Uptime;
+
+        // Device date/time — if firmware didn't set time, show placeholder
+        try
+        {
+            if (system.Time.Year >= MinimumValidDateTimeYear)
+                SystemTime = system.Time.ToString(DeviceTimeFormat);
+            else
+                SystemTime = DoubleDash;
+        }
+        catch
+        {
+            SystemTime = DoubleDash;
+        }
     }
 
     private void UpdateHasWarnings(WarningModel warning)
