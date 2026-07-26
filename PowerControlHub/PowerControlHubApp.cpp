@@ -479,11 +479,6 @@ void PowerControlHubApp::configureWifiSupport(Config* config)
 #endif    
     };
 
-    INetworkCommandHandler* networkHandlers[] = { &_relayNetworkHandler, &_soundNetworkHandler, &_warningNetworkHandler,
-        &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler, &_schedulerNetworkHandler,
-        &_externalSensorNetworkHandler, &_sensorConfigNetworkHandler, _webIndexNetworkHandler,
-        &_wifiCommandBridge
-    };
     size_t networkHandlerCount = sizeof(networkHandlers) / sizeof(networkHandlers[0]);
     _wifiController.registerHandlers(networkHandlers, networkHandlerCount);
 
