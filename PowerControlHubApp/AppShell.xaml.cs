@@ -11,6 +11,7 @@ namespace PowerControlHubApp
             Routing.RegisterRoute(nameof(ExternalSensorDetailPage), typeof(ExternalSensorDetailPage));
             Routing.RegisterRoute(nameof(LocalSensorDetailPage), typeof(LocalSensorDetailPage));
             Routing.RegisterRoute(nameof(TimeSettingsPage), typeof(TimeSettingsPage));
+            Routing.RegisterRoute(nameof(MqttSettingsPage), typeof(MqttSettingsPage));
         }
     }
 }

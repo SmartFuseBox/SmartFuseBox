@@ -96,7 +96,8 @@ PowerControlHubApp::PowerControlHubApp(SerialCommandManager* commandMgrComputer)
       , _mqttConfigHandler(&_configController, &_mqttController, commandMgrComputer)
       , _mqttRelayHandler(&_mqttController, &_messageBus, &_relayController, commandMgrComputer)
       , _mqttSensorHandler(nullptr)
-      , _mqttSystemHandler(&_mqttController, &_messageBus, commandMgrComputer)
+	  , _mqttSystemHandler(&_mqttController, &_messageBus, commandMgrComputer)
+	  , _mqttNetworkHandler(&_mqttController)
 	  , _nextRunMqttMs(0)
 #endif
 
@@ -469,7 +470,15 @@ void PowerControlHubApp::loop()
 
 void PowerControlHubApp::configureWifiSupport(Config* config)
 {
-    // network command handlers
+    INetworkCommandHandler* networkHandlers[] = { &_relayNetworkHandler, &_soundNetworkHandler, &_warningNetworkHandler,
+        &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler, &_schedulerNetworkHandler,
+        &_externalSensorNetworkHandler, &_sensorConfigNetworkHandler, _webIndexNetworkHandler,
+        &_wifiCommandBridge
+#if defined(MQTT_SUPPORT)
+        , &_mqttNetworkHandler
+#endif    
+    };
+
     INetworkCommandHandler* networkHandlers[] = { &_relayNetworkHandler, &_soundNetworkHandler, &_warningNetworkHandler,
         &_systemNetworkHandler, _sensorNetworkHandler, &_configNetworkHandler, &_schedulerNetworkHandler,
         &_externalSensorNetworkHandler, &_sensorConfigNetworkHandler, _webIndexNetworkHandler,
@@ -489,6 +498,9 @@ void PowerControlHubApp::configureWifiSupport(Config* config)
         &_schedulerNetworkHandler,
         &_externalSensorNetworkHandler,
         &_sensorConfigNetworkHandler,
+#if defined(MQTT_SUPPORT)
+        &_mqttNetworkHandler,
+#endif
     };
     uint8_t jsonVisitorCount = sizeof(jsonVisitors) / sizeof(jsonVisitors[0]);
     _wifiController.registerJsonVisitors(jsonVisitors, jsonVisitorCount);

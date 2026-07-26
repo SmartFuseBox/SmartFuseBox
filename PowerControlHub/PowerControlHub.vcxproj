@@ -78,6 +78,7 @@
     <ClCompile Include="BinaryPresenceSensor.cpp" />
     <ClCompile Include="BinaryPresenceSensor.h" />
     <ClCompile Include="ExternalSensorNetworkHandler.cpp" />
+    <ClCompile Include="MQTTNetworkHandler.cpp" />
     <ClCompile Include="NavigationController.cpp" />
     <ClCompile Include="OtaManager.cpp" />
     <ClCompile Include="PageAbout.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="MicroSdDriver.h" />
     <ClInclude Include="MQTTConfigCommandHandler.h" />
     <ClInclude Include="MQTTHandler.h" />
+    <ClInclude Include="MQTTNetworkHandler.h" />
     <ClInclude Include="MQTTRelayHandler.h" />
     <ClInclude Include="MQTTSensorHandler.h" />
     <ClInclude Include="MQTTSystemHandler.h" />

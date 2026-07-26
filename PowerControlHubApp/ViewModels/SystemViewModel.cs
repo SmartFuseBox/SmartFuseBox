@@ -66,6 +66,8 @@ public class SystemViewModel : BaseViewModel
 
     public ICommand NavigateToTimeSettingsCommand { get; }
 
+    public ICommand NavigateToMqttSettingsCommand { get; }
+
     public SystemViewModel(PowerHubService service, LogService log)
         : base(service, log)
     {
@@ -73,6 +75,7 @@ public class SystemViewModel : BaseViewModel
         RefreshPinsCommand = new Command(async () => await RefreshPinsAsync());
         InstallFirmwareCommand = new Command(async () => await InstallFirmwareAsync(), () => CanInstallFirmware);
         NavigateToTimeSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteTimeSettingsPage));
+        NavigateToMqttSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteMqttSettingsPage));
     }
 
     protected override void OnDataFetched(IndexModel index)

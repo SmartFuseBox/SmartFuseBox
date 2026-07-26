@@ -14,19 +14,29 @@
 
         <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
             <VerticalStackLayout Padding="20" Spacing="12">
-                <!-- Time settings card -->
+                <!-- Settings navigation card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
-                    <Button Text="Time"
-                            Command="{Binding NavigateToTimeSettingsCommand}"
-                            FontSize="16"
-                            FontAttributes="Bold"
-                            BackgroundColor="Transparent"
-                            TextColor="{DynamicResource AppAccent}"
-                            HorizontalOptions="Start"
-                            Padding="4"
-                            BorderColor="Blue"
-                            BorderWidth="1"/>
+                    <HorizontalStackLayout Spacing="16">
+                        <Button Text="Time"
+                                Command="{Binding NavigateToTimeSettingsCommand}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                Padding="4"
+                                BorderColor="Blue"
+                                BorderWidth="1"/>
+                        <Button Text="MQTT"
+                                Command="{Binding NavigateToMqttSettingsCommand}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                Padding="4"
+                                BorderColor="Blue"
+                                BorderWidth="1"/>
+                    </HorizontalStackLayout>
                 </Border>
 
                 <!-- Warnings card -->

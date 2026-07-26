@@ -177,6 +177,42 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default) => _connection.SetTimezoneOffsetAsync(offsetHours, ct);
 
+    public Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default) => _connection.GetMqttEnabledAsync(ct);
+
+    public Task<bool> SetMqttEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetMqttEnabledAsync(enabled, ct);
+
+    public Task<string> GetMqttBrokerAsync(CancellationToken ct = default) => _connection.GetMqttBrokerAsync(ct);
+
+    public Task<bool> SetMqttBrokerAsync(string broker, CancellationToken ct = default) => _connection.SetMqttBrokerAsync(broker, ct);
+
+    public Task<int?> GetMqttPortAsync(CancellationToken ct = default) => _connection.GetMqttPortAsync(ct);
+
+    public Task<bool> SetMqttPortAsync(int port, CancellationToken ct = default) => _connection.SetMqttPortAsync(port, ct);
+
+    public Task<string> GetMqttUsernameAsync(CancellationToken ct = default) => _connection.GetMqttUsernameAsync(ct);
+
+    public Task<bool> SetMqttUsernameAsync(string username, CancellationToken ct = default) => _connection.SetMqttUsernameAsync(username, ct);
+
+    public Task<bool> SetMqttPasswordAsync(string password, CancellationToken ct = default) => _connection.SetMqttPasswordAsync(password, ct);
+
+    public Task<string> GetMqttDeviceIdAsync(CancellationToken ct = default) => _connection.GetMqttDeviceIdAsync(ct);
+
+    public Task<bool> SetMqttDeviceIdAsync(string deviceId, CancellationToken ct = default) => _connection.SetMqttDeviceIdAsync(deviceId, ct);
+
+    public Task<bool?> GetMqttHADiscoveryAsync(CancellationToken ct = default) => _connection.GetMqttHADiscoveryAsync(ct);
+
+    public Task<bool> SetMqttHADiscoveryAsync(bool enabled, CancellationToken ct = default) => _connection.SetMqttHADiscoveryAsync(enabled, ct);
+
+    public Task<int?> GetMqttKeepAliveAsync(CancellationToken ct = default) => _connection.GetMqttKeepAliveAsync(ct);
+
+    public Task<bool> SetMqttKeepAliveAsync(int seconds, CancellationToken ct = default) => _connection.SetMqttKeepAliveAsync(seconds, ct);
+
+    public Task<bool?> GetMqttConnectionStateAsync(CancellationToken ct = default) => _connection.GetMqttConnectionStateAsync(ct);
+
+    public Task<string> GetMqttDiscoveryPrefixAsync(CancellationToken ct = default) => _connection.GetMqttDiscoveryPrefixAsync(ct);
+
+    public Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default) => _connection.SetMqttDiscoveryPrefixAsync(prefix, ct);
+
     public void Dispose()
     {
         if (_cts != null)

@@ -42,7 +42,7 @@ public abstract class BaseViewModel : INotifyPropertyChanged
 
     public ObservableCollection<LogEntryViewModel> LogEntries => _log.Entries;
 
-    public ICommand RefreshCommand { get; }
+    public virtual ICommand RefreshCommand { get; protected set; }
     public ICommand SystemLabelTappedCommand { get; }
     public ICommand FirmwareLabelTappedCommand { get; }
 

@@ -22,6 +22,11 @@ public sealed class TimeSettingsViewModel : BaseViewModel
     private bool _isRefreshing;
     private PeriodicTimer _dstTimer;
     private CancellationTokenSource _dstCts;
+    private PeriodicTimer _clockTimer;
+    private CancellationTokenSource _clockCts;
+    private DateTime _deviceTimeAtCapture;
+    private long _captureUtcTicks;
+    private const int ClockTickIntervalSeconds = 1;
 
     public sealed class TimeZoneOption
     {
@@ -64,6 +69,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 #pragma warning restore CC0009
 
     private static readonly TimeSpan DstCheckInterval = TimeSpan.FromMinutes(DstCheckIntervalMinutes);
+    private static readonly TimeSpan ClockTickInterval = TimeSpan.FromSeconds(ClockTickIntervalSeconds);
 
     public TimeSettingsViewModel(PowerHubService service, LogService log)
         : base(service, log)
@@ -73,7 +79,6 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         SaveTimezoneCommand = new Command(async () => await SaveTimezoneAsync());
     }
 
-    public ICommand RefreshCommand { get; }
     public ICommand SyncTimeCommand { get; }
     public ICommand SaveTimezoneCommand { get; }
 
@@ -129,9 +134,15 @@ public sealed class TimeSettingsViewModel : BaseViewModel
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (index?.System?.Time.Year >= MinimumValidDateTimeYear)
-                    DeviceTime = index.System.Time.ToString(DeviceTimeFormat);
+                {
+                    _deviceTimeAtCapture = index.System.Time;
+                    _captureUtcTicks = DateTime.UtcNow.Ticks;
+                    DeviceTime = _deviceTimeAtCapture.ToString(DeviceTimeFormat);
+                }
                 else
+                {
                     DeviceTime = DoubleDash;
+                }
 
                 if (index?.Config != null)
                 {
@@ -142,6 +153,8 @@ public sealed class TimeSettingsViewModel : BaseViewModel
                 StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
+
+            StartClock();
         }
         catch
         {
@@ -192,7 +205,11 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         {
             if (ok)
             {
-                DeviceTime = DateTimeOffset.UtcNow.ToString(DeviceTimeFormat);
+                DateTime utcNow = DateTime.UtcNow;
+                int offsetHours = GetSelectedTimezoneOffset();
+                _deviceTimeAtCapture = utcNow.AddHours(offsetHours);
+                _captureUtcTicks = utcNow.Ticks;
+                DeviceTime = _deviceTimeAtCapture.ToString(DeviceTimeFormat);
                 StatusMessage = MsgTimeSyncedToDevice;
             }
             else
@@ -202,6 +219,25 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 
             OnPropertyChanged(nameof(HasStatusMessage));
         });
+
+        if (ok)
+            StartClock();
+    }
+
+    private int GetSelectedTimezoneOffset()
+    {
+        if (SelectedTimezoneIndex < 0 || SelectedTimezoneIndex >= TimeZoneOptionsList.Count)
+            return TimezoneOffsetMin;
+
+        try
+        {
+            var tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneOptionsList[SelectedTimezoneIndex].TimeZoneId);
+            return (int)tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc)).TotalHours;
+        }
+        catch
+        {
+            return TimezoneOffsetMin;
+        }
     }
 
     public async Task SaveTimezoneAsync()
@@ -239,6 +275,51 @@ public sealed class TimeSettingsViewModel : BaseViewModel
             StatusMessage = MsgTimezoneNotAvailable;
             OnPropertyChanged(nameof(HasStatusMessage));
         }
+    }
+
+    private void StartClock()
+    {
+        StopClock();
+
+        _clockCts = new CancellationTokenSource();
+        var ct = _clockCts.Token;
+        _clockTimer = new PeriodicTimer(ClockTickInterval);
+
+        _ = RunClockLoopAsync(ct);
+    }
+
+    private async Task RunClockLoopAsync(CancellationToken ct)
+    {
+        while (await _clockTimer.WaitForNextTickAsync(ct))
+        {
+            try
+            {
+                long elapsedTicks = DateTime.UtcNow.Ticks - _captureUtcTicks;
+                DateTime now = _deviceTimeAtCapture.AddTicks(elapsedTicks);
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    DeviceTime = now.ToString(DeviceTimeFormat);
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch
+            {
+                // silently retry
+            }
+        }
+    }
+
+    private void StopClock()
+    {
+        _clockCts?.Cancel();
+        _clockCts?.Dispose();
+        _clockCts = null;
+        _clockTimer?.Dispose();
+        _clockTimer = null;
     }
 
     private void StartDstAutoAdjust(string timeZoneId)
@@ -311,6 +392,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 
     public void Cleanup()
     {
+        StopClock();
         StopDstAutoAdjust();
     }
 

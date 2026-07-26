@@ -476,6 +476,152 @@ namespace PowerControlHubApp.Services
             }
         }
 
+        public async Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default)
+        {
+            return await GetMqttBoolAsync(MqttConfigEnabled, ct);
+        }
+
+        public async Task<bool> SetMqttEnabledAsync(bool enabled, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigEnabled, enabled ? BoolTrueString : BoolFalseString, ct);
+        }
+
+        public async Task<string> GetMqttBrokerAsync(CancellationToken ct = default)
+        {
+            return await GetMqttStringAsync(MqttConfigBroker, ct) ?? string.Empty;
+        }
+
+        public async Task<bool> SetMqttBrokerAsync(string broker, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigBroker, broker, ct);
+        }
+
+        public async Task<int?> GetMqttPortAsync(CancellationToken ct = default)
+        {
+            return await GetMqttIntAsync(MqttConfigPort, ct);
+        }
+
+        public async Task<bool> SetMqttPortAsync(int port, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigPort, port.ToString(), ct);
+        }
+
+        public async Task<string> GetMqttUsernameAsync(CancellationToken ct = default)
+        {
+            return await GetMqttStringAsync(MqttConfigUsername, ct) ?? string.Empty;
+        }
+
+        public async Task<bool> SetMqttUsernameAsync(string username, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigUsername, username, ct);
+        }
+
+        public async Task<bool> SetMqttPasswordAsync(string password, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigPassword, password, ct);
+        }
+
+        public async Task<string> GetMqttDeviceIdAsync(CancellationToken ct = default)
+        {
+            return await GetMqttStringAsync(MqttConfigDeviceId, ct) ?? string.Empty;
+        }
+
+        public async Task<bool> SetMqttDeviceIdAsync(string deviceId, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigDeviceId, deviceId, ct);
+        }
+
+        public async Task<bool?> GetMqttHADiscoveryAsync(CancellationToken ct = default)
+        {
+            return await GetMqttBoolAsync(MqttConfigHADiscovery, ct);
+        }
+
+        public async Task<bool> SetMqttHADiscoveryAsync(bool enabled, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigHADiscovery, enabled ? BoolTrueString : BoolFalseString, ct);
+        }
+
+        public async Task<int?> GetMqttKeepAliveAsync(CancellationToken ct = default)
+        {
+            return await GetMqttIntAsync(MqttConfigKeepAlive, ct);
+        }
+
+        public async Task<bool> SetMqttKeepAliveAsync(int seconds, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigKeepAlive, seconds.ToString(), ct);
+        }
+
+        public async Task<bool?> GetMqttConnectionStateAsync(CancellationToken ct = default)
+        {
+            return await GetMqttBoolAsync(MqttConfigState, ct);
+        }
+
+        public async Task<string> GetMqttDiscoveryPrefixAsync(CancellationToken ct = default)
+        {
+            return await GetMqttStringAsync(MqttConfigDiscoveryPrefix, ct) ?? string.Empty;
+        }
+
+        public async Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default)
+        {
+            return await SetMqttStringAsync(MqttConfigDiscoveryPrefix, prefix, ct);
+        }
+
+        private async Task<string> GetMqttStringAsync(string command, CancellationToken ct)
+        {
+            try
+            {
+                string url = string.Format(RouteConfigMqttGet, command);
+                string json = await _client.GetStringAsync(url, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean() &&
+                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                {
+                    return v.GetString();
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+            return null;
+        }
+
+        private async Task<int?> GetMqttIntAsync(string command, CancellationToken ct)
+        {
+            string raw = await GetMqttStringAsync(command, ct);
+
+            if (raw != null && int.TryParse(raw, out int val))
+                return val;
+
+            return null;
+        }
+
+        private async Task<bool?> GetMqttBoolAsync(string command, CancellationToken ct)
+        {
+            string raw = await GetMqttStringAsync(command, ct);
+
+            if (raw == null)
+                return null;
+
+            return raw == BoolTrueString;
+        }
+
+        private async Task<bool> SetMqttStringAsync(string command, string value, CancellationToken ct)
+        {
+            try
+            {
+                string url = string.Format(RouteConfigMqttSet, command, Uri.EscapeDataString(value));
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static async Task<bool> IsSuccessResponseAsync(HttpResponseMessage response, CancellationToken ct)
         {
             if (!response.IsSuccessStatusCode)

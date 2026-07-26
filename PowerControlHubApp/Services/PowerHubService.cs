@@ -193,4 +193,94 @@ public class PowerHubService
     {
         return _configConnection.SetTimezoneOffsetAsync(offsetHours, ct);
     }
+
+    public Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttEnabledAsync(ct);
+    }
+
+    public Task<bool> SetMqttEnabledAsync(bool enabled, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttEnabledAsync(enabled, ct);
+    }
+
+    public Task<string> GetMqttBrokerAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttBrokerAsync(ct);
+    }
+
+    public Task<bool> SetMqttBrokerAsync(string broker, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttBrokerAsync(broker, ct);
+    }
+
+    public Task<int?> GetMqttPortAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttPortAsync(ct);
+    }
+
+    public Task<bool> SetMqttPortAsync(int port, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttPortAsync(port, ct);
+    }
+
+    public Task<string> GetMqttUsernameAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttUsernameAsync(ct);
+    }
+
+    public Task<bool> SetMqttUsernameAsync(string username, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttUsernameAsync(username, ct);
+    }
+
+    public Task<bool> SetMqttPasswordAsync(string password, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttPasswordAsync(password, ct);
+    }
+
+    public Task<string> GetMqttDeviceIdAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttDeviceIdAsync(ct);
+    }
+
+    public Task<bool> SetMqttDeviceIdAsync(string deviceId, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttDeviceIdAsync(deviceId, ct);
+    }
+
+    public Task<bool?> GetMqttHADiscoveryAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttHADiscoveryAsync(ct);
+    }
+
+    public Task<bool> SetMqttHADiscoveryAsync(bool enabled, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttHADiscoveryAsync(enabled, ct);
+    }
+
+    public Task<int?> GetMqttKeepAliveAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttKeepAliveAsync(ct);
+    }
+
+    public Task<bool> SetMqttKeepAliveAsync(int seconds, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttKeepAliveAsync(seconds, ct);
+    }
+
+    public Task<bool?> GetMqttConnectionStateAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttConnectionStateAsync(ct);
+    }
+
+    public Task<string> GetMqttDiscoveryPrefixAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetMqttDiscoveryPrefixAsync(ct);
+    }
+
+    public Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default)
+    {
+        return _configConnection.SetMqttDiscoveryPrefixAsync(prefix, ct);
+    }
 }
