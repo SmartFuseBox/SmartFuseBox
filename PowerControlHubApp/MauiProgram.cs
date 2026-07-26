@@ -94,6 +94,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<ExternalSensorDetailViewModel>();
             builder.Services.AddSingleton<LocalSensorConfigViewModel>();
             builder.Services.AddTransient<LocalSensorDetailViewModel>();
+            builder.Services.AddTransient<TimeSettingsViewModel>();
 
             // Pages
             builder.Services.AddSingleton<DashboardPage>();
@@ -105,6 +106,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<ExternalSensorDetailPage>();
             builder.Services.AddSingleton<LocalSensorConfigPage>();
             builder.Services.AddTransient<LocalSensorDetailPage>();
+            builder.Services.AddTransient<TimeSettingsPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

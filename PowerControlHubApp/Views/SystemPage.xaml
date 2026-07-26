@@ -6,10 +6,29 @@
              Title="System"
              BackgroundColor="{DynamicResource AppPageBg}">
 
-    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
         <views:TopBarView Grid.Row="0" Title="System" ShowBackButton="True" />
-        <ScrollView Grid.Row="1">
+
+        <!-- Not connected banner -->
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
             <VerticalStackLayout Padding="20" Spacing="12">
+                <!-- Time settings card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <Button Text="Time"
+                            Command="{Binding NavigateToTimeSettingsCommand}"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource AppAccent}"
+                            HorizontalOptions="Start"
+                            Padding="4"
+                            BorderColor="Blue"
+                            BorderWidth="1"/>
+                </Border>
+
                 <!-- Warnings card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
@@ -148,7 +167,7 @@
                 </Border>
             </VerticalStackLayout>
         </ScrollView>
-        <views:StatusBarView Grid.Row="2" />
+        <views:StatusBarView Grid.Row="3" />
     </Grid>
 
 </views:BasePowerControlHubContentPage>

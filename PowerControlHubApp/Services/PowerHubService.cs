@@ -173,4 +173,24 @@ public class PowerHubService
     {
         return _configConnection.TriggerOtaInstallAsync(ct);
     }
+
+    public Task<DateTimeOffset?> GetDateTimeAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetDateTimeAsync(ct);
+    }
+
+    public Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default)
+    {
+        return _configConnection.SetDateTimeAsync(unixTimestamp, ct);
+    }
+
+    public Task<int?> GetTimezoneOffsetAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetTimezoneOffsetAsync(ct);
+    }
+
+    public Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default)
+    {
+        return _configConnection.SetTimezoneOffsetAsync(offsetHours, ct);
+    }
 }

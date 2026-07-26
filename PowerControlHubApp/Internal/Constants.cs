@@ -1,5 +1,8 @@
 ﻿namespace PowerControlHubApp.Internal
 {
+
+#pragma warning disable CC0003
+
     internal static class Constants
     {
 #if WINDOWS
@@ -108,15 +111,16 @@
         public const int PortMax = 65535;
         public const string MsgIpRequired = "IP address is required.";
         public const string MsgInvalidPort = "Enter a valid port number (1–65535).";
+        public const string MessageNotConnected = "Not connected";
 
         // Relay UI
         public const string NoneString = "None";
         public const string SavedOk = "✓ Saved successfully";
         public const string SavedFailed = "⚠ One or more commands failed";
         public const int ColorOptionNoneIndex = 6;
-        public static readonly string[] ColorOptionNames = new[] { ColorName_Blue, ColorName_Green, ColorName_Grey, ColorName_Orange, ColorName_Red, ColorName_Yellow, NoneString };
-        public static readonly string[] ActionOptionNames = new[] { ActionName_Default, ActionName_Horn, ActionName_NightRelay };
-        public static readonly string[] DefaultStateOptionNames = new[] { DefaultState_Off, DefaultState_On };
+        public static readonly string[] ColorOptionNames = [ColorName_Blue, ColorName_Green, ColorName_Grey, ColorName_Orange, ColorName_Red, ColorName_Yellow, NoneString];
+        public static readonly string[] ActionOptionNames = [ActionName_Default, ActionName_Horn, ActionName_NightRelay];
+        public static readonly string[] DefaultStateOptionNames = [DefaultState_Off, DefaultState_On];
         public const string NavBack = "..";
         public const string RelayPageTitle = "Relay";
         public const string CheckMark = "✓";
@@ -191,12 +195,14 @@
         public const string RouteSystemPins = "api/system/F15";
         public const string RouteSystemGetDateTime = "api/system/F7";
         public const string RouteSystemSetDateTime = "api/system/F6";
+        public const string RouteConfigTimezoneOffset = "api/config/C20";
         public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
         public const string RouteDashboardPage = "//DashboardPage";
         public const string RouteSettingsPage = "//SettingsPage";
         public const string RouteSystemPage = "//SystemPage";
+        public const string RouteTimeSettingsPage = "TimeSettingsPage";
         public const string ConnectionTypeKey = "X-Connection-Type";
         public const string ConnectionTypePersistent = "persistent";
         public const int MaximumPermanentConnections = 2;
@@ -204,6 +210,10 @@
         public const int SecondsTen = 10;
         public const int SecondsFive = 5;
         public const int SecondsThree = 3;
+        private const int TZOffsetRawMinValue = 12;
+        private const int TZOffsetRawMaxValue = 14;
+        public const int TimezoneOffsetMin = -TZOffsetRawMinValue;
+        public const int TimezoneOffsetMax = TZOffsetRawMaxValue;
         public const int SecondsTwo = 2;
         public const string UserAgentKey = "User-Agent";
         public const string UserAgentValue = "PowerControlHub/1.0";
@@ -225,7 +235,7 @@
         public const string JsonSensorIndex = "i";
         public const string JsonSensorId = "id";
         public const string JsonSensorName = "n";
-        public const string JsonSensorMqttName = "mn";  
+        public const string JsonSensorMqttName = "mn";
         public const string JsonSensorMqttSlug = "ms";
         public const string JsonSensorMqttType = "mt";
         public const string JsonSensorMqttDeviceClass = "md";
@@ -408,4 +418,6 @@
         public const string NullByte = "0x00";
         public const string NibbleZero = "0x0";
     }
+
+#pragma warning restore CC0003
 }

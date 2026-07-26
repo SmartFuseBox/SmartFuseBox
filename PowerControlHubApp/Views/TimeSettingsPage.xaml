@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.TimeSettingsPage"
+             Title="Time Settings"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <views:TopBarView Grid.Row="0" Title="Time Settings" ShowBackButton="True" />
+
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout Padding="20" Spacing="12">
+
+                <!-- Device Time card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Device Time"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Label Text="{Binding DeviceTime}"
+                               TextColor="{DynamicResource AppEntryText}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+
+                        <ActivityIndicator IsRunning="{Binding IsRefreshing}"
+                                           IsVisible="{Binding IsRefreshing}"
+                                           Color="{DynamicResource AppAccent}"
+                                           HeightRequest="20" />
+
+                        <Button Text="Sync Time Now"
+                                Command="{Binding SyncTimeCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                CornerRadius="8"
+                                Padding="10,8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Timezone card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Timezone"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Picker ItemsSource="{Binding TimeZoneOptions}"
+                                SelectedIndex="{Binding SelectedTimezoneIndex}"
+                                TextColor="{DynamicResource AppEntryText}"
+                                TitleColor="{DynamicResource AppPlaceholderText}"
+                                Title="Select timezone..."
+                                BackgroundColor="Transparent" />
+
+                        <Button Text="Save Timezone"
+                                Command="{Binding SaveTimezoneCommand}"
+                                BackgroundColor="{DynamicResource AppAccent}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Padding="10,8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Status -->
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{DynamicResource AppAccent}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding HasStatusMessage}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <views:StatusBarView Grid.Row="3" />
+    </Grid>
+
+</views:BasePowerControlHubContentPage>
