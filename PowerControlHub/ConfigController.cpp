@@ -21,6 +21,7 @@
 #include "IBluetoothRadio.h"
 #include "IWifiController.h"
 #include "SystemFunctions.h"
+#include "DateTimeManager.h"
 
 // from NextionIds.h
 constexpr uint8_t ImageButtonColorBlue = 2;
@@ -252,6 +253,7 @@ ConfigResult ConfigController::setTimezoneOffset(const int8_t offset)
 		return ConfigResult::InvalidParameter;
 
 	_config->system.timezoneOffset = offset;
+	DateTimeManager::setTimezoneOffset(offset);
 	return ConfigResult::Success;
 }
 

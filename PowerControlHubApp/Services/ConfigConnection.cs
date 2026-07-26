@@ -437,6 +437,45 @@ namespace PowerControlHubApp.Services
             }
         }
 
+        public async Task<int?> GetTimezoneOffsetAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteConfigTimezoneOffset, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean() &&
+                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                {
+                    if (v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out int val))
+                        return val;
+
+                    if (v.ValueKind == JsonValueKind.String && int.TryParse(v.GetString(), out val))
+                        return val;
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+            return null;
+        }
+
+        public async Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigTimezoneOffset}?{JsonValueKey}={offsetHours}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static async Task<bool> IsSuccessResponseAsync(HttpResponseMessage response, CancellationToken ct)
         {
             if (!response.IsSuccessStatusCode)

@@ -173,6 +173,10 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default) => _connection.SetDateTimeAsync(unixTimestamp, ct);
 
+    public Task<int?> GetTimezoneOffsetAsync(CancellationToken ct = default) => _connection.GetTimezoneOffsetAsync(ct);
+
+    public Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default) => _connection.SetTimezoneOffsetAsync(offsetHours, ct);
+
     public void Dispose()
     {
         if (_cts != null)

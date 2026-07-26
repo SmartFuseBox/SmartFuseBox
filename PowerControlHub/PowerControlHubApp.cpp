@@ -165,6 +165,7 @@ void PowerControlHubApp::setup(RemoteSensor** remoteSensors, uint8_t remoteSenso
 	Config* config = ConfigManager::getConfigPtr();
 
 	DateTimeManager::begin(config->rtc);
+	DateTimeManager::setTimezoneOffset(config->system.timezoneOffset);
 
     // Build remote sensors from RemoteSensorsConfig (populated by ConfigManager::load()).
     // Sensors are created dynamically here; ownership stays with PowerControlHubApp (_remoteSensors).

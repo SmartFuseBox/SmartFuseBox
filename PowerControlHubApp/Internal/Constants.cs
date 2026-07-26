@@ -195,12 +195,14 @@
         public const string RouteSystemPins = "api/system/F15";
         public const string RouteSystemGetDateTime = "api/system/F7";
         public const string RouteSystemSetDateTime = "api/system/F6";
+        public const string RouteConfigTimezoneOffset = "api/config/C20";
         public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
         public const string RouteDashboardPage = "//DashboardPage";
         public const string RouteSettingsPage = "//SettingsPage";
         public const string RouteSystemPage = "//SystemPage";
+        public const string RouteTimeSettingsPage = "TimeSettingsPage";
         public const string ConnectionTypeKey = "X-Connection-Type";
         public const string ConnectionTypePersistent = "persistent";
         public const int MaximumPermanentConnections = 2;
@@ -208,6 +210,10 @@
         public const int SecondsTen = 10;
         public const int SecondsFive = 5;
         public const int SecondsThree = 3;
+        private const int TZOffsetRawMinValue = 12;
+        private const int TZOffsetRawMaxValue = 14;
+        public const int TimezoneOffsetMin = -TZOffsetRawMinValue;
+        public const int TimezoneOffsetMax = TZOffsetRawMaxValue;
         public const int SecondsTwo = 2;
         public const string UserAgentKey = "User-Agent";
         public const string UserAgentValue = "PowerControlHub/1.0";

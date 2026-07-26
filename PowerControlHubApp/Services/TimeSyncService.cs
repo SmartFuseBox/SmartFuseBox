@@ -23,7 +23,8 @@ public class TimeSyncService : IDisposable
     public TimeSyncService(IConfigConnection configConnection, ILogger<TimeSyncService> log)
         : this(configConnection, log,
                TimeSpan.FromMinutes(TimeSyncIntervalMinutes),
-               TimeSyncDriftThresholdSeconds) { }
+               TimeSyncDriftThresholdSeconds)
+    { }
 
     public TimeSyncService(IConfigConnection configConnection, ILogger<TimeSyncService> log,
                            TimeSpan interval, int driftThresholdSeconds)
@@ -110,13 +111,7 @@ public class TimeSyncService : IDisposable
         DateTimeOffset? deviceTime = await _configConnection.GetDateTimeAsync(ct);
 
         if (deviceTime == null)
-        {
-            _log.LogInformation(LogTimeSyncNotSet);
-            long nowUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            await _configConnection.SetDateTimeAsync(nowUnix, ct);
-            _log.LogInformation(LogTimeSyncSetting, 0, DateTimeOffset.UtcNow);
             return;
-        }
 
         DateTimeOffset localTime = DateTimeOffset.UtcNow;
         double deltaSec = Math.Abs((localTime - deviceTime.Value).TotalSeconds);

@@ -10,6 +10,7 @@ namespace PowerControlHubApp
             Routing.RegisterRoute(nameof(RelayDetailPage), typeof(RelayDetailPage));
             Routing.RegisterRoute(nameof(ExternalSensorDetailPage), typeof(ExternalSensorDetailPage));
             Routing.RegisterRoute(nameof(LocalSensorDetailPage), typeof(LocalSensorDetailPage));
+            Routing.RegisterRoute(nameof(TimeSettingsPage), typeof(TimeSettingsPage));
         }
     }
 }

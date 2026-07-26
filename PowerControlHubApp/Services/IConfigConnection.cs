@@ -32,5 +32,7 @@ namespace PowerControlHubApp.Services
         Task<bool> TriggerOtaInstallAsync(CancellationToken ct = default);
         Task<DateTimeOffset?> GetDateTimeAsync(CancellationToken ct = default);
         Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default);
+        Task<int?> GetTimezoneOffsetAsync(CancellationToken ct = default);
+        Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default);
     }
 }

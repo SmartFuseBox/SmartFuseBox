@@ -64,12 +64,15 @@ public class SystemViewModel : BaseViewModel
 
     public ICommand InstallFirmwareCommand { get; }
 
+    public ICommand NavigateToTimeSettingsCommand { get; }
+
     public SystemViewModel(PowerHubService service, LogService log)
         : base(service, log)
     {
         CheckForUpdateCommand = new Command(async () => await CheckForUpdateAsync());
         RefreshPinsCommand = new Command(async () => await RefreshPinsAsync());
         InstallFirmwareCommand = new Command(async () => await InstallFirmwareAsync(), () => CanInstallFirmware);
+        NavigateToTimeSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteTimeSettingsPage));
     }
 
     protected override void OnDataFetched(IndexModel index)
