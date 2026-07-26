@@ -34,5 +34,23 @@ namespace PowerControlHubApp.Services
         Task<bool> SetDateTimeAsync(long unixTimestamp, CancellationToken ct = default);
         Task<int?> GetTimezoneOffsetAsync(CancellationToken ct = default);
         Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default);
+        Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default);
+        Task<bool> SetMqttEnabledAsync(bool enabled, CancellationToken ct = default);
+        Task<string> GetMqttBrokerAsync(CancellationToken ct = default);
+        Task<bool> SetMqttBrokerAsync(string broker, CancellationToken ct = default);
+        Task<int?> GetMqttPortAsync(CancellationToken ct = default);
+        Task<bool> SetMqttPortAsync(int port, CancellationToken ct = default);
+        Task<string> GetMqttUsernameAsync(CancellationToken ct = default);
+        Task<bool> SetMqttUsernameAsync(string username, CancellationToken ct = default);
+        Task<bool> SetMqttPasswordAsync(string password, CancellationToken ct = default);
+        Task<string> GetMqttDeviceIdAsync(CancellationToken ct = default);
+        Task<bool> SetMqttDeviceIdAsync(string deviceId, CancellationToken ct = default);
+        Task<bool?> GetMqttHADiscoveryAsync(CancellationToken ct = default);
+        Task<bool> SetMqttHADiscoveryAsync(bool enabled, CancellationToken ct = default);
+        Task<int?> GetMqttKeepAliveAsync(CancellationToken ct = default);
+        Task<bool> SetMqttKeepAliveAsync(int seconds, CancellationToken ct = default);
+        Task<bool?> GetMqttConnectionStateAsync(CancellationToken ct = default);
+        Task<string> GetMqttDiscoveryPrefixAsync(CancellationToken ct = default);
+        Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default);
     }
 }

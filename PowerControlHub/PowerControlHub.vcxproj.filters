@@ -325,6 +325,9 @@
     <ClCompile Include="SensorConfigNetworkHandler.cpp">
       <Filter>Source Files\NetworkCommandHandlers</Filter>
     </ClCompile>
+    <ClCompile Include="MQTTNetworkHandler.cpp">
+      <Filter>Source Files\NetworkCommandHandlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SoundCommandHandler.h">
@@ -710,6 +713,9 @@
     </ClInclude>
     <ClInclude Include="SensorConfigNetworkHandler.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MQTTNetworkHandler.h">
+      <Filter>Header Files\NetworkCommandHandlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

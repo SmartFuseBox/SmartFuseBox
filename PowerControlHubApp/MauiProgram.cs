@@ -95,6 +95,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<LocalSensorConfigViewModel>();
             builder.Services.AddTransient<LocalSensorDetailViewModel>();
             builder.Services.AddTransient<TimeSettingsViewModel>();
+            builder.Services.AddTransient<MqttSettingsViewModel>();
 
             // Pages
             builder.Services.AddSingleton<DashboardPage>();
@@ -107,6 +108,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<LocalSensorConfigPage>();
             builder.Services.AddTransient<LocalSensorDetailPage>();
             builder.Services.AddTransient<TimeSettingsPage>();
+            builder.Services.AddTransient<MqttSettingsPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

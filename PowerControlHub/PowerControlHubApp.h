@@ -71,6 +71,7 @@
 #include "MQTTRelayHandler.h"
 #include "MQTTSensorHandler.h"
 #include "MQTTSystemHandler.h"
+#include "MQTTNetworkHandler.h"
 #endif
 
 #include "SchedulerCommandHandler.h"
@@ -151,6 +152,7 @@ private:
     MQTTRelayHandler _mqttRelayHandler;
     MQTTSensorHandler* _mqttSensorHandler;
     MQTTSystemHandler _mqttSystemHandler;
+    MQTTNetworkHandler _mqttNetworkHandler;
     uint64_t _nextRunMqttMs;
 #endif
 

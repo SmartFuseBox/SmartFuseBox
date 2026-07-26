@@ -196,6 +196,22 @@
         public const string RouteSystemGetDateTime = "api/system/F7";
         public const string RouteSystemSetDateTime = "api/system/F6";
         public const string RouteConfigTimezoneOffset = "api/config/C20";
+        public const string RouteConfigMqttGet = "api/mqtt/{0}";
+        public const string RouteConfigMqttSet = "api/mqtt/{0}?v={1}";
+        public const string MqttConfigEnabled = "M0";
+        public const string MqttConfigBroker = "M1";
+        public const string MqttConfigPort = "M2";
+        public const string MqttConfigUsername = "M3";
+        public const string MqttConfigPassword = "M4";
+        public const string MqttConfigDeviceId = "M5";
+        public const string MqttConfigHADiscovery = "M6";
+        public const string MqttConfigKeepAlive = "M7";
+        public const string MqttConfigState = "M8";
+        public const string MqttConfigDiscoveryPrefix = "M9";
+        public const string MqttConnectedLabel = "Connected";
+        public const string MqttDisconnectedLabel = "Disconnected";
+        public const string MqttMsgSaveFailed = "Save failed — device unreachable";
+        public const string MqttMsgSaved = "MQTT settings saved";
         public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
@@ -203,6 +219,7 @@
         public const string RouteSettingsPage = "//SettingsPage";
         public const string RouteSystemPage = "//SystemPage";
         public const string RouteTimeSettingsPage = "TimeSettingsPage";
+        public const string RouteMqttSettingsPage = "MqttSettingsPage";
         public const string ConnectionTypeKey = "X-Connection-Type";
         public const string ConnectionTypePersistent = "persistent";
         public const int MaximumPermanentConnections = 2;
@@ -223,6 +240,8 @@
         public const string PreferenceKey = "app_theme";
         public const string ThemeLight = "Light";
         public const string ThemeDark = "Dark";
+        public const string BoolFalseString = "0";
+        public const string BoolTrueString = "1";
 
 
         public const int KilobyteBytes = 1024;
