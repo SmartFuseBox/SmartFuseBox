@@ -36,6 +36,15 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
+                        <Button Text="SD Card"
+                                Command="{Binding NavigateToSdCardSettingsCommand}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                Padding="4"
+                                BorderColor="Blue"
+                                BorderWidth="1"/>
                     </HorizontalStackLayout>
                 </Border>
 

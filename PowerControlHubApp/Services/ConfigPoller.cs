@@ -213,6 +213,18 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default) => _connection.SetMqttDiscoveryPrefixAsync(prefix, ct);
 
+    public Task<(int Sck, int Mosi, int Miso)?> GetSdCardSpiPinsAsync(CancellationToken ct = default) => _connection.GetSdCardSpiPinsAsync(ct);
+
+    public Task<bool> SetSdCardSpiPinsAsync(int sck, int mosi, int miso, CancellationToken ct = default) => _connection.SetSdCardSpiPinsAsync(sck, mosi, miso, ct);
+
+    public Task<int?> GetSdCardInitSpeedAsync(CancellationToken ct = default) => _connection.GetSdCardInitSpeedAsync(ct);
+
+    public Task<bool> SetSdCardInitSpeedAsync(int speed, CancellationToken ct = default) => _connection.SetSdCardInitSpeedAsync(speed, ct);
+
+    public Task<int?> GetSdCardCsPinAsync(CancellationToken ct = default) => _connection.GetSdCardCsPinAsync(ct);
+
+    public Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default) => _connection.SetSdCardCsPinAsync(pin, ct);
+
     public void Dispose()
     {
         if (_cts != null)

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "BaseCommandHandler.h"
+#include "ConfigController.h"
 #include "ConfigManager.h"
 #include "SystemDefinitions.h"
 #include "SystemFunctions.h"
@@ -96,5 +97,36 @@ protected:
 
 		out = SystemFunctions::parseBooleanValue(v);
 		return true;
+	}
+
+	static const char* configResultToString(ConfigResult result)
+	{
+		switch (result)
+		{
+		case ConfigResult::Success:
+			return "Success";
+		case ConfigResult::InvalidConfig:
+			return "Invalid config";
+		case ConfigResult::Failed:
+			return "Failed";
+		case ConfigResult::MissingName:
+			return "Missing name";
+		case ConfigResult::TooLong:
+			return "Value too long";
+		case ConfigResult::InvalidRelay:
+			return "Invalid relay";
+		case ConfigResult::InvalidCommand:
+			return "Invalid command";
+		case ConfigResult::InvalidParameter:
+			return "Invalid parameter";
+		case ConfigResult::BluetoothInitFailed:
+			return "Bluetooth init failed";
+		case ConfigResult::WifiInitFailed
+		:   return "WiFi init failed";
+		case ConfigResult::InvalidPin:
+			return "Invalid pin";
+		default:
+			return "Unknown error";
+		}
 	}
 };
