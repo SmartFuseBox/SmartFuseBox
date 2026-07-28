@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             x:Class="PowerControlHubApp.Views.SdCardSettingsPage"
+             Title="SD Card Settings"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <views:TopBarView Grid.Row="0" Title="SD Card Settings" ShowBackButton="True" />
+
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout Padding="20" Spacing="12">
+
+                <!-- SPI Pins card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="SPI Pins"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Label Text="SCK (Clock)"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="11" />
+                        <Entry Text="{Binding SpiSck}"
+                               Placeholder="e.g. 12"
+                               Keyboard="Numeric"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+
+                        <Label Text="MOSI (Master Out)"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="11"
+                               Margin="0,8,0,0" />
+                        <Entry Text="{Binding SpiMosi}"
+                               Placeholder="e.g. 11"
+                               Keyboard="Numeric"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+
+                        <Label Text="MISO (Master In)"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="11"
+                               Margin="0,8,0,0" />
+                        <Entry Text="{Binding SpiMiso}"
+                               Placeholder="e.g. 13"
+                               Keyboard="Numeric"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+
+                        <Label Text="Use 255 to disable any pin"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="10"
+                               FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- CS Pin card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Chip Select"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Label Text="CS Pin"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="11" />
+                        <Entry Text="{Binding CsPin}"
+                               Placeholder="e.g. 10"
+                               Keyboard="Numeric"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+
+                        <Label Text="Use 255 to disable"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="10"
+                               FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Init Speed card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Init Speed"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Label Text="Speed (MHz)"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="11" />
+                        <Entry Text="{Binding InitSpeed}"
+                               Placeholder="4"
+                               Keyboard="Numeric"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+
+                        <Label Text="Valid: 4, 8, 12, 16, 20, 24 MHz"
+                               TextColor="{DynamicResource AppLabelSubtle}"
+                               FontSize="10"
+                               FontAttributes="Italic" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Save All button -->
+                <Button Text="Save All Settings"
+                        Command="{Binding SaveAllCommand}"
+                        BackgroundColor="{DynamicResource AppAccent}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        Margin="0,8,0,0" />
+
+                <ActivityIndicator IsRunning="{Binding IsSaving}"
+                                   IsVisible="{Binding IsSaving}"
+                                   Color="{DynamicResource AppAccent}"
+                                   HeightRequest="20" />
+
+                <!-- Status -->
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{DynamicResource AppAccent}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding HasStatusMessage}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <views:StatusBarView Grid.Row="3" />
+    </Grid>
+
+</views:BasePowerControlHubContentPage>

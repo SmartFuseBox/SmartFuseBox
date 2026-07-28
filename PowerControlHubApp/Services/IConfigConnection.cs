@@ -52,5 +52,11 @@ namespace PowerControlHubApp.Services
         Task<bool?> GetMqttConnectionStateAsync(CancellationToken ct = default);
         Task<string> GetMqttDiscoveryPrefixAsync(CancellationToken ct = default);
         Task<bool> SetMqttDiscoveryPrefixAsync(string prefix, CancellationToken ct = default);
+        Task<(int Sck, int Mosi, int Miso)?> GetSdCardSpiPinsAsync(CancellationToken ct = default);
+        Task<bool> SetSdCardSpiPinsAsync(int sck, int mosi, int miso, CancellationToken ct = default);
+        Task<int?> GetSdCardInitSpeedAsync(CancellationToken ct = default);
+        Task<bool> SetSdCardInitSpeedAsync(int speed, CancellationToken ct = default);
+        Task<int?> GetSdCardCsPinAsync(CancellationToken ct = default);
+        Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default);
     }
 }

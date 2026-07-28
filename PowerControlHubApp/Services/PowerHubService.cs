@@ -283,4 +283,34 @@ public class PowerHubService
     {
         return _configConnection.SetMqttDiscoveryPrefixAsync(prefix, ct);
     }
+
+    public Task<(int Sck, int Mosi, int Miso)?> GetSdCardSpiPinsAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetSdCardSpiPinsAsync(ct);
+    }
+
+    public Task<bool> SetSdCardSpiPinsAsync(int sck, int mosi, int miso, CancellationToken ct = default)
+    {
+        return _configConnection.SetSdCardSpiPinsAsync(sck, mosi, miso, ct);
+    }
+
+    public Task<int?> GetSdCardInitSpeedAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetSdCardInitSpeedAsync(ct);
+    }
+
+    public Task<bool> SetSdCardInitSpeedAsync(int speed, CancellationToken ct = default)
+    {
+        return _configConnection.SetSdCardInitSpeedAsync(speed, ct);
+    }
+
+    public Task<int?> GetSdCardCsPinAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetSdCardCsPinAsync(ct);
+    }
+
+    public Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default)
+    {
+        return _configConnection.SetSdCardCsPinAsync(pin, ct);
+    }
 }

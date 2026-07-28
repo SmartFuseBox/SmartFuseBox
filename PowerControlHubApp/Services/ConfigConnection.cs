@@ -566,6 +566,102 @@ namespace PowerControlHubApp.Services
             return await SetMqttStringAsync(MqttConfigDiscoveryPrefix, prefix, ct);
         }
 
+        public async Task<(int Sck, int Mosi, int Miso)?> GetSdCardSpiPinsAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteConfigSdCardSpiPins, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean() &&
+                    doc.RootElement.TryGetProperty(JsonSpiSckKey, out var sck) &&
+                    doc.RootElement.TryGetProperty(JsonSpiMosiKey, out var mosi) &&
+                    doc.RootElement.TryGetProperty(JsonSpiMisoKey, out var miso))
+                {
+                    return (sck.GetInt32(), mosi.GetInt32(), miso.GetInt32());
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+            return null;
+        }
+
+        public async Task<bool> SetSdCardSpiPinsAsync(int sck, int mosi, int miso, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigSdCardSpiPins}?sck={sck}&mosi={mosi}&miso={miso}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<int?> GetSdCardInitSpeedAsync(CancellationToken ct = default)
+        {
+            return await GetConfigIntAsync(RouteConfigSdCardInitSpeed, ct);
+        }
+
+        public async Task<bool> SetSdCardInitSpeedAsync(int speed, CancellationToken ct = default)
+        {
+            return await SetConfigValueAsync(RouteConfigSdCardInitSpeed, speed, ct);
+        }
+
+        public async Task<int?> GetSdCardCsPinAsync(CancellationToken ct = default)
+        {
+            return await GetConfigIntAsync(RouteConfigSdCardCsPin, ct);
+        }
+
+        public async Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default)
+        {
+            return await SetConfigValueAsync(RouteConfigSdCardCsPin, pin, ct);
+        }
+
+        private async Task<int?> GetConfigIntAsync(string route, CancellationToken ct)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(route, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean() &&
+                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                {
+                    if (v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out int val))
+                        return val;
+
+                    if (v.ValueKind == JsonValueKind.String && int.TryParse(v.GetString(), out val))
+                        return val;
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+            return null;
+        }
+
+        private async Task<bool> SetConfigValueAsync(string route, int value, CancellationToken ct)
+        {
+            try
+            {
+                string url = $"{route}?{JsonValueKey}={value}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private async Task<string> GetMqttStringAsync(string command, CancellationToken ct)
         {
             try

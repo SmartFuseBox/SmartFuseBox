@@ -238,7 +238,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		if (paramCount >= 1)
 		{
 			bool enable;
-			
+
 			if (!getParamValueBool(params, paramCount, "v", enable))
 			{
 				result = ConfigResult::InvalidParameter;
@@ -922,6 +922,10 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		return CommandResult::ok();
 	}
 
+	snprintf(responseBuffer, bufferSize,
+		"\"error\":%u,\"message\":\"%s\"",
+		static_cast<uint8_t>(result),
+		configResultToString(result));
 	return CommandResult::error(static_cast<uint8_t>(result));
 }
 
