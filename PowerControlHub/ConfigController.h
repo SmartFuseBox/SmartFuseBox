@@ -91,4 +91,10 @@ public:
 	ConfigResult setNextionTxPin(const uint8_t txPin);
 	ConfigResult setNextionBaudRate(const uint32_t baudRate);
 	ConfigResult setNextionUartNum(const uint8_t uartNum);
+
+	// Network authentication helpers
+	ConfigResult generateAuthKeys();
+	ConfigResult setAuthEnabled(const bool enabled);
+	ConfigResult setAuthApiKey(const char* apiKey);
+	ConfigResult setAuthHmacKey(const char* hmacKey);
 };

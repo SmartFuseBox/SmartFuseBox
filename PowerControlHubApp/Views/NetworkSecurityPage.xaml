@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             x:Class="PowerControlHubApp.Views.NetworkSecurityPage"
+             Title="Network Security"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <views:TopBarView Grid.Row="0" Title="Network Security" ShowBackButton="True" />
+
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout Padding="20" Spacing="12">
+
+                <!-- Enable / Disable card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Enable Authentication"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsEnabled}"
+                                OnColor="{DynamicResource AppAccent}"
+                                VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- API Key card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="API Key"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Entry Text="{Binding ApiKey}"
+                               Placeholder="Enter API key"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- HMAC Key card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="HMAC Key"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Entry Text="{Binding HmacKey}"
+                               Placeholder="Enter HMAC key"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Generate Keys button -->
+                <Button Text="Generate New Keys"
+                        Command="{Binding GenerateKeysCommand}"
+                        BackgroundColor="{DynamicResource AppAccent}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        Margin="0,8,0,0" />
+
+                <!-- Loading indicator -->
+                <ActivityIndicator IsRunning="{Binding IsGenerating}"
+                                   IsVisible="{Binding IsGenerating}"
+                                   Color="{DynamicResource AppAccent}"
+                                   HeightRequest="20" />
+
+                <!-- Save All button -->
+                <Button Text="Save All Settings"
+                        Command="{Binding SaveAllCommand}"
+                        BackgroundColor="{DynamicResource AppAccent}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        Margin="0,8,0,0" />
+
+                <ActivityIndicator IsRunning="{Binding IsSaving}"
+                                   IsVisible="{Binding IsSaving}"
+                                   Color="{DynamicResource AppAccent}"
+                                   HeightRequest="20" />
+
+                <!-- Status -->
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{DynamicResource AppAccent}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding HasStatusMessage}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <views:StatusBarView Grid.Row="3" />
+    </Grid>
+
+</views:BasePowerControlHubContentPage>

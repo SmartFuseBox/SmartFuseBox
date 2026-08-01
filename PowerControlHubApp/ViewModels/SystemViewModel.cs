@@ -70,6 +70,8 @@ public class SystemViewModel : BaseViewModel
 
     public ICommand NavigateToSdCardSettingsCommand { get; }
 
+    public ICommand NavigateToNetworkSecurityCommand { get; }
+
     public SystemViewModel(PowerHubService service, LogService log)
         : base(service, log)
     {
@@ -79,6 +81,7 @@ public class SystemViewModel : BaseViewModel
         NavigateToTimeSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteTimeSettingsPage));
         NavigateToMqttSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteMqttSettingsPage));
         NavigateToSdCardSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteSdCardSettingsPage));
+        NavigateToNetworkSecurityCommand = new Command(async () => await Shell.Current.GoToAsync(RouteNetworkSecurityPage));
     }
 
     protected override void OnDataFetched(IndexModel index)

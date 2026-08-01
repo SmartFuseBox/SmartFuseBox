@@ -13,6 +13,7 @@ namespace PowerControlHubApp
             Routing.RegisterRoute(nameof(TimeSettingsPage), typeof(TimeSettingsPage));
             Routing.RegisterRoute(nameof(MqttSettingsPage), typeof(MqttSettingsPage));
             Routing.RegisterRoute(nameof(SdCardSettingsPage), typeof(SdCardSettingsPage));
+            Routing.RegisterRoute(nameof(NetworkSecurityPage), typeof(NetworkSecurityPage));
         }
     }
 }

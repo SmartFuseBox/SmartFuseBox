@@ -189,6 +189,9 @@ public:
                 _wifiServer->setClientMode(cfg->network.ssid, cfg->network.password);
             }
 
+            // Provide auth configuration to server (pointer owned by global config)
+            _wifiServer->setAuthConfig(&cfg->auth);
+
             if (!_wifiServer->begin())
             {
                 if (_warningManager)

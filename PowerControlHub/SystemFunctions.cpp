@@ -20,6 +20,10 @@
 #include "SystemDefinitions.h"
 #include "ConfigManager.h"
 
+#if defined(WIFI_SUPPORT) && defined(ESP32)
+#include "mbedtls/md.h"
+#endif
+
 #if !defined(WIFI_SUPPORT)
 #include <limits.h>
 #endif
@@ -51,6 +55,51 @@ uint16_t SystemFunctions::stackAvailable()
     extern int __heap_start, * __brkval;
     unsigned int v;
     return (unsigned int)&v - (__brkval == 0 ? (unsigned int)&__heap_start : (unsigned int)__brkval);
+}
+
+bool SystemFunctions::ComputeHmacSha256(const char* key, const char* message, char* outHex, size_t outHexSize)
+{
+#if defined(WIFI_SUPPORT) && defined(ESP32)
+    if (!key || !message || !outHex || outHexSize < 65)
+        return false;
+
+    const mbedtls_md_info_t* md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+
+    if (!md_info)
+        return false;
+
+    unsigned char hmac[32];
+    mbedtls_md_context_t ctx;
+    mbedtls_md_init(&ctx);
+
+    if (mbedtls_md_setup(&ctx, md_info, 1) != 0)
+    {
+        mbedtls_md_free(&ctx);
+        return false;
+    }
+
+    if (mbedtls_md_hmac_starts(&ctx, reinterpret_cast<const unsigned char*>(key), strlen(key)) != 0 ||
+        mbedtls_md_hmac_update(&ctx, reinterpret_cast<const unsigned char*>(message), strlen(message)) != 0 ||
+        mbedtls_md_hmac_finish(&ctx, hmac) != 0)
+    {
+        mbedtls_md_free(&ctx);
+        return false;
+    }
+
+    mbedtls_md_free(&ctx);
+
+    // Convert to lowercase hex
+    for (int i = 0; i < 32; ++i)
+    {
+        snprintf(outHex + i * 2, outHexSize - i * 2, "%02x", hmac[i]);
+    }
+
+    outHex[64] = '\0';
+    return true;
+#else
+    (void)key; (void)message; (void)outHex; (void)outHexSize;
+    return false;
+#endif
 }
 
 uint8_t SystemFunctions::getUsedPins(uint8_t* pins, uint8_t maxCount)

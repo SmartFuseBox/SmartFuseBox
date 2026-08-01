@@ -64,6 +64,17 @@ public:
     static uint8_t GenerateDefaultPassword(char* buffer, size_t bufferSize);
 
     /**
+     * @brief Compute HMAC-SHA256 of a message using a key and return lowercase hex string.
+     *
+     * @param key HMAC key
+     * @param message Message to sign
+     * @param outHex Buffer to receive lowercase hex string (must be at least 65 bytes for 32 bytes + null)
+     * @param outHexSize Size of outHex buffer
+     * @return true on success, false on failure or if not supported on platform
+     */
+    static bool ComputeHmacSha256(const char* key, const char* message, char* outHex, size_t outHexSize);
+
+    /**
      * @brief Derive a hardware-unique 32-bit serial number from factory-programmed chip identity.
      *
      * Reads a hardware-burned identifier that is fixed for the lifetime of the chip and

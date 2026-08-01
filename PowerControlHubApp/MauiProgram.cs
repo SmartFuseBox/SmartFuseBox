@@ -31,7 +31,12 @@ namespace PowerControlHubApp
                 string port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
 
                 if (!string.IsNullOrEmpty(ip) && int.TryParse(port, out int p))
+                {
                     connection.Configure(ip, p);
+                    string apiKey = Preferences.Get(KeyAuthApiKey, string.Empty);
+                    string hmacKey = Preferences.Get(KeyAuthHmacKey, string.Empty);
+                    connection.ConfigureAuth(apiKey, hmacKey);
+                }
 
                 return connection;
             });
@@ -51,7 +56,12 @@ namespace PowerControlHubApp
                 string port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
 
                 if (!string.IsNullOrEmpty(ip) && int.TryParse(port, out int p))
+                {
                     connection.Configure(ip, p);
+                    string apiKey = Preferences.Get(KeyAuthApiKey, string.Empty);
+                    string hmacKey = Preferences.Get(KeyAuthHmacKey, string.Empty);
+                    connection.ConfigureAuth(apiKey, hmacKey);
+                }
 
                 return connection;
             });
@@ -70,7 +80,8 @@ namespace PowerControlHubApp
             {
                 var service = new PowerHubService(
                     sp.GetRequiredService<IDashboardConnection>(),
-                    sp.GetRequiredService<IConfigConnection>());
+                    sp.GetRequiredService<IConfigConnection>(),
+                    sp.GetRequiredService<IMessageBus>());
 
                 return service;
             });
@@ -97,6 +108,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<TimeSettingsViewModel>();
             builder.Services.AddTransient<MqttSettingsViewModel>();
             builder.Services.AddTransient<SdCardSettingsViewModel>();
+            builder.Services.AddTransient<NetworkSecurityViewModel>();
 
             // Pages
             builder.Services.AddSingleton<DashboardPage>();
@@ -111,6 +123,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<TimeSettingsPage>();
             builder.Services.AddTransient<MqttSettingsPage>();
             builder.Services.AddTransient<SdCardSettingsPage>();
+            builder.Services.AddTransient<NetworkSecurityPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

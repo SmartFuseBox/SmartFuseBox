@@ -8,7 +8,10 @@
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
-        <views:TopBarView Grid.Row="0" Title="⚙ Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="⚙ Settings"
+                  RightButtonText="↻"
+                  RightButtonCommand="{Binding SaveCommand}"
+                  RightButtonIsEnabled="{Binding IsNotBusy}" />
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="16">
 
@@ -47,6 +50,43 @@
                            Keyboard="Numeric"
                            Margin="10,0"
                            ReturnType="Done" />
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- API Key -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="API Key (X-API-Key)"
+                       TextColor="{DynamicResource AppLabelMuted}"
+                       FontSize="13" />
+                <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="0">
+                    <Entry x:Name="ApiKeyEntry"
+                           Text="{Binding ApiKey}"
+                           Placeholder="Optional – device API key for authentication"
+                           PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                           TextColor="{DynamicResource AppEntryText}"
+                           BackgroundColor="Transparent"
+                           Margin="10,0"
+                           ReturnType="Next" />
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- HMAC Key -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="HMAC Key (X-Auth-Signature)"
+                       TextColor="{DynamicResource AppLabelMuted}"
+                       FontSize="13" />
+                <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="0">
+                    <Entry x:Name="HmacKeyEntry"
+                           Text="{Binding HmacKey}"
+                           Placeholder="Optional – HMAC-SHA256 key for authentication"
+                           PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                           TextColor="{DynamicResource AppEntryText}"
+                           BackgroundColor="Transparent"
+                           IsPassword="True"
+                           Margin="10,0"
+                           ReturnType="Next" />
                 </Border>
             </VerticalStackLayout>
 
@@ -98,7 +138,8 @@
                                 <Span Text="1. Ensure your phone/PC is on the same WiFi network as the ESP32 board.&#10;" />
                                 <Span Text="2. Enter the IP address shown on the device's serial output or your router's DHCP table.&#10;" />
                                 <Span Text="3. The default port is 80.&#10;" />
-                                <Span Text="4. Tap Save &amp; Connect, then return to the Dashboard." />
+                                <Span Text="4. If the device has network authentication enabled (C19:e=1), enter the API Key or HMAC Key above to match the device's configuration.&#10;" />
+                                <Span Text="5. Tap Save &amp; Connect, then return to the Dashboard." />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>

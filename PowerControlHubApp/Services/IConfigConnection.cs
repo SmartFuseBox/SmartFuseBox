@@ -58,5 +58,10 @@ namespace PowerControlHubApp.Services
         Task<bool> SetSdCardInitSpeedAsync(int speed, CancellationToken ct = default);
         Task<int?> GetSdCardCsPinAsync(CancellationToken ct = default);
         Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default);
+        Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default);
+        Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default);
+        Task<bool> SetAuthApiKeyAsync(string apiKey, CancellationToken ct = default);
+        Task<bool> SetAuthHmacKeyAsync(string hmacKey, CancellationToken ct = default);
+        Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default);
     }
 }

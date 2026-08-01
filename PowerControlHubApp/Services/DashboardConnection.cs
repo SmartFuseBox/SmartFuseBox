@@ -10,6 +10,7 @@ namespace PowerControlHubApp.Services
     {
         private readonly HttpClient _client;
         private readonly SocketsHttpHandler _handler;
+        private readonly DeviceAuthHandler _authHandler;
         private string _baseUrl;
         private bool _disposed;
 
@@ -18,8 +19,9 @@ namespace PowerControlHubApp.Services
         public DashboardConnection()
         {
             _handler = CreateHandler();
+            _authHandler = new DeviceAuthHandler(_handler);
 
-            _client = new HttpClient(_handler, disposeHandler: false)
+            _client = new HttpClient(_authHandler, disposeHandler: false)
             {
                 Timeout = TimeSpan.FromSeconds(SecondsTen)
             };
@@ -34,6 +36,12 @@ namespace PowerControlHubApp.Services
         {
             _baseUrl = $"http://{ipAddress}:{port}";
             _client.BaseAddress = new Uri(_baseUrl + ForwardSlash);
+        }
+
+        /// <summary>Update authentication credentials used by the handler pipeline.</summary>
+        public void ConfigureAuth(string apiKey, string hmacKey)
+        {
+            _authHandler.Configure(apiKey, hmacKey);
         }
 
         public bool IsConfigured => !string.IsNullOrEmpty(_baseUrl);

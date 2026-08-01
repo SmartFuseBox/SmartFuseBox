@@ -103,6 +103,9 @@
 	  <MauiXaml Update="Views\MqttSettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\NetworkSecurityPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\NotConnectedBanner.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

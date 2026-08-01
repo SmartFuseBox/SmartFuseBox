@@ -193,6 +193,13 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			config->rtc.resetPin);
 		sender->sendCommand(ConfigRtcPins, buffer);
 
+		// C19 Network auth
+		snprintf(buffer, sizeof(buffer), "e=%d;k=%s;h=%s",
+			config->auth.enabled ? 1 : 0,
+			config->auth.apiKey,
+			config->auth.hmacKey);
+		sender->sendCommand(ConfigAuthCommand, buffer);
+
 		// N1–N6 Nextion display config (broadcast as individual commands)
 		snprintf(buffer, sizeof(buffer), "v=%u", config->nextion.enabled ? 1u : 0u);
 		sender->sendCommand(NextionEnabled, buffer);
@@ -575,6 +582,75 @@ bool ConfigCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		else
 		{
 			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, ConfigAuthCommand))
+	{
+		// C19 - Network authentication configuration (repurposed from retired Nextion usage)
+		// Params: e=0|1 (enable), k=<apikey>, h=<hmackey>, g=1 (auto-generate keys)
+		// No params returns current state
+		if (paramCount == 0)
+		{
+			// Read-only: return current auth state
+			Config* config = _configController->getConfigPtr();
+			if (config)
+			{
+				char buffer[128];
+				snprintf(buffer, sizeof(buffer), "e=%d;k=%s;h=%s",
+					config->auth.enabled ? 1 : 0,
+					config->auth.apiKey,
+					config->auth.hmacKey);
+				sender->sendCommand(ConfigAuthCommand, buffer);
+				result = ConfigResult::Success;
+			}
+			else
+			{
+				sendAckErr(sender, command, F("Config not available"));
+				return true;
+			}
+		}
+		else
+		{
+			bool generate = false;
+			getParamValueBool(params, paramCount, ConfigAuthGenerateParam, generate);
+
+			if (generate)
+			{
+				result = _configController->generateAuthKeys();
+			}
+			else
+			{
+				bool enabled;
+				if (getParamValueBool(params, paramCount, ConfigAuthEnabledParam, enabled))
+				{
+					_configController->setAuthEnabled(enabled);
+					result = ConfigResult::Success;
+				}
+
+				const char* apiKeyVal = getParamValue(params, paramCount, ConfigAuthApiKeyParam);
+				if (apiKeyVal)
+				{
+					result = _configController->setAuthApiKey(apiKeyVal);
+
+					if (result != ConfigResult::Success)
+					{
+						sendAckErr(sender, command, "API key too long");
+						return true;
+					}
+				}
+
+				const char* hmacKeyVal = getParamValue(params, paramCount, ConfigAuthHmacKeyParam);
+				if (hmacKeyVal)
+				{
+					result = _configController->setAuthHmacKey(hmacKeyVal);
+
+					if (result != ConfigResult::Success)
+					{
+						sendAckErr(sender, command, "HMAC key too long");
+						return true;
+					}
+				}
+			}
 		}
 	}
 	else if (SystemFunctions::commandMatches(command, ConfigTimeZoneOffset))
@@ -1052,6 +1128,7 @@ const char* const* ConfigCommandHandler::supportedCommands(size_t& count) const
 		ConfigBluetoothEnable, ConfigWifiEnable, ConfigWifiMode, ConfigWifiSSID,
 		ConfigWifiPassword, ConfigWifiPort, ConfigWifiState, ConfigWifiApIpAddress,
 		ConfigRtcPins,
+		ConfigAuthCommand,
 #if defined(MQTT_SUPPORT)
 		MqttConfigEnable, MqttConfigBroker, MqttConfigPort, MqttConfigUsername,
 		MqttConfigPassword, MqttConfigDeviceId, MqttConfigHADiscovery, MqttConfigKeepAlive,
