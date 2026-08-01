@@ -96,6 +96,7 @@ constexpr char ConfigWifiApIpAddress[] = "C17";
 
 constexpr char ConfigRtcPins[] = "C18";
 constexpr char ConfigNextion[] = "C19";
+constexpr char ConfigAuthCommand[] = "C19";
 constexpr char ConfigTimeZoneOffset[] = "C20";
 constexpr char ConfigMmsi[] = "C21";
 constexpr char ConfigCallSign[] = "C22";
@@ -212,6 +213,13 @@ constexpr uint8_t MaxWiFiPasswordLength = 65; // 64 chars + null
 constexpr uint8_t MaxIpAddressLength = 16; // xxx.xxx.xxx.xxx + null
 constexpr char DefaultApIpAddress[MaxIpAddressLength] = "192.168.4.1";
 constexpr uint16_t DefaultWifiPort = 80;
+
+
+// Parameter keys for C19 (auth)
+constexpr char ConfigAuthEnabledParam[] = "e"; // enabled=0/1
+constexpr char ConfigAuthApiKeyParam[] = "k"; // api key value
+constexpr char ConfigAuthHmacKeyParam[] = "h"; // hmac key value
+constexpr char ConfigAuthGenerateParam[] = "g"; // generate keys when set to 1
 
 
 // WiFi Connection Quality Thresholds

@@ -65,6 +65,7 @@ private:
 	uint64_t _lastRSSICheck;
 	IWifiRadio* _radio;
 	uint64_t _restartTime;
+	const NetworkAuthConfig* _authConfig;
 	// AP mode settings
 	char _ssid[MaxSSIDLength];
 	char _password[MaxWiFiPasswordLength];
@@ -130,4 +131,7 @@ public:
 	bool getIpAddress(char* buffer, const uint8_t bufferLength) const;
 	bool getSSID(char* buffer, const uint8_t bufferLength) const;
 	int getSignalStrength() const;
+
+	// Set auth configuration pointer (owned by global config)
+	void setAuthConfig(const NetworkAuthConfig* authConfig) { _authConfig = authConfig; }
 };

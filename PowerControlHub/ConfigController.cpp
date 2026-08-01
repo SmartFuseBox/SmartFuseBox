@@ -599,12 +599,104 @@ ConfigResult ConfigController::setNextionBaudRate(const uint32_t baudRate)
 
 ConfigResult ConfigController::setNextionUartNum(const uint8_t uartNum)
 {
-	if (_config == nullptr)
-		return ConfigResult::InvalidConfig;
+    if (_config == nullptr)
+        return ConfigResult::InvalidConfig;
 
-	if (uartNum != 1 && uartNum != 2)
+    if (uartNum != 1 && uartNum != 2)
+        return ConfigResult::InvalidParameter;
+
+    _config->nextion.uartNum = uartNum;
+    return ConfigResult::Success;
+}
+
+// Generate device-unique API and HMAC keys and store them in config.auth
+ConfigResult ConfigController::generateAuthKeys()
+{
+    if (_config == nullptr)
+        return ConfigResult::InvalidConfig;
+
+    char deviceId[32];
+    deviceId[0] = '\0';
+
+    if (SystemFunctions::GenerateDefaultPassword(deviceId, sizeof(deviceId)) != BufferSuccess)
+        return ConfigResult::Failed;
+
+    // apiKey = "ak-" + deviceId, hmacKey = "hk-" + deviceId
+    char apiKey[ConfigAuthApiKeyLength];
+    char hmacKey[ConfigAuthHmacKeyLength];
+
+    snprintf(apiKey, sizeof(apiKey), "ak-%s", deviceId);
+    apiKey[sizeof(apiKey) - 1] = '\0';
+
+    snprintf(hmacKey, sizeof(hmacKey), "hk-%s", deviceId);
+    hmacKey[sizeof(hmacKey) - 1] = '\0';
+
+    strncpy(_config->auth.apiKey, apiKey, sizeof(_config->auth.apiKey) - 1);
+    _config->auth.apiKey[sizeof(_config->auth.apiKey) - 1] = '\0';
+
+    strncpy(_config->auth.hmacKey, hmacKey, sizeof(_config->auth.hmacKey) - 1);
+    _config->auth.hmacKey[sizeof(_config->auth.hmacKey) - 1] = '\0';
+
+    return ConfigResult::Success;
+}
+
+ConfigResult ConfigController::setAuthEnabled(const bool enabled)
+{
+    if (_config == nullptr)
+        return ConfigResult::InvalidConfig;
+
+	if (enabled && (strlen(_config->auth.apiKey) == 0 || strlen(_config->auth.hmacKey) == 0))
+	{
 		return ConfigResult::InvalidParameter;
+	}
 
-	_config->nextion.uartNum = uartNum;
-	return ConfigResult::Success;
+    _config->auth.enabled = enabled;
+
+    return ConfigResult::Success;
+}
+
+ConfigResult ConfigController::setAuthApiKey(const char* apiKey)
+{
+    if (_config == nullptr)
+        return ConfigResult::InvalidConfig;
+
+	if (apiKey == nullptr)
+	{
+		setAuthEnabled(false);
+		return ConfigResult::InvalidParameter;
+	}
+
+	if (strlen(apiKey) > ConfigAuthApiKeyLength - 1)
+	{
+		setAuthEnabled(false);
+		return ConfigResult::TooLong;
+	}
+
+    strncpy(_config->auth.apiKey, apiKey, sizeof(_config->auth.apiKey) - 1);
+    _config->auth.apiKey[sizeof(_config->auth.apiKey) - 1] = '\0';
+
+    return ConfigResult::Success;
+}
+
+ConfigResult ConfigController::setAuthHmacKey(const char* hmacKey)
+{
+    if (_config == nullptr)
+        return ConfigResult::InvalidConfig;
+
+	if (hmacKey == nullptr)
+	{
+		setAuthEnabled(false);
+		return ConfigResult::InvalidParameter;
+	}
+
+	if (strlen(hmacKey) > ConfigAuthHmacKeyLength - 1)
+	{
+		setAuthEnabled(false);
+		return ConfigResult::TooLong;
+	}
+
+    strncpy(_config->auth.hmacKey, hmacKey, sizeof(_config->auth.hmacKey) - 1);
+    _config->auth.hmacKey[sizeof(_config->auth.hmacKey) - 1] = '\0';
+
+    return ConfigResult::Success;
 }

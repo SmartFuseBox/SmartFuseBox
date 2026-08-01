@@ -10,6 +10,8 @@ public class SettingsViewModel : BaseViewModel
     private readonly ThemeService _themeService;
     private string _ipAddress = string.Empty;
     private string _port = DefaultDeviceIpPort;
+    private string _apiKey = string.Empty;
+    private string _hmacKey = string.Empty;
     private string _selectedTheme;
     private string _pinsInUseText = string.Empty;
     private bool _isPinsRefreshing;
@@ -34,6 +36,28 @@ public class SettingsViewModel : BaseViewModel
         set
         {
             _port = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string ApiKey
+    {
+        get => _apiKey;
+
+        set
+        {
+            _apiKey = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string HmacKey
+    {
+        get => _hmacKey;
+
+        set
+        {
+            _hmacKey = value;
             OnPropertyChanged();
         }
     }
@@ -109,6 +133,8 @@ public class SettingsViewModel : BaseViewModel
 
         IpAddress = Preferences.Get(KeyDeviceIpAddress, string.Empty);
         Port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
+        ApiKey = Preferences.Get(KeyAuthApiKey, string.Empty);
+        HmacKey = Preferences.Get(KeyAuthHmacKey, string.Empty);
         _selectedTheme = ThemeService.Current;
     }
 
@@ -161,10 +187,15 @@ public class SettingsViewModel : BaseViewModel
             return;
         }
 
+        string apiKey = ApiKey.Trim();
+        string hmacKey = HmacKey.Trim();
+
         Preferences.Set(KeyDeviceIpAddress, ip);
         Preferences.Set(KeyDeviceIpPort, port.ToString());
+        Preferences.Set(KeyAuthApiKey, apiKey);
+        Preferences.Set(KeyAuthHmacKey, hmacKey);
 
-        Service.Configure(ip, port);
+        Service.Configure(ip, port, apiKey, hmacKey);
         StatusMessage = $"Saved. Connecting to {ip}:{port}";
     }
 

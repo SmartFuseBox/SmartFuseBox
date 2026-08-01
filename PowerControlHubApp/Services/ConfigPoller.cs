@@ -225,6 +225,16 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default) => _connection.SetSdCardCsPinAsync(pin, ct);
 
+    public Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default) => _connection.GetAuthConfigAsync(ct);
+
+    public Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetAuthEnabledAsync(enabled, ct);
+
+    public Task<bool> SetAuthApiKeyAsync(string apiKey, CancellationToken ct = default) => _connection.SetAuthApiKeyAsync(apiKey, ct);
+
+    public Task<bool> SetAuthHmacKeyAsync(string hmacKey, CancellationToken ct = default) => _connection.SetAuthHmacKeyAsync(hmacKey, ct);
+
+    public Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default) => _connection.GenerateAuthKeysAsync(ct);
+
     public void Dispose()
     {
         if (_cts != null)

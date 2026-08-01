@@ -32,6 +32,8 @@
         public const string KeyDeviceIpAddress = "device_ip";
         public const string KeyDeviceIpPort = "device_port";
         public const string DefaultDeviceIpPort = "80";
+        public const string KeyAuthApiKey = "auth_apikey";
+        public const string KeyAuthHmacKey = "auth_hmackey";
         public const string MessageNotConfigured = "Not configured — tap ⚙ to set device IP";
         public const string MessageDeviceUnreachable = "Device unreachable";
         public const string MessageNoActiveWarnings = "No active warnings";
@@ -199,6 +201,11 @@
         public const string RouteConfigSdCardSpiPins = "api/config/C4";
         public const string RouteConfigSdCardInitSpeed = "api/config/C31";
         public const string RouteConfigSdCardCsPin = "api/config/C32";
+        public const string RouteConfigAuth = "api/config/C19";
+        public const string ConfigAuthEnabledParam = "e";
+        public const string ConfigAuthApiKeyParam = "k";
+        public const string ConfigAuthHmacKeyParam = "h";
+        public const string ConfigAuthGenerateParam = "g";
         public const string RouteConfigMqttGet = "api/mqtt/{0}";
         public const string RouteConfigMqttSet = "api/mqtt/{0}?v={1}";
         public const string MqttConfigEnabled = "M0";
@@ -225,6 +232,11 @@
         public const string SdCardConfigSpiPins = "C4";
         public const string SdCardConfigInitSpeed = "C31";
         public const string SdCardConfigCsPin = "C32";
+        public const string NetworkSecurityMsgSaveFailed = "Save failed — device unreachable";
+        public const string NetworkSecurityMsgSaved = "Network security settings saved";
+        public const string NetworkSecurityMsgKeysGenerated = "New keys generated and saved";
+        public const string NetworkSecurityMsgRefreshed = "Refreshed";
+        public const string NetworkSecurityMsgGenerateFailed = "Key generation failed — device unreachable";
         public const string RouteWarnings = "api/warning/W5";
         public const string ForwardSlash = "/";
         public const string ResultSuccess = "success";
@@ -237,8 +249,14 @@
         public const string RouteTimeSettingsPage = "TimeSettingsPage";
         public const string RouteMqttSettingsPage = "MqttSettingsPage";
         public const string RouteSdCardSettingsPage = "SdCardSettingsPage";
+        public const string RouteNetworkSecurityPage = "NetworkSecurityPage";
         public const string ConnectionTypeKey = "X-Connection-Type";
         public const string ConnectionTypePersistent = "persistent";
+        public const string HeaderApiKey = "X-API-Key";
+        public const string HeaderAuthTimestamp = "X-Auth-Timestamp";
+        public const string HeaderAuthSignature = "X-Auth-Signature";
+        public const string HmacSignSeparator = "\n";
+        public const string HmacHexDash = "-";
         public const int MaximumPermanentConnections = 2;
         public const int SecondsSixty = 60;
         public const int SecondsTen = 10;

@@ -1,3 +1,4 @@
+using PowerControlHubApp.Messages;
 using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 
@@ -25,23 +26,31 @@ public class PowerHubService
     private readonly IDashboardConnection _dashboardConnection;
     private readonly IConfigConnection _configConnection;
 
-    public PowerHubService(IDashboardConnection dashboardConnection, IConfigConnection configConnection)
+    public PowerHubService(IDashboardConnection dashboardConnection, IConfigConnection configConnection, IMessageBus messageBus)
     {
         _dashboardConnection = dashboardConnection ?? throw new ArgumentNullException(nameof(dashboardConnection));
         _configConnection = configConnection ?? throw new ArgumentNullException(nameof(configConnection));
+
+        messageBus.Subscribe<AuthConfigChanged>(OnAuthConfigChanged);
     }
 
     public bool IsConfigured => _dashboardConnection.IsConfigured;
 
     public string BaseUrl => _dashboardConnection is DashboardConnection dc ? dc.BaseUrl : string.Empty;
 
-    public void Configure(string ipAddress, int port)
+    public void Configure(string ipAddress, int port, string apiKey = "", string hmacKey = "")
     {
         if (_dashboardConnection is DashboardConnection dc)
+        {
             dc.Configure(ipAddress, port);
+            dc.ConfigureAuth(apiKey ?? string.Empty, hmacKey ?? string.Empty);
+        }
 
         if (_configConnection is ConfigConnection cc)
+        {
             cc.Configure(ipAddress, port);
+            cc.ConfigureAuth(apiKey ?? string.Empty, hmacKey ?? string.Empty);
+        }
     }
 
     public Task<SystemPinsResponseModel> GetSystemPinsAsync(CancellationToken ct = default)
@@ -312,5 +321,39 @@ public class PowerHubService
     public Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default)
     {
         return _configConnection.SetSdCardCsPinAsync(pin, ct);
+    }
+
+    public Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetAuthConfigAsync(ct);
+    }
+
+    public Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default)
+    {
+        return _configConnection.SetAuthEnabledAsync(enabled, ct);
+    }
+
+    public Task<bool> SetAuthApiKeyAsync(string apiKey, CancellationToken ct = default)
+    {
+        return _configConnection.SetAuthApiKeyAsync(apiKey, ct);
+    }
+
+    public Task<bool> SetAuthHmacKeyAsync(string hmacKey, CancellationToken ct = default)
+    {
+        return _configConnection.SetAuthHmacKeyAsync(hmacKey, ct);
+    }
+
+    public Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GenerateAuthKeysAsync(ct);
+    }
+
+    private void OnAuthConfigChanged(AuthConfigChanged msg)
+    {
+        if (_dashboardConnection is DashboardConnection dc)
+            dc.ConfigureAuth(msg.Config.ApiKey, msg.Config.HmacKey);
+
+        if (_configConnection is ConfigConnection cc)
+            cc.ConfigureAuth(msg.Config.ApiKey, msg.Config.HmacKey);
     }
 }

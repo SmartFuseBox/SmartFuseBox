@@ -23,6 +23,7 @@
 #include "SystemFunctions.h"
 #include "RelayController.h"
 
+
 ConfigNetworkHandler::ConfigNetworkHandler(ConfigController* configController, WifiController* wifiController, RelayController* relayController)
 	: _configController(configController), _wifiController(wifiController), _relayController(relayController)
 {
@@ -378,6 +379,88 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		else
 		{
 			result = ConfigResult::InvalidParameter;
+		}
+	}
+	else if (SystemFunctions::commandMatches(command, ConfigAuthCommand))
+	{
+		// C19 - Network authentication configuration
+		if (paramCount == 0)
+		{
+			Config* config = _configController->getConfigPtr();
+			if (config)
+			{
+				snprintf(responseBuffer, bufferSize, "\"e\":%s,\"k\":\"%s\",\"h\":\"%s\"",
+					config->auth.enabled ? "true" : "false",
+					config->auth.apiKey,
+					config->auth.hmacKey);
+			}
+			else
+			{
+				formatJsonResponse(responseBuffer, bufferSize, false, "Config not available");
+			}
+		}
+		else
+		{
+			bool generate = false;
+			getParamValueBool(params, paramCount, ConfigAuthGenerateParam, generate);
+
+			if (generate)
+				{
+					result = _configController->generateAuthKeys();
+
+					if (result == ConfigResult::Success)
+					{
+						formatJsonResponse(responseBuffer, bufferSize, true, "");
+					}
+				}
+			else
+			{
+				const char* apiKeyVal = getParamValue(params, paramCount, ConfigAuthApiKeyParam);
+
+				if (apiKeyVal)
+				{
+					result = _configController->setAuthApiKey(apiKeyVal);
+					if (result != ConfigResult::Success)
+					{
+						const char* msg = (result == ConfigResult::TooLong)
+							? "API key too long"
+							: "API key invalid";
+						formatJsonResponse(responseBuffer, bufferSize, false, msg);
+						return CommandResult(false);
+					}
+				}
+
+				const char* hmacKeyVal = getParamValue(params, paramCount, ConfigAuthHmacKeyParam);
+
+				if (hmacKeyVal)
+				{
+					result = _configController->setAuthHmacKey(hmacKeyVal);
+					if (result != ConfigResult::Success)
+					{
+						const char* msg = (result == ConfigResult::TooLong)
+							? "HMAC key too long"
+							: "HMAC key invalid";
+						formatJsonResponse(responseBuffer, bufferSize, false, msg);
+						return CommandResult(false);
+					}
+				}
+
+				bool enabled;
+				if (getParamValueBool(params, paramCount, ConfigAuthEnabledParam, enabled))
+					{
+						result = _configController->setAuthEnabled(enabled);
+						if (result != ConfigResult::Success)
+						{
+							formatJsonResponse(responseBuffer, bufferSize, false, "Cannot enable auth: keys not set");
+							return CommandResult(false);
+						}
+					}
+
+					if (result == ConfigResult::Success)
+					{
+						formatJsonResponse(responseBuffer, bufferSize, true, "");
+					}
+				}
 		}
 	}
 	else if (SystemFunctions::commandMatches(command, NextionGetConfig))
@@ -1128,6 +1211,17 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	// C32 SD Card CS pin
 	client->print("\"sdCardCsPin\":");
 	client->print(config->sdCard.csPin);
+	client->print(",");
+
+	// C19 Network auth
+	client->print("\"auth\":{");
+	client->print("\"enabled\":");
+	client->print(config->auth.enabled ? "true" : "false");
+	client->print(",\"apiKey\":\"");
+	client->print(config->auth.apiKey);
+	client->print("\",\"hmacKey\":\"");
+	client->print(config->auth.hmacKey);
+	client->print("\"}");
 
 	client->print("}");
 }

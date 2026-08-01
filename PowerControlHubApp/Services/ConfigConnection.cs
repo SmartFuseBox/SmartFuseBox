@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PowerControlHubApp.Messages;
 using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using System.Net.Sockets;
@@ -12,6 +13,7 @@ namespace PowerControlHubApp.Services
     {
         private readonly HttpClient _client;
         private readonly SocketsHttpHandler _handler;
+        private readonly DeviceAuthHandler _authHandler;
         private readonly Channel<ConfigCommand> _queue;
         private readonly IMessageBus _messageBus;
         private readonly ILogger<ConfigConnection> _log;
@@ -25,8 +27,9 @@ namespace PowerControlHubApp.Services
             _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _handler = CreateHandler();
+            _authHandler = new DeviceAuthHandler(_handler);
 
-            _client = new HttpClient(_handler, disposeHandler: false)
+            _client = new HttpClient(_authHandler, disposeHandler: false)
             {
                 Timeout = TimeSpan.FromSeconds(SecondsTen)
             };
@@ -49,6 +52,12 @@ namespace PowerControlHubApp.Services
         {
             _baseUrl = $"http://{ipAddress}:{port}";
             _client.BaseAddress = new Uri(_baseUrl + ForwardSlash);
+        }
+
+        /// <summary>Update authentication credentials used by the handler pipeline.</summary>
+        public void ConfigureAuth(string apiKey, string hmacKey)
+        {
+            _authHandler.Configure(apiKey, hmacKey);
         }
 
         public bool IsConfigured => !string.IsNullOrEmpty(_baseUrl);
@@ -621,6 +630,109 @@ namespace PowerControlHubApp.Services
         public async Task<bool> SetSdCardCsPinAsync(int pin, CancellationToken ct = default)
         {
             return await SetConfigValueAsync(RouteConfigSdCardCsPin, pin, ct);
+        }
+
+        public async Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteConfigAuth, ct);
+                return JsonSerializer.Deserialize<AuthConfigModel>(json, JsonOptions) ?? new AuthConfigModel();
+            }
+            catch
+            {
+                return new AuthConfigModel();
+            }
+        }
+
+        public async Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigAuth}?{ConfigAuthEnabledParam}={(enabled ? BoolTrueString : BoolFalseString)}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+
+                if (!await IsSuccessResponseAsync(response, ct))
+                    return false;
+
+                await SyncAuthHandlerFromDeviceAsync(ct);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SetAuthApiKeyAsync(string apiKey, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigAuth}?{ConfigAuthApiKeyParam}={Uri.EscapeDataString(apiKey)}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+
+                if (!await IsSuccessResponseAsync(response, ct))
+                    return false;
+
+                await SyncAuthHandlerFromDeviceAsync(ct);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SetAuthHmacKeyAsync(string hmacKey, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigAuth}?{ConfigAuthHmacKeyParam}={Uri.EscapeDataString(hmacKey)}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+
+                if (!await IsSuccessResponseAsync(response, ct))
+                    return false;
+
+                await SyncAuthHandlerFromDeviceAsync(ct);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigAuth}?{ConfigAuthGenerateParam}={BoolTrueString}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+
+                if (!await IsSuccessResponseAsync(response, ct))
+                    return false;
+
+                await SyncAuthHandlerFromDeviceAsync(ct);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private async Task SyncAuthHandlerFromDeviceAsync(CancellationToken ct)
+        {
+            try
+            {
+                AuthConfigModel config = await GetAuthConfigAsync(ct);
+                _authHandler.Configure(config.ApiKey, config.HmacKey);
+                _messageBus.Publish(new AuthConfigChanged(config));
+            }
+            catch
+            {
+                // best-effort sync; if the GET fails the handler keeps its previous state
+            }
         }
 
         private async Task<int?> GetConfigIntAsync(string route, CancellationToken ct)

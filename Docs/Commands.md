@@ -100,7 +100,7 @@ Example: `GET /api/system/F2`
 | `C16` — WiFi Connection State | `C16` | Returns current `WifiConnectionState` value. Read-only, no params. |
 | `C17` — WiFi AP IP Address | `C17:192.168.4.1` | Set AP-mode IP address. Value directly, no `v=` prefix. |
 | `C18` — RTC Pins | `C18:dat=4;clk=5;rst=6` | Set DS1302 RTC pins. Use `255` for any pin not fitted. Call `C0` to persist. |
-| ~~`C19`~~ | — | **Retired.** Use `N` commands (Nextion Display Configuration) instead. |
+| `C19` — Network Authentication | `C19:e=1;k=MyApiKey;h=MyHmacKey` or `C19:g=1` | Configure WiFi API authentication. **Params:** `e=<0\|1>` enable/disable auth (disabled by default). `k=<key>` set API key (max 31 chars). `h=<key>` set HMAC-SHA256 key (max 31 chars). `g=1` auto-generate device-unique keys from the WiFi MAC address. No params returns current state as `e=<0\|1>;k=<apiKey>;h=<hmacKey>`. Call `C0` to persist. When enabled, all `/api/*` endpoints require either an `X-API-Key` header matching the configured key, or valid `X-Auth-Timestamp` + `X-Auth-Signature` HMAC headers. See [Network Authentication](#network-authentication) below. |
 | `C20` — Timezone Offset | `C20:v=-5` | Set UTC timezone offset in hours. Valid range: −12 to +14. |
 | `C21` — MMSI | `C21:123456789` | Set 9-digit Maritime Mobile Service Identity. Value directly. |
 | `C22` — Call Sign | `C22:ABCD123` | Set location call sign. Value directly, truncated to max length. |
@@ -117,7 +117,7 @@ Example: `GET /api/system/F2`
 | `C33` — Light Sensor Threshold | `C33:v=512` | Analogue threshold (0–1023) above which daytime is detected. Default 512. Uses a rolling average of the last 10 samples; 3 consecutive consistent readings required before day/night state changes (see `S16`). |
 
 **C1 response sequence:**  
-PCH sends back: `C3` (name), `C4` (SPI pins), `C5` (home-button mappings), `C7` (location type), `C9` (sound delay), `C10`–`C17` (WiFi/Bluetooth — PCH only), `C18` (RTC pins), `C20`–`C23` (location identity), `C24`–`C27` (LED config), `C28` (tones), `N1`–`N6` (Nextion config), `R6` per relay (names), `R7` per relay (colours), `R8` per relay (default states), `R9` (linked pairs), `R10` (action types), `R11` (pins), `S0` per sensor (sensor config), then `ACK:C1=ok`.
+PCH sends back: `C3` (name), `C4` (SPI pins), `C5` (home-button mappings), `C7` (location type), `C9` (sound delay), `C10`–`C17` (WiFi/Bluetooth — PCH only), `C18` (RTC pins), `C19` (network auth), `C20`–`C23` (location identity), `C24`–`C27` (LED config), `C28` (tones), `N1`–`N6` (Nextion config), `R6` per relay (names), `R7` per relay (colours), `R8` per relay (default states), `R9` (linked pairs), `R10` (action types), `R11` (pins), `S0` per sensor (sensor config), then `ACK:C1=ok`.
 
 Common errors: `Missing param`, `Empty name`, `Invalid boat type`, `Invalid offset (-12 to +14)`, `MMSI must be 9 digits`, `Invalid speed (4, 8, 12, 16, 20, or 24 MHz)`, `Config not available`, `EEPROM commit failed`.
 
@@ -521,6 +521,63 @@ Common errors: `Index out of range`, `Missing params`, `Invalid trigger type`, `
 ### WiFi timer commands
 Route: `/api/timer/{command}`  
 Example: `GET /api/timer/T0`
+
+---
+
+## Network Authentication
+
+When network auth is enabled (`C19:e=1`), every request to `/api/*` endpoints must include authentication credentials. Two authentication methods are supported; clients may use either one.
+
+### API Key (simple)
+
+Include the `X-API-Key` header with the value of the configured API key:
+
+```bash
+curl -H "X-API-Key: ak-sfb-A1B2C3" http://DEVICE/api/system/F7
+```
+
+### HMAC-SHA256 (strong)
+
+Include two headers: `X-Auth-Timestamp` (Unix epoch seconds) and `X-Auth-Signature` (lowercase hex HMAC-SHA256 of the canonical request).
+
+**Canonical signing input format:**
+```
+<timestamp>\n<METHOD>\n<path>\n<body>
+```
+
+- `timestamp` — same value as `X-Auth-Timestamp`
+- `METHOD` — HTTP method: `GET`, `POST`, etc.
+- `path` — request path, e.g. `/api/relay/R3`
+- `body` — raw request body for POST; empty string for GET
+
+**Example (Bash):**
+```bash
+TS=$(date +%s)
+PATH="/api/system/F7"
+METHOD="GET"
+BODY=""
+HMAC_KEY="hk-sfb-A1B2C3"
+
+SIGN_INPUT="${TS}\n${METHOD}\n${PATH}\n${BODY}"
+SIG=$(echo -ne "$SIGN_INPUT" | openssl dgst -sha256 -hmac "$HMAC_KEY" | awk '{print $NF}')
+
+curl -H "X-Auth-Timestamp: ${TS}" -H "X-Auth-Signature: ${SIG}" http://DEVICE${PATH}
+```
+
+### Timestamp window and clock bootstrap
+
+- The HMAC timestamp must be within ±300 seconds (5 minutes) of the device's clock.
+- **`F6` (Set DateTime) is always permitted via all transports**, even when auth is enabled, as long as the device clock has **never** been synchronized. Once time is set, `F6` requires authentication like all other commands. This prevents a deadlock where the client needs auth to set the clock but the clock is wrong, causing HMAC verification to fail.
+- Clients can use an **API Key** to bootstrap the clock via `F6`, then switch to HMAC for stronger ongoing security.
+
+### Best practices
+
+1. **Enable auth after initial setup:** `C19:g=1` to generate per-device unique keys, then `C19:e=1` to enable.
+2. **Persist changes:** Call `C0` (Save Settings) after configuring auth to survive power cycles.
+3. **Synchronize the clock:** Use `F0:w=0x00;t=<timestamp>` heartbeat or `F6:v=<timestamp>` to keep the device clock accurate for HMAC.
+4. **Rotate keys periodically:** `C19:k=<newkey>` and `C19:h=<newkey>` then `C0` to persist.
+
+Common errors: `API key too long`, `HMAC key too long`.
 
 ---
 
