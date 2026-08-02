@@ -132,6 +132,44 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- GPIO Pin Restrictions card (compile-time — fetched once) -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0"
+                        IsVisible="{Binding HasPinRestrictions}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="GPIO Restrictions"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+
+                        <!-- Hard-blocked pins -->
+                        <VerticalStackLayout Spacing="2">
+                            <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="14">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Hard-blocked: " FontAttributes="Bold" />
+                                        <Span Text="{Binding HardPinsText}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+
+                        <!-- Advisory pins -->
+                        <VerticalStackLayout Spacing="2">
+                            <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="14">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Advisory: " FontAttributes="Bold" />
+                                        <Span Text="{Binding AdvisoryPinsText}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Firmware Update card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14"

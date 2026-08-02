@@ -350,6 +350,58 @@ public:
 		}
 	}
 
+	/**
+	 * @brief Return the number of entries in the compile-time pin restriction table.
+	 *        Returns 0 on non-ESP32 targets where no table is defined.
+	 */
+	static uint8_t getPinTableSize()
+	{
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32)
+		return _pinTableSize;
+#else
+		return 0;
+#endif
+	}
+
+	/**
+	 * @brief Read a single entry from the compile-time pin restriction table.
+	 *
+	 * @param index 0-based index into the table (must be < getPinTableSize()).
+	 * @param pin   Receives the GPIO number.
+	 * @param category Receives the PinCategory for this pin.
+	 */
+	static void getPinTableEntry(uint8_t index, uint8_t& pin, PinCategory& category)
+	{
+#if defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32)
+		if (index < _pinTableSize)
+		{
+			pin = pgm_read_byte(&_pinTable[index].gpio);
+			category = static_cast<PinCategory>(pgm_read_byte(&_pinTable[index].category));
+		}
+#else
+		(void)index;
+		(void)pin;
+		(void)category;
+#endif
+	}
+
+	/**
+	 * @brief Return a short human-readable string for a PinCategory value.
+	 *        String is in PROGMEM — use with F()-style printing.
+	 */
+	static const __FlashStringHelper* categoryString(PinCategory cat)
+	{
+		switch (cat)
+		{
+			case PinCategory::Hard:
+				return F("Hard");
+			case PinCategory::Advisory:
+				return F("Advisory");
+			default:
+				return F("Safe");
+		}
+	}
+
 private:
 	inline static uint8_t _mode = PinGuardMode::None;
 };

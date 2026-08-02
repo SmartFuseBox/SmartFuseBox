@@ -16,6 +16,9 @@ F8 -> ACK:F8=ok:v=*
 F9 -> ACK:F9=ok:v=*
 F11 -> ACK:F11=ok:v=*
 
+# Pin Restrictions - compile-time restricted pins (Hard/Advisory)
+F16 -> ACK:F16=ok
+
 # RTC Diagnostic - returns status message
 F10 -> ACK:F10=ok:*
 

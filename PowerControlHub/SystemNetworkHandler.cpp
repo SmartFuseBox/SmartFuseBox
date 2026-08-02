@@ -22,6 +22,7 @@
 #include "DateTimeManager.h"
 #include "SystemFunctions.h"
 #include "FirmwareVersion.h"
+#include "PinGuard.h"
 
 #if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
 #include "OtaManager.h"
@@ -85,6 +86,85 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 			responseBuffer[pos++] = ']';
 			responseBuffer[pos] = '\0';
 		}
+
+		return CommandResult::ok();
+	}
+	else if (SystemFunctions::commandMatches(command, SystemPinRestrictions))
+	{
+		uint8_t tableSize = PinGuard::getPinTableSize();
+		uint8_t hardPins[64];
+		uint8_t advisoryPins[64];
+		uint8_t hardCount = 0;
+		uint8_t advisoryCount = 0;
+
+		for (uint8_t i = 0; i < tableSize; ++i)
+		{
+			uint8_t pin;
+			PinCategory category;
+			PinGuard::getPinTableEntry(i, pin, category);
+
+			if (category == PinCategory::Hard)
+				hardPins[hardCount++] = pin;
+			else if (category == PinCategory::Advisory)
+				advisoryPins[advisoryCount++] = pin;
+		}
+
+		size_t pos = 0;
+
+		int written = snprintf(responseBuffer + pos, bufferSize - pos,
+			"\"success\":true,\"command\":\"%s\"", command);
+
+		if (written > 0)
+			pos += (size_t)written;
+
+		// Hard pins array
+		if (hardCount > 0 && pos < bufferSize)
+		{
+			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"hard\":[");
+
+			if (written > 0)
+				pos += (size_t)written;
+
+			for (uint8_t i = 0; i < hardCount && pos < bufferSize; ++i)
+			{
+				written = snprintf(responseBuffer + pos, bufferSize - pos,
+					"%s%u", (i > 0) ? "," : "", (unsigned)hardPins[i]);
+
+				if (written > 0)
+					pos += (size_t)written;
+				else
+					break;
+			}
+
+			if (pos < bufferSize)
+				responseBuffer[pos++] = ']';
+		}
+
+		// Advisory pins array
+		if (advisoryCount > 0 && pos < bufferSize)
+		{
+			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"advisory\":[");
+
+			if (written > 0)
+				pos += (size_t)written;
+
+			for (uint8_t i = 0; i < advisoryCount && pos < bufferSize; ++i)
+			{
+				written = snprintf(responseBuffer + pos, bufferSize - pos,
+					"%s%u", (i > 0) ? "," : "", (unsigned)advisoryPins[i]);
+
+				if (written > 0)
+					pos += (size_t)written;
+				else
+					break;
+			}
+
+			if (pos < bufferSize)
+				responseBuffer[pos++] = ']';
+		}
+
+		if (pos < bufferSize)
+			responseBuffer[pos] = '\0';
 
 		return CommandResult::ok();
 	}

@@ -195,6 +195,7 @@
         public const string RouteOtaUpdate = "api/system/F13";
         public const string RouteUpdateOta = "api/system/F12?apply=1";
         public const string RouteSystemPins = "api/system/F15";
+        public const string RouteSystemPinRestrictions = "api/system/F16";
         public const string RouteSystemGetDateTime = "api/system/F7";
         public const string RouteSystemSetDateTime = "api/system/F6";
         public const string RouteConfigTimezoneOffset = "api/config/C20";

@@ -13,6 +13,12 @@ public class SystemViewModel : BaseViewModel
     private bool _isPinsRefreshing;
     private int _pinsCount;
 
+    // F16 Pin Restrictions (compile-time — fetched once, never changes)
+    private string _hardPinsText = string.Empty;
+    private string _advisoryPinsText = string.Empty;
+    private bool _hasPinRestrictions;
+    private bool _pinRestrictionsLoaded;
+
     // OTA
     private OtaStatusModel _otaStatus;
     private bool _isCheckingOta;
@@ -53,6 +59,39 @@ public class SystemViewModel : BaseViewModel
     public bool IsNotPinsRefreshing => !_isPinsRefreshing;
 
     public bool HasPins => PinsCount > 0;
+
+    public string HardPinsText
+    {
+        get => _hardPinsText;
+
+        set
+        {
+            _hardPinsText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string AdvisoryPinsText
+    {
+        get => _advisoryPinsText;
+
+        set
+        {
+            _advisoryPinsText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool HasPinRestrictions
+    {
+        get => _hasPinRestrictions;
+
+        set
+        {
+            _hasPinRestrictions = value;
+            OnPropertyChanged();
+        }
+    }
 
     // StatusMessage, HasStatus, and OnPropertyChanged are provided by BaseViewModel
 
@@ -131,6 +170,38 @@ public class SystemViewModel : BaseViewModel
         }
     }
 
+    public async Task RefreshPinRestrictionsAsync()
+    {
+        if (!Service.IsConfigured || _pinRestrictionsLoaded)
+            return;
+
+        try
+        {
+            var result = await Service.GetSystemPinRestrictionsAsync();
+
+            if (result?.Success == true)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    HardPinsText = result.Hard?.Count > 0
+                        ? string.Join(CommaSpace, result.Hard)
+                        : DoubleDash;
+
+                    AdvisoryPinsText = result.Advisory?.Count > 0
+                        ? string.Join(CommaSpace, result.Advisory)
+                        : DoubleDash;
+
+                    HasPinRestrictions = result.Hard?.Count > 0 || result.Advisory?.Count > 0;
+                    _pinRestrictionsLoaded = true;
+                });
+            }
+        }
+        catch
+        {
+            // Silently ignore — pin restrictions are optional info
+        }
+    }
+
     public async Task RefreshAsync()
     {
         if (!Service.IsConfigured || _isRefreshing)
@@ -140,6 +211,10 @@ public class SystemViewModel : BaseViewModel
 
         try
         {
+            // Fetch pin restrictions once (compile-time data, doesn't change)
+            if (!_pinRestrictionsLoaded)
+                await RefreshPinRestrictionsAsync();
+
             var list = await Service.GetWarningsAsync();
             MainThread.BeginInvokeOnMainThread(() =>
             {

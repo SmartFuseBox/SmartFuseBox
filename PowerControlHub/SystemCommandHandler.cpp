@@ -43,7 +43,7 @@ const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
 		SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
 		SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
 		SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime,
-		SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode, SystemPinUsage
+		SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode, SystemPinUsage, SystemPinRestrictions
 	};
 	count = sizeof(cmds) / sizeof(cmds[0]);
 	return cmds;
@@ -434,6 +434,25 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		}
 
 		sendAckOk(sender, command, &param);
+		return true;
+	}
+	else if (SystemFunctions::commandMatches(command, SystemPinRestrictions))
+	{
+		uint8_t tableSize = PinGuard::getPinTableSize();
+
+		for (uint8_t i = 0; i < tableSize; ++i)
+		{
+			uint8_t pin;
+			PinCategory category;
+			PinGuard::getPinTableEntry(i, pin, category);
+
+			const char* categoryName = (category == PinCategory::Hard) ? "Hard" : "Advisory";
+			char buffer[32];
+			snprintf(buffer, sizeof(buffer), "%u - %s", (unsigned)pin, categoryName);
+			sender->sendCommand(SystemPinRestrictions, buffer);
+		}
+
+		sendAckOk(sender, command);
 		return true;
 	}
 	else

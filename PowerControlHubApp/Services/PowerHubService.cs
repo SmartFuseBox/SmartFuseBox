@@ -58,6 +58,11 @@ public class PowerHubService
         return _dashboardConnection.GetSystemPinsAsync(ct);
     }
 
+    public Task<SystemPinRestrictionsResponseModel> GetSystemPinRestrictionsAsync(CancellationToken ct = default)
+    {
+        return _dashboardConnection.GetSystemPinRestrictionsAsync(ct);
+    }
+
     public Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
     {
         return _dashboardConnection.GetDashboardDataAsync(ct);
