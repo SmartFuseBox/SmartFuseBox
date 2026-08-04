@@ -63,5 +63,12 @@ namespace PowerControlHubApp.Services
         Task<bool> SetAuthApiKeyAsync(string apiKey, CancellationToken ct = default);
         Task<bool> SetAuthHmacKeyAsync(string hmacKey, CancellationToken ct = default);
         Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default);
+        Task<NextionConfigModel> GetNextionConfigAsync(CancellationToken ct = default);
+        Task<bool> SetNextionEnabledAsync(bool enabled, CancellationToken ct = default);
+        Task<bool> SetNextionHardwareSerialAsync(bool hardwareSerial, CancellationToken ct = default);
+        Task<bool> SetNextionRxPinAsync(int pin, CancellationToken ct = default);
+        Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default);
+        Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default);
+        Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default);
     }
 }

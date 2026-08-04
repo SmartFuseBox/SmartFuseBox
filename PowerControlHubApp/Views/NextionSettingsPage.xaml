@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.NextionSettingsPage"
+             Title="Nextion Settings"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+        <views:TopBarView Grid.Row="0" Title="Nextion Settings" ShowBackButton="True" />
+
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout Padding="20" Spacing="12">
+
+                <!-- Enable / Serial Mode -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}" StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Nextion Display" TextColor="{DynamicResource AppLabelMuted}" FontAttributes="Bold" FontSize="13" />
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Enabled" TextColor="{DynamicResource AppEntryText}" FontSize="14" VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding IsEnabled}" OnColor="{DynamicResource AppAccent}" VerticalOptions="Center" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                            <Label Grid.Column="0" Text="Hardware Serial" TextColor="{DynamicResource AppEntryText}" FontSize="14" VerticalOptions="Center" />
+                            <Switch Grid.Column="1" IsToggled="{Binding IsHardwareSerial}" OnColor="{DynamicResource AppAccent}" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Pins -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}" StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Pins" TextColor="{DynamicResource AppLabelMuted}" FontAttributes="Bold" FontSize="13" />
+
+                        <Label Text="RX Pin (blank or 255 = disabled)" TextColor="{DynamicResource AppLabelSubtle}" FontSize="11" />
+                        <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}" StrokeShape="RoundRectangle 8" Padding="0">
+                            <Entry Text="{Binding RxPinDisplay}" Placeholder="255 = disabled" Keyboard="Numeric" TextColor="{DynamicResource AppEntryText}" PlaceholderColor="{DynamicResource AppPlaceholderText}" />
+                        </Border>
+
+                        <Label Text="TX Pin (blank or 255 = disabled)" TextColor="{DynamicResource AppLabelSubtle}" FontSize="11" Margin="0,8,0,0" />
+                        <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}" StrokeShape="RoundRectangle 8" Padding="0">
+                            <Entry Text="{Binding TxPinDisplay}" Placeholder="255 = disabled" Keyboard="Numeric" TextColor="{DynamicResource AppEntryText}" PlaceholderColor="{DynamicResource AppPlaceholderText}" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Communication -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}" StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Communication" TextColor="{DynamicResource AppLabelMuted}" FontAttributes="Bold" FontSize="13" />
+
+                        <Label Text="Baud Rate" TextColor="{DynamicResource AppLabelSubtle}" FontSize="11" />
+                        <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}" StrokeShape="RoundRectangle 8" Padding="0">
+                            <Entry Text="{Binding BaudRate}" Placeholder="e.g. 9600" Keyboard="Numeric" TextColor="{DynamicResource AppEntryText}" PlaceholderColor="{DynamicResource AppPlaceholderText}" />
+                        </Border>
+
+                        <Label Text="UART Number" TextColor="{DynamicResource AppLabelSubtle}" FontSize="11" Margin="0,8,0,0" />
+                        <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}" StrokeShape="RoundRectangle 8" Padding="0">
+                            <Picker SelectedIndex="{Binding UartSelectedIndex}" Title="UART" ItemsSource="{Binding UartOptions}" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Reboot warning & actions -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}" StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Reboot required" FontSize="16" FontAttributes="Bold" TextColor="#cc4444" />
+                        <Label Text="Changes to Nextion configuration require a device reboot to take effect. Save settings and reboot the device." TextColor="{DynamicResource AppLabelMuted}" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Button Grid.Column="0" Text="Save" Command="{Binding SaveAllCommand}" BackgroundColor="Transparent" TextColor="{DynamicResource AppAccent}" CornerRadius="8" Padding="10,8" />
+                            <Button Grid.Column="1" Text="Reboot" Command="{Binding RebootCommand}" BackgroundColor="{DynamicResource AppAccent}" TextColor="White" CornerRadius="8" Padding="10,8" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="{Binding StatusMessage}" TextColor="{DynamicResource AppAccent}" FontSize="13" HorizontalTextAlignment="Center" IsVisible="{Binding HasStatusMessage}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <views:StatusBarView Grid.Row="3" />
+    </Grid>
+
+</views:BasePowerControlHubContentPage>

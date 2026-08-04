@@ -615,7 +615,7 @@ ConfigResult ConfigController::generateAuthKeys()
     if (_config == nullptr)
         return ConfigResult::InvalidConfig;
 
-    char deviceId[32];
+    char deviceId[26];
     deviceId[0] = '\0';
 
     if (SystemFunctions::GenerateDefaultPassword(deviceId, sizeof(deviceId)) != BufferSuccess)
