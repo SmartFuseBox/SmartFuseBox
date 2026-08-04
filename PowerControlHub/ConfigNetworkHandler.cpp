@@ -405,14 +405,14 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 			getParamValueBool(params, paramCount, ConfigAuthGenerateParam, generate);
 
 			if (generate)
-				{
-					result = _configController->generateAuthKeys();
+			{
+				result = _configController->generateAuthKeys();
 
-					if (result == ConfigResult::Success)
-					{
-						formatJsonResponse(responseBuffer, bufferSize, true, "");
-					}
+				if (result == ConfigResult::Success)
+				{
+					formatJsonResponse(responseBuffer, bufferSize, true, "");
 				}
+			}
 			else
 			{
 				const char* apiKeyVal = getParamValue(params, paramCount, ConfigAuthApiKeyParam);
@@ -426,7 +426,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 							? "API key too long"
 							: "API key invalid";
 						formatJsonResponse(responseBuffer, bufferSize, false, msg);
-						return CommandResult(false);
+						return CommandResult{false, 0};
 					}
 				}
 
@@ -435,13 +435,14 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 				if (hmacKeyVal)
 				{
 					result = _configController->setAuthHmacKey(hmacKeyVal);
+
 					if (result != ConfigResult::Success)
 					{
 						const char* msg = (result == ConfigResult::TooLong)
 							? "HMAC key too long"
 							: "HMAC key invalid";
 						formatJsonResponse(responseBuffer, bufferSize, false, msg);
-						return CommandResult(false);
+						return CommandResult{false, 0};
 					}
 				}
 
@@ -449,10 +450,11 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 				if (getParamValueBool(params, paramCount, ConfigAuthEnabledParam, enabled))
 					{
 						result = _configController->setAuthEnabled(enabled);
+
 						if (result != ConfigResult::Success)
 						{
 							formatJsonResponse(responseBuffer, bufferSize, false, "Cannot enable auth: keys not set");
-							return CommandResult(false);
+							return CommandResult{false, 0};
 						}
 					}
 
@@ -467,6 +469,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 	{
 		// N0 - returns all nextion settings as a JSON-style response in responseBuffer
 		Config* config = ConfigManager::getConfigPtr();
+
 		if (config == nullptr)
 		{
 			result = ConfigResult::InvalidConfig;
@@ -474,13 +477,13 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		else
 		{
 			int len = snprintf(responseBuffer, bufferSize,
-				"en=%u;hw=%u;rx=%u;tx=%u;baud=%lu;uart=%u",
-				config->nextion.enabled ? 1u : 0u,
-				config->nextion.isHardwareSerial ? 1u : 0u,
-				config->nextion.rxPin,
-				config->nextion.txPin,
-				config->nextion.baudRate,
-				config->nextion.uartNum);
+					"\"en\":%u,\"hw\":%u,\"rx\":%u,\"tx\":%u,\"baud\":%lu,\"uart\":%u",
+					config->nextion.enabled ? 1u : 0u,
+					config->nextion.isHardwareSerial ? 1u : 0u,
+					config->nextion.rxPin,
+					config->nextion.txPin,
+					config->nextion.baudRate,
+					config->nextion.uartNum);
 			result = (len > 0 && len < static_cast<int>(bufferSize))
 				? ConfigResult::Success : ConfigResult::InvalidParameter;
 		}

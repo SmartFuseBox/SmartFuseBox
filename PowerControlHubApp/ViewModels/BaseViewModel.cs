@@ -229,7 +229,7 @@ public abstract class BaseViewModel : INotifyPropertyChanged
     /// updates system status, then calls <see cref="OnDataFetched"/> for
     /// view-model-specific processing. Handles error cases consistently.
     /// </summary>
-    protected async Task ExecuteRefreshAsync(CancellationToken ct)
+    protected virtual async Task ExecuteRefreshAsync(CancellationToken ct)
     {
         if (!_service.IsConfigured)
         {

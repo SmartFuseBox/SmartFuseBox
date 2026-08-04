@@ -353,6 +353,41 @@ public class PowerHubService
         return _configConnection.GenerateAuthKeysAsync(ct);
     }
 
+    public Task<NextionConfigModel> GetNextionConfigAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetNextionConfigAsync(ct);
+    }
+
+    public Task<bool> SetNextionEnabledAsync(bool enabled, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionEnabledAsync(enabled, ct);
+    }
+
+    public Task<bool> SetNextionHardwareSerialAsync(bool hardwareSerial, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionHardwareSerialAsync(hardwareSerial, ct);
+    }
+
+    public Task<bool> SetNextionRxPinAsync(int pin, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionRxPinAsync(pin, ct);
+    }
+
+    public Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionTxPinAsync(pin, ct);
+    }
+
+    public Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionBaudRateAsync(baudRate, ct);
+    }
+
+    public Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default)
+    {
+        return _configConnection.SetNextionUartNumberAsync(uartNumber, ct);
+    }
+
     private void OnAuthConfigChanged(AuthConfigChanged msg)
     {
         if (_dashboardConnection is DashboardConnection dc)

@@ -235,6 +235,14 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default) => _connection.GenerateAuthKeysAsync(ct);
 
+    public Task<NextionConfigModel> GetNextionConfigAsync(CancellationToken ct = default) => _connection.GetNextionConfigAsync(ct);
+    public Task<bool> SetNextionEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetNextionEnabledAsync(enabled, ct);
+    public Task<bool> SetNextionHardwareSerialAsync(bool hardwareSerial, CancellationToken ct = default) => _connection.SetNextionHardwareSerialAsync(hardwareSerial, ct);
+    public Task<bool> SetNextionRxPinAsync(int pin, CancellationToken ct = default) => _connection.SetNextionRxPinAsync(pin, ct);
+    public Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default) => _connection.SetNextionTxPinAsync(pin, ct);
+    public Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default) => _connection.SetNextionBaudRateAsync(baudRate, ct);
+    public Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default) => _connection.SetNextionUartNumberAsync(uartNumber, ct);
+
     public void Dispose()
     {
         if (_cts != null)

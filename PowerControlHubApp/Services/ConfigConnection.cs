@@ -721,6 +721,97 @@ namespace PowerControlHubApp.Services
             }
         }
 
+        public async Task<NextionConfigModel> GetNextionConfigAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteConfigNextionGet, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                var model = new NextionConfigModel();
+
+                if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var prop in doc.RootElement.EnumerateObject())
+                    {
+                        string name = prop.Name.ToLowerInvariant();
+
+                        if (name == NextionJsonN1 || name == NextionJsonEnabled || name == NextionJsonEn)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.Enabled = v != 0;
+                        }
+                        else if (name == NextionJsonN2 || name == NextionJsonHardwareSerial || name == NextionJsonHw)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.HardwareSerial = v != 0;
+                        }
+                        else if (name == NextionJsonN3 || name == NextionJsonRxPin || name == NextionJsonRx)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.RxPin = v;
+                        }
+                        else if (name == NextionJsonN4 || name == NextionJsonTxPin || name == NextionJsonTx)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.TxPin = v;
+                        }
+                        else if (name == NextionJsonN5 || name == NextionJsonBaudRate || name == NextionJsonBaud)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.BaudRate = v;
+                        }
+                        else if (name == NextionJsonN6 || name == NextionJsonUartNumber || name == NextionJsonUart)
+                        {
+                            if (prop.Value.ValueKind == JsonValueKind.Number && prop.Value.TryGetInt32(out int v))
+                                model.UartNumber = v;
+                        }
+                    }
+                }
+
+                if (model.Enabled == null || model.HardwareSerial == null || model.RxPin == null || model.TxPin == null || model.BaudRate == null || model.UartNumber == null)
+                {
+                    int? n1 = await GetConfigIntAsync(NextionRouteN1, ct);
+                    int? n2 = await GetConfigIntAsync(NextionRouteN2, ct);
+                    int? n3 = await GetConfigIntAsync(NextionRouteN3, ct);
+                    int? n4 = await GetConfigIntAsync(NextionRouteN4, ct);
+                    int? n5 = await GetConfigIntAsync(NextionRouteN5, ct);
+                    int? n6 = await GetConfigIntAsync(NextionRouteN6, ct);
+
+                    model.Enabled ??= (n1.HasValue ? n1.Value != 0 : (bool?)null);
+                    model.HardwareSerial ??= (n2.HasValue ? n2.Value != 0 : (bool?)null);
+                    model.RxPin ??= n3;
+                    model.TxPin ??= n4;
+                    model.BaudRate ??= n5;
+                    model.UartNumber ??= n6;
+                }
+
+                return model;
+            }
+            catch
+            {
+                return new NextionConfigModel();
+            }
+        }
+
+        public async Task<bool> SetNextionEnabledAsync(bool enabled, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN1, enabled ? 1 : 0, ct);
+
+        public async Task<bool> SetNextionHardwareSerialAsync(bool hardwareSerial, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN2, hardwareSerial ? 1 : 0, ct);
+
+        public async Task<bool> SetNextionRxPinAsync(int pin, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN3, pin, ct);
+
+        public async Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN4, pin, ct);
+
+        public async Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN5, baudRate, ct);
+
+        public async Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default)
+            => await SetConfigValueAsync(NextionRouteN6, uartNumber, ct);
+
         private async Task SyncAuthHandlerFromDeviceAsync(CancellationToken ct)
         {
             try
