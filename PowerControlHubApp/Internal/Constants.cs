@@ -202,6 +202,16 @@
         public const string RouteConfigSdCardSpiPins = "api/config/C4";
         public const string RouteConfigSdCardInitSpeed = "api/config/C31";
         public const string RouteConfigSdCardCsPin = "api/config/C32";
+        // RTC config
+        public const string RouteConfigRtc = "api/config/C18";
+        public const string RouteRtcSettingsPage = "RtcSettingsPage";
+        public const string RtcMsgSaveFailed = "Save failed — device unreachable";
+        public const string RtcMsgSaved = "RTC settings saved";
+        public const string RtcMsgRefreshed = "Refreshed";
+        public const string JsonRtcDataPin = "dat";
+        public const string JsonRtcClockPin = "clk";
+        public const string JsonRtcResetPin = "rst";
+        public const int RtcPinDisabled = 255;
         // Nextion display config
         public const string RouteConfigNextionGet = "api/config/N0";
         public const string RouteConfigNextionSetFormat = "api/config/N{0}?v={1}";

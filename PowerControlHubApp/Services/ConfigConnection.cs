@@ -632,6 +632,55 @@ namespace PowerControlHubApp.Services
             return await SetConfigValueAsync(RouteConfigSdCardCsPin, pin, ct);
         }
 
+        public async Task<(int DataPin, int ClockPin, int ResetPin)?> GetRtcPinsAsync(CancellationToken ct = default)
+        {
+            try
+            {
+                string json = await _client.GetStringAsync(RouteConfigRtc, ct);
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                    success.GetBoolean())
+                {
+                    int? data = null;
+                    int? clock = null;
+                    int? reset = null;
+
+                    if (doc.RootElement.TryGetProperty(JsonRtcDataPin, out var d) && d.ValueKind == JsonValueKind.Number && d.TryGetInt32(out int dv))
+                        data = dv;
+
+                    if (doc.RootElement.TryGetProperty(JsonRtcClockPin, out var c) && c.ValueKind == JsonValueKind.Number && c.TryGetInt32(out int cv))
+                        clock = cv;
+
+                    if (doc.RootElement.TryGetProperty(JsonRtcResetPin, out var r) && r.ValueKind == JsonValueKind.Number && r.TryGetInt32(out int rv))
+                        reset = rv;
+
+                    if (data.HasValue && clock.HasValue && reset.HasValue)
+                        return (data.Value, clock.Value, reset.Value);
+                }
+            }
+            catch
+            {
+                // fall through
+            }
+
+            return null;
+        }
+
+        public async Task<bool> SetRtcPinsAsync(int dataPin, int clockPin, int resetPin, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigRtc}?{JsonRtcDataPin}={dataPin}&{JsonRtcClockPin}={clockPin}&{JsonRtcResetPin}={resetPin}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default)
         {
             try

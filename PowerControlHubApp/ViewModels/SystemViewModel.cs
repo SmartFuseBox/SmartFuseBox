@@ -109,6 +109,8 @@ public class SystemViewModel : BaseViewModel
 
     public ICommand NavigateToSdCardSettingsCommand { get; }
 
+    public ICommand NavigateToRtcSettingsCommand { get; }
+
     public ICommand NavigateToNetworkSecurityCommand { get; }
 
     public ICommand NavigateToNextionSettingsCommand { get; }
@@ -122,6 +124,7 @@ public class SystemViewModel : BaseViewModel
         NavigateToTimeSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteTimeSettingsPage));
         NavigateToMqttSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteMqttSettingsPage));
         NavigateToSdCardSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteSdCardSettingsPage));
+        NavigateToRtcSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteRtcSettingsPage));
         NavigateToNetworkSecurityCommand = new Command(async () => await Shell.Current.GoToAsync(RouteNetworkSecurityPage));
         NavigateToNextionSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteNextionSettingsPage));
     }
