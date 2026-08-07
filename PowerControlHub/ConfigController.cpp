@@ -532,10 +532,27 @@ ConfigResult ConfigController::setRtcPins(const uint8_t dataPin, const uint8_t c
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
 
-	if (PinGuard::isBlocked(PinGuard::validate(dataPin, PinUse::Output)) ||
-		PinGuard::isBlocked(PinGuard::validate(clockPin, PinUse::Output)) ||
-		PinGuard::isBlocked(PinGuard::validate(resetPin, PinUse::Output)))
+	// Temporarily clear current RTC pin assignments so they don't
+	// conflict with themselves during validation (getUsedPins collects
+	// the current rtc.dataPin/clockPin/resetPin values).
+	const uint8_t oldData = _config->rtc.dataPin;
+	const uint8_t oldClock = _config->rtc.clockPin;
+	const uint8_t oldReset = _config->rtc.resetPin;
+
+	_config->rtc.dataPin = PinDisabled;
+	_config->rtc.clockPin = PinDisabled;
+	_config->rtc.resetPin = PinDisabled;
+
+	const bool blocked = PinGuard::isBlocked(PinGuard::validate(dataPin, PinUse::Output))
+		|| PinGuard::isBlocked(PinGuard::validate(clockPin, PinUse::Output))
+		|| PinGuard::isBlocked(PinGuard::validate(resetPin, PinUse::Output));
+
+	if (blocked)
 	{
+		// Restore old values on failure
+		_config->rtc.dataPin = oldData;
+		_config->rtc.clockPin = oldClock;
+		_config->rtc.resetPin = oldReset;
 		return ConfigResult::InvalidPin;
 	}
 

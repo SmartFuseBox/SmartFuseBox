@@ -108,6 +108,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<TimeSettingsViewModel>();
             builder.Services.AddTransient<MqttSettingsViewModel>();
             builder.Services.AddTransient<SdCardSettingsViewModel>();
+            builder.Services.AddTransient<RtcSettingsViewModel>();
             builder.Services.AddTransient<NetworkSecurityViewModel>();
             builder.Services.AddTransient<NextionSettingsViewModel>();
 
@@ -124,6 +125,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<TimeSettingsPage>();
             builder.Services.AddTransient<MqttSettingsPage>();
             builder.Services.AddTransient<SdCardSettingsPage>();
+            builder.Services.AddTransient<RtcSettingsPage>();
             builder.Services.AddTransient<NetworkSecurityPage>();
             builder.Services.AddTransient<NextionSettingsPage>();
 

@@ -1216,6 +1216,16 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	client->print(config->sdCard.csPin);
 	client->print(",");
 
+	// C18 RTC DS1302 pins
+	client->print("\"rtcPins\":{");
+	client->print("\"dat\":");
+	client->print(config->rtc.dataPin);
+	client->print(",\"clk\":");
+	client->print(config->rtc.clockPin);
+	client->print(",\"rst\":");
+	client->print(config->rtc.resetPin);
+	client->print("},");
+
 	// C19 Network auth
 	client->print("\"auth\":{");
 	client->print("\"enabled\":");

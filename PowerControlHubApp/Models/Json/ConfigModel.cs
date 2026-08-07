@@ -76,5 +76,8 @@ namespace PowerControlHubApp.Models
 
         [JsonPropertyName("sdCardCsPin")]
         public int SdCardCsPin { get; set; }
+
+        [JsonPropertyName("rtcPins")]
+        public RtcConfigModel Rtc { get; set; }
     }
 }

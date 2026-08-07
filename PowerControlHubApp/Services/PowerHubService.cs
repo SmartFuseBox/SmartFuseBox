@@ -333,6 +333,16 @@ public class PowerHubService
         return _configConnection.GetAuthConfigAsync(ct);
     }
 
+    public Task<(int DataPin, int ClockPin, int ResetPin)?> GetRtcPinsAsync(CancellationToken ct = default)
+    {
+        return _configConnection.GetRtcPinsAsync(ct);
+    }
+
+    public Task<bool> SetRtcPinsAsync(int dataPin, int clockPin, int resetPin, CancellationToken ct = default)
+    {
+        return _configConnection.SetRtcPinsAsync(dataPin, clockPin, resetPin, ct);
+    }
+
     public Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default)
     {
         return _configConnection.SetAuthEnabledAsync(enabled, ct);
