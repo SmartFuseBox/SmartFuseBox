@@ -343,6 +343,11 @@ public class PowerHubService
         return _configConnection.SetRtcPinsAsync(dataPin, clockPin, resetPin, ct);
     }
 
+    public Task<bool> SetXpdzTonePinAsync(int pin, CancellationToken ct = default)
+    {
+        return _configConnection.SetXpdzTonePinAsync(pin, ct);
+    }
+
     public Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default)
     {
         return _configConnection.SetAuthEnabledAsync(enabled, ct);

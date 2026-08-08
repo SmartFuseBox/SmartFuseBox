@@ -79,5 +79,8 @@ namespace PowerControlHubApp.Models
 
         [JsonPropertyName("rtcPins")]
         public RtcConfigModel Rtc { get; set; }
+
+        [JsonPropertyName("xpdzPin")]
+        public int XpdzTonePin { get; set; }
     }
 }

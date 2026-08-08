@@ -212,6 +212,13 @@
         public const string JsonRtcClockPin = "clk";
         public const string JsonRtcResetPin = "rst";
         public const int RtcPinDisabled = 255;
+        // XpdzTone / Buzzer config
+        public const string RouteConfigXpdzTone = "api/config/C6";
+        public const string RouteXpdzToneSettingsPage = "XpdzToneSettingsPage";
+        public const string XpdzToneMsgSaveFailed = "Save failed — device unreachable";
+        public const string XpdzToneMsgSaved = "Buzzer settings saved";
+        public const string XpdzToneMsgRefreshed = "Refreshed";
+        public const string JsonXpdzPin = "xpdzPin";
         // Nextion display config
         public const string RouteConfigNextionGet = "api/config/N0";
         public const string RouteConfigNextionSetFormat = "api/config/N{0}?v={1}";

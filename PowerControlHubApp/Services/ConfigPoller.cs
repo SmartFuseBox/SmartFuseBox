@@ -229,6 +229,8 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetRtcPinsAsync(int dataPin, int clockPin, int resetPin, CancellationToken ct = default) => _connection.SetRtcPinsAsync(dataPin, clockPin, resetPin, ct);
 
+    public Task<bool> SetXpdzTonePinAsync(int pin, CancellationToken ct = default) => _connection.SetXpdzTonePinAsync(pin, ct);
+
     public Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default) => _connection.GetAuthConfigAsync(ct);
 
     public Task<bool> SetAuthEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetAuthEnabledAsync(enabled, ct);
@@ -240,11 +242,17 @@ public class ConfigPoller : IConfigConnection, IDisposable
     public Task<bool> GenerateAuthKeysAsync(CancellationToken ct = default) => _connection.GenerateAuthKeysAsync(ct);
 
     public Task<NextionConfigModel> GetNextionConfigAsync(CancellationToken ct = default) => _connection.GetNextionConfigAsync(ct);
+
     public Task<bool> SetNextionEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetNextionEnabledAsync(enabled, ct);
+
     public Task<bool> SetNextionHardwareSerialAsync(bool hardwareSerial, CancellationToken ct = default) => _connection.SetNextionHardwareSerialAsync(hardwareSerial, ct);
+
     public Task<bool> SetNextionRxPinAsync(int pin, CancellationToken ct = default) => _connection.SetNextionRxPinAsync(pin, ct);
+
     public Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default) => _connection.SetNextionTxPinAsync(pin, ct);
+
     public Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default) => _connection.SetNextionBaudRateAsync(baudRate, ct);
+
     public Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default) => _connection.SetNextionUartNumberAsync(uartNumber, ct);
 
     public void Dispose()
