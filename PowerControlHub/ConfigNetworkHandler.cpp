@@ -1027,11 +1027,12 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 
 	client->print("\"config\":{");
 
-	// Name
+	// C3 Name
 	client->print("\"name\":\"");
 	client->print(config->location.name);
 	client->print("\",");
 
+	// C4 Spi Pins
 	client->print("\"spiPins\":{");
 	client->print("\"sck\":");
 	client->print(config->spiPins.sckPin);
@@ -1043,22 +1044,22 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	client->print(config->spiPins.misoPin);
 	client->print("},");
 
-	// Vessel type
-	client->print("\"vesselType\":");
+	// C6 Xpdz Tone
+	client->print("\"xpdzPin\":");
+	client->print(static_cast<uint8_t>(config->xpdzTone.pin));
+	client->print(",");
+
+	// C7 Location type
+	client->print("\"locationType\":");
 	client->print(static_cast<uint8_t>(config->location.locationType));
 	client->print(",");
 
-	// Sound relay ID
-	client->print("\"hornRelayIndex\":");
-	client->print(static_cast<uint8_t>(config->sound.hornRelayIndex));
-	client->print(",");
-
-	// Sound start delay
+	// C9 Sound start delay
 	client->print("\"soundStartDelayMs\":");
 	client->print(static_cast<uint16_t>(config->sound.startDelayMs));
 	client->print(",");
 
-	// Bluetooth, WiFi, SSID, Password, Port, AccessMode
+	// C10 - C17 Bluetooth, WiFi, SSID, Password, Port, AccessMode
 	client->print("\"bluetoothEnabled\":");
 	client->print(config->network.bluetoothEnabled ? "true" : "false");
 	client->print(",");
@@ -1109,6 +1110,26 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	}
 
 	client->print("\",");
+
+	// C18 RTC DS1302 pins
+	client->print("\"rtcPins\":{");
+	client->print("\"dat\":");
+	client->print(config->rtc.dataPin);
+	client->print(",\"clk\":");
+	client->print(config->rtc.clockPin);
+	client->print(",\"rst\":");
+	client->print(config->rtc.resetPin);
+	client->print("},");
+
+	// C19 Network auth
+	client->print("\"auth\":{");
+	client->print("\"enabled\":");
+	client->print(config->auth.enabled ? "true" : "false");
+	client->print(",\"apiKey\":\"");
+	client->print(config->auth.apiKey);
+	client->print("\",\"hmacKey\":\"");
+	client->print(config->auth.hmacKey);
+	client->print("\"},");
 
 	// C20 Timezone offset
 	client->print("\"timezoneOffset\":");
@@ -1206,6 +1227,8 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	client->print(config->sound.badRepeatMs);
 	client->print("},");
 
+	// C29, C30 Serial only
+
 	// C31 SD Card Initialize Speed
 	client->print("\"sdCardInitializeSpeed\":");
 	client->print(config->sdCard.initializeSpeed);
@@ -1214,27 +1237,6 @@ void ConfigNetworkHandler::formatStatusJson(IWifiClient* client)
 	// C32 SD Card CS pin
 	client->print("\"sdCardCsPin\":");
 	client->print(config->sdCard.csPin);
-	client->print(",");
-
-	// C18 RTC DS1302 pins
-	client->print("\"rtcPins\":{");
-	client->print("\"dat\":");
-	client->print(config->rtc.dataPin);
-	client->print(",\"clk\":");
-	client->print(config->rtc.clockPin);
-	client->print(",\"rst\":");
-	client->print(config->rtc.resetPin);
-	client->print("},");
-
-	// C19 Network auth
-	client->print("\"auth\":{");
-	client->print("\"enabled\":");
-	client->print(config->auth.enabled ? "true" : "false");
-	client->print(",\"apiKey\":\"");
-	client->print(config->auth.apiKey);
-	client->print("\",\"hmacKey\":\"");
-	client->print(config->auth.hmacKey);
-	client->print("\"}");
 
 	client->print("}");
 }

@@ -75,6 +75,15 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
+                        <Button Text="Buzzer"
+                                Command="{Binding NavigateToXpdzToneSettingsCommand}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                Padding="4"
+                                BorderColor="Blue"
+                                BorderWidth="1"/>
                     </HorizontalStackLayout>
                 </Border>
 

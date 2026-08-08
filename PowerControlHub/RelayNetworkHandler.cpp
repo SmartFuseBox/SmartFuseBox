@@ -414,19 +414,23 @@ void RelayNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 	if (config != nullptr)
 	{
 		client->print(",\"homeMap\":[");
+
 		for (uint8_t i = 0; i < ConfigHomeButtons; i++)
 		{
 			if (i > 0)
 				client->print(",");
 			client->print(config->relay.homePageMapping[i]);
 		}
+
 		client->print("]");
 
 		client->print(",\"linked\":[");
+
 		for (uint8_t i = 0; i < ConfigMaxLinkedRelays; i++)
 		{
 			if (i > 0)
 				client->print(",");
+
 			client->print("[");
 			client->print(config->relay.linkedRelays[i][0]);
 			client->print(",");

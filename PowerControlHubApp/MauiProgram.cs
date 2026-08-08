@@ -111,6 +111,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<RtcSettingsViewModel>();
             builder.Services.AddTransient<NetworkSecurityViewModel>();
             builder.Services.AddTransient<NextionSettingsViewModel>();
+            builder.Services.AddTransient<XpdzToneSettingsViewModel>();
 
             // Pages
             builder.Services.AddSingleton<DashboardPage>();
@@ -128,6 +129,7 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<RtcSettingsPage>();
             builder.Services.AddTransient<NetworkSecurityPage>();
             builder.Services.AddTransient<NextionSettingsPage>();
+            builder.Services.AddTransient<XpdzToneSettingsPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

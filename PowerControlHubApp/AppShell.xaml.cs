@@ -16,6 +16,7 @@ namespace PowerControlHubApp
             Routing.RegisterRoute(nameof(RtcSettingsPage), typeof(RtcSettingsPage));
             Routing.RegisterRoute(nameof(NetworkSecurityPage), typeof(NetworkSecurityPage));
             Routing.RegisterRoute(nameof(NextionSettingsPage), typeof(NextionSettingsPage));
+            Routing.RegisterRoute(nameof(XpdzToneSettingsPage), typeof(XpdzToneSettingsPage));
         }
     }
 }

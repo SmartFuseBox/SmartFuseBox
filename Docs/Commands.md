@@ -246,7 +246,7 @@ WiFi commands return JSON (`{"success":true}` or `{"success":false,"message":"�
 | `R8` — Set Default State | `R8:3=1` | Power-on default state for relay `idx`: `0`=off, `1`=on. |
 | `R9` — Link Relays | `R9:3=4` (link) — `R9:3=255` (unlink) | Link two relays so toggling one toggles the other. `255` to unlink. |
 | `R10` — Set Action Type | `R10:2=0` / `R10:2=1` / `R10:2=2` | Set relay action type: `0`=Default, `1`=Horn (activates sound system), `2`=NightRelay (activates at night per light sensor). Only one relay per type at a time. |
-| `R11` — Set Pin | `R11:2=15` | Set GPIO pin for relay `idx`. Must be a valid non-zero pin number. |
+| `R11` — Set Pin | `R11:2=15` | Set GPIO pin for relay `idx`. Must be a valid non-zero pin number or 255 to disable |
 
 ### WiFi relay commands
 Route: `/api/relay/{command}`  

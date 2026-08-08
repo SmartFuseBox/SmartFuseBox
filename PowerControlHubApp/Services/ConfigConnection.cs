@@ -681,6 +681,20 @@ namespace PowerControlHubApp.Services
             }
         }
 
+        public async Task<bool> SetXpdzTonePinAsync(int pin, CancellationToken ct = default)
+        {
+            try
+            {
+                string url = $"{RouteConfigXpdzTone}?v={pin}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return response.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<AuthConfigModel> GetAuthConfigAsync(CancellationToken ct = default)
         {
             try
