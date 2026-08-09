@@ -202,7 +202,7 @@ public sealed class SdCardSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = SdCardMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

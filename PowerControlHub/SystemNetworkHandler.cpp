@@ -23,6 +23,8 @@
 #include "SystemFunctions.h"
 #include "FirmwareVersion.h"
 #include "PinGuard.h"
+#include "LocationConfig.h"
+#include <cstddef>
 
 #if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
 #include "OtaManager.h"
@@ -58,22 +60,30 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 		formatStatusJson(responseBuffer, bufferSize);
 		return CommandResult::ok();
 	}
-	else if (SystemFunctions::commandMatches(command, SystemPinUsage))
+	else if (SystemFunctions::commandMatches(command, SystemLocationTypes))
 	{
-		uint8_t pins[64];
-		uint8_t count = SystemFunctions::getUsedPins(pins, sizeof(pins));
-
 		size_t pos = 0;
 		int written = snprintf(responseBuffer + pos, bufferSize - pos,
-			"\"success\":true,\"command\":\"%s\",\"pins\":[", command);
+			"\"success\":true,\"command\":\"%s\",\"locations\":[",
+			command);
 
 		if (written > 0)
 			pos += (size_t)written;
 
-		for (uint8_t i = 0; i < count && pos < bufferSize; ++i)
+		size_t cnt = sizeof(LocationTypeDescriptors) / sizeof(LocationTypeDescriptors[0]);
+
+		for (size_t i = 0; i < cnt && pos < bufferSize; ++i)
 		{
+			const auto& d = LocationTypeDescriptors[i];
+			if (d.description == nullptr)
+				continue;
+
 			written = snprintf(responseBuffer + pos, bufferSize - pos,
-				"%s%u", (i > 0) ? "," : "", (unsigned)pins[i]);
+				"%s{\"id\":%u,\"type\":\"%u\",\"description\":\"%s\"}",
+				(pos > 0 && responseBuffer[pos - 1] != '[') ? "," : "",
+				(unsigned)d.id,
+				static_cast<uint8_t>(d.subType),
+				d.description);
 
 			if (written > 0)
 				pos += (size_t)written;
@@ -89,86 +99,60 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 
 		return CommandResult::ok();
 	}
-	else if (SystemFunctions::commandMatches(command, SystemPinRestrictions))
+	else if (SystemFunctions::commandMatches(command, SystemSetDateTime))
 	{
-		uint8_t tableSize = PinGuard::getPinTableSize();
-		uint8_t hardPins[64];
-		uint8_t advisoryPins[64];
-		uint8_t hardCount = 0;
-		uint8_t advisoryCount = 0;
-
-		for (uint8_t i = 0; i < tableSize; ++i)
+		const char* tsStr = nullptr;
+		for (uint8_t i = 0; i < paramCount; ++i)
 		{
-			uint8_t pin;
-			PinCategory category;
-			PinGuard::getPinTableEntry(i, pin, category);
-
-			if (category == PinCategory::Hard)
-				hardPins[hardCount++] = pin;
-			else if (category == PinCategory::Advisory)
-				advisoryPins[advisoryCount++] = pin;
-		}
-
-		size_t pos = 0;
-
-		int written = snprintf(responseBuffer + pos, bufferSize - pos,
-			"\"success\":true,\"command\":\"%s\"", command);
-
-		if (written > 0)
-			pos += (size_t)written;
-
-		// Hard pins array
-		if (hardCount > 0 && pos < bufferSize)
-		{
-			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"hard\":[");
-
-			if (written > 0)
-				pos += (size_t)written;
-
-			for (uint8_t i = 0; i < hardCount && pos < bufferSize; ++i)
+			if (strcmp(params[i].key, ValueParamName) == 0)
 			{
-				written = snprintf(responseBuffer + pos, bufferSize - pos,
-					"%s%u", (i > 0) ? "," : "", (unsigned)hardPins[i]);
-
-				if (written > 0)
-					pos += (size_t)written;
-				else
-					break;
+				tsStr = params[i].value;
+				break;
 			}
-
-			if (pos < bufferSize)
-				responseBuffer[pos++] = ']';
 		}
 
-		// Advisory pins array
-		if (advisoryCount > 0 && pos < bufferSize)
+		if (tsStr)
 		{
-			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"advisory\":[");
-
-			if (written > 0)
-				pos += (size_t)written;
-
-			for (uint8_t i = 0; i < advisoryCount && pos < bufferSize; ++i)
+			uint64_t timestamp = static_cast<uint64_t>(strtoull(tsStr, nullptr, 0));
+			if (timestamp > 0)
 			{
-				written = snprintf(responseBuffer + pos, bufferSize - pos,
-					"%s%u", (i > 0) ? "," : "", (unsigned)advisoryPins[i]);
-
-				if (written > 0)
-					pos += (size_t)written;
-				else
-					break;
+				DateTimeManager::setDateTime(timestamp);
+				char dateTimeStr[DateTimeBufferLength];
+				DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr));
+				snprintf(responseBuffer, bufferSize,
+					"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
+					command, dateTimeStr);
 			}
-
-			if (pos < bufferSize)
-				responseBuffer[pos++] = ']';
+			else
+			{
+				snprintf(responseBuffer, bufferSize,
+					"\"success\":false,\"error\":\"Invalid timestamp\"");
+			}
 		}
-
-		if (pos < bufferSize)
-			responseBuffer[pos] = '\0';
-
+		else
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":false,\"error\":\"Missing v parameter\"");
+		}
 		return CommandResult::ok();
 	}
-	#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
+	else if (SystemFunctions::commandMatches(command, SystemGetDateTime))
+	{
+		char dateTimeStr[DateTimeBufferLength];
+		if (DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr)))
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
+				command, dateTimeStr);
+		}
+		else
+		{
+			snprintf(responseBuffer, bufferSize,
+				"\"success\":false,\"error\":\"Date/time not set\"");
+		}
+		return CommandResult::ok();
+	}
+#if defined(OTA_AUTO_UPDATE) && defined(ESP32) && defined(WIFI_SUPPORT)
 	else if (SystemFunctions::commandMatches(command, SystemCheckForUpdate))
 	{
 		if (!_otaManager)
@@ -290,57 +274,114 @@ CommandResult SystemNetworkHandler::handleRequest(const char* method,
 		return CommandResult::ok();
 	}
 #endif // OTA_AUTO_UPDATE
-	else if (SystemFunctions::commandMatches(command, SystemGetDateTime))
+	else if (SystemFunctions::commandMatches(command, SystemPinUsage))
 	{
-		char dateTimeStr[DateTimeBufferLength];
-		if (DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr)))
+		uint8_t pins[64];
+		uint8_t count = SystemFunctions::getUsedPins(pins, sizeof(pins));
+
+		size_t pos = 0;
+		int written = snprintf(responseBuffer + pos, bufferSize - pos,
+			"\"success\":true,\"command\":\"%s\",\"pins\":[", command);
+
+		if (written > 0)
+			pos += (size_t)written;
+
+		for (uint8_t i = 0; i < count && pos < bufferSize; ++i)
 		{
-			snprintf(responseBuffer, bufferSize,
-				"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
-				command, dateTimeStr);
-		}
-		else
-		{
-			snprintf(responseBuffer, bufferSize,
-				"\"success\":false,\"error\":\"Date/time not set\"");
-		}
-		return CommandResult::ok();
-	}
-	else if (SystemFunctions::commandMatches(command, SystemSetDateTime))
-	{
-		const char* tsStr = nullptr;
-		for (uint8_t i = 0; i < paramCount; ++i)
-		{
-			if (strcmp(params[i].key, ValueParamName) == 0)
-			{
-				tsStr = params[i].value;
+			written = snprintf(responseBuffer + pos, bufferSize - pos,
+				"%s%u", (i > 0) ? "," : "", (unsigned)pins[i]);
+
+			if (written > 0)
+				pos += (size_t)written;
+			else
 				break;
-			}
 		}
 
-		if (tsStr)
+		if (pos < bufferSize)
 		{
-			uint64_t timestamp = static_cast<uint64_t>(strtoull(tsStr, nullptr, 0));
-			if (timestamp > 0)
-			{
-				DateTimeManager::setDateTime(timestamp);
-				char dateTimeStr[DateTimeBufferLength];
-				DateTimeManager::formatDateTime(dateTimeStr, sizeof(dateTimeStr));
-				snprintf(responseBuffer, bufferSize,
-					"\"success\":true,\"command\":\"%s\",\"v\":\"%s\"",
-					command, dateTimeStr);
-			}
-			else
-			{
-				snprintf(responseBuffer, bufferSize,
-					"\"success\":false,\"error\":\"Invalid timestamp\"");
-			}
+			responseBuffer[pos++] = ']';
+			responseBuffer[pos] = '\0';
 		}
-		else
+
+		return CommandResult::ok();
+	}
+	else if (SystemFunctions::commandMatches(command, SystemPinRestrictions))
+	{
+		uint8_t tableSize = PinGuard::getPinTableSize();
+		uint8_t hardPins[64]{};
+		uint8_t advisoryPins[64]{};
+		uint8_t hardCount = 0;
+		uint8_t advisoryCount = 0;
+
+		for (uint8_t i = 0; i < tableSize; ++i)
 		{
-			snprintf(responseBuffer, bufferSize,
-				"\"success\":false,\"error\":\"Missing v parameter\"");
+			uint8_t pin;
+			PinCategory category;
+			PinGuard::getPinTableEntry(i, pin, category);
+
+			if (category == PinCategory::Hard)
+				hardPins[hardCount++] = pin;
+			else if (category == PinCategory::Advisory)
+				advisoryPins[advisoryCount++] = pin;
 		}
+
+		size_t pos = 0;
+
+		int written = snprintf(responseBuffer + pos, bufferSize - pos,
+			"\"success\":true,\"command\":\"%s\"", command);
+
+		if (written > 0)
+			pos += (size_t)written;
+
+		// Hard pins array
+		if (hardCount > 0 && pos < bufferSize)
+		{
+			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"hard\":[");
+
+			if (written > 0)
+				pos += (size_t)written;
+
+			for (uint8_t i = 0; i < hardCount && pos < bufferSize; ++i)
+			{
+				written = snprintf(responseBuffer + pos, bufferSize - pos,
+					"%s%u", (i > 0) ? "," : "", (unsigned)hardPins[i]);
+
+				if (written > 0)
+					pos += (size_t)written;
+				else
+					break;
+			}
+
+			if (pos < bufferSize)
+				responseBuffer[pos++] = ']';
+		}
+
+		// Advisory pins array
+		if (advisoryCount > 0 && pos < bufferSize)
+		{
+			written = snprintf(responseBuffer + pos, bufferSize - pos, ",\"advisory\":[");
+
+			if (written > 0)
+				pos += (size_t)written;
+
+			for (uint8_t i = 0; i < advisoryCount && pos < bufferSize; ++i)
+			{
+				written = snprintf(responseBuffer + pos, bufferSize - pos,
+					"%s%u", (i > 0) ? "," : "", (unsigned)advisoryPins[i]);
+
+				if (written > 0)
+					pos += (size_t)written;
+				else
+					break;
+			}
+
+			if (pos < bufferSize)
+				responseBuffer[pos++] = ']';
+		}
+
+		if (pos < bufferSize)
+			responseBuffer[pos] = '\0';
+
 		return CommandResult::ok();
 	}
 	else
@@ -408,7 +449,7 @@ void SystemNetworkHandler::formatStatusJson(char* buffer, size_t size)
 
 void SystemNetworkHandler::formatWifiStatusJson(IWifiClient* client)
 {
-	char buffer[MaximumJsonResponseBufferSize];
+	char buffer[MaximumJsonResponseBufferSize]{};
 	buffer[0] = '\0';
 
 	formatStatusJson(buffer, sizeof(buffer));

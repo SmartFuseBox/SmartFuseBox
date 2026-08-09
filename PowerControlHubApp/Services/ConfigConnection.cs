@@ -92,6 +92,7 @@ namespace PowerControlHubApp.Services
                         TryPublishFailure(command, LogConfigFailureResponse);
                     }
                 }
+
                 catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 {
                     break;
@@ -483,6 +484,31 @@ namespace PowerControlHubApp.Services
             {
                 return false;
             }
+        }
+
+        public async Task<bool> SetLocationTypeAsync(int type, CancellationToken ct = default)
+        {
+            return await PostConfigValueAsync(RouteConfigBoatType, type.ToString(), ct);
+        }
+
+        public async Task<bool> SetMmsiAsync(string mmsi, CancellationToken ct = default)
+        {
+            return await PostConfigValueAsync(RouteConfigMmsi, mmsi, ct);
+        }
+
+        public async Task<bool> SetCallSignAsync(string callSign, CancellationToken ct = default)
+        {
+            return await PostConfigValueAsync(RouteConfigCallSign, callSign, ct);
+        }
+
+        public async Task<bool> SetHomePortAsync(string homePort, CancellationToken ct = default)
+        {
+            return await PostConfigValueAsync(RouteConfigHomePort, homePort, ct);
+        }
+
+        public async Task<bool> SetLocationNameAsync(string name, CancellationToken ct = default)
+        {
+            return await PostConfigValueAsync(RouteConfigRename, name, ct);
         }
 
         public async Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default)
@@ -912,6 +938,20 @@ namespace PowerControlHubApp.Services
                 // fall through
             }
             return null;
+        }
+
+        private async Task<bool> PostConfigValueAsync(string route, string value, CancellationToken ct)
+        {
+            try
+            {
+                string url = $"{route}?v={Uri.EscapeDataString(value)}";
+                HttpResponseMessage response = await _client.PostAsync(url, null, ct);
+                return await IsSuccessResponseAsync(response, ct);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private async Task<bool> SetConfigValueAsync(string route, int value, CancellationToken ct)

@@ -245,7 +245,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (anyFailed)
-                    StatusMessage = NextionMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 else
                     StatusMessage = NextionMsgSaved;
 
@@ -256,7 +256,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = NextionMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

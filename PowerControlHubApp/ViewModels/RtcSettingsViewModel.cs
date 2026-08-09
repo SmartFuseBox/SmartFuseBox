@@ -145,7 +145,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
             {
                 if (pinsFailed)
                 {
-                    StatusMessage = RtcMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 }
                 else
                 {
@@ -159,7 +159,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = RtcMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

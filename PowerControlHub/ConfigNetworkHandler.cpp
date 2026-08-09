@@ -603,7 +603,16 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C21 - Set MMSI
 		if (paramCount >= 1)
 		{
-			result = _configController->setMmsi(params[0].value);
+			const char* mmsi = getParamValue(params, paramCount, "v");
+
+			if (mmsi == nullptr || strlen(mmsi) != 9 || !SystemFunctions::isAllDigits(mmsi))
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				result = _configController->setMmsi(mmsi);
+			}
 		}
 		else
 		{
@@ -615,7 +624,16 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C22 - Set call sign
 		if (paramCount >= 1)
 		{
-			result = _configController->setCallSign(params[0].value);
+			const char* callSign = getParamValue(params, paramCount, "v");
+
+			if (callSign == nullptr || strlen(callSign) > ConfigCallSignLength)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				result = _configController->setCallSign(callSign);
+			}
 		}
 		else
 		{
@@ -627,7 +645,16 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 		// C23 - Set home port
 		if (paramCount >= 1)
 		{
-			result = _configController->setHomePort(params[0].value);
+			const char* homePort = getParamValue(params, paramCount, "v");
+
+			if (homePort == nullptr || strlen(homePort) > ConfigHomePortLength)
+			{
+				result = ConfigResult::InvalidParameter;
+			}
+			else
+			{
+				result = _configController->setHomePort(homePort);
+			}
 		}
 		else
 		{
@@ -1005,6 +1032,7 @@ CommandResult ConfigNetworkHandler::handleRequest(const char* method,
 
 	if (result == ConfigResult::Success)
 	{
+		formatJsonResponse(responseBuffer, bufferSize, true, "");
 		return CommandResult::ok();
 	}
 

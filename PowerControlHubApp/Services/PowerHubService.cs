@@ -26,7 +26,9 @@ public class PowerHubService
     private readonly IDashboardConnection _dashboardConnection;
     private readonly IConfigConnection _configConnection;
 
-    public PowerHubService(IDashboardConnection dashboardConnection, IConfigConnection configConnection, IMessageBus messageBus)
+    public PowerHubService(IDashboardConnection dashboardConnection,
+        IConfigConnection configConnection,
+        IMessageBus messageBus)
     {
         _dashboardConnection = dashboardConnection ?? throw new ArgumentNullException(nameof(dashboardConnection));
         _configConnection = configConnection ?? throw new ArgumentNullException(nameof(configConnection));
@@ -56,6 +58,11 @@ public class PowerHubService
     public Task<SystemPinsResponseModel> GetSystemPinsAsync(CancellationToken ct = default)
     {
         return _dashboardConnection.GetSystemPinsAsync(ct);
+    }
+
+    public Task<SystemLocationTypesResponseModel> GetSystemLocationTypesAsync(CancellationToken ct = default)
+    {
+        return _dashboardConnection.GetSystemLocationTypesAsync(ct);
     }
 
     public Task<SystemPinRestrictionsResponseModel> GetSystemPinRestrictionsAsync(CancellationToken ct = default)
@@ -206,6 +213,31 @@ public class PowerHubService
     public Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default)
     {
         return _configConnection.SetTimezoneOffsetAsync(offsetHours, ct);
+    }
+
+    public Task<bool> SetLocationTypeAsync(int type, CancellationToken ct = default)
+    {
+        return _configConnection.SetLocationTypeAsync(type, ct);
+    }
+
+    public Task<bool> SetMmsiAsync(string mmsi, CancellationToken ct = default)
+    {
+        return _configConnection.SetMmsiAsync(mmsi, ct);
+    }
+
+    public Task<bool> SetCallSignAsync(string callSign, CancellationToken ct = default)
+    {
+        return _configConnection.SetCallSignAsync(callSign, ct);
+    }
+
+    public Task<bool> SetHomePortAsync(string homePort, CancellationToken ct = default)
+    {
+        return _configConnection.SetHomePortAsync(homePort, ct);
+    }
+
+    public Task<bool> SetLocationNameAsync(string name, CancellationToken ct = default)
+    {
+        return _configConnection.SetLocationNameAsync(name, ct);
     }
 
     public Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default)

@@ -267,7 +267,7 @@ public sealed class MqttSettingsViewModel : BaseViewModel
 
                 if (anyFailed)
                 {
-                    StatusMessage = MqttMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 }
                 else
                 {
@@ -281,7 +281,7 @@ public sealed class MqttSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = MqttMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

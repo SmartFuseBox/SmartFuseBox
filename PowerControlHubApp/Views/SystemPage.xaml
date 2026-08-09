@@ -39,6 +39,15 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
+                        <Button Text="Location"
+                                Command="{Binding NavigateToLocationSettingsCommand}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="{DynamicResource AppAccent}"
+                                Padding="4"
+                                BorderColor="Blue"
+                                BorderWidth="1"/>
                         <Button Text="MQTT"
                                 Command="{Binding NavigateToMqttSettingsCommand}"
                                 FontSize="16"

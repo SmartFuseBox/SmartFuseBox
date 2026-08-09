@@ -164,11 +164,11 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
             {
                 if (enableFailed && apiKeyFailed && hmacKeyFailed)
                 {
-                    StatusMessage = NetworkSecurityMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 }
                 else if (enableFailed || apiKeyFailed || hmacKeyFailed)
                 {
-                    StatusMessage = NetworkSecurityMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 }
                 else
                 {
@@ -182,7 +182,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = NetworkSecurityMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
