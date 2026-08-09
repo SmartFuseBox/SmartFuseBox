@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
@@ -177,6 +177,7 @@
     <ClInclude Include="IWifiClient.h" />
     <ClInclude Include="IWifiController.h" />
     <ClInclude Include="IWifiRadio.h" />
+    <ClInclude Include="LocationConfig.h" />
     <ClInclude Include="MicroSdDriver.h" />
     <ClInclude Include="MQTTConfigCommandHandler.h" />
     <ClInclude Include="MQTTHandler.h" />
@@ -293,6 +294,14 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PowerControlHubApp\Models\Json\SystemLocationTypesResponseModel.cs" />
+    <None Include="PowerControlHubApp\ViewModels\LocationSettingsViewModel.cs" />
+    <None Include="PowerControlHubApp\Views\LocationSettingsPage.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="PowerControlHubApp\Views\LocationSettingsPage.xaml" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

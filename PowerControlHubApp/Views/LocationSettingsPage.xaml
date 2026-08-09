@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             x:Class="PowerControlHubApp.Views.LocationSettingsPage"
+             Title="Location Settings"
+             BackgroundColor="{DynamicResource AppPageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
+
+        <views:TopBarView Grid.Row="0" Title="Location Settings" ShowBackButton="True" />
+
+        <views:NotConnectedBanner Grid.Row="1" />
+
+        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+            <VerticalStackLayout Padding="20" Spacing="12">
+
+                <!-- Location Name -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Name"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Entry Text="{Binding LocationName}"
+                               Placeholder="Location name..."
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Location type -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Location Type"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontAttributes="Bold"
+                               FontSize="13" />
+
+                        <Picker ItemsSource="{Binding LocationTypes}"
+                                ItemDisplayBinding="{Binding Description}"
+                                SelectedIndex="{Binding SelectedIndex}"
+                                Title="Select location type..."
+                                Unfocused="OnPickerUnfocused" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Boat-specific fields (MMSI / CallSign / HomePort) -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}"
+                        Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14"
+                        Margin="0,8,0,0"
+                        IsVisible="{Binding IsBoat}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Boat Details"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="13" />
+                        <Label Text="MMSI"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="11" />
+                        <Entry Text="{Binding Mmsi}"
+                               Placeholder="MMSI"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               ClearButtonVisibility="WhileEditing"
+                               Keyboard="Numeric"
+                               MaxLength="9" />
+
+                        <Label Text="Call Sign"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="11" />
+                        <Entry Text="{Binding CallSign}"
+                               Placeholder="Call Sign"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               ClearButtonVisibility="WhileEditing"
+                               MaxLength="9" />
+
+                        <Label Text="Home Port"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="11" />
+                        <Entry Text="{Binding HomePort}"
+                               Placeholder="Home Port"
+                               TextColor="{DynamicResource AppEntryText}"
+                               PlaceholderColor="{DynamicResource AppPlaceholderText}"
+                               BackgroundColor="{DynamicResource AppEntryBg}"
+                               ClearButtonVisibility="WhileEditing" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Save"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="{DynamicResource AppAccent}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Padding="10,8" />
+
+                <Label Text="{Binding StatusMessage}"
+                       TextColor="{DynamicResource AppAccent}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="{Binding HasStatus}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <views:StatusBarView Grid.Row="3" />
+    </Grid>
+
+</views:BasePowerControlHubContentPage>

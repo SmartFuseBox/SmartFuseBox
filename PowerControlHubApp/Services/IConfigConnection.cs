@@ -73,5 +73,10 @@ namespace PowerControlHubApp.Services
         Task<bool> SetNextionTxPinAsync(int pin, CancellationToken ct = default);
         Task<bool> SetNextionBaudRateAsync(int baudRate, CancellationToken ct = default);
         Task<bool> SetNextionUartNumberAsync(int uartNumber, CancellationToken ct = default);
+        Task<bool> SetLocationTypeAsync(int type, CancellationToken ct = default);
+        Task<bool> SetMmsiAsync(string mmsi, CancellationToken ct = default);
+        Task<bool> SetCallSignAsync(string callSign, CancellationToken ct = default);
+        Task<bool> SetHomePortAsync(string homePort, CancellationToken ct = default);
+        Task<bool> SetLocationNameAsync(string name, CancellationToken ct = default);
     }
 }

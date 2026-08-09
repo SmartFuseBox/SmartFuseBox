@@ -119,7 +119,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
             {
                 if (pinFailed)
                 {
-                    StatusMessage = XpdzToneMsgSaveFailed;
+                    StatusMessage = SaveFailed;
                 }
                 else
                 {
@@ -133,7 +133,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = XpdzToneMsgSaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

@@ -198,32 +198,41 @@
         public const string RouteSystemPinRestrictions = "api/system/F16";
         public const string RouteSystemGetDateTime = "api/system/F7";
         public const string RouteSystemSetDateTime = "api/system/F6";
+        public const string RouteSystemLocationTypes = "api/system/F17";
         public const string RouteConfigTimezoneOffset = "api/config/C20";
+        public const string RouteConfigBoatType = "api/config/C7";
+        public const string RouteConfigRename = "api/config/C3";
+        public const string RouteConfigMmsi = "api/config/C21";
+        public const string RouteConfigCallSign = "api/config/C22";
+        public const string RouteConfigHomePort = "api/config/C23";
         public const string RouteConfigSdCardSpiPins = "api/config/C4";
         public const string RouteConfigSdCardInitSpeed = "api/config/C31";
         public const string RouteConfigSdCardCsPin = "api/config/C32";
+
+        public const string SaveFailed = "Save failed — device unreachable";
+
         // RTC config
         public const string RouteConfigRtc = "api/config/C18";
         public const string RouteRtcSettingsPage = "RtcSettingsPage";
-        public const string RtcMsgSaveFailed = "Save failed — device unreachable";
+        public const string RouteLocationSettingsPage = "LocationSettingsPage";
         public const string RtcMsgSaved = "RTC settings saved";
         public const string RtcMsgRefreshed = "Refreshed";
         public const string JsonRtcDataPin = "dat";
         public const string JsonRtcClockPin = "clk";
         public const string JsonRtcResetPin = "rst";
         public const int RtcPinDisabled = 255;
+
         // XpdzTone / Buzzer config
         public const string RouteConfigXpdzTone = "api/config/C6";
         public const string RouteXpdzToneSettingsPage = "XpdzToneSettingsPage";
-        public const string XpdzToneMsgSaveFailed = "Save failed — device unreachable";
         public const string XpdzToneMsgSaved = "Buzzer settings saved";
         public const string XpdzToneMsgRefreshed = "Refreshed";
         public const string JsonXpdzPin = "xpdzPin";
+
         // Nextion display config
         public const string RouteConfigNextionGet = "api/config/N0";
         public const string RouteConfigNextionSetFormat = "api/config/N{0}?v={1}";
         public const string RouteNextionSettingsPage = "NextionSettingsPage";
-        public const string NextionMsgSaveFailed = "Save failed — device unreachable";
         public const string NextionMsgSaved = "Nextion settings saved";
         public const string NextionMsgRefreshed = "Refreshed";
         public const string NextionUart1 = "UART1";
@@ -240,6 +249,7 @@
         public const string NextionRouteN4 = "api/config/N4";
         public const string NextionRouteN5 = "api/config/N5";
         public const string NextionRouteN6 = "api/config/N6";
+
         // Nextion JSON property names (N0 response)
         public const string NextionJsonN1 = "n1";
         public const string NextionJsonN2 = "n2";
@@ -259,11 +269,13 @@
         public const string NextionJsonTx = "tx";
         public const string NextionJsonBaud = "baud";
         public const string NextionJsonUart = "uart";
+
         public const string RouteConfigAuth = "api/config/C19";
         public const string ConfigAuthEnabledParam = "e";
         public const string ConfigAuthApiKeyParam = "k";
         public const string ConfigAuthHmacKeyParam = "h";
         public const string ConfigAuthGenerateParam = "g";
+
         public const string RouteConfigMqttGet = "api/mqtt/{0}";
         public const string RouteConfigMqttSet = "api/mqtt/{0}?v={1}";
         public const string MqttConfigEnabled = "M0";
@@ -278,9 +290,7 @@
         public const string MqttConfigDiscoveryPrefix = "M9";
         public const string MqttConnectedLabel = "Connected";
         public const string MqttDisconnectedLabel = "Disconnected";
-        public const string MqttMsgSaveFailed = "Save failed — device unreachable";
         public const string MqttMsgSaved = "MQTT settings saved";
-        public const string SdCardMsgSaveFailed = "Save failed — device unreachable";
         public const string SdCardMsgSaved = "SD Card settings saved";
         public const string SdCardMsgPartiallySaved = "⚠ Partially saved — SPI pins rejected (check for pin conflicts)";
         public const string SdCardMsgSpiFailed = "⚠ SPI pins not saved (pin conflict or invalid pin)";
@@ -290,7 +300,6 @@
         public const string SdCardConfigSpiPins = "C4";
         public const string SdCardConfigInitSpeed = "C31";
         public const string SdCardConfigCsPin = "C32";
-        public const string NetworkSecurityMsgSaveFailed = "Save failed — device unreachable";
         public const string NetworkSecurityMsgSaved = "Network security settings saved";
         public const string NetworkSecurityMsgKeysGenerated = "New keys generated and saved";
         public const string NetworkSecurityMsgRefreshed = "Refreshed";
@@ -526,6 +535,9 @@
         public const string LogStartupMetaFetch = "Startup: first dashboard data received, fetching sensor meta on connection 2.";
         public const string LogStartupMetaPopulated = "Startup: sensor meta cache populated.";
         public const string LogStartupMetaAlready = "Startup: dashboard data already available, fetching sensor meta on connection 2.";
+
+
+        public const string LocationTypeBoat = "boat";
 
         public const string NullByte = "0x00";
         public const string NibbleZero = "0x0";

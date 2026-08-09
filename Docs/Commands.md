@@ -61,6 +61,7 @@ These are commands used to configure the system settings and can only be sent fr
 | `F14` — PinGuard Mode | `F14` or `F14:a=true` or `F14:a=false;b=false` | Read or write the persistent PinGuard mode flags stored in `SystemHeader::pinGuardFlags`. **Params:** `a=<bool>` — AllowAdvisory: when `true`, advisory (strapping/UART) pins are permitted. `b=<bool>` — Bypass: when `true`, all PinGuard checks are skipped (no validation at all). If both `a` and `b` are `true`, Bypass takes precedence and the system returns `Safe` immediately. Changes are persisted immediately via `saveHeader()` and take effect at runtime without reboot. **Response:** `a=<0\|1>` current AllowAdvisory state, `b=<0\|1>` current Bypass state. No params = read-only. |
 | `F15` — Pin Usage | `F15` | Returns a list of all GPIO pins currently assigned in configuration. Pins set to `0xFF` (disabled / not fitted) are omitted. **Serial response:** `v=pin1,pin2,...` (single frame). **WiFi response:** JSON object with a `pins` array. No params. |
 | `F16` — Pin Restrictions | `F16` | Returns the compile-time pin restriction table for the current target MCU. Pins are classified as `Hard` (always blocked, e.g. flash-reserved, PSRAM) or `Advisory` (strapping, UART0, USB, JTAG — usable only when PinGuard AllowAdvisory is enabled). **Serial response:** one line per pin as `pin - category` followed by `ACK:F16=ok`. **WiFi response:** JSON object with `"hard"` and `"advisory"` integer arrays. No params. |
+| `F17` — Location Types | `F17` | Returns all `LocationType` enum values as descriptors. Each entry has `id` (uint8), `type` (`boat` or `other`), and `desc` (human-readable name). **Serial response:** one line per descriptor as `F17:id=<id>;type=<boat\|other>;desc=<name>` followed by `ACK:F17=ok`. **WiFi response:** JSON object with `"success"`, `"command"`, and `"locations"` array of `{"id", "type", "description"}` objects. No params. |
 
 
 **OTA behaviour (F12 / F13):**
@@ -103,9 +104,9 @@ Example: `GET /api/system/F2`
 | `C18` — RTC Pins | `C18:dat=4;clk=5;rst=6` | Set DS1302 RTC pins. Use `255` for any pin not fitted. Call `C0` to persist. |
 | `C19` — Network Authentication | `C19:e=1;k=MyApiKey;h=MyHmacKey` or `C19:g=1` | Configure WiFi API authentication. **Params:** `e=<0\|1>` enable/disable auth (disabled by default). `k=<key>` set API key (max 31 chars). `h=<key>` set HMAC-SHA256 key (max 31 chars). `g=1` auto-generate device-unique keys from the WiFi MAC address. No params returns current state as `e=<0\|1>;k=<apiKey>;h=<hmacKey>`. Call `C0` to persist. When enabled, all `/api/*` endpoints require either an `X-API-Key` header matching the configured key, or valid `X-Auth-Timestamp` + `X-Auth-Signature` HMAC headers. See [Network Authentication](#network-authentication) below. |
 | `C20` — Timezone Offset | `C20:v=-5` | Set UTC timezone offset in hours. Valid range: −12 to +14. |
-| `C21` — MMSI | `C21:123456789` | Set 9-digit Maritime Mobile Service Identity. Value directly. |
-| `C22` — Call Sign | `C22:ABCD123` | Set location call sign. Value directly, truncated to max length. |
-| `C23` — Home Port | `C23:Miami` | Set location home port. Value directly, truncated to max length. |
+| `C21` — MMSI | `C21:v=123456789` | Set 9-digit Maritime Mobile Service Identity. Value directly. |
+| `C22` — Call Sign | `C22:v=ABCD123` | Set location call sign. Value directly, truncated to max length. |
+| `C23` — Home Port | `C23:v=Miami` | Set location home port. Value directly, truncated to max length. |
 | `C24` — LED Color | `C24:t=0;c=0;r=255;g=50;b=213` | Set LED RGB color. `t`: `0`=day, `1`=night. `c`: `0`=good, `1`=bad. RGB values 0–255. |
 | `C25` — LED Brightness | `C25:t=0;b=75` | Set LED brightness 0–100. `t`: `0`=day, `1`=night. |
 | `C26` — LED Auto Switch | `C26:v=1` | Enable/disable automatic day/night LED switching. |

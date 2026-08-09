@@ -11,6 +11,8 @@ namespace PowerControlHubApp.Services
 
         Task<SystemPinRestrictionsResponseModel> GetSystemPinRestrictionsAsync(CancellationToken ct = default);
 
+        Task<SystemLocationTypesResponseModel> GetSystemLocationTypesAsync(CancellationToken ct = default);
+
         Task<List<string>> GetWarningsAsync(CancellationToken ct = default);
     }
 }

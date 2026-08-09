@@ -177,6 +177,16 @@ public class ConfigPoller : IConfigConnection, IDisposable
 
     public Task<bool> SetTimezoneOffsetAsync(int offsetHours, CancellationToken ct = default) => _connection.SetTimezoneOffsetAsync(offsetHours, ct);
 
+    public Task<bool> SetLocationTypeAsync(int type, CancellationToken ct = default) => _connection.SetLocationTypeAsync(type, ct);
+
+    public Task<bool> SetMmsiAsync(string mmsi, CancellationToken ct = default) => _connection.SetMmsiAsync(mmsi, ct);
+
+    public Task<bool> SetCallSignAsync(string callSign, CancellationToken ct = default) => _connection.SetCallSignAsync(callSign, ct);
+
+    public Task<bool> SetHomePortAsync(string homePort, CancellationToken ct = default) => _connection.SetHomePortAsync(homePort, ct);
+
+    public Task<bool> SetLocationNameAsync(string name, CancellationToken ct = default) => _connection.SetLocationNameAsync(name, ct);
+
     public Task<bool?> GetMqttEnabledAsync(CancellationToken ct = default) => _connection.GetMqttEnabledAsync(ct);
 
     public Task<bool> SetMqttEnabledAsync(bool enabled, CancellationToken ct = default) => _connection.SetMqttEnabledAsync(enabled, ct);

@@ -58,6 +58,12 @@ namespace PowerControlHubApp.Services
             return JsonSerializer.Deserialize<SystemPinRestrictionsResponseModel>(json, JsonOptions);
         }
 
+        public async Task<SystemLocationTypesResponseModel> GetSystemLocationTypesAsync(CancellationToken ct = default)
+        {
+            string json = await _client.GetStringAsync(RouteSystemLocationTypes, ct);
+            return JsonSerializer.Deserialize<SystemLocationTypesResponseModel>(json, JsonOptions);
+        }
+
         public async Task<IndexModel> GetDashboardDataAsync(CancellationToken ct = default)
         {
             string json = await _client.GetStringAsync(RouteApiIndex, ct);

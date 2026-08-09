@@ -44,6 +44,7 @@ constexpr char SystemOtaStatus[] = "F13";
 constexpr char SystemPinGuardMode[] = "F14";
 constexpr char SystemPinUsage[] = "F15";
 constexpr char SystemPinRestrictions[] = "F16";
+constexpr char SystemLocationTypes[] = "F17";
 constexpr char SystemPageDemo[] = "F150";
 
 constexpr char RelayTurnAllOff[] = "R0";

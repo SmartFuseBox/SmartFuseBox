@@ -96,10 +96,6 @@ ConfigResult ConfigController::setLocationType(const uint8_t locationlType)
 {
 	if (_config == nullptr)
 		return ConfigResult::InvalidConfig;
-
-	if (locationlType > static_cast<uint8_t>(LocationType::Yacht))
-		return ConfigResult::InvalidParameter;
-
 	_config->location.locationType = static_cast<LocationType>(locationlType);
 	updateSoundControllerConfig();
 	return ConfigResult::Success;

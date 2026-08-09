@@ -82,5 +82,8 @@ namespace PowerControlHubApp.Models
 
         [JsonPropertyName("xpdzPin")]
         public int XpdzTonePin { get; set; }
+
+        [JsonPropertyName("locationType")]
+        public int LocationType { get; set; }
     }
 }

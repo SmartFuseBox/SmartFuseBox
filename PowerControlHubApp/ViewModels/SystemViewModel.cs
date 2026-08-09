@@ -117,6 +117,8 @@ public class SystemViewModel : BaseViewModel
 
     public ICommand NavigateToXpdzToneSettingsCommand { get; }
 
+    public ICommand NavigateToLocationSettingsCommand { get; }
+
     public SystemViewModel(PowerHubService service, LogService log)
         : base(service, log)
     {
@@ -130,6 +132,7 @@ public class SystemViewModel : BaseViewModel
         NavigateToNetworkSecurityCommand = new Command(async () => await Shell.Current.GoToAsync(RouteNetworkSecurityPage));
         NavigateToNextionSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteNextionSettingsPage));
         NavigateToXpdzToneSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteXpdzToneSettingsPage));
+        NavigateToLocationSettingsCommand = new Command(async () => await Shell.Current.GoToAsync(RouteLocationSettingsPage));
     }
 
     protected override void OnDataFetched(IndexModel index)

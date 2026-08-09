@@ -20,6 +20,7 @@
 #include "ConfigManager.h"
 #include "PinGuard.h"
 #include "DateTimeManager.h"
+#include "LocationConfig.h"
 #if defined(WIFI_SUPPORT)
 #include "WifiController.h"
 #endif
@@ -43,7 +44,8 @@ const char* const* SystemCommandHandler::supportedCommands(size_t& count) const
 		SystemHeartbeatCommand, SystemInitialized, SystemFreeMemory, SystemCpuUsage,
 		SystemBluetoothStatus, SystemWifiStatus, SystemSetDateTime, SystemGetDateTime,
 		SystemSdCardPresent, SystemSdCardLogFileSize, SystemRtcDiagnostic, SystemUptime,
-		SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode, SystemPinUsage, SystemPinRestrictions
+		SystemCheckForUpdate, SystemOtaStatus, SystemPinGuardMode, SystemPinUsage, 
+		SystemPinRestrictions, SystemLocationTypes
 	};
 	count = sizeof(cmds) / sizeof(cmds[0]);
 	return cmds;
@@ -79,14 +81,14 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 	}
 	else if (SystemFunctions::commandMatches(command, SystemFreeMemory))
 	{
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemFunctions::freeMemory());
 		sendAckOk(sender, command, &param);
 	}
 	else if (SystemFunctions::commandMatches(command, SystemCpuUsage))
 	{
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		snprintf_P(param.value, sizeof(param.value), PSTR("%u"), SystemCpuMonitor::getCpuUsage());
 		sendAckOk(sender, command, &param);
@@ -157,7 +159,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 
 		if (success)
 		{
-			StringKeyValue param;
+			StringKeyValue param{};
 			strncpy(param.key, ValueParamName, sizeof(param.key));
 			DateTimeManager::formatDateTime(param.value, sizeof(param.value));
 			sendAckOk(sender, command, &param);
@@ -174,7 +176,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 	{
 		if (DateTimeManager::isTimeSet())
 		{
-			StringKeyValue param;
+			StringKeyValue param{};
 			strncpy(param.key, ValueParamName, sizeof(param.key));
 			DateTimeManager::formatDateTime(param.value, sizeof(param.value));
 			sendAckOk(sender, command, &param);
@@ -211,7 +213,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		}
 #endif
 
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		snprintf_P(param.value, sizeof(param.value), PSTR("%lu"), (unsigned long)fileSize);
 		sendAckOk(sender, command, &param);
@@ -221,7 +223,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		char diagnosticMsg[64];
 
 		bool success = DateTimeManager::rtcDiagnostic(diagnosticMsg, sizeof(diagnosticMsg));
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		strncpy(param.value, diagnosticMsg, sizeof(param.value));
 
@@ -236,7 +238,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 	}
 	else if (SystemFunctions::commandMatches(command, SystemUptime))
 	{
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		TimeParts tp = SystemFunctions::msToTimeParts(SystemFunctions::millis64());
 		SystemFunctions::formatTimeParts(param.value, sizeof(param.value), tp);
@@ -285,7 +287,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			}
 
 			constexpr uint8_t argCount = 3;
-			StringKeyValue respParams[argCount];
+			StringKeyValue respParams[argCount]{};
 			strncpy(respParams[0].key, "v", sizeof(respParams[0].key));
 			strncpy(respParams[0].value, current, sizeof(respParams[0].value));
 			strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
@@ -350,7 +352,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		}
 
 		constexpr uint8_t argCount = 4;
-		StringKeyValue respParams[argCount];
+		StringKeyValue respParams[argCount]{};
 		strncpy(respParams[0].key, "v", sizeof(respParams[0].key));
 		strncpy(respParams[0].value, current, sizeof(respParams[0].value));
 		strncpy(respParams[1].key, "av", sizeof(respParams[1].key));
@@ -402,7 +404,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		// Read back current mode
 		SystemHeader* hdr = ConfigManager::getHeaderPtr();
 		constexpr uint8_t argCount = 2;
-		StringKeyValue respParams[argCount];
+		StringKeyValue respParams[argCount]{};
 		strncpy(respParams[0].key, "a", sizeof(respParams[0].key));
 		respParams[0].value[0] = (hdr && (hdr->pinGuardFlags & PinGuardMode::AllowAdvisory)) ? '1' : '0';
 		respParams[0].value[1] = '\0';
@@ -416,7 +418,7 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 		uint8_t pins[64];
 		uint8_t count = SystemFunctions::getUsedPins(pins, sizeof(pins));
 
-		StringKeyValue param;
+		StringKeyValue param{};
 		strncpy(param.key, ValueParamName, sizeof(param.key));
 		param.value[0] = '\0';
 
@@ -450,6 +452,26 @@ bool SystemCommandHandler::handleCommand(SerialCommandManager* sender, const cha
 			char buffer[32];
 			snprintf(buffer, sizeof(buffer), "%u - %s", (unsigned)pin, categoryName);
 			sender->sendCommand(SystemPinRestrictions, buffer);
+		}
+
+		sendAckOk(sender, command);
+		return true;
+	}
+	else if (SystemFunctions::commandMatches(command, SystemLocationTypes))
+	{
+		// Send location type descriptors one per line for serial clients
+		size_t cnt = sizeof(LocationTypeDescriptors) / sizeof(LocationTypeDescriptors[0]);
+		for (size_t i = 0; i < cnt; ++i)
+		{
+			const auto& d = LocationTypeDescriptors[i];
+			if (d.description == nullptr)
+				continue;
+			char buffer[128];
+			snprintf(buffer, sizeof(buffer), "id=%u;type=%" PRIu8 ";desc=%s",
+				(unsigned)d.id,
+				static_cast<uint8_t>(d.subType),
+				d.description);
+			sender->sendCommand(SystemLocationTypes, buffer);
 		}
 
 		sendAckOk(sender, command);
