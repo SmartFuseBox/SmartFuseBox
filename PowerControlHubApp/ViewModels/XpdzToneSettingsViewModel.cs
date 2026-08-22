@@ -2,6 +2,7 @@ using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -67,7 +68,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
 
         try
         {
-            var index = await Service.GetDashboardDataAsync();
+            IndexModel index = await Service.GetDashboardDataAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -77,7 +78,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
                 }
 
                 IsConnected = true;
-                StatusMessage = $"{XpdzToneMsgRefreshed} {DateTime.Now:HH:mm:ss}";
+                StatusMessage = $"{Refreshed} {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
@@ -109,7 +110,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
 
             if (int.TryParse(Pin, out int pin))
             {
-                var ok = await Service.SetXpdzTonePinAsync(pin);
+                bool ok = await Service.SetXpdzTonePinAsync(pin);
                 pinFailed = !ok;
             }
 
@@ -123,7 +124,7 @@ public sealed class XpdzToneSettingsViewModel : BaseViewModel
                 }
                 else
                 {
-                    StatusMessage = XpdzToneMsgSaved;
+                    StatusMessage = BuzzerSettingsSaved;
                 }
 
                 OnPropertyChanged(nameof(HasStatusMessage));

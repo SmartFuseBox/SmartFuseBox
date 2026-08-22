@@ -2,12 +2,13 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.SystemPage"
-             Title="System"
+             Title="{x:Static localization:AppResources.SystemTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
-        <views:TopBarView Grid.Row="0" Title="System"
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.SystemTitle}"
                   RightButtonText="↻"
                   RightButtonCommand="{Binding RefreshCommand}"
                   RightButtonIsEnabled="{Binding IsNotBusy}" />
@@ -15,13 +16,13 @@
         <!-- Not connected banner -->
         <views:NotConnectedBanner Grid.Row="1" />
 
-        <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
+        <ScrollView Grid.Row="2">
             <VerticalStackLayout Padding="20" Spacing="12">
                 <!-- Settings navigation card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
-                    <HorizontalStackLayout Spacing="16">
-                        <Button Text="Time"
+                    <HorizontalStackLayout Spacing="16" IsEnabled="{Binding IsConnected}">
+                        <Button Text="{x:Static localization:AppResources.Time}"
                                 Command="{Binding NavigateToTimeSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -30,7 +31,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="RTC"
+                        <Button Text="{x:Static localization:AppResources.RTC}"
                                 Command="{Binding NavigateToRtcSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -39,7 +40,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="Location"
+                        <Button Text="{x:Static localization:AppResources.Location}"
                                 Command="{Binding NavigateToLocationSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -48,7 +49,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="MQTT"
+                        <Button Text="{x:Static localization:AppResources.MQTT}"
                                 Command="{Binding NavigateToMqttSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -57,7 +58,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="SD Card"
+                        <Button Text="{x:Static localization:AppResources.SDCard}"
                                 Command="{Binding NavigateToSdCardSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -66,7 +67,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="Security"
+                        <Button Text="{x:Static localization:AppResources.Security}"
                                 Command="{Binding NavigateToNetworkSecurityCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -75,7 +76,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="Nextion"
+                        <Button Text="{x:Static localization:AppResources.Nextion}"
                                 Command="{Binding NavigateToNextionSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -84,7 +85,7 @@
                                 Padding="4"
                                 BorderColor="Blue"
                                 BorderWidth="1"/>
-                        <Button Text="Buzzer"
+                        <Button Text="{x:Static localization:AppResources.Buzzer}"
                                 Command="{Binding NavigateToXpdzToneSettingsCommand}"
                                 FontSize="16"
                                 FontAttributes="Bold"
@@ -96,11 +97,30 @@
                     </HorizontalStackLayout>
                 </Border>
 
-                <!-- Warnings card -->
+                <!-- Language selection card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{x:Static localization:AppResources.LanguageLabel}"
+                               TextColor="{DynamicResource AppLabelMuted}"
+                               FontSize="13" />
+                        <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
+                                StrokeShape="RoundRectangle 8" Padding="0">
+                            <Picker ItemsSource="{Binding LanguageOptions}"
+                                    SelectedItem="{Binding SelectedLanguage}"
+                                    TextColor="{DynamicResource AppEntryText}"
+                                    BackgroundColor="Transparent"
+                                    TitleColor="{DynamicResource AppPlaceholderText}"
+                                    Margin="10,0" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Warnings card -->
+                <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
+                        StrokeShape="RoundRectangle 8" Padding="14" IsEnabled="{Binding IsConnected}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Active Warnings"
+                        <Label Text="{x:Static localization:AppResources.ActiveWarnings}"
                                FontSize="20"
                                FontAttributes="Bold"
                                TextColor="{DynamicResource AppAccent}" />
@@ -114,7 +134,7 @@
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                             <CollectionView.EmptyView>
-                                <Label Text="No active warnings" TextColor="{DynamicResource AppLabelMuted}" />
+                                <Label Text="{x:Static localization:AppResources.MessageNoActiveWarnings}" TextColor="{DynamicResource AppLabelMuted}" />
                             </CollectionView.EmptyView>
                         </CollectionView>
                     </VerticalStackLayout>
@@ -122,12 +142,12 @@
 
                 <!-- GPIO Pins In Use card (moved from Settings) -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
-                        StrokeShape="RoundRectangle 8" Padding="14"
+                        StrokeShape="RoundRectangle 8" Padding="14" IsEnabled="{Binding IsConnected}"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0"
-                                   Text="GPIOs In Use"
+                                   Text="{x:Static localization:AppResources.GpiosInUse}"
                                    TextColor="{DynamicResource AppLabelMuted}"
                                    FontAttributes="Bold"
                                    FontSize="13"
@@ -161,7 +181,8 @@
                                IsVisible="{Binding HasPins}">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="{Binding PinsCount, StringFormat='{0} pin(s) currently assigned'}" />
+                                    <Span Text="{Binding PinsCount}" />
+                                    <Span Text="{x:Static localization:AppResources.PinsAssignedSuffix}" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>
@@ -170,11 +191,11 @@
 
                 <!-- GPIO Pin Restrictions card (compile-time — fetched once) -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
-                        StrokeShape="RoundRectangle 8" Padding="14"
+                        StrokeShape="RoundRectangle 8" Padding="14" IsEnabled="{Binding IsConnected}"
                         Margin="0,8,0,0"
                         IsVisible="{Binding HasPinRestrictions}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="GPIO Restrictions"
+                        <Label Text="{x:Static localization:AppResources.GpioRestrictions}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13"
@@ -185,7 +206,7 @@
                             <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="14">
                                 <Label.FormattedText>
                                     <FormattedString>
-                                        <Span Text="Hard-blocked: " FontAttributes="Bold" />
+                                        <Span Text="{x:Static localization:AppResources.HardBlockedPrefix}" FontAttributes="Bold" />
                                         <Span Text="{Binding HardPinsText}" />
                                     </FormattedString>
                                 </Label.FormattedText>
@@ -197,7 +218,7 @@
                             <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="14">
                                 <Label.FormattedText>
                                     <FormattedString>
-                                        <Span Text="Advisory: " FontAttributes="Bold" />
+                                        <Span Text="{x:Static localization:AppResources.AdvisoryPrefix}" FontAttributes="Bold" />
                                         <Span Text="{Binding AdvisoryPinsText}" />
                                     </FormattedString>
                                 </Label.FormattedText>
@@ -208,10 +229,10 @@
 
                 <!-- Firmware Update card -->
                 <Border BackgroundColor="{DynamicResource AppHelpCardBg}" Stroke="{DynamicResource AppHelpCardStroke}"
-                        StrokeShape="RoundRectangle 8" Padding="14"
+                        StrokeShape="RoundRectangle 8" Padding="14" IsEnabled="{Binding IsConnected}"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Firmware Update"
+                        <Label Text="{x:Static localization:AppResources.FirmwareUpdate}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13"
@@ -222,7 +243,7 @@
                                LineBreakMode="NoWrap">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="Current version: " />
+                                    <Span Text="{x:Static localization:AppResources.CurrentVersionPrefix}" />
                                     <Span Text="{Binding CurrentFirmwareVersion}" />
                                 </FormattedString>
                             </Label.FormattedText>
@@ -234,7 +255,7 @@
                                IsVisible="{Binding IsUpdateAvailable}">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="Available version: " />
+                                    <Span Text="{x:Static localization:AppResources.AvailableVersionPrefix}" />
                                     <Span Text="{Binding AvailableFirmwareVersion}" />
                                 </FormattedString>
                             </Label.FormattedText>
@@ -242,14 +263,14 @@
 
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <Button Grid.Column="0"
-                                    Text="Check for Updates"
+                                    Text="{x:Static localization:AppResources.CheckForUpdates}"
                                     Command="{Binding CheckForUpdateCommand}"
                                     BackgroundColor="Transparent"
                                     TextColor="{DynamicResource AppAccent}"
                                     CornerRadius="8"
                                     Padding="10,8" />
                             <Button Grid.Column="1"
-                                    Text="Install"
+                                    Text="{x:Static localization:AppResources.Install}"
                                     Command="{Binding InstallFirmwareCommand}"
                                     IsVisible="{Binding IsUpdateAvailable}"
                                     BackgroundColor="{DynamicResource AppAccent}"

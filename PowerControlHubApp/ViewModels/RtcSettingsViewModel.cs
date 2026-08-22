@@ -2,6 +2,7 @@ using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -91,7 +92,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
 
         try
         {
-            var index = await Service.GetDashboardDataAsync();
+            IndexModel index = await Service.GetDashboardDataAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -103,7 +104,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
                 }
 
                 IsConnected = true;
-                StatusMessage = $"{RtcMsgRefreshed} {DateTime.Now:HH:mm:ss}";
+                StatusMessage = $"{Refreshed} {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
@@ -135,7 +136,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
 
             if (int.TryParse(DataPin, out int data) && int.TryParse(ClockPin, out int clock) && int.TryParse(ResetPin, out int reset))
             {
-                var ok = await Service.SetRtcPinsAsync(data, clock, reset);
+                bool ok = await Service.SetRtcPinsAsync(data, clock, reset);
                 pinsFailed = !ok;
             }
 
@@ -149,7 +150,7 @@ public sealed class RtcSettingsViewModel : BaseViewModel
                 }
                 else
                 {
-                    StatusMessage = RtcMsgSaved;
+                    StatusMessage = RtcSettingsSaved;
                 }
 
                 OnPropertyChanged(nameof(HasStatusMessage));

@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -129,7 +130,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 
         try
         {
-            var index = await Service.GetDashboardDataAsync();
+            IndexModel index = await Service.GetDashboardDataAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -177,7 +178,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         {
             try
             {
-                var tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneOptionsList[i].TimeZoneId);
+                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneOptionsList[i].TimeZoneId);
                 int currentOffset = (int)tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc)).TotalHours;
 
                 if (currentOffset == offsetHours)
@@ -231,7 +232,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 
         try
         {
-            var tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneOptionsList[SelectedTimezoneIndex].TimeZoneId);
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneOptionsList[SelectedTimezoneIndex].TimeZoneId);
             return (int)tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc)).TotalHours;
         }
         catch
@@ -245,12 +246,12 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         if (!Service.IsConfigured || SelectedTimezoneIndex < 0 || SelectedTimezoneIndex >= TimeZoneOptionsList.Count)
             return;
 
-        var option = TimeZoneOptionsList[SelectedTimezoneIndex];
+        TimeZoneOption option = TimeZoneOptionsList[SelectedTimezoneIndex];
 
         try
         {
-            var tz = TimeZoneInfo.FindSystemTimeZoneById(option.TimeZoneId);
-            var offset = tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc));
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById(option.TimeZoneId);
+            TimeSpan offset = tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc));
             int offsetHours = (int)offset.TotalHours;
 
             bool ok = await Service.SetTimezoneOffsetAsync(offsetHours);
@@ -282,7 +283,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         StopClock();
 
         _clockCts = new CancellationTokenSource();
-        var ct = _clockCts.Token;
+        CancellationToken ct = _clockCts.Token;
         _clockTimer = new PeriodicTimer(ClockTickInterval);
 
         _ = RunClockLoopAsync(ct);
@@ -327,7 +328,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         StopDstAutoAdjust();
 
         _dstCts = new CancellationTokenSource();
-        var ct = _dstCts.Token;
+        CancellationToken ct = _dstCts.Token;
         _dstTimer = new PeriodicTimer(DstCheckInterval);
 
         _ = RunDstLoopAsync(timeZoneId, ct);
@@ -339,7 +340,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
 
         try
         {
-            var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
             lastOffset = (int)tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc)).TotalHours;
         }
         catch
@@ -351,7 +352,7 @@ public sealed class TimeSettingsViewModel : BaseViewModel
         {
             try
             {
-                var tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 int currentOffset = (int)tz.GetUtcOffset(new DateTime(DateTime.UtcNow.Ticks, DateTimeKind.Utc)).TotalHours;
 
                 if (currentOffset != lastOffset)

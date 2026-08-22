@@ -18,12 +18,12 @@ internal static class CommandFileProcessor
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"Command file not found: {filePath}");
 
-        var lines = File.ReadAllLines(filePath);
-        var commands = new List<string>();
+        string[] lines = File.ReadAllLines(filePath);
+        List<string> commands = [];
 
-        foreach (var rawLine in lines)
+        foreach (string rawLine in lines)
         {
-            var line = rawLine.Trim();
+            string line = rawLine.Trim();
 
             // Skip blank lines and comments
             if (string.IsNullOrEmpty(line) || line.StartsWith('#'))
@@ -32,7 +32,7 @@ internal static class CommandFileProcessor
             // Apply parameter substitution if provided
             if (parameters != null)
             {
-                foreach (var kvp in parameters)
+                foreach (KeyValuePair<string, string> kvp in parameters)
                 {
                     line = line.Replace($"{{{{{kvp.Key}}}}}", kvp.Value);
                 }
@@ -41,7 +41,7 @@ internal static class CommandFileProcessor
             commands.Add(line);
         }
 
-        return commands.ToArray();
+        return [.. commands];
     }
 
     /// <summary>

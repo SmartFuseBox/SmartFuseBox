@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              x:Class="PowerControlHubApp.Views.NotConnectedBanner">
 
@@ -10,7 +10,7 @@
             BackgroundColor="#cc4444"
             Stroke="Transparent"
             IsVisible="{Binding IsDisconnected}">
-        <Label Text="{x:Static internal:Constants.MessageNotConnected}"
+        <Label Text="{x:Static localization:AppResources.MessageNotConnected}"
                TextColor="White"
                FontAttributes="Bold"
                HorizontalOptions="Center"

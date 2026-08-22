@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Models.Json
 {
@@ -54,7 +55,7 @@ namespace PowerControlHubApp.Models.Json
 
             if (el.ValueKind == JsonValueKind.String)
             {
-                var s = el.GetString();
+                string s = el.GetString();
                 return s ?? string.Empty;
             }
 
@@ -108,9 +109,9 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorTemperature, out var el))
+                if (TryGet(ExtraFields, JsonSensorTemperature, out JsonElement el))
                 {
-                    var s = FormatDouble(el, SensorFmtTempDouble);
+                    string s = FormatDouble(el, SensorFmtTempDouble);
                     return string.IsNullOrEmpty(s) ? string.Empty : s + SensorSuffixCelsius;
                 }
 
@@ -122,10 +123,10 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorHumidity, out var el))
+                if (TryGet(ExtraFields, JsonSensorHumidity, out JsonElement el))
                 {
-                    var s = FormatDouble(el, SensorFmtTempDouble);
-                    return string.IsNullOrEmpty(s) ? string.Empty : s + SensorSuffixPercent;
+                    string s = FormatDouble(el, SensorFmtTempDouble);
+                    return string.IsNullOrEmpty(s) ? string.Empty : s + SuffixPercent;
                 }
 
                 return string.Empty;
@@ -136,9 +137,9 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorDewPoint, out var el))
+                if (TryGet(ExtraFields, JsonSensorDewPoint, out JsonElement el))
                 {
-                    var s = FormatDouble(el, SensorFmtTempDouble);
+                    string s = FormatDouble(el, SensorFmtTempDouble);
                     return string.IsNullOrEmpty(s) ? string.Empty : s + SensorSuffixCelsius;
                 }
 
@@ -150,7 +151,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorComfort, out var el) && el.ValueKind == JsonValueKind.String)
+                if (TryGet(ExtraFields, JsonSensorComfort, out JsonElement el) && el.ValueKind == JsonValueKind.String)
                     return el.GetString() ?? string.Empty;
 
                 return string.Empty;
@@ -161,7 +162,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorCondensationRisk, out var el) && el.ValueKind == JsonValueKind.String)
+                if (TryGet(ExtraFields, JsonSensorCondensationRisk, out JsonElement el) && el.ValueKind == JsonValueKind.String)
                     return el.GetString() ?? string.Empty;
 
                 return string.Empty;
@@ -173,8 +174,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorIsDaytime, out var el) && TryGetBool(el, out bool isDay))
-                    return isDay ? SensorIconSun : SensorIconMoon;
+                if (TryGet(ExtraFields, JsonSensorIsDaytime, out JsonElement el) && TryGetBool(el, out bool isDay))
+                    return isDay ? IconSun : IconMoon;
 
                 return string.Empty;
             }
@@ -184,8 +185,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorIsDaytime, out var el) && TryGetBool(el, out bool isDay))
-                    return isDay ? SensorLabelDay : SensorLabelNight;
+                if (TryGet(ExtraFields, JsonSensorIsDaytime, out JsonElement el) && TryGetBool(el, out bool isDay))
+                    return isDay ? LabelDay : LabelNight;
 
                 return string.Empty;
             }
@@ -195,7 +196,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorLightLevel, out var el))
+                if (TryGet(ExtraFields, JsonSensorLightLevel, out JsonElement el))
                     return FormatInt(el);
 
                 return string.Empty;
@@ -206,7 +207,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorAvgLightLevel, out var el))
+                if (TryGet(ExtraFields, JsonSensorAvgLightLevel, out JsonElement el))
                     return FormatInt(el);
 
                 return string.Empty;
@@ -218,7 +219,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorGps, out var el) && el.ValueKind == JsonValueKind.Object)
+                if (TryGet(ExtraFields, JsonSensorGps, out JsonElement el) && el.ValueKind == JsonValueKind.Object)
                     return el;
 
                 return null;
@@ -229,7 +230,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsLat, out var el))
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsLat, out JsonElement el))
                     return FormatDouble(el, SensorFmtGpsCoord);
 
                 return string.Empty;
@@ -240,7 +241,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsLon, out var el))
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsLon, out JsonElement el))
                     return FormatDouble(el, SensorFmtGpsCoord);
 
                 return string.Empty;
@@ -251,8 +252,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsAlt, out var el))
-                    return FormatDouble(el, SensorFmtDouble2) + SensorSuffixMetre;
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsAlt, out JsonElement el))
+                    return $"{FormatDouble(el, SensorFmtDouble2)} {SuffixMetre}";
 
                 return string.Empty;
             }
@@ -262,8 +263,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsSpeed, out var el))
-                    return FormatDouble(el, SensorFmtDouble2) + SensorSuffixKmh;
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsSpeed, out JsonElement el))
+                    return $"{FormatDouble(el, SensorFmtDouble2)} {SuffixKmh}";
 
                 return string.Empty;
             }
@@ -273,8 +274,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsCourse, out var el))
-                    return FormatDouble(el, SensorFmtDouble2) + SensorSuffixDegree;
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsCourse, out JsonElement el))
+                    return $"{FormatDouble(el, SensorFmtDouble2)} {SuffixDegree}";
 
                 return string.Empty;
             }
@@ -284,22 +285,22 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsSats, out var el))
+                if (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsSats, out JsonElement el))
                     return FormatInt(el);
 
                 return string.Empty;
             }
         }
 
-        public string GpsFixLabel => (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsValid, out var el) && TryGetBool(el, out bool v) && v) ? SensorLabelFix : SensorLabelNoFix;
+        public string GpsFixLabel => (GpsObject.HasValue && TryGet(GpsObject, JsonSensorGpsValid, out JsonElement el) && TryGetBool(el, out bool v) && v) ? LabelFix : LabelNoFix;
 
         // --- System ---
         public string FreeMemory
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorFreeMemory, out var el) && el.TryGetInt32(out int mem))
-                    return $"{Math.Round((double)mem / KilobyteBytes, 0)}{SensorSuffixKb}";
+                if (TryGet(ExtraFields, JsonSensorFreeMemory, out JsonElement el) && el.TryGetInt32(out int mem))
+                    return $"{Math.Round((double)mem / KilobyteBytes, 0)}{SuffixKb}";
 
                 return string.Empty;
             }
@@ -309,8 +310,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorCpuUsage, out var el) && el.TryGetInt32(out int cpu))
-                    return $"{cpu}{SensorSuffixPercent}";
+                if (TryGet(ExtraFields, JsonSensorCpuUsage, out JsonElement el) && el.TryGetInt32(out int cpu))
+                    return $"{cpu}{SuffixPercent}";
 
                 return string.Empty;
             }
@@ -321,15 +322,15 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorState, out var el) && el.ValueKind == JsonValueKind.String)
+                if (TryGet(ExtraFields, JsonSensorState, out JsonElement el) && el.ValueKind == JsonValueKind.String)
                 {
-                    var s = el.GetString();
+                    string s = el.GetString();
 
                     if (s == SensorStateDetected)
-                        return SensorIconRedCircle;
+                        return IconRedCircle;
 
                     if (s == SensorStateClear)
-                        return SensorIconGreenCircle;
+                        return IconGreenCircle;
                 }
 
                 return string.Empty;
@@ -340,15 +341,15 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorState, out var el) && el.ValueKind == JsonValueKind.String)
+                if (TryGet(ExtraFields, JsonSensorState, out JsonElement el) && el.ValueKind == JsonValueKind.String)
                 {
-                    var s = el.GetString();
+                    string s = el.GetString();
 
                     if (s == SensorStateDetected)
-                        return SensorLabelDetected;
+                        return LabelDetected;
 
                     if (s == SensorStateClear)
-                        return SensorLabelClear;
+                        return LabelClear;
 
                     return s ?? string.Empty;
                 }
@@ -362,8 +363,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorVoltage, out var el))
-                    return FormatDouble(el, SensorFmtDouble2) + SensorSuffixVolt;
+                if (TryGet(ExtraFields, JsonSensorVoltage, out JsonElement el))
+                    return FormatDouble(el, SensorFmtDouble2) + SuffixVolt;
 
                 return string.Empty;
             }
@@ -373,8 +374,8 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorVoltageAvg, out var el))
-                    return FormatDouble(el, SensorFmtDouble2) + SensorSuffixVolt;
+                if (TryGet(ExtraFields, JsonSensorVoltageAvg, out JsonElement el))
+                    return FormatDouble(el, SensorFmtDouble2) + SuffixVolt;
 
                 return string.Empty;
             }
@@ -385,7 +386,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorWaterLevel, out var el))
+                if (TryGet(ExtraFields, JsonSensorWaterLevel, out JsonElement el))
                     return FormatInt(el);
 
                 return string.Empty;
@@ -396,7 +397,7 @@ namespace PowerControlHubApp.Models.Json
         {
             get
             {
-                if (TryGet(ExtraFields, JsonSensorWaterLevelAvg, out var el))
+                if (TryGet(ExtraFields, JsonSensorWaterLevelAvg, out JsonElement el))
                     return FormatInt(el);
 
                 return string.Empty;
@@ -411,9 +412,9 @@ namespace PowerControlHubApp.Models.Json
                 if (!ExtraFields.HasValue || ExtraFields.Value.ValueKind != JsonValueKind.Object)
                     return string.Empty;
 
-                var parts = new List<string>();
+                List<string> parts = [];
 
-                foreach (var p in ExtraFields.Value.EnumerateObject())
+                foreach (JsonProperty p in ExtraFields.Value.EnumerateObject())
                 {
                     if (p.NameEquals(JsonSensorUid) || p.NameEquals(JsonSensorIdType) || p.NameEquals(JsonSensorType))
                         continue;
@@ -421,7 +422,7 @@ namespace PowerControlHubApp.Models.Json
                     if (p.Value.ValueKind == JsonValueKind.Object)
                     {
                         // Flatten small nested objects (gps)
-                        foreach (var sub in p.Value.EnumerateObject())
+                        foreach (JsonProperty sub in p.Value.EnumerateObject())
                         {
                             parts.Add($"{sub.Name}={sub.Value.ToString()}");
                         }
@@ -432,7 +433,7 @@ namespace PowerControlHubApp.Models.Json
                     }
                 }
 
-                return string.Join(SensorSummarySeparator, parts);
+                return string.Join(SummarySeparator, parts);
             }
         }
     }

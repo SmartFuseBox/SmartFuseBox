@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
+             xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
              x:Class="PowerControlHubApp.Views.LocalSensorDetailPage"
-             Title="Sensor"
+             Title="{x:Static localization:AppResources.SensorTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <views:BasePowerControlHubContentPage.Resources>
@@ -68,21 +70,21 @@
                 <!-- Identity -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="IDENTITY" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.SectionIdentity}" Style="{StaticResource SectionTitle}" />
 
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Name" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.NameLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Entry Text="{Binding Name}"
                                        Style="{StaticResource FieldEntry}"
-                                       Placeholder="e.g. Bilge Pump"
+                                       Placeholder="{x:Static localization:AppResources.PlaceholderBilgePump}"
                                        MaxLength="20"
                                        ReturnType="Done" />
                             </Border>
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Sensor Type" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.SensorTypeLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Picker ItemsSource="{Binding SensorTypeOptions}"
                                         SelectedIndex="{Binding SelectedTypeIndex}"
@@ -95,7 +97,7 @@
                 <!-- Hardware -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="HARDWARE" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.SectionHardware}" Style="{StaticResource SectionTitle}" />
 
                         <VerticalStackLayout Spacing="3"
                                          IsVisible="{Binding Pin0Visible}">
@@ -126,7 +128,7 @@
                 <!-- Options (visible based on sensor type) -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="OPTIONS" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.OptionsSection}" Style="{StaticResource SectionTitle}" />
 
                         <!-- Option 1-0 -->
                         <VerticalStackLayout Spacing="3"
@@ -185,9 +187,9 @@
                 <!-- Enabled -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="ENABLED" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.EnabledSection}" Style="{StaticResource SectionTitle}" />
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                            <Label Text="Sensor Enabled" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                            <Label Text="{x:Static localization:AppResources.SensorEnabled}" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
                             <Switch IsToggled="{Binding IsEnabled}" OnColor="{DynamicResource AppSwitchOn}" />
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
@@ -217,10 +219,11 @@
                 </Label.Triggers>
             </Label>
 
-            <Button Grid.Column="1" Text="🗑 Remove" Command="{Binding RemoveCommand}"
+            <Button Grid.Column="1" 
+                    Text="{x:Static internal:Constants.IconRemove} {x:Static localization:AppResources.Remove}"
                     BackgroundColor="{DynamicResource AppCardStroke}"
                     TextColor="{DynamicResource AppLabelPrimary}" />
-            <Button Grid.Column="2" Text="Save" Command="{Binding SaveCommand}" />
+            <Button Grid.Column="2" Text="{x:Static localization:AppResources.Save}" Command="{Binding SaveCommand}" />
         </Grid>
     </Grid>
 </views:BasePowerControlHubContentPage>

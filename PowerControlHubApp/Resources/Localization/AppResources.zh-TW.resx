@@ -1,0 +1,1222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MessageNotConfigured" xml:space="preserve">
+    <value>未設定 — 點按 ⚙ 以設定裝置 IP</value>
+  </data>
+  <data name="MessageDeviceUnreachable" xml:space="preserve">
+    <value>裝置無法連線</value>
+  </data>
+  <data name="MessageNoActiveWarnings" xml:space="preserve">
+    <value>無作用中的警告</value>
+  </data>
+  <data name="MessageToggleFailed" xml:space="preserve">
+    <value>切換失敗 — 查看日誌</value>
+  </data>
+  <data name="MessageNotConnected" xml:space="preserve">
+    <value>未連線</value>
+  </data>
+  <data name="MsgIpRequired" xml:space="preserve">
+    <value>需要 IP 位址。</value>
+  </data>
+  <data name="MsgInvalidPort" xml:space="preserve">
+    <value>輸入有效的連接埠號碼（1–65535）。</value>
+  </data>
+  <data name="NotConfigured" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="LogOtaTrigger" xml:space="preserve">
+    <value>OTA：觸發韌體安裝…</value>
+  </data>
+  <data name="OtaTriggerFailed" xml:space="preserve">
+    <value>OTA 觸發失敗</value>
+  </data>
+  <data name="OtaDialogTitle" xml:space="preserve">
+    <value>安裝韌體</value>
+  </data>
+  <data name="OtaDialogAccept" xml:space="preserve">
+    <value>安裝</value>
+  </data>
+  <data name="OtaDialogMessage" xml:space="preserve">
+    <value>有 {0} 的 OTA 更新可供使用。要立即下載並安裝嗎？</value>
+  </data>
+  <data name="OtaLabelAvailable" xml:space="preserve">
+    <value>有可用更新：{0}（已安裝：{1}）</value>
+  </data>
+  <data name="OtaLabelChecking" xml:space="preserve">
+    <value>正在檢查韌體更新…</value>
+  </data>
+  <data name="OtaLabelDownloading" xml:space="preserve">
+    <value>正在下載韌體更新…</value>
+  </data>
+  <data name="OtaLabelRebooting" xml:space="preserve">
+    <value>正在套用更新 — 裝置重新啟動中…</value>
+  </data>
+  <data name="OtaLabelFailed" xml:space="preserve">
+    <value>韌體更新失敗。點按以重試。</value>
+  </data>
+  <data name="OtaLabelUptodate" xml:space="preserve">
+    <value>韌體已是最新版本 ({0})</value>
+  </data>
+  <data name="LogDashboardStarted" xml:space="preserve">
+    <value>DashboardPoller 已啟動，間隔為 {IntervalMs} 毫秒</value>
+  </data>
+  <data name="LogDashboardFetched" xml:space="preserve">
+    <value>DashboardPoller 已於 {Time} 抓取索引</value>
+  </data>
+  <data name="LogDashboardSkipping" xml:space="preserve">
+    <value>DashboardPoller 略過輪詢：服務未設定</value>
+  </data>
+  <data name="LogDeviceInvalidJson" xml:space="preserve">
+    <value>裝置在輪詢索引時傳回無效的 JSON</value>
+  </data>
+  <data name="LogUnexpectedPollingError" xml:space="preserve">
+    <value>輪詢索引時發生未預期的錯誤</value>
+  </data>
+  <data name="LogDashboardStopping" xml:space="preserve">
+    <value>DashboardPoller 正在停止</value>
+  </data>
+  <data name="LogMetaRefreshFailed" xml:space="preserve">
+    <value>啟動時無法重新整理感測器中繼資料快取</value>
+  </data>
+  <data name="RelayPageTitle" xml:space="preserve">
+    <value>接力</value>
+  </data>
+  <data name="RelayPageTitleFormat" xml:space="preserve">
+    <value>轉送 {0}</value>
+  </data>
+  <data name="SavedOk" xml:space="preserve">
+    <value>儲存成功</value>
+  </data>
+  <data name="SavedFailed" xml:space="preserve">
+    <value>一個或多個命令失敗</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>儲存失敗 — 裝置無法連線</value>
+  </data>
+  <data name="PinFormat" xml:space="preserve">
+    <value>釘選 {0}</value>
+  </data>
+  <data name="PinSummaryFormat" xml:space="preserve">
+    <value>釘選 {0}，{1}</value>
+  </data>
+  <data name="ErrRemoveCommandFailed" xml:space="preserve">
+    <value>移除指令失敗</value>
+  </data>
+  <data name="RemoveSensor" xml:space="preserve">
+    <value>移除感應器</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>返回</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>無</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>好</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+    <value>重新啟動</value>
+  </data>
+  <data name="Refreshed" xml:space="preserve">
+    <value>已重新整理</value>
+  </data>
+  <data name="ColorBlue" xml:space="preserve">
+    <value>藍色</value>
+  </data>
+  <data name="ColorGreen" xml:space="preserve">
+    <value>綠色</value>
+  </data>
+  <data name="ColorGrey" xml:space="preserve">
+    <value>灰色</value>
+  </data>
+  <data name="ColorOrange" xml:space="preserve">
+    <value>橙色</value>
+  </data>
+  <data name="ColorRed" xml:space="preserve">
+    <value>紅色</value>
+  </data>
+  <data name="ColorYellow" xml:space="preserve">
+    <value>黃色</value>
+  </data>
+  <data name="ActionDefault" xml:space="preserve">
+    <value>預設</value>
+  </data>
+  <data name="ActionHorn" xml:space="preserve">
+    <value>角</value>
+  </data>
+  <data name="ActionNightRelay" xml:space="preserve">
+    <value>夜間接力</value>
+  </data>
+  <data name="ActionBadgeDefault" xml:space="preserve">
+    <value>預設</value>
+  </data>
+  <data name="ActionBadgeHorn" xml:space="preserve">
+    <value>喇叭</value>
+  </data>
+  <data name="ActionBadgeNight" xml:space="preserve">
+    <value>夜晚</value>
+  </data>
+  <data name="StateOff" xml:space="preserve">
+    <value>關</value>
+  </data>
+  <data name="StateOn" xml:space="preserve">
+    <value>開啟</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>光</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>黑暗</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="DeviceIpAddress" xml:space="preserve">
+    <value>裝置 IP 位址</value>
+  </data>
+  <data name="HttpPort" xml:space="preserve">
+    <value>HTTP 連接埠</value>
+  </data>
+  <data name="ApiKeyLabel" xml:space="preserve">
+    <value>API 金鑰 (X-API-Key)</value>
+  </data>
+  <data name="HmacKeyLabel" xml:space="preserve">
+    <value>HMAC 金鑰 (X-Auth-Signature)</value>
+  </data>
+  <data name="AppThemeLabel" xml:space="preserve">
+    <value>應用程式主題</value>
+  </data>
+  <data name="SaveAndConnect" xml:space="preserve">
+    <value>儲存並連線</value>
+  </data>
+  <data name="HowToConnect" xml:space="preserve">
+    <value>如何連接</value>
+  </data>
+  <data name="HowToConnectStep1" xml:space="preserve">
+    <value>1. 確保您的手機/電腦與 ESP32 開發板連接到同一個 WiFi 網路。</value>
+  </data>
+  <data name="HowToConnectStep2" xml:space="preserve">
+    <value>2. 輸入裝置序列輸出或路由器 DHCP 表中顯示的 IP 位址。</value>
+  </data>
+  <data name="HowToConnectStep3" xml:space="preserve">
+    <value>3. 預設連接埠是 80。</value>
+  </data>
+  <data name="HowToConnectStep4" xml:space="preserve">
+    <value>4. 若裝置已啟用網路驗證（C19:e=1），請在上方輸入 API 金鑰或 HMAC 金鑰，以符合裝置的設定。</value>
+  </data>
+  <data name="HowToConnectStep5" xml:space="preserve">
+    <value>5. 點選儲存並連線，然後返回儀表板。</value>
+  </data>
+  <data name="PlaceholderIpAddress" xml:space="preserve">
+    <value>例如 192.168.1.100</value>
+  </data>
+  <data name="PlaceholderPort" xml:space="preserve">
+    <value>80</value>
+  </data>
+  <data name="PlaceholderApiKey" xml:space="preserve">
+    <value>選用 – 用於驗證的裝置 API 金鑰</value>
+  </data>
+  <data name="PlaceholderHmacKey" xml:space="preserve">
+    <value>選用 – 用於驗證的 HMAC-SHA256 金鑰</value>
+  </data>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>系統</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="RTC" xml:space="preserve">
+    <value>即時時鐘</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>位置</value>
+  </data>
+  <data name="MQTT" xml:space="preserve">
+    <value>MQTT</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD卡</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>安全</value>
+  </data>
+  <data name="Nextion" xml:space="preserve">
+    <value>奈克森</value>
+  </data>
+  <data name="Buzzer" xml:space="preserve">
+    <value>蜂鳴器</value>
+  </data>
+  <data name="ActiveWarnings" xml:space="preserve">
+    <value>生效中的警報</value>
+  </data>
+  <data name="GpiosInUse" xml:space="preserve">
+    <value>GPIO 使用中</value>
+  </data>
+  <data name="GpioPinRestrictions" xml:space="preserve">
+    <value>GPIO 接腳限制</value>
+  </data>
+  <data name="PinsAssignedFormat" xml:space="preserve">
+    <value>目前已指派 {0} 個針腳</value>
+  </data>
+  <data name="ControlsSection" xml:space="preserve">
+    <value>控制</value>
+  </data>
+  <data name="SensorsSection" xml:space="preserve">
+    <value>感測器</value>
+  </data>
+  <data name="RelayConfigTitle" xml:space="preserve">
+    <value>中繼組態</value>
+  </data>
+  <data name="RelayConfigPageTitle" xml:space="preserve">
+    <value>中繼配置</value>
+  </data>
+  <data name="SectionIdentity" xml:space="preserve">
+    <value>身分</value>
+  </data>
+  <data name="SectionHardware" xml:space="preserve">
+    <value>硬體</value>
+  </data>
+  <data name="SectionBehaviour" xml:space="preserve">
+    <value>行為</value>
+  </data>
+  <data name="SectionLinking" xml:space="preserve">
+    <value>連結</value>
+  </data>
+  <data name="ShortNameLabel" xml:space="preserve">
+    <value>短名稱（最多5字元）</value>
+  </data>
+  <data name="LongNameLabel" xml:space="preserve">
+    <value>長名稱（最多20字元）</value>
+  </data>
+  <data name="GpioPinLabel" xml:space="preserve">
+    <value>GPIO 接腳（空白或 255 = 停用）</value>
+  </data>
+  <data name="DefaultStateLabel" xml:space="preserve">
+    <value>開機預設狀態</value>
+  </data>
+  <data name="ActionTypeLabel" xml:space="preserve">
+    <value>動作類型</value>
+  </data>
+  <data name="ButtonColourLabel" xml:space="preserve">
+    <value>按鈕顏色</value>
+  </data>
+  <data name="LinkedRelayLabel" xml:space="preserve">
+    <value>連結繼電器</value>
+  </data>
+  <data name="LinkedRelayHelp" xml:space="preserve">
+    <value>切換此繼電器也會切換連結的繼電器。</value>
+  </data>
+  <data name="PlaceholderShortName" xml:space="preserve">
+    <value>例如 Bilge</value>
+  </data>
+  <data name="PlaceholderLongName" xml:space="preserve">
+    <value>例如艙底泵</value>
+  </data>
+  <data name="PlaceholderPinDisabled" xml:space="preserve">
+    <value>255 = 停用</value>
+  </data>
+  <data name="LocalSensorsTitle" xml:space="preserve">
+    <value>本地感測器</value>
+  </data>
+  <data name="ExternalSensorsTitle" xml:space="preserve">
+    <value>外部感測器</value>
+  </data>
+  <data name="LocalSensorsPageTitle" xml:space="preserve">
+    <value>本地感測器</value>
+  </data>
+  <data name="ExternalSensorsPageTitle" xml:space="preserve">
+    <value>外部感測器</value>
+  </data>
+  <data name="SensorPageTitle" xml:space="preserve">
+    <value>感測器</value>
+  </data>
+  <data name="SensorNotConfigured" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="SensorTypeWater" xml:space="preserve">
+    <value>水</value>
+  </data>
+  <data name="SensorTypeDht11" xml:space="preserve">
+    <value>DHT11</value>
+  </data>
+  <data name="SensorTypeLight" xml:space="preserve">
+    <value>光</value>
+  </data>
+  <data name="SensorTypeGps" xml:space="preserve">
+    <value>全球定位系統</value>
+  </data>
+  <data name="SensorTypeSystem" xml:space="preserve">
+    <value>系統</value>
+  </data>
+  <data name="SensorTypeBinaryPresence" xml:space="preserve">
+    <value>二進位存在</value>
+  </data>
+  <data name="SensorTypeVoltage" xml:space="preserve">
+    <value>電壓</value>
+  </data>
+  <data name="SensorTypeUnknown" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="SensorTypeMetaDataUnavailable" xml:space="preserve">
+    <value>感應器類型中繼資料無法使用。</value>
+  </data>
+  <data name="SensorTypeWaterPicker" xml:space="preserve">
+    <value>水 (0)</value>
+  </data>
+  <data name="SensorTypeDht11Picker" xml:space="preserve">
+    <value>DHT11 (1)</value>
+  </data>
+  <data name="SensorTypeLightPicker" xml:space="preserve">
+    <value>光（2）</value>
+  </data>
+  <data name="SensorTypeGpsPicker" xml:space="preserve">
+    <value>GPS（3）</value>
+  </data>
+  <data name="SensorTypeSystemPicker" xml:space="preserve">
+    <value>系統 (4)</value>
+  </data>
+  <data name="SensorTypeBinaryPresencePicker" xml:space="preserve">
+    <value>二進位存在 (5)</value>
+  </data>
+  <data name="SensorTypeVoltagePicker" xml:space="preserve">
+    <value>電壓 (6)</value>
+  </data>
+  <data name="SuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SuffixKb" xml:space="preserve">
+    <value>千位元組</value>
+  </data>
+  <data name="SuffixKmh" xml:space="preserve">
+    <value>公里/小時</value>
+  </data>
+  <data name="SuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="LabelDay" xml:space="preserve">
+    <value>天</value>
+  </data>
+  <data name="LabelNight" xml:space="preserve">
+    <value>夜晚</value>
+  </data>
+  <data name="LabelFix" xml:space="preserve">
+    <value>修正</value>
+  </data>
+  <data name="LabelNoFix" xml:space="preserve">
+    <value>不需修正</value>
+  </data>
+  <data name="LabelDetected" xml:space="preserve">
+    <value>已偵測到</value>
+  </data>
+  <data name="LabelClear" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="FailAddUpdateSensor" xml:space="preserve">
+    <value>新增/更新感測器項目</value>
+  </data>
+  <data name="FailEnableDisableSensor" xml:space="preserve">
+    <value>變更啟用狀態</value>
+  </data>
+  <data name="FailSaveSettings" xml:space="preserve">
+    <value>將設定儲存到磁碟</value>
+  </data>
+  <data name="FailPrefix" xml:space="preserve">
+    <value>無法：</value>
+  </data>
+  <data name="LabelPin0Default" xml:space="preserve">
+    <value>GPIO 腳位 0（空白或 255 = 停用）</value>
+  </data>
+  <data name="LabelPin1Default" xml:space="preserve">
+    <value>GPIO 接腳 1（空白或 255 = 停用）</value>
+  </data>
+  <data name="LabelOpt1_0Default" xml:space="preserve">
+    <value>選項 1 (int8)</value>
+  </data>
+  <data name="LabelOpt1_1Default" xml:space="preserve">
+    <value>選項 2（int8）</value>
+  </data>
+  <data name="LabelOpt2_0Default" xml:space="preserve">
+    <value>選項 3 (int16)</value>
+  </data>
+  <data name="LabelOpt2_1Default" xml:space="preserve">
+    <value>選項 4 (int16)</value>
+  </data>
+  <data name="TimeSettingsTitle" xml:space="preserve">
+    <value>時間設定</value>
+  </data>
+  <data name="RtcSettingsTitle" xml:space="preserve">
+    <value>RTC 設定</value>
+  </data>
+  <data name="LocationSettingsTitle" xml:space="preserve">
+    <value>位置設定</value>
+  </data>
+  <data name="MqttSettingsTitle" xml:space="preserve">
+    <value>MQTT 設定</value>
+  </data>
+  <data name="SdCardSettingsTitle" xml:space="preserve">
+    <value>SD 卡設定</value>
+  </data>
+  <data name="NetworkSecurityTitle" xml:space="preserve">
+    <value>網路安全</value>
+  </data>
+  <data name="NextionSettingsTitle" xml:space="preserve">
+    <value>Nextion 設定</value>
+  </data>
+  <data name="BuzzerSettingsTitle" xml:space="preserve">
+    <value>蜂鳴器設定</value>
+  </data>
+  <data name="RtcSettingsSaved" xml:space="preserve">
+    <value>RTC 設定已儲存</value>
+  </data>
+  <data name="BuzzerSettingsSaved" xml:space="preserve">
+    <value>蜂鳴器設定已儲存</value>
+  </data>
+  <data name="NextionSettingsSaved" xml:space="preserve">
+    <value>Nextion 設定已儲存</value>
+  </data>
+  <data name="NextionRebootTitle" xml:space="preserve">
+    <value>需要重新開機</value>
+  </data>
+  <data name="NextionRebootMessage" xml:space="preserve">
+    <value>變更需要裝置重新啟動才能生效。現在重新啟動裝置嗎？（如果裝置沒有重新啟動端點，您將需要手動重新啟動電源）</value>
+  </data>
+  <data name="NextionRebootSavedMessage" xml:space="preserve">
+    <value>設定已儲存。請重新啟動裝置以套用 Nextion 設定。</value>
+  </data>
+  <data name="NextionRebootFailed" xml:space="preserve">
+    <value>無法在重新啟動前儲存設定。</value>
+  </data>
+  <data name="NextionUart1" xml:space="preserve">
+    <value>UART1</value>
+  </data>
+  <data name="NextionUart2" xml:space="preserve">
+    <value>UART2</value>
+  </data>
+  <data name="NextionUartLabel" xml:space="preserve">
+    <value>UART 連接埠</value>
+  </data>
+  <data name="NextionBaudRateLabel" xml:space="preserve">
+    <value>鮑率</value>
+  </data>
+  <data name="NextionRxPinLabel" xml:space="preserve">
+    <value>RX 接腳</value>
+  </data>
+  <data name="NextionTxPinLabel" xml:space="preserve">
+    <value>TX 接腳</value>
+  </data>
+  <data name="NextionEnabledLabel" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="MqttConnected" xml:space="preserve">
+    <value>已連線</value>
+  </data>
+  <data name="MqttDisconnected" xml:space="preserve">
+    <value>已中斷連線</value>
+  </data>
+  <data name="MqttSettingsSaved" xml:space="preserve">
+    <value>MQTT 設定已儲存</value>
+  </data>
+  <data name="MqttConnectionLabel" xml:space="preserve">
+    <value>連線</value>
+  </data>
+  <data name="MqttEnabledLabel" xml:space="preserve">
+    <value>MQTT 已啟用</value>
+  </data>
+  <data name="MqttConnectionStateLabel" xml:space="preserve">
+    <value>連線狀態</value>
+  </data>
+  <data name="MqttBrokerLabel" xml:space="preserve">
+    <value>經紀人</value>
+  </data>
+  <data name="MqttPortLabel" xml:space="preserve">
+    <value>港口</value>
+  </data>
+  <data name="MqttUsernameLabel" xml:space="preserve">
+    <value>使用者名稱</value>
+  </data>
+  <data name="MqttPasswordLabel" xml:space="preserve">
+    <value>密碼</value>
+  </data>
+  <data name="MqttDeviceIdLabel" xml:space="preserve">
+    <value>裝置 ID</value>
+  </data>
+  <data name="MqttHaDiscoveryLabel" xml:space="preserve">
+    <value>Home Assistant 發現</value>
+  </data>
+  <data name="MqttKeepAliveLabel" xml:space="preserve">
+    <value>保持連線（秒）</value>
+  </data>
+  <data name="MqttDiscoveryPrefixLabel" xml:space="preserve">
+    <value>發現前綴</value>
+  </data>
+  <data name="SdCardSettingsSaved" xml:space="preserve">
+    <value>SD卡設定已儲存</value>
+  </data>
+  <data name="SdCardPartiallySaved" xml:space="preserve">
+    <value>部分已儲存 — SPI 接腳已拒絕（請檢查接腳衝突）</value>
+  </data>
+  <data name="SdCardSpiFailed" xml:space="preserve">
+    <value>SPI 接腳未儲存（接腳衝突或無效的接腳）</value>
+  </data>
+  <data name="SdCardSpiPinsLabel" xml:space="preserve">
+    <value>SPI 引腳 (SCK/MOSI/MISO)</value>
+  </data>
+  <data name="SdCardInitSpeedLabel" xml:space="preserve">
+    <value>初始速度 (MHz)</value>
+  </data>
+  <data name="SdCardCsPinLabel" xml:space="preserve">
+    <value>CS 接腳</value>
+  </data>
+  <data name="NetworkSecuritySettingsSaved" xml:space="preserve">
+    <value>網路安全性設定已儲存</value>
+  </data>
+  <data name="NetworkSecurityKeysGenerated" xml:space="preserve">
+    <value>新金鑰已產生並儲存</value>
+  </data>
+  <data name="NetworkSecurityGenerateFailed" xml:space="preserve">
+    <value>金鑰產生失敗 — 裝置無法連線</value>
+  </data>
+  <data name="NetworkSecurityAuthEnabledLabel" xml:space="preserve">
+    <value>已啟用驗證</value>
+  </data>
+  <data name="NetworkSecurityGenerateKeys" xml:space="preserve">
+    <value>產生新金鑰</value>
+  </data>
+  <data name="NetworkSecurityApiKeyLabel" xml:space="preserve">
+    <value>API 金鑰</value>
+  </data>
+  <data name="NetworkSecurityHmacKeyLabel" xml:space="preserve">
+    <value>HMAC 金鑰</value>
+  </data>
+  <data name="TimeSettingsTimezoneLabel" xml:space="preserve">
+    <value>時區偏移（小時）</value>
+  </data>
+  <data name="TimeSettingsSyncNow" xml:space="preserve">
+    <value>立即同步</value>
+  </data>
+  <data name="TimeSettingsSaved" xml:space="preserve">
+    <value>時間設定已儲存</value>
+  </data>
+  <data name="LocationSettingsBoatTypeLabel" xml:space="preserve">
+    <value>船型</value>
+  </data>
+  <data name="LocationSettingsRenameLabel" xml:space="preserve">
+    <value>重新命名</value>
+  </data>
+  <data name="LocationSettingsMmsiLabel" xml:space="preserve">
+    <value>海事行動業務識別碼</value>
+  </data>
+  <data name="LocationSettingsCallSignLabel" xml:space="preserve">
+    <value>呼號</value>
+  </data>
+  <data name="LocationSettingsHomePortLabel" xml:space="preserve">
+    <value>母港</value>
+  </data>
+  <data name="LocationSettingsSaved" xml:space="preserve">
+    <value>位置設定已儲存</value>
+  </data>
+  <data name="PowerHubNotConfigured" xml:space="preserve">
+    <value>PowerHubService 尚未設定。請先呼叫 Configure()。</value>
+  </data>
+  <data name="LogConfigExecuting" xml:space="preserve">
+    <value>ConfigConnection 正在執行：{Description}</value>
+  </data>
+  <data name="LogConfigSucceeded" xml:space="preserve">
+    <value>ConfigConnection 成功：{Description}</value>
+  </data>
+  <data name="LogConfigFailed" xml:space="preserve">
+    <value>ConfigConnection 失敗：{Description}</value>
+  </data>
+  <data name="LogConfigFailureResponse" xml:space="preserve">
+    <value>裝置傳回失敗回應</value>
+  </data>
+  <data name="LogConfigConsumerError" xml:space="preserve">
+    <value>ConfigConnection 消費者錯誤</value>
+  </data>
+  <data name="LogPublishSuccessFailed" xml:space="preserve">
+    <value>無法針對 {Description} 發佈成功訊息</value>
+  </data>
+  <data name="LogPublishFailureFailed" xml:space="preserve">
+    <value>無法發佈失敗訊息：{Description}</value>
+  </data>
+  <data name="ConfigSuccessRelay" xml:space="preserve">
+    <value>中繼設定成功</value>
+  </data>
+  <data name="ConfigSuccessSensor" xml:space="preserve">
+    <value>感測器設定成功</value>
+  </data>
+  <data name="LogConfigMetaRefreshed" xml:space="preserve">
+    <value>ConfigPoller：連線後 SensorMetaCache 已重新整理。</value>
+  </data>
+  <data name="LogConfigHealthCheckFailed" xml:space="preserve">
+    <value>ConfigPoller: 連線健康檢查失敗。</value>
+  </data>
+  <data name="LogTimeSyncStarted" xml:space="preserve">
+    <value>TimeSyncService 已啟動，間隔 {IntervalMin} 分鐘，漂移閾值 {DriftSec} 秒</value>
+  </data>
+  <data name="LogTimeSyncDeviceTime" xml:space="preserve">
+    <value>TimeSyncService：裝置時間為 {DeviceTime}，差異 {DeltaSec} 秒</value>
+  </data>
+  <data name="LogTimeSyncSetting" xml:space="preserve">
+    <value>TimeSyncService：漂移 {DeltaSec} 秒超過閾值，正在將裝置時間設定為 {LocalTime}</value>
+  </data>
+  <data name="LogTimeSyncInSync" xml:space="preserve">
+    <value>TimeSyncService：裝置時間已同步（時間差 {DeltaSec} 秒）</value>
+  </data>
+  <data name="LogTimeSyncNotSet" xml:space="preserve">
+    <value>TimeSyncService：裝置時間未設定，正在同步</value>
+  </data>
+  <data name="LogTimeSyncFailed" xml:space="preserve">
+    <value>TimeSyncService：時間同步嘗試失敗</value>
+  </data>
+  <data name="LogTimeSyncStopping" xml:space="preserve">
+    <value>TimeSyncService 正在停止</value>
+  </data>
+  <data name="LogStartupMetaFetch" xml:space="preserve">
+    <value>啟動：已收到第一個儀表板資料，正在連線 2 上擷取感測器中繼資料。</value>
+  </data>
+  <data name="LogStartupMetaPopulated" xml:space="preserve">
+    <value>啟動：感測器中繼資料快取已填入。</value>
+  </data>
+  <data name="LogStartupMetaAlready" xml:space="preserve">
+    <value>啟動：儀表板資料已可用，正在連線 2 上取得感測器中繼資料</value>
+  </data>
+  <data name="TempLabel" xml:space="preserve">
+    <value>暫存</value>
+  </data>
+  <data name="HumidityLabel" xml:space="preserve">
+    <value>濕度</value>
+  </data>
+  <data name="DewPointLabel" xml:space="preserve">
+    <value>露點</value>
+  </data>
+  <data name="ComfortLabel" xml:space="preserve">
+    <value>舒適</value>
+  </data>
+  <data name="CondensationRiskLabel" xml:space="preserve">
+    <value>結露風險</value>
+  </data>
+  <data name="LightLevelLabel" xml:space="preserve">
+    <value>亮度等級</value>
+  </data>
+  <data name="IsDaytimeLabel" xml:space="preserve">
+    <value>日光</value>
+  </data>
+  <data name="GpsLatLabel" xml:space="preserve">
+    <value>緯度</value>
+  </data>
+  <data name="GpsLonLabel" xml:space="preserve">
+    <value>隆</value>
+  </data>
+  <data name="GpsAltLabel" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="GpsSpeedLabel" xml:space="preserve">
+    <value>速度</value>
+  </data>
+  <data name="GpsCourseLabel" xml:space="preserve">
+    <value>課程</value>
+  </data>
+  <data name="GpsSatsLabel" xml:space="preserve">
+    <value>聰</value>
+  </data>
+  <data name="WaterLevelLabel" xml:space="preserve">
+    <value>水位</value>
+  </data>
+  <data name="FreeMemoryLabel" xml:space="preserve">
+    <value>可用記憶體</value>
+  </data>
+  <data name="CpuUsageLabel" xml:space="preserve">
+    <value>中央處理器</value>
+  </data>
+  <data name="VoltageLabel" xml:space="preserve">
+    <value>電壓</value>
+  </data>
+  <data name="StateLabel" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="AverageLabel" xml:space="preserve">
+    <value>平均</value>
+  </data>
+  <data name="MsgCancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="SensorSuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SensorSuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SensorSuffixKb" xml:space="preserve">
+    <value>千位元</value>
+  </data>
+  <data name="SensorSuffixKmh" xml:space="preserve">
+    <value>公里/小時</value>
+  </data>
+  <data name="SensorSuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SensorSuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SensorSuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>儀表板</value>
+  </data>
+  <data name="Relays" xml:space="preserve">
+    <value>繼電器</value>
+  </data>
+  <data name="ExternalSensors" xml:space="preserve">
+    <value>外部感測器</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="HelloWorld" xml:space="preserve">
+    <value>你好，世界！</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>安裝</value>
+  </data>
+  <data name="NoRelaysConfigured" xml:space="preserve">
+    <value>尚未設定任何中繼伺服器</value>
+  </data>
+  <data name="NoSensorsConfigured" xml:space="preserve">
+    <value>未設定感測器</value>
+  </data>
+  <data name="MemLabel" xml:space="preserve">
+    <value>記憶：</value>
+  </data>
+  <data name="CpuLabel" xml:space="preserve">
+    <value>CPU：</value>
+  </data>
+  <data name="FwPrefix" xml:space="preserve">
+    <value>轉寄：</value>
+  </data>
+  <data name="LogLabel" xml:space="preserve">
+    <value>日誌</value>
+  </data>
+  <data name="RefreshNowTooltip" xml:space="preserve">
+    <value>立即重新整理</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="GpioRestrictions" xml:space="preserve">
+    <value>GPIO 限制</value>
+  </data>
+  <data name="HardBlockedPrefix" xml:space="preserve">
+    <value>強制封鎖：</value>
+  </data>
+  <data name="AdvisoryPrefix" xml:space="preserve">
+    <value>公告：</value>
+  </data>
+  <data name="FirmwareUpdate" xml:space="preserve">
+    <value>韌體更新</value>
+  </data>
+  <data name="CurrentVersionPrefix" xml:space="preserve">
+    <value>目前版本：</value>
+  </data>
+  <data name="AvailableVersionPrefix" xml:space="preserve">
+    <value>可用版本：</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>檢查更新</value>
+  </data>
+  <data name="PinsAssignedSuffix" xml:space="preserve">
+    <value>目前已指派的 PIN 碼</value>
+  </data>
+  <data name="DeviceTime" xml:space="preserve">
+    <value>裝置時間</value>
+  </data>
+  <data name="SyncTimeNow" xml:space="preserve">
+    <value>立即同步時間</value>
+  </data>
+  <data name="TimezoneLabel" xml:space="preserve">
+    <value>時區</value>
+  </data>
+  <data name="SelectTimezone" xml:space="preserve">
+    <value>選擇時區...</value>
+  </data>
+  <data name="SaveTimezone" xml:space="preserve">
+    <value>儲存時區</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="LocationNamePlaceholder" xml:space="preserve">
+    <value>位置名稱...</value>
+  </data>
+  <data name="LocationType" xml:space="preserve">
+    <value>位置類型</value>
+  </data>
+  <data name="SelectLocationType" xml:space="preserve">
+    <value>選取位置類型...</value>
+  </data>
+  <data name="BoatDetails" xml:space="preserve">
+    <value>船隻詳情</value>
+  </data>
+  <data name="RtcPins" xml:space="preserve">
+    <value>RTC 接腳</value>
+  </data>
+  <data name="DataPin" xml:space="preserve">
+    <value>資料腳位</value>
+  </data>
+  <data name="ClockPin" xml:space="preserve">
+    <value>時脈接腳</value>
+  </data>
+  <data name="ResetPin" xml:space="preserve">
+    <value>重設 PIN 碼</value>
+  </data>
+  <data name="Use255DisableAnyPin" xml:space="preserve">
+    <value>使用 255 來停用任何接腳</value>
+  </data>
+  <data name="SpiPins" xml:space="preserve">
+    <value>SPI 接腳</value>
+  </data>
+  <data name="SckClock" xml:space="preserve">
+    <value>SCK（時脈）</value>
+  </data>
+  <data name="MosiMasterOut" xml:space="preserve">
+    <value>MOSI（主設備輸出）</value>
+  </data>
+  <data name="MisoMasterIn" xml:space="preserve">
+    <value>MISO（主機輸入）</value>
+  </data>
+  <data name="Use255Disable" xml:space="preserve">
+    <value>使用 255 即可停用</value>
+  </data>
+  <data name="ChipSelect" xml:space="preserve">
+    <value>晶片選擇</value>
+  </data>
+  <data name="InitSpeed" xml:space="preserve">
+    <value>初始速度</value>
+  </data>
+  <data name="SpeedMhz" xml:space="preserve">
+    <value>速度 (MHz)</value>
+  </data>
+  <data name="ValidSpeeds" xml:space="preserve">
+    <value>有效：4、8、12、16、20、24 MHz</value>
+  </data>
+  <data name="EnableAuthentication" xml:space="preserve">
+    <value>啟用驗證</value>
+  </data>
+  <data name="EnterApiKeyPlaceholder" xml:space="preserve">
+    <value>輸入 API 金鑰</value>
+  </data>
+  <data name="EnterHmacKeyPlaceholder" xml:space="preserve">
+    <value>輸入 HMAC 金鑰</value>
+  </data>
+  <data name="NextionDisplay" xml:space="preserve">
+    <value>Nextion 顯示器</value>
+  </data>
+  <data name="HardwareSerial" xml:space="preserve">
+    <value>硬體序列</value>
+  </data>
+  <data name="Pins" xml:space="preserve">
+    <value>大頭針</value>
+  </data>
+  <data name="RxPinDisabled" xml:space="preserve">
+    <value>RX 接腳（空白或 255 = 停用）</value>
+  </data>
+  <data name="TxPinDisabled" xml:space="preserve">
+    <value>TX 接腳（空白或 255 = 停用）</value>
+  </data>
+  <data name="Communication" xml:space="preserve">
+    <value>溝通</value>
+  </data>
+  <data name="UartNumber" xml:space="preserve">
+    <value>UART 編號</value>
+  </data>
+  <data name="Uart" xml:space="preserve">
+    <value>通用非同步收發傳輸器</value>
+  </data>
+  <data name="RebootRequired" xml:space="preserve">
+    <value>需要重新開機</value>
+  </data>
+  <data name="NextionRebootRequiredMessage" xml:space="preserve">
+    <value>變更 Nextion 設定需要重新啟動裝置才能生效。儲存設定並重新啟動裝置。</value>
+  </data>
+  <data name="BuzzerPin" xml:space="preserve">
+    <value>蜂鳴器接腳</value>
+  </data>
+  <data name="GpioPin" xml:space="preserve">
+    <value>GPIO 接腳</value>
+  </data>
+  <data name="Use255DisablePin" xml:space="preserve">
+    <value>使用 255 來停用接腳</value>
+  </data>
+  <data name="HostIp" xml:space="preserve">
+    <value>主機 / IP</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>憑證</value>
+  </data>
+  <data name="LeaveEmptyForNone" xml:space="preserve">
+    <value>若無則留空</value>
+  </data>
+  <data name="EnterPasswordToChange" xml:space="preserve">
+    <value>輸入密碼以進行變更</value>
+  </data>
+  <data name="DeviceIdentity" xml:space="preserve">
+    <value>裝置身分</value>
+  </data>
+  <data name="MqttDeviceIdPlaceholder" xml:space="preserve">
+    <value>例如 boat_seawolf_01</value>
+  </data>
+  <data name="HomeassistantPlaceholder" xml:space="preserve">
+    <value>Home Assistant</value>
+  </data>
+  <data name="KeepAliveSeconds" xml:space="preserve">
+    <value>保持連線（秒）</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>進階</value>
+  </data>
+  <data name="SaveAllSettings" xml:space="preserve">
+    <value>儲存所有設定</value>
+  </data>
+  <data name="ExternalSensorTitle" xml:space="preserve">
+    <value>外部感測器</value>
+  </data>
+  <data name="SensorTypeLabel" xml:space="preserve">
+    <value>感測器類型</value>
+  </data>
+  <data name="SelectSensorType" xml:space="preserve">
+    <value>選擇感測器類型</value>
+  </data>
+  <data name="MqttName" xml:space="preserve">
+    <value>MQTT 名稱</value>
+  </data>
+  <data name="MqttSlug" xml:space="preserve">
+    <value>MQTT 別名</value>
+  </data>
+  <data name="MqttType" xml:space="preserve">
+    <value>MQTT 類型</value>
+  </data>
+  <data name="MqttDeviceClass" xml:space="preserve">
+    <value>MQTT 裝置類別</value>
+  </data>
+  <data name="MqttUnit" xml:space="preserve">
+    <value>MQTT 單元</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>二進位</value>
+  </data>
+  <data name="OptionsSection" xml:space="preserve">
+    <value>選項</value>
+  </data>
+  <data name="EnabledSection" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="SensorEnabled" xml:space="preserve">
+    <value>感測器已啟用</value>
+  </data>
+  <data name="SensorTypePresenceShort" xml:space="preserve">
+    <value>存在</value>
+  </data>
+  <data name="LevelLabel" xml:space="preserve">
+    <value>等級</value>
+  </data>
+  <data name="TemperatureLabel" xml:space="preserve">
+    <value>溫度</value>
+  </data>
+  <data name="CondensationLabel" xml:space="preserve">
+    <value>凝結</value>
+  </data>
+  <data name="LatitudeLabel" xml:space="preserve">
+    <value>緯度</value>
+  </data>
+  <data name="LongitudeLabel" xml:space="preserve">
+    <value>經度</value>
+  </data>
+  <data name="AltitudeLabel" xml:space="preserve">
+    <value>海拔</value>
+  </data>
+  <data name="SatellitesLabel" xml:space="preserve">
+    <value>衛星</value>
+  </data>
+  <data name="FreeRamLabel" xml:space="preserve">
+    <value>可用記憶體</value>
+  </data>
+  <data name="InstantLabel" xml:space="preserve">
+    <value>即時</value>
+  </data>
+  <data name="RollingAvgLabel" xml:space="preserve">
+    <value>滾動平均</value>
+  </data>
+  <data name="PlaceholderPin21" xml:space="preserve">
+    <value>例如 21</value>
+  </data>
+  <data name="PlaceholderPin22" xml:space="preserve">
+    <value>例如 22</value>
+  </data>
+  <data name="PlaceholderPin23" xml:space="preserve">
+    <value>例如 23</value>
+  </data>
+  <data name="PlaceholderPin12" xml:space="preserve">
+    <value>例如12</value>
+  </data>
+  <data name="PlaceholderPin11" xml:space="preserve">
+    <value>例如 11</value>
+  </data>
+  <data name="PlaceholderPin13" xml:space="preserve">
+    <value>例如 13</value>
+  </data>
+  <data name="PlaceholderPin10" xml:space="preserve">
+    <value>例如 10</value>
+  </data>
+  <data name="PlaceholderBaud9600" xml:space="preserve">
+    <value>例如 9600</value>
+  </data>
+  <data name="MmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="CallSignLabel" xml:space="preserve">
+    <value>呼號</value>
+  </data>
+  <data name="HomePortLabel" xml:space="preserve">
+    <value>母港</value>
+  </data>
+  <data name="CsPin" xml:space="preserve">
+    <value>CS 接腳</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API 金鑰</value>
+  </data>
+  <data name="HmacKey" xml:space="preserve">
+    <value>HMAC 金鑰</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+    <value>鮑率</value>
+  </data>
+  <data name="Connection" xml:space="preserve">
+    <value>連接</value>
+  </data>
+  <data name="GenerateNewKeys" xml:space="preserve">
+    <value>產生新金鑰</value>
+  </data>
+  <data name="Placeholder255Disabled" xml:space="preserve">
+    <value>255 = 停用</value>
+  </data>
+  <data name="PlaceholderBilgeShort" xml:space="preserve">
+    <value>例如 Bilge</value>
+  </data>
+  <data name="PlaceholderBilgePump" xml:space="preserve">
+    <value>例如艙底泵</value>
+  </data>
+  <data name="GpioPinDisabled" xml:space="preserve">
+    <value>GPIO 接腳（空白或 255 = 停用）</value>
+  </data>
+  <data name="SensorTypePresence" xml:space="preserve">
+    <value>存在</value>
+  </data>
+  <data name="ExtSensorsTitle" xml:space="preserve">
+    <value>外部感測器</value>
+  </data>
+  <data name="SensorTitle" xml:space="preserve">
+    <value>感測器</value>
+  </data>
+  <data name="SpeedLabel" xml:space="preserve">
+    <value>速度</value>
+  </data>
+  <data name="CourseLabel" xml:space="preserve">
+    <value>課程</value>
+  </data>
+  <data name="AvgLabel" xml:space="preserve">
+    <value>平均</value>
+  </data>
+  <data name="PinPairFormat" xml:space="preserve">
+    <value>釘選 {0}，{1}</value>
+  </data>
+  <data name="PlaceholderMqttPort" xml:space="preserve">
+    <value>1883</value>
+  </data>
+  <data name="PlaceholderKeepAlive" xml:space="preserve">
+    <value>60</value>
+  </data>
+  <data name="PlaceholderSpeedMhz" xml:space="preserve">
+    <value>4</value>
+  </data>
+</root>

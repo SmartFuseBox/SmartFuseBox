@@ -1,5 +1,4 @@
 ﻿using CommandLinePlus;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -46,7 +45,7 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
             Display.WriteLine(VerbosityLevel.Normal, $"Reading configuration from: {filePath}");
 
             // Build parameter dictionary for substitution
-            var parameters = new Dictionary<string, string>();
+            Dictionary<string, string> parameters = [];
             if (!string.IsNullOrEmpty(wifiSsid))
                 parameters["WIFI_SSID"] = wifiSsid;
             if (!string.IsNullOrEmpty(wifiPassword))
@@ -159,10 +158,10 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
 
             if (success)
             {
-                string version   = root.TryGetProperty("v",    out JsonElement vProp)    ? vProp.GetString()    ?? "unknown" : "unknown";
-                string available = root.TryGetProperty("av",   out JsonElement avProp)   ? avProp.GetString()   ?? ""        : "";
-                string state     = root.TryGetProperty("s",    out JsonElement sProp)    ? sProp.GetString()    ?? "unknown" : "unknown";
-                string auto      = root.TryGetProperty("auto", out JsonElement autoProp) ? autoProp.GetString() ?? "0"       : "0";
+                string version = root.TryGetProperty("v", out JsonElement vProp) ? vProp.GetString() ?? "unknown" : "unknown";
+                string available = root.TryGetProperty("av", out JsonElement avProp) ? avProp.GetString() ?? "" : "";
+                string state = root.TryGetProperty("s", out JsonElement sProp) ? sProp.GetString() ?? "unknown" : "unknown";
+                string auto = root.TryGetProperty("auto", out JsonElement autoProp) ? autoProp.GetString() ?? "0" : "0";
 
                 Display.WriteLine(VerbosityLevel.Quiet, $"Current version : {version}");
                 Display.WriteLine(VerbosityLevel.Quiet, $"Available version: {(string.IsNullOrEmpty(available) ? "none" : available)}");
@@ -221,9 +220,9 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
 
             if (success)
             {
-                string version   = root.TryGetProperty("v",  out JsonElement vProp)  ? vProp.GetString()  ?? "unknown" : "unknown";
-                string available = root.TryGetProperty("av", out JsonElement avProp) ? avProp.GetString() ?? ""        : "";
-                string state     = root.TryGetProperty("s",  out JsonElement sProp)  ? sProp.GetString()  ?? "unknown" : "unknown";
+                string version = root.TryGetProperty("v", out JsonElement vProp) ? vProp.GetString() ?? "unknown" : "unknown";
+                string available = root.TryGetProperty("av", out JsonElement avProp) ? avProp.GetString() ?? "" : "";
+                string state = root.TryGetProperty("s", out JsonElement sProp) ? sProp.GetString() ?? "unknown" : "unknown";
 
                 Display.WriteLine(VerbosityLevel.Quiet, $"Current version  : {version}");
                 Display.WriteLine(VerbosityLevel.Quiet, $"Available version: {(string.IsNullOrEmpty(available) ? "none" : available)}");
@@ -316,7 +315,7 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
             Display.WriteLine(VerbosityLevel.Normal, $"Loading test commands from: {filePath}");
 
             // Check if this is a WiFi-format test file (METHOD /endpoint format)
-            var firstLine = File.ReadLines(filePath).FirstOrDefault(l => !string.IsNullOrWhiteSpace(l) && !l.TrimStart().StartsWith('#'));
+            string? firstLine = File.ReadLines(filePath).FirstOrDefault(l => !string.IsNullOrWhiteSpace(l) && !l.TrimStart().StartsWith('#'));
             bool isWifiFormat = firstLine != null && (firstLine.TrimStart().StartsWith("GET ") || firstLine.TrimStart().StartsWith("POST "));
 
             if (isWifiFormat)
@@ -344,7 +343,7 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
     {
         try
         {
-            var tests = WifiTestCommandParser.ParseTestFile(filePath);
+            List<WifiTestCommand> tests = WifiTestCommandParser.ParseTestFile(filePath);
             Display.WriteLine(VerbosityLevel.Quiet, $"Loaded {tests.Count} WiFi test cases");
 
             string baseUrl = $"http://{ipAddress}:{port}";
@@ -352,13 +351,13 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
 
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
 
-            var results = new List<WifiTestResult>();
+            List<WifiTestResult> results = [];
             int passed = 0;
             int failed = 0;
 
-            foreach (var test in tests)
+            foreach (WifiTestCommand test in tests)
             {
-                var result = new WifiTestResult
+                WifiTestResult result = new WifiTestResult
                 {
                     Method = test.Method,
                     Endpoint = test.Endpoint,
@@ -443,7 +442,7 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
     {
         try
         {
-            var tests = TestCommandParser.ParseTestFile(filePath);
+            List<TestCommand> tests = TestCommandParser.ParseTestFile(filePath);
             Display.WriteLine(VerbosityLevel.Quiet, $"Loaded {tests.Count} test cases (serial format over WiFi)");
 
             string baseUrl = $"http://{ipAddress}:{port}";
@@ -452,13 +451,13 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
 
             // Run tests
-            var results = new List<TestResult>();
+            List<TestResult> results = [];
             int passed = 0;
             int failed = 0;
 
-            foreach (var test in tests)
+            foreach (TestCommand test in tests)
             {
-                var result = new TestResult
+                TestResult result = new TestResult
                 {
                     Command = test.Command,
                     ExpectedResponses = test.ExpectedResponses
@@ -500,8 +499,8 @@ internal class WifiConfigProcessor : BaseCommandLine, IDisposable
                         }
                         else
                         {
-                            string error = root.TryGetProperty("error", out JsonElement errorProp) 
-                                ? errorProp.GetString() ?? "unknown error" 
+                            string error = root.TryGetProperty("error", out JsonElement errorProp)
+                                ? errorProp.GetString() ?? "unknown error"
                                 : "unknown error";
                             actualResponse = $"ACK:{commandName}={error}";
                         }

@@ -3,28 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization" xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
              x:Class="PowerControlHubApp.Views.SettingsPage"
-             Title="Settings"
+             Title="{x:Static localization:AppResources.Settings}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
-        <views:TopBarView Grid.Row="0" Title="⚙ Settings"
-                  RightButtonText="↻"
-                  RightButtonCommand="{Binding SaveCommand}"
-                  RightButtonIsEnabled="{Binding IsNotBusy}" />
+        <views:TopBarView Grid.Row="0" 
+            Title="{x:Static internal:Constants.IconSettings} {x:Static localization:AppResources.SettingsTitle}"
+            RightButtonText="↻"
+            RightButtonCommand="{Binding SaveCommand}"
+            RightButtonIsEnabled="{Binding IsNotBusy}" />
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20" Spacing="16">
 
             <!-- IP Address -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="Device IP Address"
+                <Label Text="{x:Static localization:AppResources.DeviceIpAddress}"
                        TextColor="{DynamicResource AppLabelMuted}"
                        FontSize="13" />
                 <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
                         StrokeShape="RoundRectangle 8" Padding="0">
                     <Entry x:Name="IpEntry"
                            Text="{Binding IpAddress}"
-                           Placeholder="e.g. 192.168.1.100"
+                           Placeholder="{x:Static localization:AppResources.PlaceholderIpAddress}"
                            PlaceholderColor="{DynamicResource AppPlaceholderText}"
                            TextColor="{DynamicResource AppEntryText}"
                            BackgroundColor="Transparent"
@@ -37,13 +39,13 @@
 
             <!-- Port -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="HTTP Port"
+                <Label Text="{x:Static localization:AppResources.HttpPort}"
                        TextColor="{DynamicResource AppLabelMuted}"
                        FontSize="13" />
                 <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
                         StrokeShape="RoundRectangle 8" Padding="0">
                     <Entry Text="{Binding Port}"
-                           Placeholder="80"
+                           Placeholder="{x:Static localization:AppResources.PlaceholderPort}"
                            PlaceholderColor="{DynamicResource AppPlaceholderText}"
                            TextColor="{DynamicResource AppEntryText}"
                            BackgroundColor="Transparent"
@@ -55,14 +57,14 @@
 
             <!-- API Key -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="API Key (X-API-Key)"
+                <Label Text="{x:Static localization:AppResources.ApiKeyLabel}"
                        TextColor="{DynamicResource AppLabelMuted}"
                        FontSize="13" />
                 <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
                         StrokeShape="RoundRectangle 8" Padding="0">
                     <Entry x:Name="ApiKeyEntry"
                            Text="{Binding ApiKey}"
-                           Placeholder="Optional – device API key for authentication"
+                           Placeholder="{x:Static localization:AppResources.PlaceholderApiKey}"
                            PlaceholderColor="{DynamicResource AppPlaceholderText}"
                            TextColor="{DynamicResource AppEntryText}"
                            BackgroundColor="Transparent"
@@ -73,14 +75,14 @@
 
             <!-- HMAC Key -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="HMAC Key (X-Auth-Signature)"
+                <Label Text="{x:Static localization:AppResources.HmacKeyLabel}"
                        TextColor="{DynamicResource AppLabelMuted}"
                        FontSize="13" />
                 <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
                         StrokeShape="RoundRectangle 8" Padding="0">
                     <Entry x:Name="HmacKeyEntry"
                            Text="{Binding HmacKey}"
-                           Placeholder="Optional – HMAC-SHA256 key for authentication"
+                           Placeholder="{x:Static localization:AppResources.PlaceholderHmacKey}"
                            PlaceholderColor="{DynamicResource AppPlaceholderText}"
                            TextColor="{DynamicResource AppEntryText}"
                            BackgroundColor="Transparent"
@@ -92,7 +94,7 @@
 
             <!-- Theme -->
             <VerticalStackLayout Spacing="4">
-                <Label Text="App Theme"
+                <Label Text="{x:Static localization:AppResources.AppThemeLabel}"
                        TextColor="{DynamicResource AppLabelMuted}"
                        FontSize="13" />
                 <Border BackgroundColor="{DynamicResource AppEntryBg}" Stroke="{DynamicResource AppEntryStroke}"
@@ -107,7 +109,7 @@
             </VerticalStackLayout>
 
             <!-- Save button -->
-            <Button Text="Save &amp; Connect"
+            <Button Text="{x:Static localization:AppResources.SaveAndConnect}"
                     Command="{Binding SaveCommand}"
                     BackgroundColor="#512BD4"
                     TextColor="White"
@@ -128,18 +130,22 @@
                     StrokeShape="RoundRectangle 8" Padding="14"
                     Margin="0,16,0,0">
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="How to connect"
+                    <Label Text="{x:Static localization:AppResources.HowToConnect}"
                            TextColor="{DynamicResource AppLabelMuted}"
                            FontAttributes="Bold"
                            FontSize="13" />
                     <Label TextColor="{DynamicResource AppLabelSubtle}" FontSize="12" LineBreakMode="WordWrap">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="1. Ensure your phone/PC is on the same WiFi network as the ESP32 board.&#10;" />
-                                <Span Text="2. Enter the IP address shown on the device's serial output or your router's DHCP table.&#10;" />
-                                <Span Text="3. The default port is 80.&#10;" />
-                                <Span Text="4. If the device has network authentication enabled (C19:e=1), enter the API Key or HMAC Key above to match the device's configuration.&#10;" />
-                                <Span Text="5. Tap Save &amp; Connect, then return to the Dashboard." />
+                                <Span Text="{x:Static localization:AppResources.HowToConnectStep1}" />
+                                <Span Text="&#10;" />
+                                <Span Text="{x:Static localization:AppResources.HowToConnectStep2}" />
+                                <Span Text="&#10;" />
+                                <Span Text="{x:Static localization:AppResources.HowToConnectStep3}" />
+                                <Span Text="&#10;" />
+                                <Span Text="{x:Static localization:AppResources.HowToConnectStep4}" />
+                                <Span Text="&#10;" />
+                                <Span Text="{x:Static localization:AppResources.HowToConnectStep5}" />
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>

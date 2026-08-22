@@ -2,13 +2,14 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.XpdzToneSettingsPage"
-             Title="Buzzer Settings"
+             Title="{x:Static localization:AppResources.BuzzerSettingsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="Buzzer Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.BuzzerSettingsTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -20,23 +21,23 @@
                         Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Buzzer Pin"
+                        <Label Text="{x:Static localization:AppResources.BuzzerPin}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="GPIO Pin"
+                        <Label Text="{x:Static localization:AppResources.GpioPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding Pin}"
-                               Placeholder="e.g. 21"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin21}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Use 255 to disable pin"
+                        <Label Text="{x:Static localization:AppResources.Use255DisablePin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="10"
                                FontAttributes="Italic" />
@@ -44,7 +45,7 @@
                 </Border>
 
                 <!-- Save All button -->
-                <Button Text="Save All Settings"
+                <Button Text="{x:Static localization:AppResources.SaveAllSettings}"
                         Command="{Binding SaveAllCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"

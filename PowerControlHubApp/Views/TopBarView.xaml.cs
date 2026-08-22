@@ -1,6 +1,5 @@
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
-
 namespace PowerControlHubApp.Views;
 
 public partial class TopBarView : ContentView

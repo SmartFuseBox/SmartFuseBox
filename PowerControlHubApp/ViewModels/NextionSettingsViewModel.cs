@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -186,7 +187,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
 
         try
         {
-            var cfg = await Service.GetNextionConfigAsync();
+            NextionConfigModel cfg = await Service.GetNextionConfigAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -200,7 +201,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
                 BaudRate = _baudRate == 0 ? string.Empty : _baudRate.ToString();
 
                 IsConnected = true;
-                StatusMessage = $"{NextionMsgRefreshed} {DateTime.Now:HH:mm:ss}";
+                StatusMessage = $"{Refreshed} {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
@@ -247,7 +248,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
                 if (anyFailed)
                     StatusMessage = SaveFailed;
                 else
-                    StatusMessage = NextionMsgSaved;
+                    StatusMessage = NextionSettingsSaved;
 
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
@@ -268,7 +269,7 @@ public sealed class NextionSettingsViewModel : BaseViewModel
 
     public async Task RebootAsync()
     {
-        bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(NextionRebootTitle, NextionRebootMessage, NextionRebootButton, MsgCancel);
+        bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(NextionRebootTitle, NextionRebootMessage, Reboot, Cancel);
 
         if (!confirmed)
             return;
@@ -276,11 +277,11 @@ public sealed class NextionSettingsViewModel : BaseViewModel
         try
         {
             await Service.SaveSettingsAsync();
-            await Application.Current.Windows[0].Page.DisplayAlertAsync(NextionRebootButton, NextionRebootSaved, NextionRebootOk);
+            await Application.Current.Windows[0].Page.DisplayAlertAsync(Reboot, NextionRebootSavedMessage, OK);
         }
         catch
         {
-            await Application.Current.Windows[0].Page.DisplayAlertAsync(NextionRebootButton, NextionRebootFailed, NextionRebootOk);
+            await Application.Current.Windows[0].Page.DisplayAlertAsync(Reboot, NextionRebootFailed, OK);
         }
     }
 

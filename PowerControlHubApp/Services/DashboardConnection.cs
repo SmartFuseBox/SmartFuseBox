@@ -76,24 +76,24 @@ namespace PowerControlHubApp.Services
 
             using JsonDocument doc = JsonDocument.Parse(json);
 
-            if (doc.RootElement.TryGetProperty(JsonSensors, out var sensorsElement) &&
+            if (doc.RootElement.TryGetProperty(JsonSensors, out JsonElement sensorsElement) &&
                 sensorsElement.ValueKind == JsonValueKind.Object)
             {
-                var sensorList = new List<SensorsModel>();
+                List<SensorsModel> sensorList = [];
 
-                foreach (var sensorProp in sensorsElement.EnumerateObject())
+                foreach (JsonProperty sensorProp in sensorsElement.EnumerateObject())
                 {
                     string sensorName = sensorProp.Name;
 
                     // The firmware emits both "idType" (sensor id: Dht11=1, Light=2, ...) and
                     // "type" (SensorType: Local=0, Remote=1). We must use idType for template selection.
-                    if (sensorProp.Value.TryGetProperty(JsonSensorIdType, out var idTypeEl) &&
+                    if (sensorProp.Value.TryGetProperty(JsonSensorIdType, out JsonElement idTypeEl) &&
                         idTypeEl.ValueKind == JsonValueKind.Number)
                     {
                         byte idType = idTypeEl.GetByte();
                         int uid = 0;
 
-                        if (sensorProp.Value.TryGetProperty(JsonSensorUid, out var uidEl) && uidEl.ValueKind == JsonValueKind.Number)
+                        if (sensorProp.Value.TryGetProperty(JsonSensorUid, out JsonElement uidEl) && uidEl.ValueKind == JsonValueKind.Number)
                         {
                             uid = uidEl.GetInt32();
                         }
@@ -127,7 +127,7 @@ namespace PowerControlHubApp.Services
 
         private static SocketsHttpHandler CreateHandler()
         {
-            var handler = new SocketsHttpHandler
+            SocketsHttpHandler handler = new SocketsHttpHandler
             {
                 PooledConnectionIdleTimeout = TimeSpan.FromSeconds(SecondsSixty),
                 PooledConnectionLifetime = Timeout.InfiniteTimeSpan,
@@ -136,7 +136,7 @@ namespace PowerControlHubApp.Services
 
                 ConnectCallback = async (context, ct) =>
                 {
-                    var socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
+                    Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
                     {
                         NoDelay = true
                     };

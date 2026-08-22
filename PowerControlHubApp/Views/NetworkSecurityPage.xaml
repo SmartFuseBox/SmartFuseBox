@@ -2,13 +2,14 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.NetworkSecurityPage"
-             Title="Network Security"
+             Title="{x:Static localization:AppResources.NetworkSecurityTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="Network Security" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.NetworkSecurityTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -21,7 +22,7 @@
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0"
-                               Text="Enable Authentication"
+                               Text="{x:Static localization:AppResources.EnableAuthentication}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13"
@@ -39,13 +40,13 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="API Key"
+                        <Label Text="{x:Static localization:AppResources.ApiKey}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
                         <Entry Text="{Binding ApiKey}"
-                               Placeholder="Enter API key"
+                               Placeholder="{x:Static localization:AppResources.EnterApiKeyPlaceholder}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
@@ -59,13 +60,13 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="HMAC Key"
+                        <Label Text="{x:Static localization:AppResources.HmacKey}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
                         <Entry Text="{Binding HmacKey}"
-                               Placeholder="Enter HMAC key"
+                               Placeholder="{x:Static localization:AppResources.EnterHmacKeyPlaceholder}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
@@ -74,7 +75,7 @@
                 </Border>
 
                 <!-- Generate Keys button -->
-                <Button Text="Generate New Keys"
+                <Button Text="{x:Static localization:AppResources.GenerateNewKeys}"
                         Command="{Binding GenerateKeysCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"
@@ -91,7 +92,7 @@
                                    HeightRequest="20" />
 
                 <!-- Save All button -->
-                <Button Text="Save All Settings"
+                <Button Text="{x:Static localization:AppResources.SaveAllSettings}"
                         Command="{Binding SaveAllCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"

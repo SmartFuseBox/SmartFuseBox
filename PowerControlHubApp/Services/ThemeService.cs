@@ -1,4 +1,5 @@
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Services;
 
@@ -86,12 +87,12 @@ public class ThemeService
     {
         if (Application.Current is null) return;
 
-        var palette = themeName == ThemeDark ? DarkPalette : LightPalette;
-        var resources = Application.Current.Resources;
+        Dictionary<string, string> palette = themeName == ThemeDark ? DarkPalette : LightPalette;
+        ResourceDictionary resources = Application.Current.Resources;
 
         // Overwrite each key in-place. DynamicResource bindings react
         // immediately; no MergedDictionaries manipulation needed.
-        foreach (var (key, hex) in palette)
+        foreach ((string key, string hex) in palette)
             resources[key] = Color.FromArgb(hex);
 
         if (persist)

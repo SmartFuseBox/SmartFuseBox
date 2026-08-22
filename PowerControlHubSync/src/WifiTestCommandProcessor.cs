@@ -12,7 +12,7 @@ internal class WifiTestCommand
 
     public bool IsMatch(string actualJsonResponse)
     {
-        foreach (var expected in ExpectedResponses)
+        foreach (string expected in ExpectedResponses)
         {
             if (MatchesJsonPattern(actualJsonResponse, expected))
                 return true;
@@ -32,7 +32,7 @@ internal class WifiTestCommand
                 .Replace("\\{", "\\{")
                 .Replace("\\}", "\\}") + "$";
 
-            return System.Text.RegularExpressions.Regex.IsMatch(actualJson.Trim(), regexPattern, 
+            return System.Text.RegularExpressions.Regex.IsMatch(actualJson.Trim(), regexPattern,
                 System.Text.RegularExpressions.RegexOptions.Singleline);
         }
 
@@ -59,19 +59,19 @@ internal static class WifiTestCommandParser
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"WiFi test file not found: {filePath}");
 
-        var tests = new List<WifiTestCommand>();
-        var lines = File.ReadAllLines(filePath);
+        List<WifiTestCommand> tests = [];
+        string[] lines = File.ReadAllLines(filePath);
 
-        foreach (var rawLine in lines)
+        foreach (string rawLine in lines)
         {
-            var line = rawLine.Trim();
+            string line = rawLine.Trim();
 
             // Skip blank lines and comments
             if (string.IsNullOrEmpty(line) || line.StartsWith('#'))
                 continue;
 
             // Parse format: METHOD /endpoint [body] -> EXPECTED_JSON_RESPONSE
-            var parts = line.Split(new[] { "->" }, StringSplitOptions.TrimEntries);
+            string[] parts = line.Split(new[] { "->" }, StringSplitOptions.TrimEntries);
             if (parts.Length != 2)
             {
                 Console.WriteLine($"Warning: Skipping invalid WiFi test line: {line}");
@@ -79,8 +79,8 @@ internal static class WifiTestCommandParser
             }
 
             // Parse left side: METHOD /endpoint [body]
-            var leftSide = parts[0].Trim();
-            var leftParts = leftSide.Split(new[] { ' ' }, 3, StringSplitOptions.RemoveEmptyEntries);
+            string leftSide = parts[0].Trim();
+            string[] leftParts = leftSide.Split(new[] { ' ' }, 3, StringSplitOptions.RemoveEmptyEntries);
 
             if (leftParts.Length < 2)
             {
@@ -93,9 +93,7 @@ internal static class WifiTestCommandParser
             string body = leftParts.Length > 2 ? leftParts[2] : string.Empty;
 
             // Parse right side: JSON responses
-            var responses = parts[1].Split('|', StringSplitOptions.TrimEntries)
-                                    .Select(r => r.Trim())
-                                    .ToArray();
+            string[] responses = [.. parts[1].Split('|', StringSplitOptions.TrimEntries).Select(r => r.Trim())];
 
             tests.Add(new WifiTestCommand
             {

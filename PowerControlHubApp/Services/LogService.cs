@@ -21,7 +21,7 @@ public class LogService
 
     public void Log(LogLevel level, string message)
     {
-        var entry = new LogEntryViewModel
+        LogEntryViewModel entry = new LogEntryViewModel
         {
             Timestamp = DateTime.Now,
             Level = level,

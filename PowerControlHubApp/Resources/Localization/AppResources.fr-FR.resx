@@ -1,0 +1,1222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MessageNotConfigured" xml:space="preserve">
+    <value>Non configuré — appuyez sur ⚙ pour définir l’IP de l’appareil</value>
+  </data>
+  <data name="MessageDeviceUnreachable" xml:space="preserve">
+    <value>Appareil injoignable</value>
+  </data>
+  <data name="MessageNoActiveWarnings" xml:space="preserve">
+    <value>Aucun avertissement actif</value>
+  </data>
+  <data name="MessageToggleFailed" xml:space="preserve">
+    <value>Échec du basculement — consultez le journal</value>
+  </data>
+  <data name="MessageNotConnected" xml:space="preserve">
+    <value>Non connecté</value>
+  </data>
+  <data name="MsgIpRequired" xml:space="preserve">
+    <value>L'adresse IP est requise.</value>
+  </data>
+  <data name="MsgInvalidPort" xml:space="preserve">
+    <value>Saisissez un numéro de port valide (1–65535).</value>
+  </data>
+  <data name="NotConfigured" xml:space="preserve">
+    <value>Non configuré</value>
+  </data>
+  <data name="LogOtaTrigger" xml:space="preserve">
+    <value>OTA : déclenchement de l’installation du micrologiciel…</value>
+  </data>
+  <data name="OtaTriggerFailed" xml:space="preserve">
+    <value>Échec du déclenchement OTA</value>
+  </data>
+  <data name="OtaDialogTitle" xml:space="preserve">
+    <value>Installer le firmware</value>
+  </data>
+  <data name="OtaDialogAccept" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="OtaDialogMessage" xml:space="preserve">
+    <value>Une mise à jour OTA vers {0} est disponible. Télécharger et installer maintenant ?</value>
+  </data>
+  <data name="OtaLabelAvailable" xml:space="preserve">
+    <value>Mise à jour disponible : {0} (installée : {1})</value>
+  </data>
+  <data name="OtaLabelChecking" xml:space="preserve">
+    <value>Vérification de la mise à jour du micrologiciel…</value>
+  </data>
+  <data name="OtaLabelDownloading" xml:space="preserve">
+    <value>Téléchargement de la mise à jour du micrologiciel…</value>
+  </data>
+  <data name="OtaLabelRebooting" xml:space="preserve">
+    <value>Application de la mise à jour — redémarrage de l’appareil…</value>
+  </data>
+  <data name="OtaLabelFailed" xml:space="preserve">
+    <value>Échec de la mise à jour du firmware. Appuyez pour réessayer.</value>
+  </data>
+  <data name="OtaLabelUptodate" xml:space="preserve">
+    <value>Le firmware est à jour ({0})</value>
+  </data>
+  <data name="LogDashboardStarted" xml:space="preserve">
+    <value>DashboardPoller démarré avec un intervalle de {IntervalMs} ms</value>
+  </data>
+  <data name="LogDashboardFetched" xml:space="preserve">
+    <value>DashboardPoller a récupéré l’index à {Time}</value>
+  </data>
+  <data name="LogDashboardSkipping" xml:space="preserve">
+    <value>DashboardPoller ignore la scrutation : service non configuré</value>
+  </data>
+  <data name="LogDeviceInvalidJson" xml:space="preserve">
+    <value>L'appareil a renvoyé un JSON invalide lors de la scrutation de l'index.</value>
+  </data>
+  <data name="LogUnexpectedPollingError" xml:space="preserve">
+    <value>Erreur inattendue lors de l'interrogation de l'index</value>
+  </data>
+  <data name="LogDashboardStopping" xml:space="preserve">
+    <value>DashboardPoller arrêt</value>
+  </data>
+  <data name="LogMetaRefreshFailed" xml:space="preserve">
+    <value>Échec du rafraîchissement du cache de métadonnées du capteur au démarrage</value>
+  </data>
+  <data name="RelayPageTitle" xml:space="preserve">
+    <value>Relais</value>
+  </data>
+  <data name="RelayPageTitleFormat" xml:space="preserve">
+    <value>Relais {0}</value>
+  </data>
+  <data name="SavedOk" xml:space="preserve">
+    <value>Enregistré avec succès</value>
+  </data>
+  <data name="SavedFailed" xml:space="preserve">
+    <value>Une ou plusieurs commandes ont échoué</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Échec de l'enregistrement — appareil injoignable</value>
+  </data>
+  <data name="PinFormat" xml:space="preserve">
+    <value>Épingler {0}</value>
+  </data>
+  <data name="PinSummaryFormat" xml:space="preserve">
+    <value>Code PIN {0}, {1}</value>
+  </data>
+  <data name="ErrRemoveCommandFailed" xml:space="preserve">
+    <value>Échec de la commande de suppression</value>
+  </data>
+  <data name="RemoveSensor" xml:space="preserve">
+    <value>Retirer le capteur</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+    <value>Redémarrer</value>
+  </data>
+  <data name="Refreshed" xml:space="preserve">
+    <value>Rafraîchi</value>
+  </data>
+  <data name="ColorBlue" xml:space="preserve">
+    <value>Bleu</value>
+  </data>
+  <data name="ColorGreen" xml:space="preserve">
+    <value>Vert</value>
+  </data>
+  <data name="ColorGrey" xml:space="preserve">
+    <value>Gris</value>
+  </data>
+  <data name="ColorOrange" xml:space="preserve">
+    <value>orange</value>
+  </data>
+  <data name="ColorRed" xml:space="preserve">
+    <value>Rouge</value>
+  </data>
+  <data name="ColorYellow" xml:space="preserve">
+    <value>Jaune</value>
+  </data>
+  <data name="ActionDefault" xml:space="preserve">
+    <value>défaut</value>
+  </data>
+  <data name="ActionHorn" xml:space="preserve">
+    <value>Corne</value>
+  </data>
+  <data name="ActionNightRelay" xml:space="preserve">
+    <value>Relais nocturne</value>
+  </data>
+  <data name="ActionBadgeDefault" xml:space="preserve">
+    <value>Par défaut</value>
+  </data>
+  <data name="ActionBadgeHorn" xml:space="preserve">
+    <value>Corne</value>
+  </data>
+  <data name="ActionBadgeNight" xml:space="preserve">
+    <value>Nuit</value>
+  </data>
+  <data name="StateOff" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="StateOn" xml:space="preserve">
+    <value>Sur</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Lumière</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="DeviceIpAddress" xml:space="preserve">
+    <value>Adresse IP de l'appareil</value>
+  </data>
+  <data name="HttpPort" xml:space="preserve">
+    <value>Port HTTP</value>
+  </data>
+  <data name="ApiKeyLabel" xml:space="preserve">
+    <value>Clé API (X-API-Key)</value>
+  </data>
+  <data name="HmacKeyLabel" xml:space="preserve">
+    <value>Clé HMAC (X-Auth-Signature)</value>
+  </data>
+  <data name="AppThemeLabel" xml:space="preserve">
+    <value>Thème de l'application</value>
+  </data>
+  <data name="SaveAndConnect" xml:space="preserve">
+    <value>Enregistrer et connecter</value>
+  </data>
+  <data name="HowToConnect" xml:space="preserve">
+    <value>Comment se connecter</value>
+  </data>
+  <data name="HowToConnectStep1" xml:space="preserve">
+    <value>1. Assurez-vous que votre téléphone/PC est sur le même réseau WiFi que la carte ESP32.</value>
+  </data>
+  <data name="HowToConnectStep2" xml:space="preserve">
+    <value>2. Saisissez l'adresse IP affichée sur la sortie série de l'appareil ou dans la table DHCP de votre routeur.</value>
+  </data>
+  <data name="HowToConnectStep3" xml:space="preserve">
+    <value>3. Le port par défaut est 80.</value>
+  </data>
+  <data name="HowToConnectStep4" xml:space="preserve">
+    <value>4. Si l'authentification réseau est activée sur l'appareil (C19:e=1), saisissez la clé API ou la clé HMAC ci-dessus pour correspondre à la configuration de l'appareil.</value>
+  </data>
+  <data name="HowToConnectStep5" xml:space="preserve">
+    <value>5. Appuyez sur Enregistrer et connecter, puis revenez au tableau de bord.</value>
+  </data>
+  <data name="PlaceholderIpAddress" xml:space="preserve">
+    <value>par ex. 192.168.1.100</value>
+  </data>
+  <data name="PlaceholderPort" xml:space="preserve">
+    <value>80</value>
+  </data>
+  <data name="PlaceholderApiKey" xml:space="preserve">
+    <value>Facultatif – clé API de l’appareil pour l’authentification</value>
+  </data>
+  <data name="PlaceholderHmacKey" xml:space="preserve">
+    <value>Facultatif – clé HMAC-SHA256 pour l'authentification</value>
+  </data>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>Système</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>temps</value>
+  </data>
+  <data name="RTC" xml:space="preserve">
+    <value>RTC</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Localisation</value>
+  </data>
+  <data name="MQTT" xml:space="preserve">
+    <value>MQTT</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>Carte SD</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>Sécurité</value>
+  </data>
+  <data name="Nextion" xml:space="preserve">
+    <value>Nextion</value>
+  </data>
+  <data name="Buzzer" xml:space="preserve">
+    <value>Buzzer</value>
+  </data>
+  <data name="ActiveWarnings" xml:space="preserve">
+    <value>Alertes actives</value>
+  </data>
+  <data name="GpiosInUse" xml:space="preserve">
+    <value>GPIOs en cours d'utilisation</value>
+  </data>
+  <data name="GpioPinRestrictions" xml:space="preserve">
+    <value>Restrictions des broches GPIO</value>
+  </data>
+  <data name="PinsAssignedFormat" xml:space="preserve">
+    <value>{0} broche(s) actuellement affectée(s)</value>
+  </data>
+  <data name="ControlsSection" xml:space="preserve">
+    <value>COMMANDES</value>
+  </data>
+  <data name="SensorsSection" xml:space="preserve">
+    <value>CAPTEURS</value>
+  </data>
+  <data name="RelayConfigTitle" xml:space="preserve">
+    <value>Configuration du relais</value>
+  </data>
+  <data name="RelayConfigPageTitle" xml:space="preserve">
+    <value>Configuration du relais</value>
+  </data>
+  <data name="SectionIdentity" xml:space="preserve">
+    <value>identité</value>
+  </data>
+  <data name="SectionHardware" xml:space="preserve">
+    <value>MATÉRIEL</value>
+  </data>
+  <data name="SectionBehaviour" xml:space="preserve">
+    <value>COMPORTEMENT</value>
+  </data>
+  <data name="SectionLinking" xml:space="preserve">
+    <value>LIAISON</value>
+  </data>
+  <data name="ShortNameLabel" xml:space="preserve">
+    <value>Nom court (max 5 caractères)</value>
+  </data>
+  <data name="LongNameLabel" xml:space="preserve">
+    <value>Nom long (max 20 caractères)</value>
+  </data>
+  <data name="GpioPinLabel" xml:space="preserve">
+    <value>Broche GPIO (vide ou 255 = désactivée)</value>
+  </data>
+  <data name="DefaultStateLabel" xml:space="preserve">
+    <value>État par défaut à la mise sous tension</value>
+  </data>
+  <data name="ActionTypeLabel" xml:space="preserve">
+    <value>Type d’action</value>
+  </data>
+  <data name="ButtonColourLabel" xml:space="preserve">
+    <value>Couleur du bouton</value>
+  </data>
+  <data name="LinkedRelayLabel" xml:space="preserve">
+    <value>Relais lié</value>
+  </data>
+  <data name="LinkedRelayHelp" xml:space="preserve">
+    <value>Basculer ce relais basculera également le relais lié.</value>
+  </data>
+  <data name="PlaceholderShortName" xml:space="preserve">
+    <value>p. ex. Bilge</value>
+  </data>
+  <data name="PlaceholderLongName" xml:space="preserve">
+    <value>p. ex. Pompe de cale</value>
+  </data>
+  <data name="PlaceholderPinDisabled" xml:space="preserve">
+    <value>255 = désactivé</value>
+  </data>
+  <data name="LocalSensorsTitle" xml:space="preserve">
+    <value>Capteurs locaux</value>
+  </data>
+  <data name="ExternalSensorsTitle" xml:space="preserve">
+    <value>Capteurs externes</value>
+  </data>
+  <data name="LocalSensorsPageTitle" xml:space="preserve">
+    <value>Capteurs locaux</value>
+  </data>
+  <data name="ExternalSensorsPageTitle" xml:space="preserve">
+    <value>Capteurs externes</value>
+  </data>
+  <data name="SensorPageTitle" xml:space="preserve">
+    <value>Capteur</value>
+  </data>
+  <data name="SensorNotConfigured" xml:space="preserve">
+    <value>Non configuré</value>
+  </data>
+  <data name="SensorTypeWater" xml:space="preserve">
+    <value>Eau</value>
+  </data>
+  <data name="SensorTypeDht11" xml:space="preserve">
+    <value>DHT11</value>
+  </data>
+  <data name="SensorTypeLight" xml:space="preserve">
+    <value>Lumière</value>
+  </data>
+  <data name="SensorTypeGps" xml:space="preserve">
+    <value>GPS</value>
+  </data>
+  <data name="SensorTypeSystem" xml:space="preserve">
+    <value>Système</value>
+  </data>
+  <data name="SensorTypeBinaryPresence" xml:space="preserve">
+    <value>Présence binaire</value>
+  </data>
+  <data name="SensorTypeVoltage" xml:space="preserve">
+    <value>Tension</value>
+  </data>
+  <data name="SensorTypeUnknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="SensorTypeMetaDataUnavailable" xml:space="preserve">
+    <value>Métadonnées du type de capteur indisponibles.</value>
+  </data>
+  <data name="SensorTypeWaterPicker" xml:space="preserve">
+    <value>Eau (0)</value>
+  </data>
+  <data name="SensorTypeDht11Picker" xml:space="preserve">
+    <value>DHT11 (1)</value>
+  </data>
+  <data name="SensorTypeLightPicker" xml:space="preserve">
+    <value>Lumière (2)</value>
+  </data>
+  <data name="SensorTypeGpsPicker" xml:space="preserve">
+    <value>GPS (3)</value>
+  </data>
+  <data name="SensorTypeSystemPicker" xml:space="preserve">
+    <value>Système (4)</value>
+  </data>
+  <data name="SensorTypeBinaryPresencePicker" xml:space="preserve">
+    <value>Présence binaire (5)</value>
+  </data>
+  <data name="SensorTypeVoltagePicker" xml:space="preserve">
+    <value>Tension (6)</value>
+  </data>
+  <data name="SuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SuffixKb" xml:space="preserve">
+    <value>ko</value>
+  </data>
+  <data name="SuffixKmh" xml:space="preserve">
+    <value>km/h</value>
+  </data>
+  <data name="SuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="LabelDay" xml:space="preserve">
+    <value>Jour</value>
+  </data>
+  <data name="LabelNight" xml:space="preserve">
+    <value>Nuit</value>
+  </data>
+  <data name="LabelFix" xml:space="preserve">
+    <value>Corriger</value>
+  </data>
+  <data name="LabelNoFix" xml:space="preserve">
+    <value>Aucune correction</value>
+  </data>
+  <data name="LabelDetected" xml:space="preserve">
+    <value>Détecté</value>
+  </data>
+  <data name="LabelClear" xml:space="preserve">
+    <value>Effacer</value>
+  </data>
+  <data name="FailAddUpdateSensor" xml:space="preserve">
+    <value>ajouter/mettre à jour l'entrée du capteur</value>
+  </data>
+  <data name="FailEnableDisableSensor" xml:space="preserve">
+    <value>Modifier l’état d’activation</value>
+  </data>
+  <data name="FailSaveSettings" xml:space="preserve">
+    <value>enregistrer les paramètres sur le disque</value>
+  </data>
+  <data name="FailPrefix" xml:space="preserve">
+    <value>Échec de :</value>
+  </data>
+  <data name="LabelPin0Default" xml:space="preserve">
+    <value>Broche GPIO 0 (vide ou 255 = désactivé)</value>
+  </data>
+  <data name="LabelPin1Default" xml:space="preserve">
+    <value>Broche GPIO 1 (vide ou 255 = désactivé)</value>
+  </data>
+  <data name="LabelOpt1_0Default" xml:space="preserve">
+    <value>Option 1 (int8)</value>
+  </data>
+  <data name="LabelOpt1_1Default" xml:space="preserve">
+    <value>Option 2 (int8)</value>
+  </data>
+  <data name="LabelOpt2_0Default" xml:space="preserve">
+    <value>Option 3 (int16)</value>
+  </data>
+  <data name="LabelOpt2_1Default" xml:space="preserve">
+    <value>Option 4 (int16)</value>
+  </data>
+  <data name="TimeSettingsTitle" xml:space="preserve">
+    <value>Paramètres de l'heure</value>
+  </data>
+  <data name="RtcSettingsTitle" xml:space="preserve">
+    <value>Paramètres RTC</value>
+  </data>
+  <data name="LocationSettingsTitle" xml:space="preserve">
+    <value>Paramètres de localisation</value>
+  </data>
+  <data name="MqttSettingsTitle" xml:space="preserve">
+    <value>Paramètres MQTT</value>
+  </data>
+  <data name="SdCardSettingsTitle" xml:space="preserve">
+    <value>Paramètres de la carte SD</value>
+  </data>
+  <data name="NetworkSecurityTitle" xml:space="preserve">
+    <value>Sécurité des réseaux</value>
+  </data>
+  <data name="NextionSettingsTitle" xml:space="preserve">
+    <value>Paramètres Nextion</value>
+  </data>
+  <data name="BuzzerSettingsTitle" xml:space="preserve">
+    <value>Paramètres du buzzer</value>
+  </data>
+  <data name="RtcSettingsSaved" xml:space="preserve">
+    <value>Paramètres RTC enregistrés</value>
+  </data>
+  <data name="BuzzerSettingsSaved" xml:space="preserve">
+    <value>Paramètres du buzzer enregistrés</value>
+  </data>
+  <data name="NextionSettingsSaved" xml:space="preserve">
+    <value>Paramètres Nextion enregistrés</value>
+  </data>
+  <data name="NextionRebootTitle" xml:space="preserve">
+    <value>Redémarrage requis</value>
+  </data>
+  <data name="NextionRebootMessage" xml:space="preserve">
+    <value>Les modifications nécessitent un redémarrage de l'appareil pour prendre effet. Redémarrer l'appareil maintenant ? (Si l'appareil ne possède pas de point de terminaison de redémarrage, vous devrez le mettre hors tension puis sous tension manuellement.)</value>
+  </data>
+  <data name="NextionRebootSavedMessage" xml:space="preserve">
+    <value>Paramètres enregistrés. Veuillez redémarrer l'appareil pour appliquer la configuration Nextion.</value>
+  </data>
+  <data name="NextionRebootFailed" xml:space="preserve">
+    <value>Impossible d'enregistrer les paramètres avant le redémarrage.</value>
+  </data>
+  <data name="NextionUart1" xml:space="preserve">
+    <value>UART1</value>
+  </data>
+  <data name="NextionUart2" xml:space="preserve">
+    <value>UART2</value>
+  </data>
+  <data name="NextionUartLabel" xml:space="preserve">
+    <value>Port UART</value>
+  </data>
+  <data name="NextionBaudRateLabel" xml:space="preserve">
+    <value>débit en bauds</value>
+  </data>
+  <data name="NextionRxPinLabel" xml:space="preserve">
+    <value>Broche RX</value>
+  </data>
+  <data name="NextionTxPinLabel" xml:space="preserve">
+    <value>Broche TX</value>
+  </data>
+  <data name="NextionEnabledLabel" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="MqttConnected" xml:space="preserve">
+    <value>Connecté</value>
+  </data>
+  <data name="MqttDisconnected" xml:space="preserve">
+    <value>Déconnecté</value>
+  </data>
+  <data name="MqttSettingsSaved" xml:space="preserve">
+    <value>Paramètres MQTT enregistrés</value>
+  </data>
+  <data name="MqttConnectionLabel" xml:space="preserve">
+    <value>Connexion</value>
+  </data>
+  <data name="MqttEnabledLabel" xml:space="preserve">
+    <value>MQTT activé</value>
+  </data>
+  <data name="MqttConnectionStateLabel" xml:space="preserve">
+    <value>État de la connexion</value>
+  </data>
+  <data name="MqttBrokerLabel" xml:space="preserve">
+    <value>Courtier</value>
+  </data>
+  <data name="MqttPortLabel" xml:space="preserve">
+    <value>port</value>
+  </data>
+  <data name="MqttUsernameLabel" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
+  </data>
+  <data name="MqttPasswordLabel" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="MqttDeviceIdLabel" xml:space="preserve">
+    <value>ID de l'appareil</value>
+  </data>
+  <data name="MqttHaDiscoveryLabel" xml:space="preserve">
+    <value>Home Assistant Découverte</value>
+  </data>
+  <data name="MqttKeepAliveLabel" xml:space="preserve">
+    <value>Maintien de la connexion (s)</value>
+  </data>
+  <data name="MqttDiscoveryPrefixLabel" xml:space="preserve">
+    <value>Préfixe de découverte</value>
+  </data>
+  <data name="SdCardSettingsSaved" xml:space="preserve">
+    <value>Paramètres de la carte SD enregistrés</value>
+  </data>
+  <data name="SdCardPartiallySaved" xml:space="preserve">
+    <value>Partiellement enregistré — broches SPI rejetées (vérifiez les conflits de broches)</value>
+  </data>
+  <data name="SdCardSpiFailed" xml:space="preserve">
+    <value>Broches SPI non enregistrées (conflit de broches ou broche invalide)</value>
+  </data>
+  <data name="SdCardSpiPinsLabel" xml:space="preserve">
+    <value>Broches SPI (SCK/MOSI/MISO)</value>
+  </data>
+  <data name="SdCardInitSpeedLabel" xml:space="preserve">
+    <value>Vitesse d’initialisation (MHz)</value>
+  </data>
+  <data name="SdCardCsPinLabel" xml:space="preserve">
+    <value>CS Pin</value>
+  </data>
+  <data name="NetworkSecuritySettingsSaved" xml:space="preserve">
+    <value>Paramètres de sécurité réseau enregistrés</value>
+  </data>
+  <data name="NetworkSecurityKeysGenerated" xml:space="preserve">
+    <value>Nouvelles clés générées et sauvegardées</value>
+  </data>
+  <data name="NetworkSecurityGenerateFailed" xml:space="preserve">
+    <value>Échec de la génération de la clé — appareil inaccessible</value>
+  </data>
+  <data name="NetworkSecurityAuthEnabledLabel" xml:space="preserve">
+    <value>Authentification activée</value>
+  </data>
+  <data name="NetworkSecurityGenerateKeys" xml:space="preserve">
+    <value>Générer de nouvelles clés</value>
+  </data>
+  <data name="NetworkSecurityApiKeyLabel" xml:space="preserve">
+    <value>Clé API</value>
+  </data>
+  <data name="NetworkSecurityHmacKeyLabel" xml:space="preserve">
+    <value>Clé HMAC</value>
+  </data>
+  <data name="TimeSettingsTimezoneLabel" xml:space="preserve">
+    <value>Décalage horaire (heures)</value>
+  </data>
+  <data name="TimeSettingsSyncNow" xml:space="preserve">
+    <value>Synchroniser maintenant</value>
+  </data>
+  <data name="TimeSettingsSaved" xml:space="preserve">
+    <value>Paramètres de l'heure enregistrés</value>
+  </data>
+  <data name="LocationSettingsBoatTypeLabel" xml:space="preserve">
+    <value>Type de bateau</value>
+  </data>
+  <data name="LocationSettingsRenameLabel" xml:space="preserve">
+    <value>Renommer</value>
+  </data>
+  <data name="LocationSettingsMmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="LocationSettingsCallSignLabel" xml:space="preserve">
+    <value>Indicatif d'appel</value>
+  </data>
+  <data name="LocationSettingsHomePortLabel" xml:space="preserve">
+    <value>Port d'attache</value>
+  </data>
+  <data name="LocationSettingsSaved" xml:space="preserve">
+    <value>Paramètres de localisation enregistrés</value>
+  </data>
+  <data name="PowerHubNotConfigured" xml:space="preserve">
+    <value>PowerHubService n'est pas configuré. Appelez d'abord Configure().</value>
+  </data>
+  <data name="LogConfigExecuting" xml:space="preserve">
+    <value>ConfigConnection en cours d'exécution : {Description}</value>
+  </data>
+  <data name="LogConfigSucceeded" xml:space="preserve">
+    <value>ConfigConnection réussie : {Description}</value>
+  </data>
+  <data name="LogConfigFailed" xml:space="preserve">
+    <value>Échec de ConfigConnection : {Description}</value>
+  </data>
+  <data name="LogConfigFailureResponse" xml:space="preserve">
+    <value>L'appareil a renvoyé une réponse d'échec.</value>
+  </data>
+  <data name="LogConfigConsumerError" xml:space="preserve">
+    <value>Erreur du consommateur ConfigConnection</value>
+  </data>
+  <data name="LogPublishSuccessFailed" xml:space="preserve">
+    <value>Échec de la publication du message de succès pour : {Description}</value>
+  </data>
+  <data name="LogPublishFailureFailed" xml:space="preserve">
+    <value>Échec de la publication du message d'échec pour : {Description}</value>
+  </data>
+  <data name="ConfigSuccessRelay" xml:space="preserve">
+    <value>Configuration du relais réussie</value>
+  </data>
+  <data name="ConfigSuccessSensor" xml:space="preserve">
+    <value>ConfigurationCapteurRéussie</value>
+  </data>
+  <data name="LogConfigMetaRefreshed" xml:space="preserve">
+    <value>ConfigPoller : SensorMetaCache actualisé après connexion.</value>
+  </data>
+  <data name="LogConfigHealthCheckFailed" xml:space="preserve">
+    <value>ConfigPoller : échec du contrôle de santé de la connexion.</value>
+  </data>
+  <data name="LogTimeSyncStarted" xml:space="preserve">
+    <value>TimeSyncService démarré avec intervalle {IntervalMin}min, seuil de dérive {DriftSec}s</value>
+  </data>
+  <data name="LogTimeSyncDeviceTime" xml:space="preserve">
+    <value>TimeSyncService: l'heure de l'appareil est {DeviceTime}, delta {DeltaSec}s</value>
+  </data>
+  <data name="LogTimeSyncSetting" xml:space="preserve">
+    <value>TimeSyncService : la dérive de {DeltaSec}s dépasse le seuil, réglage de l'heure de l'appareil sur {LocalTime}</value>
+  </data>
+  <data name="LogTimeSyncInSync" xml:space="preserve">
+    <value>TimeSyncService : l'heure de l'appareil est synchronisée (delta {DeltaSec}s)</value>
+  </data>
+  <data name="LogTimeSyncNotSet" xml:space="preserve">
+    <value>TimeSyncService : heure de l'appareil non définie, synchronisation en cours</value>
+  </data>
+  <data name="LogTimeSyncFailed" xml:space="preserve">
+    <value>TimeSyncService : échec de la tentative de synchronisation de l'heure</value>
+  </data>
+  <data name="LogTimeSyncStopping" xml:space="preserve">
+    <value>TimeSyncService en cours d’arrêt</value>
+  </data>
+  <data name="LogStartupMetaFetch" xml:space="preserve">
+    <value>Démarrage : premières données du tableau de bord reçues, récupération des métadonnées des capteurs sur la connexion 2.</value>
+  </data>
+  <data name="LogStartupMetaPopulated" xml:space="preserve">
+    <value>Démarrage : cache de métadonnées de capteur rempli.</value>
+  </data>
+  <data name="LogStartupMetaAlready" xml:space="preserve">
+    <value>Démarrage : données du tableau de bord déjà disponibles, récupération des métadonnées des capteurs sur la connexion 2.</value>
+  </data>
+  <data name="TempLabel" xml:space="preserve">
+    <value>intérimaire</value>
+  </data>
+  <data name="HumidityLabel" xml:space="preserve">
+    <value>Humidité</value>
+  </data>
+  <data name="DewPointLabel" xml:space="preserve">
+    <value>point de rosée</value>
+  </data>
+  <data name="ComfortLabel" xml:space="preserve">
+    <value>Confort</value>
+  </data>
+  <data name="CondensationRiskLabel" xml:space="preserve">
+    <value>Risque de condensation</value>
+  </data>
+  <data name="LightLevelLabel" xml:space="preserve">
+    <value>Niveau de lumière</value>
+  </data>
+  <data name="IsDaytimeLabel" xml:space="preserve">
+    <value>Lumière du jour</value>
+  </data>
+  <data name="GpsLatLabel" xml:space="preserve">
+    <value>dorsal</value>
+  </data>
+  <data name="GpsLonLabel" xml:space="preserve">
+    <value>Lon</value>
+  </data>
+  <data name="GpsAltLabel" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="GpsSpeedLabel" xml:space="preserve">
+    <value>Vitesse</value>
+  </data>
+  <data name="GpsCourseLabel" xml:space="preserve">
+    <value>Cours</value>
+  </data>
+  <data name="GpsSatsLabel" xml:space="preserve">
+    <value>Sats</value>
+  </data>
+  <data name="WaterLevelLabel" xml:space="preserve">
+    <value>Niveau d'eau</value>
+  </data>
+  <data name="FreeMemoryLabel" xml:space="preserve">
+    <value>Mémoire libre</value>
+  </data>
+  <data name="CpuUsageLabel" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="VoltageLabel" xml:space="preserve">
+    <value>Tension</value>
+  </data>
+  <data name="StateLabel" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="AverageLabel" xml:space="preserve">
+    <value>Moy.</value>
+  </data>
+  <data name="MsgCancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="SensorSuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SensorSuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SensorSuffixKb" xml:space="preserve">
+    <value>ko</value>
+  </data>
+  <data name="SensorSuffixKmh" xml:space="preserve">
+    <value>km/h</value>
+  </data>
+  <data name="SensorSuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SensorSuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SensorSuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Tableau de bord</value>
+  </data>
+  <data name="Relays" xml:space="preserve">
+    <value>Relais</value>
+  </data>
+  <data name="ExternalSensors" xml:space="preserve">
+    <value>Capteurs externes</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="HelloWorld" xml:space="preserve">
+    <value>Bonjour, le monde !</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="NoRelaysConfigured" xml:space="preserve">
+    <value>Aucun relais configuré</value>
+  </data>
+  <data name="NoSensorsConfigured" xml:space="preserve">
+    <value>Aucun capteur configuré</value>
+  </data>
+  <data name="MemLabel" xml:space="preserve">
+    <value>Mémoire :</value>
+  </data>
+  <data name="CpuLabel" xml:space="preserve">
+    <value>CPU :</value>
+  </data>
+  <data name="FwPrefix" xml:space="preserve">
+    <value>TR:</value>
+  </data>
+  <data name="LogLabel" xml:space="preserve">
+    <value>JOURNAL</value>
+  </data>
+  <data name="RefreshNowTooltip" xml:space="preserve">
+    <value>Actualiser maintenant</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="GpioRestrictions" xml:space="preserve">
+    <value>Restrictions GPIO</value>
+  </data>
+  <data name="HardBlockedPrefix" xml:space="preserve">
+    <value>Bloqué définitivement :</value>
+  </data>
+  <data name="AdvisoryPrefix" xml:space="preserve">
+    <value>Avis :</value>
+  </data>
+  <data name="FirmwareUpdate" xml:space="preserve">
+    <value>Mise à jour du firmware</value>
+  </data>
+  <data name="CurrentVersionPrefix" xml:space="preserve">
+    <value>Version actuelle :</value>
+  </data>
+  <data name="AvailableVersionPrefix" xml:space="preserve">
+    <value>Version disponible :</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Rechercher les mises à jour</value>
+  </data>
+  <data name="PinsAssignedSuffix" xml:space="preserve">
+    <value>broche(s) actuellement affectée(s)</value>
+  </data>
+  <data name="DeviceTime" xml:space="preserve">
+    <value>Heure de l'appareil</value>
+  </data>
+  <data name="SyncTimeNow" xml:space="preserve">
+    <value>Synchroniser l’heure maintenant</value>
+  </data>
+  <data name="TimezoneLabel" xml:space="preserve">
+    <value>fuseau horaire</value>
+  </data>
+  <data name="SelectTimezone" xml:space="preserve">
+    <value>Sélectionner un fuseau horaire...</value>
+  </data>
+  <data name="SaveTimezone" xml:space="preserve">
+    <value>Enregistrer le fuseau horaire</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="LocationNamePlaceholder" xml:space="preserve">
+    <value>Nom de l'emplacement...</value>
+  </data>
+  <data name="LocationType" xml:space="preserve">
+    <value>Type d'emplacement</value>
+  </data>
+  <data name="SelectLocationType" xml:space="preserve">
+    <value>Sélectionner le type d’emplacement...</value>
+  </data>
+  <data name="BoatDetails" xml:space="preserve">
+    <value>Détails du bateau</value>
+  </data>
+  <data name="RtcPins" xml:space="preserve">
+    <value>Broches RTC</value>
+  </data>
+  <data name="DataPin" xml:space="preserve">
+    <value>Broche de données</value>
+  </data>
+  <data name="ClockPin" xml:space="preserve">
+    <value>Goupille d'horloge</value>
+  </data>
+  <data name="ResetPin" xml:space="preserve">
+    <value>Réinitialiser le PIN</value>
+  </data>
+  <data name="Use255DisableAnyPin" xml:space="preserve">
+    <value>Utilisez 255 pour désactiver toute broche</value>
+  </data>
+  <data name="SpiPins" xml:space="preserve">
+    <value>Broches SPI</value>
+  </data>
+  <data name="SckClock" xml:space="preserve">
+    <value>SCK (Horloge)</value>
+  </data>
+  <data name="MosiMasterOut" xml:space="preserve">
+    <value>MOSI (sortie maître)</value>
+  </data>
+  <data name="MisoMasterIn" xml:space="preserve">
+    <value>MISO (Master en)</value>
+  </data>
+  <data name="Use255Disable" xml:space="preserve">
+    <value>Utilisez 255 pour désactiver</value>
+  </data>
+  <data name="ChipSelect" xml:space="preserve">
+    <value>Sélection de puce</value>
+  </data>
+  <data name="InitSpeed" xml:space="preserve">
+    <value>Vitesse initiale</value>
+  </data>
+  <data name="SpeedMhz" xml:space="preserve">
+    <value>Vitesse (MHz)</value>
+  </data>
+  <data name="ValidSpeeds" xml:space="preserve">
+    <value>Valide : 4, 8, 12, 16, 20, 24 MHz</value>
+  </data>
+  <data name="EnableAuthentication" xml:space="preserve">
+    <value>Activer l'authentification</value>
+  </data>
+  <data name="EnterApiKeyPlaceholder" xml:space="preserve">
+    <value>Saisissez la clé API</value>
+  </data>
+  <data name="EnterHmacKeyPlaceholder" xml:space="preserve">
+    <value>Saisissez la clé HMAC</value>
+  </data>
+  <data name="NextionDisplay" xml:space="preserve">
+    <value>Écran Nextion</value>
+  </data>
+  <data name="HardwareSerial" xml:space="preserve">
+    <value>Numéro de série matériel</value>
+  </data>
+  <data name="Pins" xml:space="preserve">
+    <value>Épingles</value>
+  </data>
+  <data name="RxPinDisabled" xml:space="preserve">
+    <value>Broche RX (vide ou 255 = désactivé)</value>
+  </data>
+  <data name="TxPinDisabled" xml:space="preserve">
+    <value>Broche TX (vide ou 255 = désactivé)</value>
+  </data>
+  <data name="Communication" xml:space="preserve">
+    <value>Communication</value>
+  </data>
+  <data name="UartNumber" xml:space="preserve">
+    <value>Numéro UART</value>
+  </data>
+  <data name="Uart" xml:space="preserve">
+    <value>UART</value>
+  </data>
+  <data name="RebootRequired" xml:space="preserve">
+    <value>Redémarrage requis</value>
+  </data>
+  <data name="NextionRebootRequiredMessage" xml:space="preserve">
+    <value>Les modifications de la configuration Nextion nécessitent un redémarrage de l'appareil pour prendre effet. Enregistrez les paramètres et redémarrez l'appareil.</value>
+  </data>
+  <data name="BuzzerPin" xml:space="preserve">
+    <value>Broche du buzzer</value>
+  </data>
+  <data name="GpioPin" xml:space="preserve">
+    <value>Broche GPIO</value>
+  </data>
+  <data name="Use255DisablePin" xml:space="preserve">
+    <value>Utilisez 255 pour désactiver la broche.</value>
+  </data>
+  <data name="HostIp" xml:space="preserve">
+    <value>Hôte / IP</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>Identifiants</value>
+  </data>
+  <data name="LeaveEmptyForNone" xml:space="preserve">
+    <value>Laisser vide pour aucun</value>
+  </data>
+  <data name="EnterPasswordToChange" xml:space="preserve">
+    <value>Entrez le mot de passe pour modifier</value>
+  </data>
+  <data name="DeviceIdentity" xml:space="preserve">
+    <value>Identité de l'appareil</value>
+  </data>
+  <data name="MqttDeviceIdPlaceholder" xml:space="preserve">
+    <value>p. ex. boat_seawolf_01</value>
+  </data>
+  <data name="HomeassistantPlaceholder" xml:space="preserve">
+    <value>homeassistant</value>
+  </data>
+  <data name="KeepAliveSeconds" xml:space="preserve">
+    <value>Keep Alive (secondes)</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Avancé</value>
+  </data>
+  <data name="SaveAllSettings" xml:space="preserve">
+    <value>Enregistrer tous les paramètres</value>
+  </data>
+  <data name="ExternalSensorTitle" xml:space="preserve">
+    <value>Capteur externe</value>
+  </data>
+  <data name="SensorTypeLabel" xml:space="preserve">
+    <value>Type de capteur</value>
+  </data>
+  <data name="SelectSensorType" xml:space="preserve">
+    <value>Sélectionner le type de capteur</value>
+  </data>
+  <data name="MqttName" xml:space="preserve">
+    <value>Nom MQTT</value>
+  </data>
+  <data name="MqttSlug" xml:space="preserve">
+    <value>Slug MQTT</value>
+  </data>
+  <data name="MqttType" xml:space="preserve">
+    <value>Type MQTT</value>
+  </data>
+  <data name="MqttDeviceClass" xml:space="preserve">
+    <value>Classe d'appareil MQTT</value>
+  </data>
+  <data name="MqttUnit" xml:space="preserve">
+    <value>Unité MQTT</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>Binaire</value>
+  </data>
+  <data name="OptionsSection" xml:space="preserve">
+    <value>OPTIONS</value>
+  </data>
+  <data name="EnabledSection" xml:space="preserve">
+    <value>ACTIVÉ</value>
+  </data>
+  <data name="SensorEnabled" xml:space="preserve">
+    <value>Capteur activé</value>
+  </data>
+  <data name="SensorTypePresenceShort" xml:space="preserve">
+    <value>Présence</value>
+  </data>
+  <data name="LevelLabel" xml:space="preserve">
+    <value>Niveau</value>
+  </data>
+  <data name="TemperatureLabel" xml:space="preserve">
+    <value>Température</value>
+  </data>
+  <data name="CondensationLabel" xml:space="preserve">
+    <value>Condensation</value>
+  </data>
+  <data name="LatitudeLabel" xml:space="preserve">
+    <value>latitude</value>
+  </data>
+  <data name="LongitudeLabel" xml:space="preserve">
+    <value>Longitude</value>
+  </data>
+  <data name="AltitudeLabel" xml:space="preserve">
+    <value>Altitude</value>
+  </data>
+  <data name="SatellitesLabel" xml:space="preserve">
+    <value>Satellites</value>
+  </data>
+  <data name="FreeRamLabel" xml:space="preserve">
+    <value>RAM libre</value>
+  </data>
+  <data name="InstantLabel" xml:space="preserve">
+    <value>Instantané</value>
+  </data>
+  <data name="RollingAvgLabel" xml:space="preserve">
+    <value>Moyenne mobile</value>
+  </data>
+  <data name="PlaceholderPin21" xml:space="preserve">
+    <value>p. ex. 21</value>
+  </data>
+  <data name="PlaceholderPin22" xml:space="preserve">
+    <value>p. ex. 22</value>
+  </data>
+  <data name="PlaceholderPin23" xml:space="preserve">
+    <value>p. ex. 23</value>
+  </data>
+  <data name="PlaceholderPin12" xml:space="preserve">
+    <value>p. ex. 12</value>
+  </data>
+  <data name="PlaceholderPin11" xml:space="preserve">
+    <value>p. ex. 11</value>
+  </data>
+  <data name="PlaceholderPin13" xml:space="preserve">
+    <value>p. ex. 13</value>
+  </data>
+  <data name="PlaceholderPin10" xml:space="preserve">
+    <value>p. ex. 10</value>
+  </data>
+  <data name="PlaceholderBaud9600" xml:space="preserve">
+    <value>p. ex. 9600</value>
+  </data>
+  <data name="MmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="CallSignLabel" xml:space="preserve">
+    <value>Indicatif d'appel</value>
+  </data>
+  <data name="HomePortLabel" xml:space="preserve">
+    <value>Port d'attache</value>
+  </data>
+  <data name="CsPin" xml:space="preserve">
+    <value>CS Pin</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>Clé API</value>
+  </data>
+  <data name="HmacKey" xml:space="preserve">
+    <value>Clé HMAC</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+    <value>Débit en bauds</value>
+  </data>
+  <data name="Connection" xml:space="preserve">
+    <value>Connexion</value>
+  </data>
+  <data name="GenerateNewKeys" xml:space="preserve">
+    <value>Générer de nouvelles clés</value>
+  </data>
+  <data name="Placeholder255Disabled" xml:space="preserve">
+    <value>255 = désactivé</value>
+  </data>
+  <data name="PlaceholderBilgeShort" xml:space="preserve">
+    <value>p. ex. Bilge</value>
+  </data>
+  <data name="PlaceholderBilgePump" xml:space="preserve">
+    <value>ex. : Pompe de cale</value>
+  </data>
+  <data name="GpioPinDisabled" xml:space="preserve">
+    <value>Broche GPIO  (vide ou 255 = désactivé)</value>
+  </data>
+  <data name="SensorTypePresence" xml:space="preserve">
+    <value>Présence</value>
+  </data>
+  <data name="ExtSensorsTitle" xml:space="preserve">
+    <value>Capteurs ext.</value>
+  </data>
+  <data name="SensorTitle" xml:space="preserve">
+    <value>Capteur</value>
+  </data>
+  <data name="SpeedLabel" xml:space="preserve">
+    <value>Vitesse</value>
+  </data>
+  <data name="CourseLabel" xml:space="preserve">
+    <value>Cours</value>
+  </data>
+  <data name="AvgLabel" xml:space="preserve">
+    <value>Moy.</value>
+  </data>
+  <data name="PinPairFormat" xml:space="preserve">
+    <value>Épingler {0}, {1}</value>
+  </data>
+  <data name="PlaceholderMqttPort" xml:space="preserve">
+    <value>1883</value>
+  </data>
+  <data name="PlaceholderKeepAlive" xml:space="preserve">
+    <value>60</value>
+  </data>
+  <data name="PlaceholderSpeedMhz" xml:space="preserve">
+    <value>4</value>
+  </data>
+</root>

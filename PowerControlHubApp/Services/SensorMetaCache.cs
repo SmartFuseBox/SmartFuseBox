@@ -1,5 +1,5 @@
 using PowerControlHubApp.Models;
-using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Services;
 
@@ -37,8 +37,8 @@ public sealed class SensorMetaCache
         if (current.Count != incoming.Count)
             return false;
 
-        var currentIds = current.Select(d => d.Id).OrderBy(id => id);
-        var incomingIds = incoming.Select(d => d.Id).OrderBy(id => id);
+        IOrderedEnumerable<int> currentIds = current.Select(d => d.Id).OrderBy(id => id);
+        IOrderedEnumerable<int> incomingIds = incoming.Select(d => d.Id).OrderBy(id => id);
         return currentIds.SequenceEqual(incomingIds);
     }
 

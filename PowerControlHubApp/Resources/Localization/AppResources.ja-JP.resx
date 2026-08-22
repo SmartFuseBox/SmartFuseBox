@@ -1,0 +1,1222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MessageNotConfigured" xml:space="preserve">
+    <value>未設定 — ⚙をタップしてデバイスのIPを設定</value>
+  </data>
+  <data name="MessageDeviceUnreachable" xml:space="preserve">
+    <value>デバイスに到達できません</value>
+  </data>
+  <data name="MessageNoActiveWarnings" xml:space="preserve">
+    <value>アクティブな警告はありません</value>
+  </data>
+  <data name="MessageToggleFailed" xml:space="preserve">
+    <value>切り替えに失敗しました — ログを参照してください</value>
+  </data>
+  <data name="MessageNotConnected" xml:space="preserve">
+    <value>未接続</value>
+  </data>
+  <data name="MsgIpRequired" xml:space="preserve">
+    <value>IPアドレスが必要です。</value>
+  </data>
+  <data name="MsgInvalidPort" xml:space="preserve">
+    <value>有効なポート番号を入力してください（1～65535）。</value>
+  </data>
+  <data name="NotConfigured" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="LogOtaTrigger" xml:space="preserve">
+    <value>OTA: ファームウェアインストールを開始しています…</value>
+  </data>
+  <data name="OtaTriggerFailed" xml:space="preserve">
+    <value>OTAトリガーに失敗しました</value>
+  </data>
+  <data name="OtaDialogTitle" xml:space="preserve">
+    <value>ファームウェアをインストール</value>
+  </data>
+  <data name="OtaDialogAccept" xml:space="preserve">
+    <value>インストール</value>
+  </data>
+  <data name="OtaDialogMessage" xml:space="preserve">
+    <value>{0}へのOTAアップデートが利用可能です。今すぐダウンロードしてインストールしますか？</value>
+  </data>
+  <data name="OtaLabelAvailable" xml:space="preserve">
+    <value>更新が利用可能です: {0} (インストール済み: {1})</value>
+  </data>
+  <data name="OtaLabelChecking" xml:space="preserve">
+    <value>ファームウェアの更新を確認中…</value>
+  </data>
+  <data name="OtaLabelDownloading" xml:space="preserve">
+    <value>ファームウェアアップデートをダウンロードしています…</value>
+  </data>
+  <data name="OtaLabelRebooting" xml:space="preserve">
+    <value>アップデートを適用しています — デバイスを再起動しています…</value>
+  </data>
+  <data name="OtaLabelFailed" xml:space="preserve">
+    <value>ファームウェアの更新に失敗しました。タップして再試行してください。</value>
+  </data>
+  <data name="OtaLabelUptodate" xml:space="preserve">
+    <value>ファームウェアは最新です（{0}）</value>
+  </data>
+  <data name="LogDashboardStarted" xml:space="preserve">
+    <value>DashboardPoller が間隔 {IntervalMs} ミリ秒で開始されました</value>
+  </data>
+  <data name="LogDashboardFetched" xml:space="preserve">
+    <value>DashboardPoller が {Time} にインデックスを取得しました</value>
+  </data>
+  <data name="LogDashboardSkipping" xml:space="preserve">
+    <value>DashboardPoller がポーリングをスキップしています: サービスが設定されていません</value>
+  </data>
+  <data name="LogDeviceInvalidJson" xml:space="preserve">
+    <value>デバイスがインデックスのポーリング中に無効なJSONを返しました</value>
+  </data>
+  <data name="LogUnexpectedPollingError" xml:space="preserve">
+    <value>インデックスのポーリング中に予期しないエラーが発生しました</value>
+  </data>
+  <data name="LogDashboardStopping" xml:space="preserve">
+    <value>DashboardPoller を停止しています</value>
+  </data>
+  <data name="LogMetaRefreshFailed" xml:space="preserve">
+    <value>起動時にセンサーメタキャッシュの更新に失敗しました</value>
+  </data>
+  <data name="RelayPageTitle" xml:space="preserve">
+    <value>リレー</value>
+  </data>
+  <data name="RelayPageTitleFormat" xml:space="preserve">
+    <value>リレー {0}</value>
+  </data>
+  <data name="SavedOk" xml:space="preserve">
+    <value>正常に保存されました</value>
+  </data>
+  <data name="SavedFailed" xml:space="preserve">
+    <value>1つ以上のコマンドが失敗しました</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>保存に失敗しました — デバイスに到達できません</value>
+  </data>
+  <data name="PinFormat" xml:space="preserve">
+    <value>ピン留め {0}</value>
+  </data>
+  <data name="PinSummaryFormat" xml:space="preserve">
+    <value>ピン留め {0}、{1}</value>
+  </data>
+  <data name="ErrRemoveCommandFailed" xml:space="preserve">
+    <value>削除コマンドが失敗しました</value>
+  </data>
+  <data name="RemoveSensor" xml:space="preserve">
+    <value>センサーを取り外す</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>戻る</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>なし</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>オーケー</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+    <value>再起動</value>
+  </data>
+  <data name="Refreshed" xml:space="preserve">
+    <value>リフレッシュ済み</value>
+  </data>
+  <data name="ColorBlue" xml:space="preserve">
+    <value>青</value>
+  </data>
+  <data name="ColorGreen" xml:space="preserve">
+    <value>緑</value>
+  </data>
+  <data name="ColorGrey" xml:space="preserve">
+    <value>グレー</value>
+  </data>
+  <data name="ColorOrange" xml:space="preserve">
+    <value>オレンジ</value>
+  </data>
+  <data name="ColorRed" xml:space="preserve">
+    <value>赤</value>
+  </data>
+  <data name="ColorYellow" xml:space="preserve">
+    <value>黄色</value>
+  </data>
+  <data name="ActionDefault" xml:space="preserve">
+    <value>デフォルト</value>
+  </data>
+  <data name="ActionHorn" xml:space="preserve">
+    <value>角</value>
+  </data>
+  <data name="ActionNightRelay" xml:space="preserve">
+    <value>ナイトリレー</value>
+  </data>
+  <data name="ActionBadgeDefault" xml:space="preserve">
+    <value>デフォルト</value>
+  </data>
+  <data name="ActionBadgeHorn" xml:space="preserve">
+    <value>ホーン</value>
+  </data>
+  <data name="ActionBadgeNight" xml:space="preserve">
+    <value>夜</value>
+  </data>
+  <data name="StateOff" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="StateOn" xml:space="preserve">
+    <value>オン</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>光</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>暗い</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="DeviceIpAddress" xml:space="preserve">
+    <value>デバイスIPアドレス</value>
+  </data>
+  <data name="HttpPort" xml:space="preserve">
+    <value>HTTPポート</value>
+  </data>
+  <data name="ApiKeyLabel" xml:space="preserve">
+    <value>APIキー（X-API-Key）</value>
+  </data>
+  <data name="HmacKeyLabel" xml:space="preserve">
+    <value>HMACキー (X-Auth-Signature)</value>
+  </data>
+  <data name="AppThemeLabel" xml:space="preserve">
+    <value>アプリのテーマ</value>
+  </data>
+  <data name="SaveAndConnect" xml:space="preserve">
+    <value>保存して接続</value>
+  </data>
+  <data name="HowToConnect" xml:space="preserve">
+    <value>接続方法</value>
+  </data>
+  <data name="HowToConnectStep1" xml:space="preserve">
+    <value>1. スマートフォン/PCがESP32ボードと同じWi-Fiネットワークに接続されていることを確認してください。</value>
+  </data>
+  <data name="HowToConnectStep2" xml:space="preserve">
+    <value>2. デバイスのシリアル出力またはルーターのDHCPテーブルに表示されているIPアドレスを入力します。</value>
+  </data>
+  <data name="HowToConnectStep3" xml:space="preserve">
+    <value>3. デフォルトのポートは80です。</value>
+  </data>
+  <data name="HowToConnectStep4" xml:space="preserve">
+    <value>4. デバイスでネットワーク認証が有効になっている場合（C19:e=1）、デバイスの設定に合わせて上記にAPIキーまたはHMACキーを入力してください。</value>
+  </data>
+  <data name="HowToConnectStep5" xml:space="preserve">
+    <value>5. 保存して接続をタップし、ダッシュボードに戻ります。</value>
+  </data>
+  <data name="PlaceholderIpAddress" xml:space="preserve">
+    <value>例：192.168.1.100</value>
+  </data>
+  <data name="PlaceholderPort" xml:space="preserve">
+    <value>80</value>
+  </data>
+  <data name="PlaceholderApiKey" xml:space="preserve">
+    <value>オプション – 認証用のデバイスAPIキー</value>
+  </data>
+  <data name="PlaceholderHmacKey" xml:space="preserve">
+    <value>オプション – 認証用のHMAC-SHA256キー</value>
+  </data>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>システム</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>時間</value>
+  </data>
+  <data name="RTC" xml:space="preserve">
+    <value>リアルタイムクロック</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>場所</value>
+  </data>
+  <data name="MQTT" xml:space="preserve">
+    <value>MQTT</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SDカード</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>セキュリティ</value>
+  </data>
+  <data name="Nextion" xml:space="preserve">
+    <value>Nextion</value>
+  </data>
+  <data name="Buzzer" xml:space="preserve">
+    <value>ブザー</value>
+  </data>
+  <data name="ActiveWarnings" xml:space="preserve">
+    <value>アクティブな警告</value>
+  </data>
+  <data name="GpiosInUse" xml:space="preserve">
+    <value>使用中のGPIO</value>
+  </data>
+  <data name="GpioPinRestrictions" xml:space="preserve">
+    <value>GPIOピンの制限</value>
+  </data>
+  <data name="PinsAssignedFormat" xml:space="preserve">
+    <value>現在 {0} 個のピンが割り当てられています</value>
+  </data>
+  <data name="ControlsSection" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="SensorsSection" xml:space="preserve">
+    <value>センサー</value>
+  </data>
+  <data name="RelayConfigTitle" xml:space="preserve">
+    <value>リレー設定</value>
+  </data>
+  <data name="RelayConfigPageTitle" xml:space="preserve">
+    <value>リレー設定</value>
+  </data>
+  <data name="SectionIdentity" xml:space="preserve">
+    <value>アイデンティティ</value>
+  </data>
+  <data name="SectionHardware" xml:space="preserve">
+    <value>ハードウェア</value>
+  </data>
+  <data name="SectionBehaviour" xml:space="preserve">
+    <value>行動</value>
+  </data>
+  <data name="SectionLinking" xml:space="preserve">
+    <value>リンキング</value>
+  </data>
+  <data name="ShortNameLabel" xml:space="preserve">
+    <value>短縮名（最大5文字）</value>
+  </data>
+  <data name="LongNameLabel" xml:space="preserve">
+    <value>長い名前（最大20文字）</value>
+  </data>
+  <data name="GpioPinLabel" xml:space="preserve">
+    <value>GPIOピン（空白または255 = 無効）</value>
+  </data>
+  <data name="DefaultStateLabel" xml:space="preserve">
+    <value>電源投入時のデフォルト状態</value>
+  </data>
+  <data name="ActionTypeLabel" xml:space="preserve">
+    <value>アクションタイプ</value>
+  </data>
+  <data name="ButtonColourLabel" xml:space="preserve">
+    <value>ボタンの色</value>
+  </data>
+  <data name="LinkedRelayLabel" xml:space="preserve">
+    <value>連携リレー</value>
+  </data>
+  <data name="LinkedRelayHelp" xml:space="preserve">
+    <value>このリレーを切り替えると、連動しているリレーも切り替わります。</value>
+  </data>
+  <data name="PlaceholderShortName" xml:space="preserve">
+    <value>例：ビルジ</value>
+  </data>
+  <data name="PlaceholderLongName" xml:space="preserve">
+    <value>例：ビルジポンプ</value>
+  </data>
+  <data name="PlaceholderPinDisabled" xml:space="preserve">
+    <value>255 = 無効</value>
+  </data>
+  <data name="LocalSensorsTitle" xml:space="preserve">
+    <value>ローカルセンサー</value>
+  </data>
+  <data name="ExternalSensorsTitle" xml:space="preserve">
+    <value>外部センサー</value>
+  </data>
+  <data name="LocalSensorsPageTitle" xml:space="preserve">
+    <value>ローカルセンサー</value>
+  </data>
+  <data name="ExternalSensorsPageTitle" xml:space="preserve">
+    <value>外部センサー</value>
+  </data>
+  <data name="SensorPageTitle" xml:space="preserve">
+    <value>センサー</value>
+  </data>
+  <data name="SensorNotConfigured" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="SensorTypeWater" xml:space="preserve">
+    <value>水</value>
+  </data>
+  <data name="SensorTypeDht11" xml:space="preserve">
+    <value>DHT11</value>
+  </data>
+  <data name="SensorTypeLight" xml:space="preserve">
+    <value>光</value>
+  </data>
+  <data name="SensorTypeGps" xml:space="preserve">
+    <value>GPS</value>
+  </data>
+  <data name="SensorTypeSystem" xml:space="preserve">
+    <value>システム</value>
+  </data>
+  <data name="SensorTypeBinaryPresence" xml:space="preserve">
+    <value>バイナリプレゼンス</value>
+  </data>
+  <data name="SensorTypeVoltage" xml:space="preserve">
+    <value>電圧</value>
+  </data>
+  <data name="SensorTypeUnknown" xml:space="preserve">
+    <value>不明</value>
+  </data>
+  <data name="SensorTypeMetaDataUnavailable" xml:space="preserve">
+    <value>センサータイプのメタデータが利用できません。</value>
+  </data>
+  <data name="SensorTypeWaterPicker" xml:space="preserve">
+    <value>水(0)</value>
+  </data>
+  <data name="SensorTypeDht11Picker" xml:space="preserve">
+    <value>DHT11 (1)</value>
+  </data>
+  <data name="SensorTypeLightPicker" xml:space="preserve">
+    <value>ライト（2）</value>
+  </data>
+  <data name="SensorTypeGpsPicker" xml:space="preserve">
+    <value>GPS（3）</value>
+  </data>
+  <data name="SensorTypeSystemPicker" xml:space="preserve">
+    <value>システム（4）</value>
+  </data>
+  <data name="SensorTypeBinaryPresencePicker" xml:space="preserve">
+    <value>バイナリプレゼンス（5）</value>
+  </data>
+  <data name="SensorTypeVoltagePicker" xml:space="preserve">
+    <value>電圧（6）</value>
+  </data>
+  <data name="SuffixCelsius" xml:space="preserve">
+    <value>℃</value>
+  </data>
+  <data name="SuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SuffixKb" xml:space="preserve">
+    <value>kb</value>
+  </data>
+  <data name="SuffixKmh" xml:space="preserve">
+    <value>km/h</value>
+  </data>
+  <data name="SuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SuffixMetre" xml:space="preserve">
+    <value>エム</value>
+  </data>
+  <data name="SuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="LabelDay" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="LabelNight" xml:space="preserve">
+    <value>夜</value>
+  </data>
+  <data name="LabelFix" xml:space="preserve">
+    <value>修正して</value>
+  </data>
+  <data name="LabelNoFix" xml:space="preserve">
+    <value>修正なし</value>
+  </data>
+  <data name="LabelDetected" xml:space="preserve">
+    <value>検出された</value>
+  </data>
+  <data name="LabelClear" xml:space="preserve">
+    <value>クリア</value>
+  </data>
+  <data name="FailAddUpdateSensor" xml:space="preserve">
+    <value>センサー項目の追加/更新</value>
+  </data>
+  <data name="FailEnableDisableSensor" xml:space="preserve">
+    <value>有効状態を変更</value>
+  </data>
+  <data name="FailSaveSettings" xml:space="preserve">
+    <value>設定をディスクに保存</value>
+  </data>
+  <data name="FailPrefix" xml:space="preserve">
+    <value>失敗しました：</value>
+  </data>
+  <data name="LabelPin0Default" xml:space="preserve">
+    <value>GPIOピン0（空白または255の場合は無効）</value>
+  </data>
+  <data name="LabelPin1Default" xml:space="preserve">
+    <value>GPIOピン1（空白または255 = 無効）</value>
+  </data>
+  <data name="LabelOpt1_0Default" xml:space="preserve">
+    <value>オプション1 (int8)</value>
+  </data>
+  <data name="LabelOpt1_1Default" xml:space="preserve">
+    <value>オプション2（int8）</value>
+  </data>
+  <data name="LabelOpt2_0Default" xml:space="preserve">
+    <value>オプション3（int16）</value>
+  </data>
+  <data name="LabelOpt2_1Default" xml:space="preserve">
+    <value>オプション4（int16）</value>
+  </data>
+  <data name="TimeSettingsTitle" xml:space="preserve">
+    <value>時間設定</value>
+  </data>
+  <data name="RtcSettingsTitle" xml:space="preserve">
+    <value>RTC設定</value>
+  </data>
+  <data name="LocationSettingsTitle" xml:space="preserve">
+    <value>位置情報設定</value>
+  </data>
+  <data name="MqttSettingsTitle" xml:space="preserve">
+    <value>MQTT設定</value>
+  </data>
+  <data name="SdCardSettingsTitle" xml:space="preserve">
+    <value>SDカード設定</value>
+  </data>
+  <data name="NetworkSecurityTitle" xml:space="preserve">
+    <value>ネットワークセキュリティ</value>
+  </data>
+  <data name="NextionSettingsTitle" xml:space="preserve">
+    <value>Nextion設定</value>
+  </data>
+  <data name="BuzzerSettingsTitle" xml:space="preserve">
+    <value>ブザー設定</value>
+  </data>
+  <data name="RtcSettingsSaved" xml:space="preserve">
+    <value>RTC設定を保存しました</value>
+  </data>
+  <data name="BuzzerSettingsSaved" xml:space="preserve">
+    <value>ブザー設定を保存しました</value>
+  </data>
+  <data name="NextionSettingsSaved" xml:space="preserve">
+    <value>Nextion設定が保存されました</value>
+  </data>
+  <data name="NextionRebootTitle" xml:space="preserve">
+    <value>再起動が必要です</value>
+  </data>
+  <data name="NextionRebootMessage" xml:space="preserve">
+    <value>変更を有効にするにはデバイスの再起動が必要です。今すぐデバイスを再起動しますか？（デバイスに再起動エンドポイントがない場合は、手動で電源を入れ直す必要があります）</value>
+  </data>
+  <data name="NextionRebootSavedMessage" xml:space="preserve">
+    <value>設定を保存しました。Nextionの設定を適用するために、デバイスの電源を入れ直してください。</value>
+  </data>
+  <data name="NextionRebootFailed" xml:space="preserve">
+    <value>再起動前に設定を保存できませんでした。</value>
+  </data>
+  <data name="NextionUart1" xml:space="preserve">
+    <value>UART1</value>
+  </data>
+  <data name="NextionUart2" xml:space="preserve">
+    <value>UART2</value>
+  </data>
+  <data name="NextionUartLabel" xml:space="preserve">
+    <value>UARTポート</value>
+  </data>
+  <data name="NextionBaudRateLabel" xml:space="preserve">
+    <value>ボーレート</value>
+  </data>
+  <data name="NextionRxPinLabel" xml:space="preserve">
+    <value>RXピン</value>
+  </data>
+  <data name="NextionTxPinLabel" xml:space="preserve">
+    <value>TXピン</value>
+  </data>
+  <data name="NextionEnabledLabel" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="MqttConnected" xml:space="preserve">
+    <value>接続済み</value>
+  </data>
+  <data name="MqttDisconnected" xml:space="preserve">
+    <value>切断されました</value>
+  </data>
+  <data name="MqttSettingsSaved" xml:space="preserve">
+    <value>MQTT設定が保存されました</value>
+  </data>
+  <data name="MqttConnectionLabel" xml:space="preserve">
+    <value>接続</value>
+  </data>
+  <data name="MqttEnabledLabel" xml:space="preserve">
+    <value>MQTT 有効</value>
+  </data>
+  <data name="MqttConnectionStateLabel" xml:space="preserve">
+    <value>接続状態</value>
+  </data>
+  <data name="MqttBrokerLabel" xml:space="preserve">
+    <value>ブローカー</value>
+  </data>
+  <data name="MqttPortLabel" xml:space="preserve">
+    <value>ポート</value>
+  </data>
+  <data name="MqttUsernameLabel" xml:space="preserve">
+    <value>ユーザー名</value>
+  </data>
+  <data name="MqttPasswordLabel" xml:space="preserve">
+    <value>パスワード</value>
+  </data>
+  <data name="MqttDeviceIdLabel" xml:space="preserve">
+    <value>デバイスID</value>
+  </data>
+  <data name="MqttHaDiscoveryLabel" xml:space="preserve">
+    <value>Home Assistant ディスカバリー</value>
+  </data>
+  <data name="MqttKeepAliveLabel" xml:space="preserve">
+    <value>キープアライブ（秒）</value>
+  </data>
+  <data name="MqttDiscoveryPrefixLabel" xml:space="preserve">
+    <value>ディスカバリープレフィックス</value>
+  </data>
+  <data name="SdCardSettingsSaved" xml:space="preserve">
+    <value>SDカードの設定を保存しました</value>
+  </data>
+  <data name="SdCardPartiallySaved" xml:space="preserve">
+    <value>部分的に保存されました — SPIピンは拒否されました（ピンの競合を確認してください）</value>
+  </data>
+  <data name="SdCardSpiFailed" xml:space="preserve">
+    <value>SPIピンが保存されませんでした（ピン競合または無効なピン）</value>
+  </data>
+  <data name="SdCardSpiPinsLabel" xml:space="preserve">
+    <value>SPIピン（SCK/MOSI/MISO）</value>
+  </data>
+  <data name="SdCardInitSpeedLabel" xml:space="preserve">
+    <value>初期速度（MHz）</value>
+  </data>
+  <data name="SdCardCsPinLabel" xml:space="preserve">
+    <value>CSピン</value>
+  </data>
+  <data name="NetworkSecuritySettingsSaved" xml:space="preserve">
+    <value>ネットワークセキュリティ設定を保存しました</value>
+  </data>
+  <data name="NetworkSecurityKeysGenerated" xml:space="preserve">
+    <value>新しい鍵が生成され、保存されました</value>
+  </data>
+  <data name="NetworkSecurityGenerateFailed" xml:space="preserve">
+    <value>キー生成に失敗しました — デバイスに到達できません</value>
+  </data>
+  <data name="NetworkSecurityAuthEnabledLabel" xml:space="preserve">
+    <value>認証が有効になっています</value>
+  </data>
+  <data name="NetworkSecurityGenerateKeys" xml:space="preserve">
+    <value>新しい鍵を生成</value>
+  </data>
+  <data name="NetworkSecurityApiKeyLabel" xml:space="preserve">
+    <value>APIキー</value>
+  </data>
+  <data name="NetworkSecurityHmacKeyLabel" xml:space="preserve">
+    <value>HMACキー</value>
+  </data>
+  <data name="TimeSettingsTimezoneLabel" xml:space="preserve">
+    <value>タイムゾーンオフセット（時間）</value>
+  </data>
+  <data name="TimeSettingsSyncNow" xml:space="preserve">
+    <value>今すぐ同期</value>
+  </data>
+  <data name="TimeSettingsSaved" xml:space="preserve">
+    <value>時刻設定を保存しました</value>
+  </data>
+  <data name="LocationSettingsBoatTypeLabel" xml:space="preserve">
+    <value>ボートの種類</value>
+  </data>
+  <data name="LocationSettingsRenameLabel" xml:space="preserve">
+    <value>名前を変更</value>
+  </data>
+  <data name="LocationSettingsMmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="LocationSettingsCallSignLabel" xml:space="preserve">
+    <value>コールサイン</value>
+  </data>
+  <data name="LocationSettingsHomePortLabel" xml:space="preserve">
+    <value>母港</value>
+  </data>
+  <data name="LocationSettingsSaved" xml:space="preserve">
+    <value>位置情報の設定が保存されました</value>
+  </data>
+  <data name="PowerHubNotConfigured" xml:space="preserve">
+    <value>PowerHubService が構成されていません。最初に Configure() を呼び出してください。</value>
+  </data>
+  <data name="LogConfigExecuting" xml:space="preserve">
+    <value>ConfigConnection 実行中: {Description}</value>
+  </data>
+  <data name="LogConfigSucceeded" xml:space="preserve">
+    <value>ConfigConnection が成功しました: {Description}</value>
+  </data>
+  <data name="LogConfigFailed" xml:space="preserve">
+    <value>ConfigConnectionに失敗しました: {Description}</value>
+  </data>
+  <data name="LogConfigFailureResponse" xml:space="preserve">
+    <value>デバイスが失敗応答を返しました</value>
+  </data>
+  <data name="LogConfigConsumerError" xml:space="preserve">
+    <value>ConfigConnection コンシューマーエラー</value>
+  </data>
+  <data name="LogPublishSuccessFailed" xml:space="preserve">
+    <value>成功メッセージを公開できませんでした: {Description}</value>
+  </data>
+  <data name="LogPublishFailureFailed" xml:space="preserve">
+    <value>{Description} の失敗メッセージを公開できませんでした</value>
+  </data>
+  <data name="ConfigSuccessRelay" xml:space="preserve">
+    <value>リレー設定が成功しました</value>
+  </data>
+  <data name="ConfigSuccessSensor" xml:space="preserve">
+    <value>センサー設定に成功しました</value>
+  </data>
+  <data name="LogConfigMetaRefreshed" xml:space="preserve">
+    <value>ConfigPoller: SensorMetaCache は接続後にリフレッシュされました。</value>
+  </data>
+  <data name="LogConfigHealthCheckFailed" xml:space="preserve">
+    <value>ConfigPoller: 接続ヘルスチェックに失敗しました。</value>
+  </data>
+  <data name="LogTimeSyncStarted" xml:space="preserve">
+    <value>TimeSyncService が間隔 {IntervalMin} 分、ドリフトしきい値 {DriftSec} 秒で開始されました。</value>
+  </data>
+  <data name="LogTimeSyncDeviceTime" xml:space="preserve">
+    <value>TimeSyncService: デバイス時刻は {DeviceTime}、差分 {DeltaSec}秒</value>
+  </data>
+  <data name="LogTimeSyncSetting" xml:space="preserve">
+    <value>TimeSyncService: ドリフト {DeltaSec} 秒がしきい値を超えました。デバイス時刻を {LocalTime} に設定します</value>
+  </data>
+  <data name="LogTimeSyncInSync" xml:space="preserve">
+    <value>TimeSyncService: デバイスの時刻は同期しています（差分 {DeltaSec}秒）</value>
+  </data>
+  <data name="LogTimeSyncNotSet" xml:space="preserve">
+    <value>TimeSyncService: デバイスの時刻が未設定のため、同期しています</value>
+  </data>
+  <data name="LogTimeSyncFailed" xml:space="preserve">
+    <value>TimeSyncService: 時刻同期の試行に失敗しました</value>
+  </data>
+  <data name="LogTimeSyncStopping" xml:space="preserve">
+    <value>TimeSyncService 停止中</value>
+  </data>
+  <data name="LogStartupMetaFetch" xml:space="preserve">
+    <value>スタートアップ: 最初のダッシュボードデータを受信、接続2でセンサーメタを取得中</value>
+  </data>
+  <data name="LogStartupMetaPopulated" xml:space="preserve">
+    <value>起動時: センサーメタキャッシュが投入されました。</value>
+  </data>
+  <data name="LogStartupMetaAlready" xml:space="preserve">
+    <value>起動時: ダッシュボードデータは既に利用可能です。接続2でセンサーメタを取得中です。</value>
+  </data>
+  <data name="TempLabel" xml:space="preserve">
+    <value>温度</value>
+  </data>
+  <data name="HumidityLabel" xml:space="preserve">
+    <value>湿度</value>
+  </data>
+  <data name="DewPointLabel" xml:space="preserve">
+    <value>露点</value>
+  </data>
+  <data name="ComfortLabel" xml:space="preserve">
+    <value>快適さ</value>
+  </data>
+  <data name="CondensationRiskLabel" xml:space="preserve">
+    <value>結露リスク</value>
+  </data>
+  <data name="LightLevelLabel" xml:space="preserve">
+    <value>光レベル</value>
+  </data>
+  <data name="IsDaytimeLabel" xml:space="preserve">
+    <value>日光</value>
+  </data>
+  <data name="GpsLatLabel" xml:space="preserve">
+    <value>緯度</value>
+  </data>
+  <data name="GpsLonLabel" xml:space="preserve">
+    <value>ロン</value>
+  </data>
+  <data name="GpsAltLabel" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="GpsSpeedLabel" xml:space="preserve">
+    <value>スピード</value>
+  </data>
+  <data name="GpsCourseLabel" xml:space="preserve">
+    <value>コース</value>
+  </data>
+  <data name="GpsSatsLabel" xml:space="preserve">
+    <value>サッツ</value>
+  </data>
+  <data name="WaterLevelLabel" xml:space="preserve">
+    <value>水位</value>
+  </data>
+  <data name="FreeMemoryLabel" xml:space="preserve">
+    <value>空きメモリ</value>
+  </data>
+  <data name="CpuUsageLabel" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="VoltageLabel" xml:space="preserve">
+    <value>電圧</value>
+  </data>
+  <data name="StateLabel" xml:space="preserve">
+    <value>州</value>
+  </data>
+  <data name="AverageLabel" xml:space="preserve">
+    <value>平均</value>
+  </data>
+  <data name="MsgCancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="SensorSuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SensorSuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SensorSuffixKb" xml:space="preserve">
+    <value>kb</value>
+  </data>
+  <data name="SensorSuffixKmh" xml:space="preserve">
+    <value>km/h</value>
+  </data>
+  <data name="SensorSuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SensorSuffixMetre" xml:space="preserve">
+    <value>エム</value>
+  </data>
+  <data name="SensorSuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>ダッシュボード</value>
+  </data>
+  <data name="Relays" xml:space="preserve">
+    <value>リレー</value>
+  </data>
+  <data name="ExternalSensors" xml:space="preserve">
+    <value>外部センサー</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="HelloWorld" xml:space="preserve">
+    <value>こんにちは、世界！</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>インストール</value>
+  </data>
+  <data name="NoRelaysConfigured" xml:space="preserve">
+    <value>リレーは設定されていません</value>
+  </data>
+  <data name="NoSensorsConfigured" xml:space="preserve">
+    <value>センサーが設定されていません</value>
+  </data>
+  <data name="MemLabel" xml:space="preserve">
+    <value>メモリ：</value>
+  </data>
+  <data name="CpuLabel" xml:space="preserve">
+    <value>CPU：</value>
+  </data>
+  <data name="FwPrefix" xml:space="preserve">
+    <value>転送：</value>
+  </data>
+  <data name="LogLabel" xml:space="preserve">
+    <value>ログ</value>
+  </data>
+  <data name="RefreshNowTooltip" xml:space="preserve">
+    <value>今すぐ更新</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="GpioRestrictions" xml:space="preserve">
+    <value>GPIO制限</value>
+  </data>
+  <data name="HardBlockedPrefix" xml:space="preserve">
+    <value>ハードブロック済み：</value>
+  </data>
+  <data name="AdvisoryPrefix" xml:space="preserve">
+    <value>勧告：</value>
+  </data>
+  <data name="FirmwareUpdate" xml:space="preserve">
+    <value>ファームウェアアップデート</value>
+  </data>
+  <data name="CurrentVersionPrefix" xml:space="preserve">
+    <value>現在のバージョン：</value>
+  </data>
+  <data name="AvailableVersionPrefix" xml:space="preserve">
+    <value>利用可能なバージョン：</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>更新を確認</value>
+  </data>
+  <data name="PinsAssignedSuffix" xml:space="preserve">
+    <value>現在割り当てられているPIN</value>
+  </data>
+  <data name="DeviceTime" xml:space="preserve">
+    <value>デバイス時間</value>
+  </data>
+  <data name="SyncTimeNow" xml:space="preserve">
+    <value>今すぐ時刻を同期</value>
+  </data>
+  <data name="TimezoneLabel" xml:space="preserve">
+    <value>タイムゾーン</value>
+  </data>
+  <data name="SelectTimezone" xml:space="preserve">
+    <value>タイムゾーンを選択...</value>
+  </data>
+  <data name="SaveTimezone" xml:space="preserve">
+    <value>タイムゾーンを保存</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="LocationNamePlaceholder" xml:space="preserve">
+    <value>場所名...</value>
+  </data>
+  <data name="LocationType" xml:space="preserve">
+    <value>ロケーションタイプ</value>
+  </data>
+  <data name="SelectLocationType" xml:space="preserve">
+    <value>場所タイプを選択...</value>
+  </data>
+  <data name="BoatDetails" xml:space="preserve">
+    <value>ボート詳細</value>
+  </data>
+  <data name="RtcPins" xml:space="preserve">
+    <value>RTCピン</value>
+  </data>
+  <data name="DataPin" xml:space="preserve">
+    <value>データピン</value>
+  </data>
+  <data name="ClockPin" xml:space="preserve">
+    <value>クロックピン</value>
+  </data>
+  <data name="ResetPin" xml:space="preserve">
+    <value>PINをリセット</value>
+  </data>
+  <data name="Use255DisableAnyPin" xml:space="preserve">
+    <value>任意のピンを無効にするには255を使用します。</value>
+  </data>
+  <data name="SpiPins" xml:space="preserve">
+    <value>SPIピン</value>
+  </data>
+  <data name="SckClock" xml:space="preserve">
+    <value>SCK（クロック）</value>
+  </data>
+  <data name="MosiMasterOut" xml:space="preserve">
+    <value>MOSI（マスター出力）</value>
+  </data>
+  <data name="MisoMasterIn" xml:space="preserve">
+    <value>MISO（マスタ入力）</value>
+  </data>
+  <data name="Use255Disable" xml:space="preserve">
+    <value>無効にするには255を使用してください。</value>
+  </data>
+  <data name="ChipSelect" xml:space="preserve">
+    <value>チップセレクト</value>
+  </data>
+  <data name="InitSpeed" xml:space="preserve">
+    <value>初期速度</value>
+  </data>
+  <data name="SpeedMhz" xml:space="preserve">
+    <value>速度（MHz）</value>
+  </data>
+  <data name="ValidSpeeds" xml:space="preserve">
+    <value>有効: 4、8、12、16、20、24 MHz</value>
+  </data>
+  <data name="EnableAuthentication" xml:space="preserve">
+    <value>認証を有効にする</value>
+  </data>
+  <data name="EnterApiKeyPlaceholder" xml:space="preserve">
+    <value>APIキーを入力</value>
+  </data>
+  <data name="EnterHmacKeyPlaceholder" xml:space="preserve">
+    <value>HMACキーを入力</value>
+  </data>
+  <data name="NextionDisplay" xml:space="preserve">
+    <value>ネクション ディスプレイ</value>
+  </data>
+  <data name="HardwareSerial" xml:space="preserve">
+    <value>ハードウェアシリアル</value>
+  </data>
+  <data name="Pins" xml:space="preserve">
+    <value>ピン</value>
+  </data>
+  <data name="RxPinDisabled" xml:space="preserve">
+    <value>RXピン（空白または255 = 無効）</value>
+  </data>
+  <data name="TxPinDisabled" xml:space="preserve">
+    <value>TXピン（空白または255 = 無効）</value>
+  </data>
+  <data name="Communication" xml:space="preserve">
+    <value>コミュニケーション</value>
+  </data>
+  <data name="UartNumber" xml:space="preserve">
+    <value>UART番号</value>
+  </data>
+  <data name="Uart" xml:space="preserve">
+    <value>UART</value>
+  </data>
+  <data name="RebootRequired" xml:space="preserve">
+    <value>再起動が必要です</value>
+  </data>
+  <data name="NextionRebootRequiredMessage" xml:space="preserve">
+    <value>Nextion設定の変更を有効にするには、デバイスの再起動が必要です。設定を保存してデバイスを再起動してください。</value>
+  </data>
+  <data name="BuzzerPin" xml:space="preserve">
+    <value>ブザーピン</value>
+  </data>
+  <data name="GpioPin" xml:space="preserve">
+    <value>GPIOピン</value>
+  </data>
+  <data name="Use255DisablePin" xml:space="preserve">
+    <value>ピンを無効にするには255を使用してください</value>
+  </data>
+  <data name="HostIp" xml:space="preserve">
+    <value>ホスト / IP</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>資格情報</value>
+  </data>
+  <data name="LeaveEmptyForNone" xml:space="preserve">
+    <value>なしの場合は空欄のままにしてください</value>
+  </data>
+  <data name="EnterPasswordToChange" xml:space="preserve">
+    <value>変更するにはパスワードを入力してください</value>
+  </data>
+  <data name="DeviceIdentity" xml:space="preserve">
+    <value>デバイス識別情報</value>
+  </data>
+  <data name="MqttDeviceIdPlaceholder" xml:space="preserve">
+    <value>例：boat_seawolf_01</value>
+  </data>
+  <data name="HomeassistantPlaceholder" xml:space="preserve">
+    <value>ホームアシスタント</value>
+  </data>
+  <data name="KeepAliveSeconds" xml:space="preserve">
+    <value>キープアライブ（秒）</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>上級</value>
+  </data>
+  <data name="SaveAllSettings" xml:space="preserve">
+    <value>すべての設定を保存</value>
+  </data>
+  <data name="ExternalSensorTitle" xml:space="preserve">
+    <value>外部センサー</value>
+  </data>
+  <data name="SensorTypeLabel" xml:space="preserve">
+    <value>センサータイプ</value>
+  </data>
+  <data name="SelectSensorType" xml:space="preserve">
+    <value>センサータイプを選択</value>
+  </data>
+  <data name="MqttName" xml:space="preserve">
+    <value>MQTT名</value>
+  </data>
+  <data name="MqttSlug" xml:space="preserve">
+    <value>MQTTスラッグ</value>
+  </data>
+  <data name="MqttType" xml:space="preserve">
+    <value>MQTTタイプ</value>
+  </data>
+  <data name="MqttDeviceClass" xml:space="preserve">
+    <value>MQTTデバイスクラス</value>
+  </data>
+  <data name="MqttUnit" xml:space="preserve">
+    <value>MQTTユニット</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>バイナリ</value>
+  </data>
+  <data name="OptionsSection" xml:space="preserve">
+    <value>オプション</value>
+  </data>
+  <data name="EnabledSection" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="SensorEnabled" xml:space="preserve">
+    <value>センサー有効</value>
+  </data>
+  <data name="SensorTypePresenceShort" xml:space="preserve">
+    <value>存在</value>
+  </data>
+  <data name="LevelLabel" xml:space="preserve">
+    <value>レベル</value>
+  </data>
+  <data name="TemperatureLabel" xml:space="preserve">
+    <value>温度</value>
+  </data>
+  <data name="CondensationLabel" xml:space="preserve">
+    <value>凝縮</value>
+  </data>
+  <data name="LatitudeLabel" xml:space="preserve">
+    <value>緯度</value>
+  </data>
+  <data name="LongitudeLabel" xml:space="preserve">
+    <value>経度</value>
+  </data>
+  <data name="AltitudeLabel" xml:space="preserve">
+    <value>高度</value>
+  </data>
+  <data name="SatellitesLabel" xml:space="preserve">
+    <value>衛星</value>
+  </data>
+  <data name="FreeRamLabel" xml:space="preserve">
+    <value>空きRAM</value>
+  </data>
+  <data name="InstantLabel" xml:space="preserve">
+    <value>インスタント</value>
+  </data>
+  <data name="RollingAvgLabel" xml:space="preserve">
+    <value>移動平均</value>
+  </data>
+  <data name="PlaceholderPin21" xml:space="preserve">
+    <value>例：21</value>
+  </data>
+  <data name="PlaceholderPin22" xml:space="preserve">
+    <value>例：22</value>
+  </data>
+  <data name="PlaceholderPin23" xml:space="preserve">
+    <value>例：23</value>
+  </data>
+  <data name="PlaceholderPin12" xml:space="preserve">
+    <value>例：12</value>
+  </data>
+  <data name="PlaceholderPin11" xml:space="preserve">
+    <value>例：11</value>
+  </data>
+  <data name="PlaceholderPin13" xml:space="preserve">
+    <value>例：13</value>
+  </data>
+  <data name="PlaceholderPin10" xml:space="preserve">
+    <value>例: 10</value>
+  </data>
+  <data name="PlaceholderBaud9600" xml:space="preserve">
+    <value>例：9600</value>
+  </data>
+  <data name="MmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="CallSignLabel" xml:space="preserve">
+    <value>コールサイン</value>
+  </data>
+  <data name="HomePortLabel" xml:space="preserve">
+    <value>母港</value>
+  </data>
+  <data name="CsPin" xml:space="preserve">
+    <value>CSピン</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>APIキー</value>
+  </data>
+  <data name="HmacKey" xml:space="preserve">
+    <value>HMACキー</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+    <value>ボーレート</value>
+  </data>
+  <data name="Connection" xml:space="preserve">
+    <value>接続</value>
+  </data>
+  <data name="GenerateNewKeys" xml:space="preserve">
+    <value>新しいキーを生成</value>
+  </data>
+  <data name="Placeholder255Disabled" xml:space="preserve">
+    <value>255 = 無効</value>
+  </data>
+  <data name="PlaceholderBilgeShort" xml:space="preserve">
+    <value>例：ビルジ</value>
+  </data>
+  <data name="PlaceholderBilgePump" xml:space="preserve">
+    <value>例：ビルジポンプ</value>
+  </data>
+  <data name="GpioPinDisabled" xml:space="preserve">
+    <value>GPIOピン（空白または255 = 無効）</value>
+  </data>
+  <data name="SensorTypePresence" xml:space="preserve">
+    <value>存在</value>
+  </data>
+  <data name="ExtSensorsTitle" xml:space="preserve">
+    <value>外部センサー</value>
+  </data>
+  <data name="SensorTitle" xml:space="preserve">
+    <value>センサー</value>
+  </data>
+  <data name="SpeedLabel" xml:space="preserve">
+    <value>速度</value>
+  </data>
+  <data name="CourseLabel" xml:space="preserve">
+    <value>コース</value>
+  </data>
+  <data name="AvgLabel" xml:space="preserve">
+    <value>平均</value>
+  </data>
+  <data name="PinPairFormat" xml:space="preserve">
+    <value>ピン留め {0}、{1}</value>
+  </data>
+  <data name="PlaceholderMqttPort" xml:space="preserve">
+    <value>1883</value>
+  </data>
+  <data name="PlaceholderKeepAlive" xml:space="preserve">
+    <value>60</value>
+  </data>
+  <data name="PlaceholderSpeedMhz" xml:space="preserve">
+    <value>4</value>
+  </data>
+</root>

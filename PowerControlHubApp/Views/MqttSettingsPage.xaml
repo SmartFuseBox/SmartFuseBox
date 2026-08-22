@@ -2,13 +2,14 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.MqttSettingsPage"
-             Title="MQTT Settings"
+             Title="{x:Static localization:AppResources.MqttSettingsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="MQTT Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.MqttSettingsTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -20,14 +21,14 @@
                         Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Connection"
+                        <Label Text="{x:Static localization:AppResources.Connection}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0"
-                                   Text="MQTT Enabled"
+                                   Text="{x:Static localization:AppResources.MqttEnabledLabel}"
                                    TextColor="{DynamicResource AppEntryText}"
                                    FontSize="14"
                                    VerticalOptions="Center" />
@@ -43,7 +44,7 @@
 
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0"
-                                   Text="Connection State"
+                                   Text="{x:Static localization:AppResources.MqttConnectionStateLabel}"
                                    TextColor="{DynamicResource AppEntryText}"
                                    FontSize="14"
                                    VerticalOptions="Center" />
@@ -63,27 +64,27 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Broker"
+                        <Label Text="{x:Static localization:AppResources.MqttBrokerLabel}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="Host / IP"
+                        <Label Text="{x:Static localization:AppResources.HostIp}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding MqttBroker}"
-                               Placeholder="e.g. 192.168.1.100"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderIpAddress}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Port"
+                        <Label Text="{x:Static localization:AppResources.MqttPortLabel}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding MqttPort}"
-                               Placeholder="1883"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderMqttPort}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
@@ -98,27 +99,27 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Credentials"
+                        <Label Text="{x:Static localization:AppResources.Credentials}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="Username"
+                        <Label Text="{x:Static localization:AppResources.MqttUsernameLabel}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding MqttUsername}"
-                               Placeholder="Leave empty for none"
+                               Placeholder="{x:Static localization:AppResources.LeaveEmptyForNone}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Password"
+                        <Label Text="{x:Static localization:AppResources.MqttPasswordLabel}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding MqttPassword}"
-                               Placeholder="Enter password to change"
+                               Placeholder="{x:Static localization:AppResources.EnterPasswordToChange}"
                                IsPassword="True"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
@@ -133,27 +134,27 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Device Identity"
+                        <Label Text="{x:Static localization:AppResources.DeviceIdentity}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="Device ID"
+                        <Label Text="{x:Static localization:AppResources.MqttDeviceIdLabel}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding MqttDeviceId}"
-                               Placeholder="e.g. boat_seawolf_01"
+                               Placeholder="{x:Static localization:AppResources.MqttDeviceIdPlaceholder}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Discovery Prefix"
+                        <Label Text="{x:Static localization:AppResources.MqttDiscoveryPrefixLabel}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding MqttDiscoveryPrefix}"
-                               Placeholder="homeassistant"
+                               Placeholder="{x:Static localization:AppResources.HomeassistantPlaceholder}"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
@@ -167,14 +168,14 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Advanced"
+                        <Label Text="{x:Static localization:AppResources.Advanced}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0"
-                                   Text="Home Assistant Discovery"
+                                   Text="{x:Static localization:AppResources.MqttHaDiscoveryLabel}"
                                    TextColor="{DynamicResource AppEntryText}"
                                    FontSize="14"
                                    VerticalOptions="Center" />
@@ -188,11 +189,11 @@
                                  Color="{DynamicResource AppHelpCardStroke}"
                                  Margin="0,4" />
 
-                        <Label Text="Keep Alive (seconds)"
+                        <Label Text="{x:Static localization:AppResources.KeepAliveSeconds}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding MqttKeepAlive}"
-                               Placeholder="60"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderKeepAlive}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
@@ -202,7 +203,7 @@
                 </Border>
 
                 <!-- Save All button -->
-                <Button Text="Save All Settings"
+                <Button Text="{x:Static localization:AppResources.SaveAllSettings}"
                         Command="{Binding SaveAllCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"

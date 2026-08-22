@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PowerControlHubApp.Services;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 #if WINDOWS
 using WinRT.Interop;
@@ -39,11 +40,12 @@ namespace PowerControlHubApp
 
             // Apply after InitializeComponent so Application.Resources is populated.
             ThemeService.ApplySaved();
+            LanguageService.ApplySaved();
         }
 
         protected override Window CreateWindow(IActivationState activationState)
         {
-            var window = new Window(new AppShell());
+            Window window = new Window(new AppShell());
 
 #if WINDOWS
             window.HandlerChanged += OnWindowHandlerChanged;

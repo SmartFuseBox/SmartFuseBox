@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Models.Json;
 
@@ -29,23 +30,23 @@ public class OtaStatusModel
     public string Auto { get; set; } = OtaAuto_Off;
 
     public bool UpdateAvailable =>
-        string.Equals(State, OtaState_Available, StringComparison.OrdinalIgnoreCase);
+        String.Equals(State, OtaState_Available, StringComparison.OrdinalIgnoreCase);
 
     public bool IsBusy =>
         State is OtaState_Checking or OtaState_Downloading or OtaState_Rebooting;
 
     public bool HasFailed =>
-        string.Equals(State, OtaState_Failed, StringComparison.OrdinalIgnoreCase);
+        String.Equals(State, OtaState_Failed, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Human-readable label shown in the update banner.</summary>
     public string BannerLabel => State switch
     {
-        var s when string.Equals(s, OtaState_Available, StringComparison.OrdinalIgnoreCase) => string.Format(OtaLabel_Available, AvailableVersion, CurrentVersion),
-        var s when string.Equals(s, OtaState_Checking, StringComparison.OrdinalIgnoreCase) => OtaLabel_Checking,
-        var s when string.Equals(s, OtaState_Downloading, StringComparison.OrdinalIgnoreCase) => OtaLabel_Downloading,
-        var s when string.Equals(s, OtaState_Rebooting, StringComparison.OrdinalIgnoreCase) => OtaLabel_Rebooting,
-        var s when string.Equals(s, OtaState_Failed, StringComparison.OrdinalIgnoreCase) => OtaLabel_Failed,
-        var s when string.Equals(s, OtaState_UpToDate, StringComparison.OrdinalIgnoreCase) => string.Format(OtaLabel_Uptodate, CurrentVersion),
-        _ => string.Empty
+        string s when String.Equals(s, OtaState_Available, StringComparison.OrdinalIgnoreCase) => String.Format(OtaLabelAvailable, AvailableVersion, CurrentVersion),
+        string s when String.Equals(s, OtaState_Checking, StringComparison.OrdinalIgnoreCase) => OtaLabelChecking,
+        string s when String.Equals(s, OtaState_Downloading, StringComparison.OrdinalIgnoreCase) => OtaLabelDownloading,
+        string s when String.Equals(s, OtaState_Rebooting, StringComparison.OrdinalIgnoreCase) => OtaLabelRebooting,
+        string s when String.Equals(s, OtaState_Failed, StringComparison.OrdinalIgnoreCase) => OtaLabelFailed,
+        string s when String.Equals(s, OtaState_UpToDate, StringComparison.OrdinalIgnoreCase) => String.Format(OtaLabelUptodate, CurrentVersion),
+        _ => String.Empty
     };
 }

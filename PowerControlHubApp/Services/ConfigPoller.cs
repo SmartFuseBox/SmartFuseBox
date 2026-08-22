@@ -3,6 +3,7 @@ using PowerControlHubApp.Messages;
 using PowerControlHubApp.Models;
 using PowerControlHubApp.Models.Json;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Services;
 
@@ -81,7 +82,7 @@ public class ConfigPoller : IConfigConnection, IDisposable
             try
             {
                 // Use a lightweight health check (e.g. GetSensorMetaAsync)
-                var meta = await _connection.GetSensorMetaAsync(stoppingToken);
+                List<SensorTypeDescriptorModel> meta = await _connection.GetSensorMetaAsync(stoppingToken);
                 isConnected = meta != null;
 
                 if (isConnected && !_lastConnected)

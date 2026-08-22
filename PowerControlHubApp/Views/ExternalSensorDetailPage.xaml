@@ -3,32 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
+             xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
              x:Class="PowerControlHubApp.Views.ExternalSensorDetailPage"
-             Title="External Sensor"
+             Title="{x:Static localization:AppResources.ExternalSensorTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
-        <views:TopBarView Grid.Row="0" Title="External Sensor" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.ExternalSensorTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
         <ScrollView Grid.Row="2" IsVisible="{Binding IsConnected}">
             <VerticalStackLayout Padding="16" Spacing="12">
-                <Label Text="IDENTITY" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
-                <Entry Placeholder="Name" Text="{Binding Name}" />
-                <Label Text="Sensor Type" FontAttributes="Bold" FontSize="12" TextColor="{DynamicResource AppAccent}" />
+                <Label Text="{x:Static localization:AppResources.SectionIdentity}" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
+                <Entry Placeholder="{x:Static localization:AppResources.NameLabel}" Text="{Binding Name}" />
+                <Label Text="{x:Static localization:AppResources.SensorTypeLabel}" FontAttributes="Bold" FontSize="12" TextColor="{DynamicResource AppAccent}" />
                 <Picker ItemsSource="{Binding SensorTypeOptions}"
                         SelectedIndex="{Binding SelectedSensorTypeIndex}"
-                        Title="Select sensor type" />
+                        Title="{x:Static localization:AppResources.SelectSensorType}" />
 
                 <Label Text="MQTT" FontAttributes="Bold" TextColor="{DynamicResource AppAccent}" />
-                <Entry Placeholder="MQTT Name" Text="{Binding MqttName}" />
-                <Entry Placeholder="MQTT Slug" Text="{Binding MqttSlug}" />
-                <Entry Placeholder="MQTT Type" Text="{Binding MqttType}" />
-                <Entry Placeholder="MQTT Device Class" Text="{Binding MqttDeviceClass}" />
-                <Entry Placeholder="MQTT Unit" Text="{Binding MqttUnit}" />
+                <Entry Placeholder="{x:Static localization:AppResources.MqttName}" Text="{Binding MqttName}" />
+                <Entry Placeholder="{x:Static localization:AppResources.MqttSlug}" Text="{Binding MqttSlug}" />
+                <Entry Placeholder="{x:Static localization:AppResources.MqttType}" Text="{Binding MqttType}" />
+                <Entry Placeholder="{x:Static localization:AppResources.MqttDeviceClass}" Text="{Binding MqttDeviceClass}" />
+                <Entry Placeholder="{x:Static localization:AppResources.MqttUnit}" Text="{Binding MqttUnit}" />
                 <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                    <Label Text="Binary" VerticalOptions="Center" />
+                    <Label Text="{x:Static localization:AppResources.Binary}" VerticalOptions="Center" />
                     <Switch IsToggled="{Binding MqttIsBinary}" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>
@@ -36,8 +38,8 @@
 
         <Grid Grid.Row="3" Padding="16,0,16,12" ColumnDefinitions="*,*" ColumnSpacing="10"
               IsVisible="{Binding IsConnected}">
-            <Button Grid.Column="0" Text="🗑 Remove" Command="{Binding RemoveCommand}" IsEnabled="{Binding IsNotBusy}" BackgroundColor="{DynamicResource AppCardStroke}" TextColor="{DynamicResource AppLabelPrimary}" />
-            <Button Grid.Column="1" Text="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding IsNotBusy}" />
+            <Button Grid.Column="0" Text="{x:Static internal:Constants.IconRemove} {x:Static localization:AppResources.Remove}" />
+            <Button Grid.Column="1" Text="{x:Static localization:AppResources.Save}" Command="{Binding SaveCommand}" IsEnabled="{Binding IsNotBusy}" />
         </Grid>
     </Grid>
 </views:BasePowerControlHubContentPage>

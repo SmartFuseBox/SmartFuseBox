@@ -11,7 +11,7 @@ namespace PowerControlHubApp
 
         public static MauiApp CreateMauiApp()
         {
-            var builder = MauiApp.CreateBuilder();
+            MauiAppBuilder builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -26,7 +26,7 @@ namespace PowerControlHubApp
             // Connections — each owns its own HttpClient (one persistent TCP socket)
             builder.Services.AddSingleton<DashboardConnection>(sp =>
             {
-                var connection = new DashboardConnection();
+                DashboardConnection connection = new DashboardConnection();
                 string ip = Preferences.Get(KeyDeviceIpAddress, string.Empty);
                 string port = Preferences.Get(KeyDeviceIpPort, DefaultDeviceIpPort);
 
@@ -48,7 +48,7 @@ namespace PowerControlHubApp
             // Register ConfigConnection as the inner singleton
             builder.Services.AddSingleton<ConfigConnection>(sp =>
             {
-                var connection = new ConfigConnection(
+                ConfigConnection connection = new ConfigConnection(
                     sp.GetRequiredService<IMessageBus>(),
                     sp.GetRequiredService<ILogger<ConfigConnection>>());
 
@@ -78,7 +78,7 @@ namespace PowerControlHubApp
             // Legacy service — kept as thin facade that delegates to the two connections
             builder.Services.AddSingleton<PowerHubService>(sp =>
             {
-                var service = new PowerHubService(
+                PowerHubService service = new PowerHubService(
                     sp.GetRequiredService<IDashboardConnection>(),
                     sp.GetRequiredService<IConfigConnection>(),
                     sp.GetRequiredService<IMessageBus>());
@@ -92,6 +92,7 @@ namespace PowerControlHubApp
             builder.Services.AddSingleton<SensorMetaCache>();
             builder.Services.AddSingleton<LogService>();
             builder.Services.AddSingleton<ThemeService>();
+            builder.Services.AddSingleton<LanguageService>();
             builder.Services.AddSingleton<RelayStore>();
             builder.Services.AddSingleton<TimeSyncService>();
 
@@ -114,15 +115,14 @@ namespace PowerControlHubApp
             builder.Services.AddTransient<NextionSettingsViewModel>();
             builder.Services.AddTransient<XpdzToneSettingsViewModel>();
 
-            // Pages
-            builder.Services.AddSingleton<DashboardPage>();
-            builder.Services.AddSingleton<SettingsPage>();
-            builder.Services.AddSingleton<RelayConfigPage>();
-            builder.Services.AddSingleton<SystemPage>();
+            builder.Services.AddTransient<DashboardPage>();
+            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<RelayConfigPage>();
+            builder.Services.AddTransient<SystemPage>();
             builder.Services.AddTransient<RelayDetailPage>();
-            builder.Services.AddSingleton<ExternalSensorConfigPage>();
+            builder.Services.AddTransient<ExternalSensorConfigPage>();
             builder.Services.AddTransient<ExternalSensorDetailPage>();
-            builder.Services.AddSingleton<LocalSensorConfigPage>();
+            builder.Services.AddTransient<LocalSensorConfigPage>();
             builder.Services.AddTransient<LocalSensorDetailPage>();
             builder.Services.AddTransient<TimeSettingsPage>();
             builder.Services.AddTransient<LocationSettingsPage>();

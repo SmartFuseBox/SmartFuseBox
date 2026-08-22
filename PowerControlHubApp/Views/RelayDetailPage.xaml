@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.RelayDetailPage"
              Title="{Binding PageTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
@@ -81,15 +82,15 @@
                 <!-- ── Identity ── -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="IDENTITY" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.SectionIdentity}" Style="{StaticResource SectionTitle}" />
 
                         <!-- Short name -->
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Short Name (max 5 chars)" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.ShortNameLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Entry Text="{Binding ShortName}"
                                        Style="{StaticResource FieldEntry}"
-                                       Placeholder="e.g. Bilge"
+                                       Placeholder="{x:Static localization:AppResources.PlaceholderBilgeShort}"
                                        MaxLength="5"
                                        ReturnType="Next" />
                             </Border>
@@ -97,11 +98,11 @@
 
                         <!-- Long name -->
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Long Name (max 20 chars)" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.LongNameLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Entry Text="{Binding LongName}"
                                        Style="{StaticResource FieldEntry}"
-                                       Placeholder="e.g. Bilge Pump"
+                                       Placeholder="{x:Static localization:AppResources.PlaceholderBilgePump}"
                                        MaxLength="20"
                                        ReturnType="Done" />
                             </Border>
@@ -112,15 +113,15 @@
                 <!-- ── Hardware ── -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="HARDWARE" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.SectionHardware}" Style="{StaticResource SectionTitle}" />
 
                         <!-- GPIO pin -->
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="GPIO Pin  (blank or 255 = disabled)" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.GpioPinDisabled}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Entry Text="{Binding PinDisplay}"
                                        Style="{StaticResource FieldEntry}"
-                                       Placeholder="255 = disabled"
+                                       Placeholder="{x:Static localization:AppResources.Placeholder255Disabled}"
                                        Keyboard="Numeric"
                                        ReturnType="Done" />
                             </Border>
@@ -131,11 +132,11 @@
                 <!-- ── Behaviour ── -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="BEHAVIOUR" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.SectionBehaviour}" Style="{StaticResource SectionTitle}" />
 
                         <!-- Default state -->
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Default State at Power-On" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.DefaultStateLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Picker ItemsSource="{Binding DefaultStateOptions}"
                                         SelectedIndex="{Binding DefaultStateIndex}"
@@ -145,7 +146,7 @@
 
                         <!-- Action type -->
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Action Type" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.ActionTypeLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Picker ItemsSource="{Binding ActionOptions}"
                                         SelectedIndex="{Binding SelectedActionIndex}"
@@ -155,7 +156,7 @@
 
                         <!-- Button colour -->
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="Button Colour" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.ButtonColourLabel}" Style="{StaticResource FieldLabel}" />
                             <!-- Colour swatches -->
                             <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center">
                                 <!-- Blue -->
@@ -277,13 +278,13 @@
                 <!-- ── Linking ── -->
                 <Border Style="{StaticResource SectionCard}">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="LINKING" Style="{StaticResource SectionTitle}" />
-                        <Label Text="Toggling this relay will also toggle the linked relay."
+                        <Label Text="{x:Static localization:AppResources.SectionLinking}" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{x:Static localization:AppResources.LinkedRelayHelp}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontSize="12"
                                Margin="0,0,0,4" />
                         <VerticalStackLayout Spacing="3">
-                            <Label Text="Linked Relay" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{x:Static localization:AppResources.LinkedRelayLabel}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource FieldBorder}">
                                 <Picker ItemsSource="{Binding LinkedRelayOptions}"
                                         SelectedIndex="{Binding SelectedLinkedIndex}"
@@ -331,7 +332,7 @@
 
             <!-- Save button -->
             <Button Grid.Column="1"
-                    Text="Save"
+                    Text="{x:Static localization:AppResources.Save}"
                     Command="{Binding SaveCommand}"
                     BackgroundColor="#512BD4"
                     TextColor="White"

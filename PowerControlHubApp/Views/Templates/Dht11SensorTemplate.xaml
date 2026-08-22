@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
     x:Class="PowerControlHubApp.Views.Templates.Dht11SensorTemplate">
 
     <ResourceDictionary.MergedDictionaries>
@@ -23,14 +24,14 @@
                         <Label Text="🌡" FontSize="20" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding Temperature}"
                                Style="{StaticResource SensorPrimaryValue}" />
-                        <Label Text="Temperature"
+                        <Label Text="{x:Static localization:AppResources.TemperatureLabel}"
                                Style="{StaticResource SensorFieldLabel}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1" Spacing="1" HorizontalOptions="Center">
                         <Label Text="💧" FontSize="20" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding Humidity}"
                                Style="{StaticResource SensorPrimaryValue}" />
-                        <Label Text="Humidity"
+                        <Label Text="{x:Static localization:AppResources.HumidityLabel}"
                                Style="{StaticResource SensorFieldLabel}" />
                     </VerticalStackLayout>
                 </Grid>
@@ -40,13 +41,13 @@
 
                 <!-- Secondary rows -->
                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="3" ColumnSpacing="8">
-                    <Label Grid.Row="0" Grid.Column="0" Text="Dew point"  Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="{x:Static localization:AppResources.DewPointLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding DewPoint}" Style="{StaticResource SensorSecondaryValue}" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="Comfort"    Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="{x:Static localization:AppResources.ComfortLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding Comfort}" Style="{StaticResource SensorSecondaryValue}" />
 
-                    <Label Grid.Row="2" Grid.Column="0" Text="Condensation" Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="2" Grid.Column="0" Text="{x:Static localization:AppResources.CondensationLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding CondensationRisk}" Style="{StaticResource SensorSecondaryValue}" />
                 </Grid>
 
