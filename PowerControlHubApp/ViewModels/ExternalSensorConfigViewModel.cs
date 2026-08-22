@@ -4,6 +4,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 

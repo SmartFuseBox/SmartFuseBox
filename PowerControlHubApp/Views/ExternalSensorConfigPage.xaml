@@ -5,9 +5,11 @@
              xmlns:models="clr-namespace:PowerControlHubApp.Models"
              xmlns:converters="clr-namespace:PowerControlHubApp.Converters"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
+             xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
              x:Class="PowerControlHubApp.Views.ExternalSensorConfigPage"
              x:Name="PageRoot"
-             Title="Ext. Sensors"
+             Title="{x:Static localization:AppResources.ExtSensorsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <views:BasePowerControlHubContentPage.Resources>
@@ -41,10 +43,11 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- Top bar -->
-        <views:TopBarView Grid.Row="0" Title="📡 External Sensors"
-                          RightButtonText="↻"
-                          RightButtonCommand="{Binding LoadCommand}"
-                          RightButtonIsEnabled="{Binding IsNotBusy}" />
+        <views:TopBarView Grid.Row="0" 
+            Title="{x:Static internal:Constants.IconExternalSensor} {x:Static localization:AppResources.ExternalSensorsTitle}"
+            RightButtonText="↻"
+            RightButtonCommand="{Binding LoadCommand}"
+            RightButtonIsEnabled="{Binding IsNotBusy}" />
 
         <!-- Not connected banner -->
         <views:NotConnectedBanner Grid.Row="1" />
@@ -107,7 +110,7 @@
                                         </Label.Text>
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsConfigured}" Value="False">
-                                                <Setter Property="Text" Value="Not configured" />
+                                                <Setter Property="Text" Value="{x:Static localization:AppResources.SensorNotConfigured}" />
                                             </DataTrigger>
                                         </Label.Triggers>
                                     </Label>

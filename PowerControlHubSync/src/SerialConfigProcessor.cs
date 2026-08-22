@@ -48,7 +48,7 @@ internal class SerialConfigProcessor : BaseCommandLine, IDisposable
             Display.WriteLine(VerbosityLevel.Normal, $"Reading configuration from: {filePath}");
 
             // Build parameter dictionary for substitution
-            var parameters = new Dictionary<string, string>();
+            Dictionary<string, string> parameters = [];
             if (!string.IsNullOrEmpty(wifiSsid))
                 parameters["WIFI_SSID"] = wifiSsid;
             if (!string.IsNullOrEmpty(wifiPassword))
@@ -297,7 +297,7 @@ internal class SerialConfigProcessor : BaseCommandLine, IDisposable
         {
             Display.WriteLine(VerbosityLevel.Normal, $"Loading test commands from: {filePath}");
 
-            var tests = TestCommandParser.ParseTestFile(filePath);
+            List<TestCommand> tests = TestCommandParser.ParseTestFile(filePath);
             Display.WriteLine(VerbosityLevel.Quiet, $"Loaded {tests.Count} test cases");
 
             // Initialize COM port
@@ -321,13 +321,13 @@ internal class SerialConfigProcessor : BaseCommandLine, IDisposable
             }
 
             // Run tests
-            var results = new List<TestResult>();
+            List<TestResult> results = [];
             int passed = 0;
             int failed = 0;
 
-            foreach (var test in tests)
+            foreach (TestCommand test in tests)
             {
-                var result = new TestResult
+                TestResult result = new TestResult
                 {
                     Command = test.Command,
                     ExpectedResponses = test.ExpectedResponses
@@ -352,7 +352,7 @@ internal class SerialConfigProcessor : BaseCommandLine, IDisposable
                             string line = _serialPort.ReadLine().Trim();
 
                             // Look for ACK or actual response
-                            if (line.Contains($"ACK:{commandName}") || 
+                            if (line.Contains($"ACK:{commandName}") ||
                                 line.Contains($"{commandName}:") ||
                                 line.StartsWith(commandName))
                             {

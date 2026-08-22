@@ -25,25 +25,25 @@ public sealed class RelayStore
     public void ReplaceAll(IReadOnlyList<RelayViewModel> incoming)
     {
         // Only consider enabled relays for the dashboard.
-        var enabled = incoming.Where(r => r.IsEnabled).ToList();
+        List<RelayViewModel> enabled = incoming.Where(r => r.IsEnabled).ToList();
 
         // Map incoming enabled relays by index for quick lookup.
-        var incomingByIndex = enabled.ToDictionary(r => r.Index);
+        Dictionary<int, RelayViewModel> incomingByIndex = enabled.ToDictionary(r => r.Index);
 
         // Remove any existing relays that are no longer present/enabled.
         for (int i = Relays.Count - 1; i >= 0; i--)
         {
-            var existing = Relays[i];
+            RelayViewModel existing = Relays[i];
 
             if (!incomingByIndex.ContainsKey(existing.Index))
                 Relays.RemoveAt(i);
         }
 
         // Update in-place any existing relays with new values.
-        var updatedIndices = new HashSet<int>();
-        foreach (var existing in Relays)
+        HashSet<int> updatedIndices = [];
+        foreach (RelayViewModel existing in Relays)
         {
-            if (incomingByIndex.TryGetValue(existing.Index, out var updated))
+            if (incomingByIndex.TryGetValue(existing.Index, out RelayViewModel updated))
             {
                 existing.ShortName = updated.ShortName;
                 existing.LongName = updated.LongName;
@@ -58,8 +58,8 @@ public sealed class RelayStore
         }
 
         // Add any incoming enabled relays that didn't already exist.
-        var toAdd = enabled.Where(r => !updatedIndices.Contains(r.Index)).OrderBy(r => r.Index);
-        foreach (var vm in toAdd)
+        IOrderedEnumerable<RelayViewModel> toAdd = enabled.Where(r => !updatedIndices.Contains(r.Index)).OrderBy(r => r.Index);
+        foreach (RelayViewModel vm in toAdd)
             Relays.Add(vm);
     }
 
@@ -72,12 +72,12 @@ public sealed class RelayStore
         if (models == null)
             return [];
 
-        var list = new List<RelayViewModel>(models.Count);
+        List<RelayViewModel> list = new List<RelayViewModel>(models.Count);
 
         for (int i = 0; i < models.Count; i++)
         {
-            var m = models[i];
-            var vm = new RelayViewModel
+            RelayModel m = models[i];
+            RelayViewModel vm = new RelayViewModel
             {
                 Index = m.Index,
                 ShortName = m.ShortName,
@@ -102,7 +102,7 @@ public sealed class RelayStore
     /// </summary>
     public void UpdateState(int index, int state)
     {
-        var relay = Relays.FirstOrDefault(r => r.Index == index);
+        RelayViewModel relay = Relays.FirstOrDefault(r => r.Index == index);
 
         if (relay != null)
             relay.State = state;
@@ -114,7 +114,7 @@ public sealed class RelayStore
     /// </summary>
     public void UpdateRelay(int index, RelayViewModel updated)
     {
-        var existing = Relays.FirstOrDefault(r => r.Index == index);
+        RelayViewModel existing = Relays.FirstOrDefault(r => r.Index == index);
 
         if (existing != null)
         {

@@ -106,14 +106,14 @@ public sealed class DeviceAuthHandler : DelegatingHandler
                 // will use an empty body.
                 try
                 {
-                    using var ms = new MemoryStream();
+                    using MemoryStream ms = new MemoryStream();
                     await request.Content.CopyToAsync(ms, cancellationToken);
                     ms.Position = 0;
                     body = Encoding.UTF8.GetString(ms.ToArray());
 
                     // Re-buffer the content so the inner handler can read it
-                    var bufferred = new ByteArrayContent(ms.ToArray());
-                    foreach (var h in request.Content.Headers)
+                    ByteArrayContent bufferred = new ByteArrayContent(ms.ToArray());
+                    foreach (KeyValuePair<string, IEnumerable<string>> h in request.Content.Headers)
                         bufferred.Headers.TryAddWithoutValidation(h.Key, h.Value);
                     request.Content = bufferred;
                 }
@@ -128,7 +128,7 @@ public sealed class DeviceAuthHandler : DelegatingHandler
             byte[] keyBytes = Encoding.UTF8.GetBytes(hmacKey);
             byte[] messageBytes = Encoding.UTF8.GetBytes(signInput);
 
-            using var hmacSha = new HMACSHA256(keyBytes);
+            using HMACSHA256 hmacSha = new HMACSHA256(keyBytes);
             byte[] hash = hmacSha.ComputeHash(messageBytes);
 
             string signature = BitConverter.ToString(hash).Replace(HmacHexDash, string.Empty).ToLowerInvariant();

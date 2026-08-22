@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
              xmlns:vm="clr-namespace:PowerControlHubApp.ViewModels"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.TimeSettingsPage"
-             Title="Time Settings"
+             Title="{x:Static localization:AppResources.TimeSettingsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="Time Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.TimeSettingsTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -21,7 +22,7 @@
                         Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Device Time"
+                        <Label Text="{x:Static localization:AppResources.DeviceTime}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
@@ -37,7 +38,7 @@
                                            Color="{DynamicResource AppAccent}"
                                            HeightRequest="20" />
 
-                        <Button Text="Sync Time Now"
+                        <Button Text="{x:Static localization:AppResources.SyncTimeNow}"
                                 Command="{Binding SyncTimeCommand}"
                                 BackgroundColor="Transparent"
                                 TextColor="{DynamicResource AppAccent}"
@@ -52,7 +53,7 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Timezone"
+                        <Label Text="{x:Static localization:AppResources.TimezoneLabel}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
@@ -61,10 +62,10 @@
                                 SelectedIndex="{Binding SelectedTimezoneIndex}"
                                 TextColor="{DynamicResource AppEntryText}"
                                 TitleColor="{DynamicResource AppPlaceholderText}"
-                                Title="Select timezone..."
+                                Title="{x:Static localization:AppResources.SelectTimezone}"
                                 BackgroundColor="Transparent" />
 
-                        <Button Text="Save Timezone"
+                        <Button Text="{x:Static localization:AppResources.SaveTimezone}"
                                 Command="{Binding SaveTimezoneCommand}"
                                 BackgroundColor="{DynamicResource AppAccent}"
                                 TextColor="White"

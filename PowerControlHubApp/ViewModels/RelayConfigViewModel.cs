@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -74,8 +75,8 @@ public class RelayConfigViewModel : BaseViewModel
         if (!_initialLoadingComplete)
             return;
 
-        var incoming = RelayStore.FromModels(index.Relays ?? []);
-        var incomingByIndex = incoming.ToDictionary(r => r.Index);
+        List<RelayViewModel> incoming = RelayStore.FromModels(index.Relays ?? []);
+        Dictionary<int, RelayViewModel> incomingByIndex = incoming.ToDictionary(r => r.Index);
 
         // If our collection hasn't been initialised with the expected slot
         // count, populate it once so we have stable instances to update.
@@ -85,7 +86,7 @@ public class RelayConfigViewModel : BaseViewModel
 
             for (int i = 0; i < RelayCount; i++)
             {
-                RelayViewModel relay = incomingByIndex.TryGetValue(i, out var m)
+                RelayViewModel relay = incomingByIndex.TryGetValue(i, out RelayViewModel m)
                     ? m
                     : new RelayViewModel { Index = i, Pin = UnconfiguredPin };
 
@@ -97,9 +98,9 @@ public class RelayConfigViewModel : BaseViewModel
         }
 
         // Update existing RelayViewModel instances in-place.
-        foreach (var existing in Relays)
+        foreach (RelayViewModel existing in Relays)
         {
-            if (incomingByIndex.TryGetValue(existing.Index, out var updated))
+            if (incomingByIndex.TryGetValue(existing.Index, out RelayViewModel updated))
             {
                 existing.ShortName = updated.ShortName;
                 existing.LongName = updated.LongName;

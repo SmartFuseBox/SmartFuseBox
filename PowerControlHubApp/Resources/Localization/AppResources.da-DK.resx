@@ -1,0 +1,1222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MessageNotConfigured" xml:space="preserve">
+    <value>Ikke konfigureret — tryk på ⚙ for at indstille enheds-IP</value>
+  </data>
+  <data name="MessageDeviceUnreachable" xml:space="preserve">
+    <value>Enheden kan ikke nås</value>
+  </data>
+  <data name="MessageNoActiveWarnings" xml:space="preserve">
+    <value>Ingen aktive advarsler</value>
+  </data>
+  <data name="MessageToggleFailed" xml:space="preserve">
+    <value>Skift mislykkedes — se loggen</value>
+  </data>
+  <data name="MessageNotConnected" xml:space="preserve">
+    <value>Ikke forbundet</value>
+  </data>
+  <data name="MsgIpRequired" xml:space="preserve">
+    <value>IP-adresse er påkrævet.</value>
+  </data>
+  <data name="MsgInvalidPort" xml:space="preserve">
+    <value>Indtast et gyldigt portnummer (1–65535).</value>
+  </data>
+  <data name="NotConfigured" xml:space="preserve">
+    <value>Ikke konfigureret</value>
+  </data>
+  <data name="LogOtaTrigger" xml:space="preserve">
+    <value>OTA: starter firmwareinstallation…</value>
+  </data>
+  <data name="OtaTriggerFailed" xml:space="preserve">
+    <value>OTA-trigger fejlede</value>
+  </data>
+  <data name="OtaDialogTitle" xml:space="preserve">
+    <value>Installer firmware</value>
+  </data>
+  <data name="OtaDialogAccept" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="OtaDialogMessage" xml:space="preserve">
+    <value>En OTA-opdatering til {0} er tilgængelig. Vil du downloade og installere den nu?</value>
+  </data>
+  <data name="OtaLabelAvailable" xml:space="preserve">
+    <value>Opdatering tilgængelig: {0} (installeret: {1})</value>
+  </data>
+  <data name="OtaLabelChecking" xml:space="preserve">
+    <value>Søger efter firmwareopdatering…</value>
+  </data>
+  <data name="OtaLabelDownloading" xml:space="preserve">
+    <value>Henter firmwareopdatering…</value>
+  </data>
+  <data name="OtaLabelRebooting" xml:space="preserve">
+    <value>Installerer opdatering — enheden genstarter…</value>
+  </data>
+  <data name="OtaLabelFailed" xml:space="preserve">
+    <value>Firmwareopdatering mislykkedes. Tryk for at prøve igen.</value>
+  </data>
+  <data name="OtaLabelUptodate" xml:space="preserve">
+    <value>Firmware er opdateret ({0})</value>
+  </data>
+  <data name="LogDashboardStarted" xml:space="preserve">
+    <value>DashboardPoller startet med interval {IntervalMs}ms</value>
+  </data>
+  <data name="LogDashboardFetched" xml:space="preserve">
+    <value>DashboardPoller hentede indeks kl. {Time}</value>
+  </data>
+  <data name="LogDashboardSkipping" xml:space="preserve">
+    <value>DashboardPoller springer polling over: tjenesten er ikke konfigureret</value>
+  </data>
+  <data name="LogDeviceInvalidJson" xml:space="preserve">
+    <value>Enhed returnerede ugyldig JSON under polling af indeks</value>
+  </data>
+  <data name="LogUnexpectedPollingError" xml:space="preserve">
+    <value>Uventet fejl under polling af indeks</value>
+  </data>
+  <data name="LogDashboardStopping" xml:space="preserve">
+    <value>DashboardPoller stopper</value>
+  </data>
+  <data name="LogMetaRefreshFailed" xml:space="preserve">
+    <value>Kunne ikke opdatere sensor meta cache ved opstart</value>
+  </data>
+  <data name="RelayPageTitle" xml:space="preserve">
+    <value>Relæ</value>
+  </data>
+  <data name="RelayPageTitleFormat" xml:space="preserve">
+    <value>Relæ {0}</value>
+  </data>
+  <data name="SavedOk" xml:space="preserve">
+    <value>Gemt succesfuldt</value>
+  </data>
+  <data name="SavedFailed" xml:space="preserve">
+    <value>En eller flere kommandoer mislykkedes</value>
+  </data>
+  <data name="SaveFailed" xml:space="preserve">
+    <value>Gem mislykkedes — enhed ikke tilgængelig</value>
+  </data>
+  <data name="PinFormat" xml:space="preserve">
+    <value>Fastgør {0}</value>
+  </data>
+  <data name="PinSummaryFormat" xml:space="preserve">
+    <value>PIN {0}, {1}</value>
+  </data>
+  <data name="ErrRemoveCommandFailed" xml:space="preserve">
+    <value>Fjern kommando mislykkedes</value>
+  </data>
+  <data name="RemoveSensor" xml:space="preserve">
+    <value>Fjern sensor</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Fjern</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Annuller</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Gem</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Tilbage</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Ingen</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Reboot" xml:space="preserve">
+    <value>Genstart</value>
+  </data>
+  <data name="Refreshed" xml:space="preserve">
+    <value>Opdateret</value>
+  </data>
+  <data name="ColorBlue" xml:space="preserve">
+    <value>blå</value>
+  </data>
+  <data name="ColorGreen" xml:space="preserve">
+    <value>Grøn</value>
+  </data>
+  <data name="ColorGrey" xml:space="preserve">
+    <value>grå</value>
+  </data>
+  <data name="ColorOrange" xml:space="preserve">
+    <value>orange</value>
+  </data>
+  <data name="ColorRed" xml:space="preserve">
+    <value>Rød</value>
+  </data>
+  <data name="ColorYellow" xml:space="preserve">
+    <value>gul</value>
+  </data>
+  <data name="ActionDefault" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="ActionHorn" xml:space="preserve">
+    <value>horn</value>
+  </data>
+  <data name="ActionNightRelay" xml:space="preserve">
+    <value>Natstafet</value>
+  </data>
+  <data name="ActionBadgeDefault" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="ActionBadgeHorn" xml:space="preserve">
+    <value>horn</value>
+  </data>
+  <data name="ActionBadgeNight" xml:space="preserve">
+    <value>Nat</value>
+  </data>
+  <data name="StateOff" xml:space="preserve">
+    <value>Slukket</value>
+  </data>
+  <data name="StateOn" xml:space="preserve">
+    <value>Til</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Lys</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>mørk</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Indstillinger</value>
+  </data>
+  <data name="DeviceIpAddress" xml:space="preserve">
+    <value>Enhed IP-adresse</value>
+  </data>
+  <data name="HttpPort" xml:space="preserve">
+    <value>HTTP-port</value>
+  </data>
+  <data name="ApiKeyLabel" xml:space="preserve">
+    <value>API-nøgle (X-API-Key)</value>
+  </data>
+  <data name="HmacKeyLabel" xml:space="preserve">
+    <value>HMAC-nøgle (X-Auth-Signature)</value>
+  </data>
+  <data name="AppThemeLabel" xml:space="preserve">
+    <value>App-tema</value>
+  </data>
+  <data name="SaveAndConnect" xml:space="preserve">
+    <value>Gem &amp; Tilslut</value>
+  </data>
+  <data name="HowToConnect" xml:space="preserve">
+    <value>Sådan opretter du forbindelse</value>
+  </data>
+  <data name="HowToConnectStep1" xml:space="preserve">
+    <value>1. Sørg for, at din telefon/pc er på det samme WiFi-netværk som ESP32-kortet.</value>
+  </data>
+  <data name="HowToConnectStep2" xml:space="preserve">
+    <value>2. Indtast IP-adressen, der vises i enhedens serielle output eller din routers DHCP-tabel.</value>
+  </data>
+  <data name="HowToConnectStep3" xml:space="preserve">
+    <value>3. Standardporten er 80.</value>
+  </data>
+  <data name="HowToConnectStep4" xml:space="preserve">
+    <value>4. Hvis enheden har netværksgodkendelse aktiveret (C19:e=1), skal du indtaste API-nøglen eller HMAC-nøglen ovenfor for at matche enhedens konfiguration.</value>
+  </data>
+  <data name="HowToConnectStep5" xml:space="preserve">
+    <value>5. Tryk på Gem &amp; Tilslut, og vend derefter tilbage til Dashboardet.</value>
+  </data>
+  <data name="PlaceholderIpAddress" xml:space="preserve">
+    <value>f.eks. 192.168.1.100</value>
+  </data>
+  <data name="PlaceholderPort" xml:space="preserve">
+    <value>80</value>
+  </data>
+  <data name="PlaceholderApiKey" xml:space="preserve">
+    <value>Valgfrit – enheds-API-nøgle til autentificering</value>
+  </data>
+  <data name="PlaceholderHmacKey" xml:space="preserve">
+    <value>Valgfrit – HMAC-SHA256-nøgle til autentificering</value>
+  </data>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>system</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Tid</value>
+  </data>
+  <data name="RTC" xml:space="preserve">
+    <value>RTC</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Placering</value>
+  </data>
+  <data name="MQTT" xml:space="preserve">
+    <value>MQTT</value>
+  </data>
+  <data name="SDCard" xml:space="preserve">
+    <value>SD-kort</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>Sikkerhed</value>
+  </data>
+  <data name="Nextion" xml:space="preserve">
+    <value>Nextion</value>
+  </data>
+  <data name="Buzzer" xml:space="preserve">
+    <value>summer</value>
+  </data>
+  <data name="ActiveWarnings" xml:space="preserve">
+    <value>Aktive advarsler</value>
+  </data>
+  <data name="GpiosInUse" xml:space="preserve">
+    <value>GPIO'er i brug</value>
+  </data>
+  <data name="GpioPinRestrictions" xml:space="preserve">
+    <value>GPIO pin-begrænsninger</value>
+  </data>
+  <data name="PinsAssignedFormat" xml:space="preserve">
+    <value>{0} pin(s) aktuelt tildelt</value>
+  </data>
+  <data name="ControlsSection" xml:space="preserve">
+    <value>KONTROLLER</value>
+  </data>
+  <data name="SensorsSection" xml:space="preserve">
+    <value>Sensorer</value>
+  </data>
+  <data name="RelayConfigTitle" xml:space="preserve">
+    <value>Relækonfiguration</value>
+  </data>
+  <data name="RelayConfigPageTitle" xml:space="preserve">
+    <value>Relækonfiguration</value>
+  </data>
+  <data name="SectionIdentity" xml:space="preserve">
+    <value>identitet</value>
+  </data>
+  <data name="SectionHardware" xml:space="preserve">
+    <value>hardware</value>
+  </data>
+  <data name="SectionBehaviour" xml:space="preserve">
+    <value>ADFÆRD</value>
+  </data>
+  <data name="SectionLinking" xml:space="preserve">
+    <value>Sammenkædning</value>
+  </data>
+  <data name="ShortNameLabel" xml:space="preserve">
+    <value>Kort navn (maks. 5 tegn)</value>
+  </data>
+  <data name="LongNameLabel" xml:space="preserve">
+    <value>Langt navn (maks. 20 tegn)</value>
+  </data>
+  <data name="GpioPinLabel" xml:space="preserve">
+    <value>GPIO Pin  (tom eller 255 = deaktiveret)</value>
+  </data>
+  <data name="DefaultStateLabel" xml:space="preserve">
+    <value>Standardtilstand ved tænding</value>
+  </data>
+  <data name="ActionTypeLabel" xml:space="preserve">
+    <value>Handlingstype</value>
+  </data>
+  <data name="ButtonColourLabel" xml:space="preserve">
+    <value>Knapfarve</value>
+  </data>
+  <data name="LinkedRelayLabel" xml:space="preserve">
+    <value>Linket relæ</value>
+  </data>
+  <data name="LinkedRelayHelp" xml:space="preserve">
+    <value>At skifte dette relæ vil også skifte det tilknyttede relæ.</value>
+  </data>
+  <data name="PlaceholderShortName" xml:space="preserve">
+    <value>f.eks. Bilge</value>
+  </data>
+  <data name="PlaceholderLongName" xml:space="preserve">
+    <value>f.eks. lænsepumpe</value>
+  </data>
+  <data name="PlaceholderPinDisabled" xml:space="preserve">
+    <value>255 = deaktiveret</value>
+  </data>
+  <data name="LocalSensorsTitle" xml:space="preserve">
+    <value>Lokale sensorer</value>
+  </data>
+  <data name="ExternalSensorsTitle" xml:space="preserve">
+    <value>Eksterne sensorer</value>
+  </data>
+  <data name="LocalSensorsPageTitle" xml:space="preserve">
+    <value>Lokale sensorer</value>
+  </data>
+  <data name="ExternalSensorsPageTitle" xml:space="preserve">
+    <value>Ekst. sensorer</value>
+  </data>
+  <data name="SensorPageTitle" xml:space="preserve">
+    <value>sensor</value>
+  </data>
+  <data name="SensorNotConfigured" xml:space="preserve">
+    <value>Ikke konfigureret</value>
+  </data>
+  <data name="SensorTypeWater" xml:space="preserve">
+    <value>Vand</value>
+  </data>
+  <data name="SensorTypeDht11" xml:space="preserve">
+    <value>DHT11</value>
+  </data>
+  <data name="SensorTypeLight" xml:space="preserve">
+    <value>Lys</value>
+  </data>
+  <data name="SensorTypeGps" xml:space="preserve">
+    <value>GPS</value>
+  </data>
+  <data name="SensorTypeSystem" xml:space="preserve">
+    <value>system</value>
+  </data>
+  <data name="SensorTypeBinaryPresence" xml:space="preserve">
+    <value>Binær tilstedeværelse</value>
+  </data>
+  <data name="SensorTypeVoltage" xml:space="preserve">
+    <value>Spænding</value>
+  </data>
+  <data name="SensorTypeUnknown" xml:space="preserve">
+    <value>Ukendt</value>
+  </data>
+  <data name="SensorTypeMetaDataUnavailable" xml:space="preserve">
+    <value>Sensortype metadata ikke tilgængelig.</value>
+  </data>
+  <data name="SensorTypeWaterPicker" xml:space="preserve">
+    <value>Vand (0)</value>
+  </data>
+  <data name="SensorTypeDht11Picker" xml:space="preserve">
+    <value>DHT11 (1)</value>
+  </data>
+  <data name="SensorTypeLightPicker" xml:space="preserve">
+    <value>Lys (2)</value>
+  </data>
+  <data name="SensorTypeGpsPicker" xml:space="preserve">
+    <value>GPS (3)</value>
+  </data>
+  <data name="SensorTypeSystemPicker" xml:space="preserve">
+    <value>System (4)</value>
+  </data>
+  <data name="SensorTypeBinaryPresencePicker" xml:space="preserve">
+    <value>Binær tilstedeværelse (5)</value>
+  </data>
+  <data name="SensorTypeVoltagePicker" xml:space="preserve">
+    <value>Spænding (6)</value>
+  </data>
+  <data name="SuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SuffixKb" xml:space="preserve">
+    <value>kb</value>
+  </data>
+  <data name="SuffixKmh" xml:space="preserve">
+    <value>km/t</value>
+  </data>
+  <data name="SuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="LabelDay" xml:space="preserve">
+    <value>Dag</value>
+  </data>
+  <data name="LabelNight" xml:space="preserve">
+    <value>Nat</value>
+  </data>
+  <data name="LabelFix" xml:space="preserve">
+    <value>Fix</value>
+  </data>
+  <data name="LabelNoFix" xml:space="preserve">
+    <value>Ingen løsning</value>
+  </data>
+  <data name="LabelDetected" xml:space="preserve">
+    <value>Opdaget</value>
+  </data>
+  <data name="LabelClear" xml:space="preserve">
+    <value>Klar</value>
+  </data>
+  <data name="FailAddUpdateSensor" xml:space="preserve">
+    <value>tilføj/opdater sensorpost</value>
+  </data>
+  <data name="FailEnableDisableSensor" xml:space="preserve">
+    <value>skift aktiveret tilstand</value>
+  </data>
+  <data name="FailSaveSettings" xml:space="preserve">
+    <value>Gem indstillinger på disk</value>
+  </data>
+  <data name="FailPrefix" xml:space="preserve">
+    <value>Kunne ikke:</value>
+  </data>
+  <data name="LabelPin0Default" xml:space="preserve">
+    <value>GPIO Pin 0 (tom eller 255 = deaktiveret)</value>
+  </data>
+  <data name="LabelPin1Default" xml:space="preserve">
+    <value>GPIO-ben 1 (tom eller 255 = deaktiveret)</value>
+  </data>
+  <data name="LabelOpt1_0Default" xml:space="preserve">
+    <value>Mulighed 1 (int8)</value>
+  </data>
+  <data name="LabelOpt1_1Default" xml:space="preserve">
+    <value>Valgmulighed 2 (int8)</value>
+  </data>
+  <data name="LabelOpt2_0Default" xml:space="preserve">
+    <value>Mulighed 3 (int16)</value>
+  </data>
+  <data name="LabelOpt2_1Default" xml:space="preserve">
+    <value>Valgmulighed 4 (int16)</value>
+  </data>
+  <data name="TimeSettingsTitle" xml:space="preserve">
+    <value>Tidsindstillinger</value>
+  </data>
+  <data name="RtcSettingsTitle" xml:space="preserve">
+    <value>RTC-indstillinger</value>
+  </data>
+  <data name="LocationSettingsTitle" xml:space="preserve">
+    <value>Placeringsindstillinger</value>
+  </data>
+  <data name="MqttSettingsTitle" xml:space="preserve">
+    <value>MQTT-indstillinger</value>
+  </data>
+  <data name="SdCardSettingsTitle" xml:space="preserve">
+    <value>SD-kortindstillinger</value>
+  </data>
+  <data name="NetworkSecurityTitle" xml:space="preserve">
+    <value>Netværkssikkerhed</value>
+  </data>
+  <data name="NextionSettingsTitle" xml:space="preserve">
+    <value>Nextion-indstillinger</value>
+  </data>
+  <data name="BuzzerSettingsTitle" xml:space="preserve">
+    <value>Summerindstillinger</value>
+  </data>
+  <data name="RtcSettingsSaved" xml:space="preserve">
+    <value>RTC-indstillinger gemt</value>
+  </data>
+  <data name="BuzzerSettingsSaved" xml:space="preserve">
+    <value>Buzzerindstillinger gemt</value>
+  </data>
+  <data name="NextionSettingsSaved" xml:space="preserve">
+    <value>Nextion indstillinger gemt</value>
+  </data>
+  <data name="NextionRebootTitle" xml:space="preserve">
+    <value>Genstart påkrævet</value>
+  </data>
+  <data name="NextionRebootMessage" xml:space="preserve">
+    <value>Ændringer kræver en genstart af enheden for at træde i kraft. Genstart enheden nu? (Hvis enheden ikke har et genstart-endepunkt, skal du slukke og tænde den manuelt)</value>
+  </data>
+  <data name="NextionRebootSavedMessage" xml:space="preserve">
+    <value>Indstillinger gemt. Sluk og tænd venligst enheden for at anvende Nextion-konfigurationen.</value>
+  </data>
+  <data name="NextionRebootFailed" xml:space="preserve">
+    <value>Kunne ikke gemme indstillinger før genstart.</value>
+  </data>
+  <data name="NextionUart1" xml:space="preserve">
+    <value>UART1</value>
+  </data>
+  <data name="NextionUart2" xml:space="preserve">
+    <value>UART2</value>
+  </data>
+  <data name="NextionUartLabel" xml:space="preserve">
+    <value>UART-port</value>
+  </data>
+  <data name="NextionBaudRateLabel" xml:space="preserve">
+    <value>baudrate</value>
+  </data>
+  <data name="NextionRxPinLabel" xml:space="preserve">
+    <value>RX-ben</value>
+  </data>
+  <data name="NextionTxPinLabel" xml:space="preserve">
+    <value>TX-ben</value>
+  </data>
+  <data name="NextionEnabledLabel" xml:space="preserve">
+    <value>Aktiveret</value>
+  </data>
+  <data name="MqttConnected" xml:space="preserve">
+    <value>Forbundet</value>
+  </data>
+  <data name="MqttDisconnected" xml:space="preserve">
+    <value>Afbrudt</value>
+  </data>
+  <data name="MqttSettingsSaved" xml:space="preserve">
+    <value>MQTT-indstillinger gemt</value>
+  </data>
+  <data name="MqttConnectionLabel" xml:space="preserve">
+    <value>Forbindelse</value>
+  </data>
+  <data name="MqttEnabledLabel" xml:space="preserve">
+    <value>MQTT aktiveret</value>
+  </data>
+  <data name="MqttConnectionStateLabel" xml:space="preserve">
+    <value>Forbindelsestilstand</value>
+  </data>
+  <data name="MqttBrokerLabel" xml:space="preserve">
+    <value>Mægler</value>
+  </data>
+  <data name="MqttPortLabel" xml:space="preserve">
+    <value>Havn</value>
+  </data>
+  <data name="MqttUsernameLabel" xml:space="preserve">
+    <value>brugernavn</value>
+  </data>
+  <data name="MqttPasswordLabel" xml:space="preserve">
+    <value>Adgangskode</value>
+  </data>
+  <data name="MqttDeviceIdLabel" xml:space="preserve">
+    <value>Enheds-id</value>
+  </data>
+  <data name="MqttHaDiscoveryLabel" xml:space="preserve">
+    <value>Home Assistant Opdagelse</value>
+  </data>
+  <data name="MqttKeepAliveLabel" xml:space="preserve">
+    <value>Hold i live (s)</value>
+  </data>
+  <data name="MqttDiscoveryPrefixLabel" xml:space="preserve">
+    <value>Opdagelsespræfiks</value>
+  </data>
+  <data name="SdCardSettingsSaved" xml:space="preserve">
+    <value>SD-kortindstillinger gemt</value>
+  </data>
+  <data name="SdCardPartiallySaved" xml:space="preserve">
+    <value>Delvist gemt — SPI-ben afvist (tjek for pin-konflikter)</value>
+  </data>
+  <data name="SdCardSpiFailed" xml:space="preserve">
+    <value>SPI-ben ikke gemt (benkonflikt eller ugyldigt ben)</value>
+  </data>
+  <data name="SdCardSpiPinsLabel" xml:space="preserve">
+    <value>SPI-ben (SCK/MOSI/MISO)</value>
+  </data>
+  <data name="SdCardInitSpeedLabel" xml:space="preserve">
+    <value>Starthastighed (MHz)</value>
+  </data>
+  <data name="SdCardCsPinLabel" xml:space="preserve">
+    <value>CS PIN</value>
+  </data>
+  <data name="NetworkSecuritySettingsSaved" xml:space="preserve">
+    <value>Netværkssikkerhedsindstillinger gemt</value>
+  </data>
+  <data name="NetworkSecurityKeysGenerated" xml:space="preserve">
+    <value>Nye nøgler genereret og gemt</value>
+  </data>
+  <data name="NetworkSecurityGenerateFailed" xml:space="preserve">
+    <value>Nøglegenerering mislykkedes — enhed utilgængelig</value>
+  </data>
+  <data name="NetworkSecurityAuthEnabledLabel" xml:space="preserve">
+    <value>Godkendelse aktiveret</value>
+  </data>
+  <data name="NetworkSecurityGenerateKeys" xml:space="preserve">
+    <value>Generer nye nøgler</value>
+  </data>
+  <data name="NetworkSecurityApiKeyLabel" xml:space="preserve">
+    <value>API-nøgle</value>
+  </data>
+  <data name="NetworkSecurityHmacKeyLabel" xml:space="preserve">
+    <value>HMAC-nøgle</value>
+  </data>
+  <data name="TimeSettingsTimezoneLabel" xml:space="preserve">
+    <value>Tidszoneoffset (timer)</value>
+  </data>
+  <data name="TimeSettingsSyncNow" xml:space="preserve">
+    <value>Synkroniser nu</value>
+  </data>
+  <data name="TimeSettingsSaved" xml:space="preserve">
+    <value>Tidsindstillinger gemt</value>
+  </data>
+  <data name="LocationSettingsBoatTypeLabel" xml:space="preserve">
+    <value>Bådtype</value>
+  </data>
+  <data name="LocationSettingsRenameLabel" xml:space="preserve">
+    <value>Omdøb</value>
+  </data>
+  <data name="LocationSettingsMmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="LocationSettingsCallSignLabel" xml:space="preserve">
+    <value>Kaldesignal</value>
+  </data>
+  <data name="LocationSettingsHomePortLabel" xml:space="preserve">
+    <value>Hjemmehavn</value>
+  </data>
+  <data name="LocationSettingsSaved" xml:space="preserve">
+    <value>Placeringsindstillinger gemt</value>
+  </data>
+  <data name="PowerHubNotConfigured" xml:space="preserve">
+    <value>PowerHubService er ikke konfigureret. Kald Configure() først.</value>
+  </data>
+  <data name="LogConfigExecuting" xml:space="preserve">
+    <value>ConfigConnection udfører: {Description}</value>
+  </data>
+  <data name="LogConfigSucceeded" xml:space="preserve">
+    <value>ConfigConnection lykkedes: {Description}</value>
+  </data>
+  <data name="LogConfigFailed" xml:space="preserve">
+    <value>ConfigConnection mislykkedes: {Description}</value>
+  </data>
+  <data name="LogConfigFailureResponse" xml:space="preserve">
+    <value>Enheden returnerede fejlsvar</value>
+  </data>
+  <data name="LogConfigConsumerError" xml:space="preserve">
+    <value>ConfigConnection consumer-fejl</value>
+  </data>
+  <data name="LogPublishSuccessFailed" xml:space="preserve">
+    <value>Kunne ikke publicere succesbesked for: {Description}</value>
+  </data>
+  <data name="LogPublishFailureFailed" xml:space="preserve">
+    <value>Kunne ikke publicere fejlmeddelelse for: {Description}</value>
+  </data>
+  <data name="ConfigSuccessRelay" xml:space="preserve">
+    <value>Relækonfiguration lykkedes</value>
+  </data>
+  <data name="ConfigSuccessSensor" xml:space="preserve">
+    <value>SensorKonfigurationLykkedes</value>
+  </data>
+  <data name="LogConfigMetaRefreshed" xml:space="preserve">
+    <value>ConfigPoller: SensorMetaCache opdateret efter forbindelse.</value>
+  </data>
+  <data name="LogConfigHealthCheckFailed" xml:space="preserve">
+    <value>ConfigPoller: Forbindelsens sundhedstjek mislykkedes.</value>
+  </data>
+  <data name="LogTimeSyncStarted" xml:space="preserve">
+    <value>TimeSyncService startet med interval {IntervalMin} min, driftgrænse {DriftSec} s</value>
+  </data>
+  <data name="LogTimeSyncDeviceTime" xml:space="preserve">
+    <value>TimeSyncService: enhedstid er {DeviceTime}, delta {DeltaSec}s</value>
+  </data>
+  <data name="LogTimeSyncSetting" xml:space="preserve">
+    <value>TimeSyncService: drift {DeltaSec}s overskrider grænsen, indstiller enhedstid til {LocalTime}</value>
+  </data>
+  <data name="LogTimeSyncInSync" xml:space="preserve">
+    <value>TimeSyncService: enhedstiden er synkroniseret (delta {DeltaSec}s)</value>
+  </data>
+  <data name="LogTimeSyncNotSet" xml:space="preserve">
+    <value>TimeSyncService: enhedstid ikke indstillet, synkroniserer</value>
+  </data>
+  <data name="LogTimeSyncFailed" xml:space="preserve">
+    <value>TimeSyncService: tidsynkroniseringsforsøg mislykkedes</value>
+  </data>
+  <data name="LogTimeSyncStopping" xml:space="preserve">
+    <value>TimeSyncService stopper</value>
+  </data>
+  <data name="LogStartupMetaFetch" xml:space="preserve">
+    <value>Opstart: første dashboarddata modtaget, henter sensormetadata på forbindelse 2.</value>
+  </data>
+  <data name="LogStartupMetaPopulated" xml:space="preserve">
+    <value>Opstart: sensor-metacache udfyldt.</value>
+  </data>
+  <data name="LogStartupMetaAlready" xml:space="preserve">
+    <value>Opstart: dashboarddata er allerede tilgængelige, henter sensormeta på forbindelse 2.</value>
+  </data>
+  <data name="TempLabel" xml:space="preserve">
+    <value>Temp</value>
+  </data>
+  <data name="HumidityLabel" xml:space="preserve">
+    <value>Fugtighed</value>
+  </data>
+  <data name="DewPointLabel" xml:space="preserve">
+    <value>Dugpunkt</value>
+  </data>
+  <data name="ComfortLabel" xml:space="preserve">
+    <value>Komfort</value>
+  </data>
+  <data name="CondensationRiskLabel" xml:space="preserve">
+    <value>Kondensrisiko</value>
+  </data>
+  <data name="LightLevelLabel" xml:space="preserve">
+    <value>Lysniveau</value>
+  </data>
+  <data name="IsDaytimeLabel" xml:space="preserve">
+    <value>Dagslys</value>
+  </data>
+  <data name="GpsLatLabel" xml:space="preserve">
+    <value>breddegrad</value>
+  </data>
+  <data name="GpsLonLabel" xml:space="preserve">
+    <value>Lon</value>
+  </data>
+  <data name="GpsAltLabel" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="GpsSpeedLabel" xml:space="preserve">
+    <value>Hastighed</value>
+  </data>
+  <data name="GpsCourseLabel" xml:space="preserve">
+    <value>Kursus</value>
+  </data>
+  <data name="GpsSatsLabel" xml:space="preserve">
+    <value>Sats</value>
+  </data>
+  <data name="WaterLevelLabel" xml:space="preserve">
+    <value>Vandstand</value>
+  </data>
+  <data name="FreeMemoryLabel" xml:space="preserve">
+    <value>Ledig hukommelse</value>
+  </data>
+  <data name="CpuUsageLabel" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="VoltageLabel" xml:space="preserve">
+    <value>Spænding</value>
+  </data>
+  <data name="StateLabel" xml:space="preserve">
+    <value>Stat</value>
+  </data>
+  <data name="AverageLabel" xml:space="preserve">
+    <value>Gns.</value>
+  </data>
+  <data name="MsgCancel" xml:space="preserve">
+    <value>Annuller</value>
+  </data>
+  <data name="SensorSuffixCelsius" xml:space="preserve">
+    <value>°C</value>
+  </data>
+  <data name="SensorSuffixPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="SensorSuffixKb" xml:space="preserve">
+    <value>kb</value>
+  </data>
+  <data name="SensorSuffixKmh" xml:space="preserve">
+    <value>km/t</value>
+  </data>
+  <data name="SensorSuffixVolt" xml:space="preserve">
+    <value>V</value>
+  </data>
+  <data name="SensorSuffixMetre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="SensorSuffixDegree" xml:space="preserve">
+    <value>°</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Relays" xml:space="preserve">
+    <value>Relæer</value>
+  </data>
+  <data name="ExternalSensors" xml:space="preserve">
+    <value>Eksterne sensorer</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Indstillinger</value>
+  </data>
+  <data name="HelloWorld" xml:space="preserve">
+    <value>Hej, verden!</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="NoRelaysConfigured" xml:space="preserve">
+    <value>Ingen relæer konfigureret</value>
+  </data>
+  <data name="NoSensorsConfigured" xml:space="preserve">
+    <value>Ingen sensorer konfigureret</value>
+  </data>
+  <data name="MemLabel" xml:space="preserve">
+    <value>Hukommelse:</value>
+  </data>
+  <data name="CpuLabel" xml:space="preserve">
+    <value>CPU:</value>
+  </data>
+  <data name="FwPrefix" xml:space="preserve">
+    <value>VS:</value>
+  </data>
+  <data name="LogLabel" xml:space="preserve">
+    <value>log</value>
+  </data>
+  <data name="RefreshNowTooltip" xml:space="preserve">
+    <value>Opdater nu</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Sprog</value>
+  </data>
+  <data name="GpioRestrictions" xml:space="preserve">
+    <value>GPIO-begrænsninger</value>
+  </data>
+  <data name="HardBlockedPrefix" xml:space="preserve">
+    <value>Hårdt blokeret:</value>
+  </data>
+  <data name="AdvisoryPrefix" xml:space="preserve">
+    <value>Rådgivning:</value>
+  </data>
+  <data name="FirmwareUpdate" xml:space="preserve">
+    <value>Firmwareopdatering</value>
+  </data>
+  <data name="CurrentVersionPrefix" xml:space="preserve">
+    <value>Nuværende version:</value>
+  </data>
+  <data name="AvailableVersionPrefix" xml:space="preserve">
+    <value>Tilgængelig version:</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Søg efter opdateringer</value>
+  </data>
+  <data name="PinsAssignedSuffix" xml:space="preserve">
+    <value>Pinkode(r) aktuelt tildelt</value>
+  </data>
+  <data name="DeviceTime" xml:space="preserve">
+    <value>Enhedstid</value>
+  </data>
+  <data name="SyncTimeNow" xml:space="preserve">
+    <value>Synkroniser tid nu</value>
+  </data>
+  <data name="TimezoneLabel" xml:space="preserve">
+    <value>Tidszone</value>
+  </data>
+  <data name="SelectTimezone" xml:space="preserve">
+    <value>Vælg tidszone...</value>
+  </data>
+  <data name="SaveTimezone" xml:space="preserve">
+    <value>Gem tidszone</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>Navn</value>
+  </data>
+  <data name="LocationNamePlaceholder" xml:space="preserve">
+    <value>Stednavn...</value>
+  </data>
+  <data name="LocationType" xml:space="preserve">
+    <value>Lokationstype</value>
+  </data>
+  <data name="SelectLocationType" xml:space="preserve">
+    <value>Vælg placeringstype...</value>
+  </data>
+  <data name="BoatDetails" xml:space="preserve">
+    <value>Båddetaljer</value>
+  </data>
+  <data name="RtcPins" xml:space="preserve">
+    <value>RTC-ben</value>
+  </data>
+  <data name="DataPin" xml:space="preserve">
+    <value>Datapin</value>
+  </data>
+  <data name="ClockPin" xml:space="preserve">
+    <value>Urstift</value>
+  </data>
+  <data name="ResetPin" xml:space="preserve">
+    <value>Nulstil pinkode</value>
+  </data>
+  <data name="Use255DisableAnyPin" xml:space="preserve">
+    <value>Brug 255 til at deaktivere enhver pin</value>
+  </data>
+  <data name="SpiPins" xml:space="preserve">
+    <value>SPI-ben</value>
+  </data>
+  <data name="SckClock" xml:space="preserve">
+    <value>SCK (ur)</value>
+  </data>
+  <data name="MosiMasterOut" xml:space="preserve">
+    <value>MOSI (Master-udgang)</value>
+  </data>
+  <data name="MisoMasterIn" xml:space="preserve">
+    <value>MISO (Master ind)</value>
+  </data>
+  <data name="Use255Disable" xml:space="preserve">
+    <value>Brug 255 til at deaktivere</value>
+  </data>
+  <data name="ChipSelect" xml:space="preserve">
+    <value>Chip-select</value>
+  </data>
+  <data name="InitSpeed" xml:space="preserve">
+    <value>Starthastighed</value>
+  </data>
+  <data name="SpeedMhz" xml:space="preserve">
+    <value>Hastighed (MHz)</value>
+  </data>
+  <data name="ValidSpeeds" xml:space="preserve">
+    <value>Gyldig: 4, 8, 12, 16, 20, 24 MHz</value>
+  </data>
+  <data name="EnableAuthentication" xml:space="preserve">
+    <value>Aktivér godkendelse</value>
+  </data>
+  <data name="EnterApiKeyPlaceholder" xml:space="preserve">
+    <value>Indtast API-nøgle</value>
+  </data>
+  <data name="EnterHmacKeyPlaceholder" xml:space="preserve">
+    <value>Indtast HMAC-nøgle</value>
+  </data>
+  <data name="NextionDisplay" xml:space="preserve">
+    <value>Nextion Display</value>
+  </data>
+  <data name="HardwareSerial" xml:space="preserve">
+    <value>Hardware-serienummer</value>
+  </data>
+  <data name="Pins" xml:space="preserve">
+    <value>Knappenåle</value>
+  </data>
+  <data name="RxPinDisabled" xml:space="preserve">
+    <value>RX-pin (tom eller 255 = deaktiveret)</value>
+  </data>
+  <data name="TxPinDisabled" xml:space="preserve">
+    <value>TX-pin (tom eller 255 = deaktiveret)</value>
+  </data>
+  <data name="Communication" xml:space="preserve">
+    <value>Kommunikation</value>
+  </data>
+  <data name="UartNumber" xml:space="preserve">
+    <value>UART-nummer</value>
+  </data>
+  <data name="Uart" xml:space="preserve">
+    <value>UART</value>
+  </data>
+  <data name="RebootRequired" xml:space="preserve">
+    <value>Genstart påkrævet</value>
+  </data>
+  <data name="NextionRebootRequiredMessage" xml:space="preserve">
+    <value>Ændringer i Nextion-konfigurationen kræver en genstart af enheden for at træde i kraft. Gem indstillingerne og genstart enheden.</value>
+  </data>
+  <data name="BuzzerPin" xml:space="preserve">
+    <value>Buzzer-pin</value>
+  </data>
+  <data name="GpioPin" xml:space="preserve">
+    <value>GPIO-ben</value>
+  </data>
+  <data name="Use255DisablePin" xml:space="preserve">
+    <value>Brug 255 for at deaktivere pin</value>
+  </data>
+  <data name="HostIp" xml:space="preserve">
+    <value>Vært / IP</value>
+  </data>
+  <data name="Credentials" xml:space="preserve">
+    <value>Legitimationsoplysninger</value>
+  </data>
+  <data name="LeaveEmptyForNone" xml:space="preserve">
+    <value>Lad stå tomt for ingen</value>
+  </data>
+  <data name="EnterPasswordToChange" xml:space="preserve">
+    <value>Indtast adgangskode for at ændre</value>
+  </data>
+  <data name="DeviceIdentity" xml:space="preserve">
+    <value>Enhedsidentitet</value>
+  </data>
+  <data name="MqttDeviceIdPlaceholder" xml:space="preserve">
+    <value>f.eks. boat_seawolf_01</value>
+  </data>
+  <data name="HomeassistantPlaceholder" xml:space="preserve">
+    <value>hjemmeassistent</value>
+  </data>
+  <data name="KeepAliveSeconds" xml:space="preserve">
+    <value>Keep Alive (sekunder)</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Avanceret</value>
+  </data>
+  <data name="SaveAllSettings" xml:space="preserve">
+    <value>Gem alle indstillinger</value>
+  </data>
+  <data name="ExternalSensorTitle" xml:space="preserve">
+    <value>Ekstern sensor</value>
+  </data>
+  <data name="SensorTypeLabel" xml:space="preserve">
+    <value>Sensortype</value>
+  </data>
+  <data name="SelectSensorType" xml:space="preserve">
+    <value>Vælg sensortype</value>
+  </data>
+  <data name="MqttName" xml:space="preserve">
+    <value>MQTT Navn</value>
+  </data>
+  <data name="MqttSlug" xml:space="preserve">
+    <value>MQTT Slug</value>
+  </data>
+  <data name="MqttType" xml:space="preserve">
+    <value>MQTT type</value>
+  </data>
+  <data name="MqttDeviceClass" xml:space="preserve">
+    <value>MQTT Enhedsklasse</value>
+  </data>
+  <data name="MqttUnit" xml:space="preserve">
+    <value>MQTT-enhed</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>binær</value>
+  </data>
+  <data name="OptionsSection" xml:space="preserve">
+    <value>INDSTILLINGER</value>
+  </data>
+  <data name="EnabledSection" xml:space="preserve">
+    <value>AKTIVERET</value>
+  </data>
+  <data name="SensorEnabled" xml:space="preserve">
+    <value>Sensor aktiveret</value>
+  </data>
+  <data name="SensorTypePresenceShort" xml:space="preserve">
+    <value>Tilstedeværelse</value>
+  </data>
+  <data name="LevelLabel" xml:space="preserve">
+    <value>Niveau</value>
+  </data>
+  <data name="TemperatureLabel" xml:space="preserve">
+    <value>Temperatur</value>
+  </data>
+  <data name="CondensationLabel" xml:space="preserve">
+    <value>Kondensation</value>
+  </data>
+  <data name="LatitudeLabel" xml:space="preserve">
+    <value>Breddegrad</value>
+  </data>
+  <data name="LongitudeLabel" xml:space="preserve">
+    <value>Længdegrad</value>
+  </data>
+  <data name="AltitudeLabel" xml:space="preserve">
+    <value>Højde</value>
+  </data>
+  <data name="SatellitesLabel" xml:space="preserve">
+    <value>satellitter</value>
+  </data>
+  <data name="FreeRamLabel" xml:space="preserve">
+    <value>Ledig RAM</value>
+  </data>
+  <data name="InstantLabel" xml:space="preserve">
+    <value>Øjeblikkelig</value>
+  </data>
+  <data name="RollingAvgLabel" xml:space="preserve">
+    <value>glidende gennemsnit</value>
+  </data>
+  <data name="PlaceholderPin21" xml:space="preserve">
+    <value>f.eks. 21</value>
+  </data>
+  <data name="PlaceholderPin22" xml:space="preserve">
+    <value>f.eks. 22</value>
+  </data>
+  <data name="PlaceholderPin23" xml:space="preserve">
+    <value>f.eks. 23</value>
+  </data>
+  <data name="PlaceholderPin12" xml:space="preserve">
+    <value>f.eks. 12</value>
+  </data>
+  <data name="PlaceholderPin11" xml:space="preserve">
+    <value>f.eks. 11</value>
+  </data>
+  <data name="PlaceholderPin13" xml:space="preserve">
+    <value>f.eks. 13</value>
+  </data>
+  <data name="PlaceholderPin10" xml:space="preserve">
+    <value>f.eks. 10</value>
+  </data>
+  <data name="PlaceholderBaud9600" xml:space="preserve">
+    <value>f.eks. 9600</value>
+  </data>
+  <data name="MmsiLabel" xml:space="preserve">
+    <value>MMSI</value>
+  </data>
+  <data name="CallSignLabel" xml:space="preserve">
+    <value>Kaldesignal</value>
+  </data>
+  <data name="HomePortLabel" xml:space="preserve">
+    <value>Hjemhavn</value>
+  </data>
+  <data name="CsPin" xml:space="preserve">
+    <value>CS nål</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>API-nøgle</value>
+  </data>
+  <data name="HmacKey" xml:space="preserve">
+    <value>HMAC-nøgle</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Aktiveret</value>
+  </data>
+  <data name="BaudRate" xml:space="preserve">
+    <value>Baudhastighed</value>
+  </data>
+  <data name="Connection" xml:space="preserve">
+    <value>Forbindelse</value>
+  </data>
+  <data name="GenerateNewKeys" xml:space="preserve">
+    <value>Generer nye nøgler</value>
+  </data>
+  <data name="Placeholder255Disabled" xml:space="preserve">
+    <value>255 = deaktiveret</value>
+  </data>
+  <data name="PlaceholderBilgeShort" xml:space="preserve">
+    <value>f.eks. Bilge</value>
+  </data>
+  <data name="PlaceholderBilgePump" xml:space="preserve">
+    <value>f.eks. lænsepumpe</value>
+  </data>
+  <data name="GpioPinDisabled" xml:space="preserve">
+    <value>GPIO Pin (blank eller 255 = deaktiveret)</value>
+  </data>
+  <data name="SensorTypePresence" xml:space="preserve">
+    <value>Nærvær</value>
+  </data>
+  <data name="ExtSensorsTitle" xml:space="preserve">
+    <value>Eksterne sensorer</value>
+  </data>
+  <data name="SensorTitle" xml:space="preserve">
+    <value>Sensor</value>
+  </data>
+  <data name="SpeedLabel" xml:space="preserve">
+    <value>Hastighed</value>
+  </data>
+  <data name="CourseLabel" xml:space="preserve">
+    <value>Kursus</value>
+  </data>
+  <data name="AvgLabel" xml:space="preserve">
+    <value>Gns.</value>
+  </data>
+  <data name="PinPairFormat" xml:space="preserve">
+    <value>Pinkode {0}, {1}</value>
+  </data>
+  <data name="PlaceholderMqttPort" xml:space="preserve">
+    <value>1883</value>
+  </data>
+  <data name="PlaceholderKeepAlive" xml:space="preserve">
+    <value>60</value>
+  </data>
+  <data name="PlaceholderSpeedMhz" xml:space="preserve">
+    <value>4</value>
+  </data>
+</root>

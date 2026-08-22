@@ -1,8 +1,9 @@
-using PowerControlHubApp.Internal;
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -145,13 +146,13 @@ public sealed class LocationSettingsViewModel : BaseViewModel
         _isLoading = true;
         try
         {
-            var locTask = Service.GetSystemLocationTypesAsync();
-            var dashTask = Service.GetDashboardDataAsync();
+            Task<SystemLocationTypesResponseModel> locTask = Service.GetSystemLocationTypesAsync();
+            Task<IndexModel> dashTask = Service.GetDashboardDataAsync();
 
             await Task.WhenAll(locTask, dashTask);
 
-            var resp = locTask.Result;
-            var index = dashTask.Result;
+            SystemLocationTypesResponseModel resp = locTask.Result;
+            IndexModel index = dashTask.Result;
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -159,7 +160,7 @@ public sealed class LocationSettingsViewModel : BaseViewModel
 
                 if (resp?.Locations != null)
                 {
-                    foreach (var l in resp.Locations)
+                    foreach (LocationTypeModel l in resp.Locations)
                         LocationTypes.Add(l);
                 }
 
@@ -232,7 +233,7 @@ public sealed class LocationSettingsViewModel : BaseViewModel
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = ok ? Constants.SavedOk : Constants.SaveFailed;
+                StatusMessage = ok ? $"{IconCheckMark} {SavedOk}" : $"{IconWarning} {SavedFailed}";
                 OnPropertyChanged(nameof(HasStatus));
             });
         }
@@ -240,7 +241,7 @@ public sealed class LocationSettingsViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = Constants.SaveFailed;
+                StatusMessage = SaveFailed;
                 OnPropertyChanged(nameof(HasStatus));
             });
         }

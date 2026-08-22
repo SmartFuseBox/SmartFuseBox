@@ -4,6 +4,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -61,7 +62,7 @@ public class LocalSensorDetailViewModel : BaseViewModel
     // Validates all fields against descriptor min/max, returns first error or null
     private string ValidateAll()
     {
-        var desc = _metaCache.GetDescriptor(_sensorType);
+        SensorTypeDescriptorModel desc = _metaCache.GetDescriptor(_sensorType);
 
         if (desc == null)
             return SensorTypeMetaDataUnavailable;
@@ -69,8 +70,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
         // Pins
         if (desc.Pins.Count > 0)
         {
-            var pin0 = desc.Pins[0];
-            var err = ValidateField(pin0.Label, Pin0, pin0.Min, pin0.Max, isPin: true);
+            SensorFieldDescriptorModel pin0 = desc.Pins[0];
+            string err = ValidateField(pin0.Label, Pin0, pin0.Min, pin0.Max, isPin: true);
 
             if (err != null)
                 return err;
@@ -78,8 +79,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
 
         if (desc.Pins.Count > 1)
         {
-            var pin1 = desc.Pins[1];
-            var err = ValidateField(pin1.Label, Pin1, pin1.Min, pin1.Max, isPin: true);
+            SensorFieldDescriptorModel pin1 = desc.Pins[1];
+            string err = ValidateField(pin1.Label, Pin1, pin1.Min, pin1.Max, isPin: true);
 
             if (err != null)
                 return err;
@@ -88,8 +89,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
         // Options1
         if (desc.Options1.Count > 0)
         {
-            var opt1_0 = desc.Options1[0];
-            var err = ValidateField(opt1_0.Label, Opt1_0, opt1_0.Min, opt1_0.Max);
+            SensorFieldDescriptorModel opt1_0 = desc.Options1[0];
+            string err = ValidateField(opt1_0.Label, Opt1_0, opt1_0.Min, opt1_0.Max);
 
             if (err != null)
                 return err;
@@ -97,8 +98,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
 
         if (desc.Options1.Count > 1)
         {
-            var opt1_1 = desc.Options1[1];
-            var err = ValidateField(opt1_1.Label, Opt1_1, opt1_1.Min, opt1_1.Max);
+            SensorFieldDescriptorModel opt1_1 = desc.Options1[1];
+            string err = ValidateField(opt1_1.Label, Opt1_1, opt1_1.Min, opt1_1.Max);
 
             if (err != null)
                 return err;
@@ -107,8 +108,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
         // Options2
         if (desc.Options2.Count > 0)
         {
-            var opt2_0 = desc.Options2[0];
-            var err = ValidateField(opt2_0.Label, Opt2_0, opt2_0.Min, opt2_0.Max);
+            SensorFieldDescriptorModel opt2_0 = desc.Options2[0];
+            string err = ValidateField(opt2_0.Label, Opt2_0, opt2_0.Min, opt2_0.Max);
 
             if (err != null)
                 return err;
@@ -116,8 +117,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
 
         if (desc.Options2.Count > 1)
         {
-            var opt2_1 = desc.Options2[1];
-            var err = ValidateField(opt2_1.Label, Opt2_1, opt2_1.Min, opt2_1.Max);
+            SensorFieldDescriptorModel opt2_1 = desc.Options2[1];
+            string err = ValidateField(opt2_1.Label, Opt2_1, opt2_1.Min, opt2_1.Max);
 
             if (err != null)
                 return err;
@@ -518,7 +519,7 @@ public class LocalSensorDetailViewModel : BaseViewModel
 
     // IsBusy, IsNotBusy, StatusMessage, and HasStatus are provided by BaseViewModel
 
-    public bool IsError => HasStatus && !StatusMessage.StartsWith(CheckMark);
+    public bool IsError => HasStatus && !StatusMessage.StartsWith(IconCheckMark);
 
     public LocalSensorDetailViewModel(PowerHubService service, LogService log, SensorMetaCache metaCache)
         : base(service, log)
@@ -800,8 +801,8 @@ public class LocalSensorDetailViewModel : BaseViewModel
             }
 
             StatusMessage = failures.Count == 0
-                ? SavedOk
-                : $"{FailPrefix}{string.Join(FailSeparator, failures)}";
+                ? $"{IconCheckMark} {SavedOk}"
+                : $"{IconWarning} {FailPrefix}{string.Join(FailSeparator, failures)}";
         }
         catch (Exception ex)
         {
@@ -819,10 +820,10 @@ public class LocalSensorDetailViewModel : BaseViewModel
             return;
 
         bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(
-            MsgRemoveSensor,
+            RemoveSensor,
             $"Remove local sensor at index {_sensorIndex}?\n\nThis cannot be undone.",
-            MsgRemove,
-            MsgCancel);
+            Remove,
+            Cancel);
 
         if (!confirmed)
             return;
@@ -840,7 +841,7 @@ public class LocalSensorDetailViewModel : BaseViewModel
             if (ok)
                 await Shell.Current.GoToAsync(NavBack);
             else
-                StatusMessage = ErrRemoveCommandFailed;
+                StatusMessage = $"{IconWarning}{ErrRemoveCommandFailed}";
         }
         catch (Exception ex)
         {

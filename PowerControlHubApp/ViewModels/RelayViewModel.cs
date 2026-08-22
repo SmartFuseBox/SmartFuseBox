@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels
 {
@@ -139,6 +140,12 @@ namespace PowerControlHubApp.ViewModels
         /// otherwise falls back to <see cref="ShortName"/>.
         /// </summary>
         public string DisplayName => !string.IsNullOrWhiteSpace(LongName) ? LongName : ShortName;
+
+        /// <summary>
+        /// Pin summary for the list sub-label. Falls back to the localized
+        /// "Not configured" text when the relay has no pin assigned.
+        /// </summary>
+        public string PinSummary => IsEnabled ? string.Format(PinFormat, Pin) : SensorNotConfigured;
 
         /// <summary>
         /// Translates <see cref="ButtonImage"/> into the corresponding panel accent colour.

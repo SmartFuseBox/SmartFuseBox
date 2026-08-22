@@ -10,7 +10,7 @@ internal class TestCommand
 
     public bool IsMatch(string actualResponse)
     {
-        foreach (var expected in ExpectedResponses)
+        foreach (string expected in ExpectedResponses)
         {
             if (MatchesPattern(actualResponse, expected))
                 return true;
@@ -47,29 +47,27 @@ internal static class TestCommandParser
         if (!File.Exists(filePath))
             throw new FileNotFoundException($"Test file not found: {filePath}");
 
-        var tests = new List<TestCommand>();
-        var lines = File.ReadAllLines(filePath);
+        List<TestCommand> tests = [];
+        string[] lines = File.ReadAllLines(filePath);
 
-        foreach (var rawLine in lines)
+        foreach (string rawLine in lines)
         {
-            var line = rawLine.Trim();
+            string line = rawLine.Trim();
 
             // Skip blank lines and comments
             if (string.IsNullOrEmpty(line) || line.StartsWith('#'))
                 continue;
 
             // Parse format: COMMAND -> EXPECTED_RESPONSE
-            var parts = line.Split(new[] { "->" }, StringSplitOptions.TrimEntries);
+            string[] parts = line.Split(new[] { "->" }, StringSplitOptions.TrimEntries);
             if (parts.Length != 2)
             {
                 Console.WriteLine($"Warning: Skipping invalid test line: {line}");
                 continue;
             }
 
-            var command = parts[0].Trim();
-            var responses = parts[1].Split('|', StringSplitOptions.TrimEntries)
-                                    .Select(r => r.Trim())
-                                    .ToArray();
+            string command = parts[0].Trim();
+            string[] responses = [.. parts[1].Split('|', StringSplitOptions.TrimEntries).Select(r => r.Trim())];
 
             tests.Add(new TestCommand
             {

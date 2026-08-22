@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
+
 namespace PowerControlHubApp.Services
 {
     public class ConfigConnection : IConfigConnection, IDisposable
@@ -137,7 +139,7 @@ namespace PowerControlHubApp.Services
 
         private static SocketsHttpHandler CreateHandler()
         {
-            var handler = new SocketsHttpHandler
+            SocketsHttpHandler handler = new SocketsHttpHandler
             {
                 PooledConnectionIdleTimeout = TimeSpan.FromSeconds(SecondsSixty),
                 PooledConnectionLifetime = Timeout.InfiniteTimeSpan,
@@ -145,7 +147,7 @@ namespace PowerControlHubApp.Services
                 MaxConnectionsPerServer = 1,
                 ConnectCallback = async (context, ct) =>
                 {
-                    var socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
+                    Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp)
                     {
                         NoDelay = true
                     };
@@ -172,8 +174,8 @@ namespace PowerControlHubApp.Services
             string json = await _client.GetStringAsync($"{RouteLocalSensorConfig}{SensorConfigGetAll}?meta=1", ct);
             using JsonDocument doc = JsonDocument.Parse(json);
 
-            if (doc.RootElement.TryGetProperty(JsonMeta, out var meta) &&
-                meta.TryGetProperty(JsonMetaDescriptors, out var descriptors) &&
+            if (doc.RootElement.TryGetProperty(JsonMeta, out JsonElement meta) &&
+                meta.TryGetProperty(JsonMetaDescriptors, out JsonElement descriptors) &&
                 descriptors.ValueKind == JsonValueKind.Array)
             {
                 return JsonSerializer.Deserialize<List<SensorTypeDescriptorModel>>(descriptors.GetRawText(), JsonOptions) ?? [];
@@ -187,13 +189,13 @@ namespace PowerControlHubApp.Services
             string json = await _client.GetStringAsync(RouteExternalSensor, ct);
             using JsonDocument doc = JsonDocument.Parse(json);
 
-            var list = new List<ExternalSensorConfigModel>();
+            List<ExternalSensorConfigModel> list = [];
 
-            if (doc.RootElement.TryGetProperty(JsonSensors, out var sensors) && sensors.ValueKind == JsonValueKind.Array)
+            if (doc.RootElement.TryGetProperty(JsonSensors, out JsonElement sensors) && sensors.ValueKind == JsonValueKind.Array)
             {
-                foreach (var el in sensors.EnumerateArray())
+                foreach (JsonElement el in sensors.EnumerateArray())
                 {
-                    var m = new ExternalSensorConfigModel
+                    ExternalSensorConfigModel m = new ExternalSensorConfigModel
                     {
                         Index = el.GetProperty(JsonSensorIndex).GetInt32(),
                         SensorId = el.GetProperty(JsonSensorId).GetInt32(),
@@ -246,13 +248,13 @@ namespace PowerControlHubApp.Services
             string json = await _client.GetStringAsync(RouteLocalSensorConfig, ct);
             using JsonDocument doc = JsonDocument.Parse(json);
 
-            var list = new List<LocalSensorConfigModel>();
+            List<LocalSensorConfigModel> list = [];
 
-            if (doc.RootElement.TryGetProperty(JsonSensors, out var sensors) && sensors.ValueKind == JsonValueKind.Array)
+            if (doc.RootElement.TryGetProperty(JsonSensors, out JsonElement sensors) && sensors.ValueKind == JsonValueKind.Array)
             {
-                foreach (var el in sensors.EnumerateArray())
+                foreach (JsonElement el in sensors.EnumerateArray())
                 {
-                    var m = new LocalSensorConfigModel
+                    LocalSensorConfigModel m = new LocalSensorConfigModel
                     {
                         Index = el.GetProperty(JsonLocalSensorIndex).GetInt32(),
                         SensorType = el.GetProperty(JsonLocalSensorType).GetInt32(),
@@ -416,13 +418,13 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(RouteSystemGetDateTime, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean() &&
-                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                    doc.RootElement.TryGetProperty(JsonValueKey, out JsonElement v))
                 {
                     string dtStr = v.GetString();
 
-                    if (DateTimeOffset.TryParse(dtStr, out var dt))
+                    if (DateTimeOffset.TryParse(dtStr, out DateTimeOffset dt))
                         return dt;
                 }
             }
@@ -454,9 +456,9 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(RouteConfigTimezoneOffset, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean() &&
-                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                    doc.RootElement.TryGetProperty(JsonValueKey, out JsonElement v))
                 {
                     if (v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out int val))
                         return val;
@@ -608,11 +610,11 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(RouteConfigSdCardSpiPins, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean() &&
-                    doc.RootElement.TryGetProperty(JsonSpiSckKey, out var sck) &&
-                    doc.RootElement.TryGetProperty(JsonSpiMosiKey, out var mosi) &&
-                    doc.RootElement.TryGetProperty(JsonSpiMisoKey, out var miso))
+                    doc.RootElement.TryGetProperty(JsonSpiSckKey, out JsonElement sck) &&
+                    doc.RootElement.TryGetProperty(JsonSpiMosiKey, out JsonElement mosi) &&
+                    doc.RootElement.TryGetProperty(JsonSpiMisoKey, out JsonElement miso))
                 {
                     return (sck.GetInt32(), mosi.GetInt32(), miso.GetInt32());
                 }
@@ -665,20 +667,20 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(RouteConfigRtc, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean())
                 {
                     int? data = null;
                     int? clock = null;
                     int? reset = null;
 
-                    if (doc.RootElement.TryGetProperty(JsonRtcDataPin, out var d) && d.ValueKind == JsonValueKind.Number && d.TryGetInt32(out int dv))
+                    if (doc.RootElement.TryGetProperty(JsonRtcDataPin, out JsonElement d) && d.ValueKind == JsonValueKind.Number && d.TryGetInt32(out int dv))
                         data = dv;
 
-                    if (doc.RootElement.TryGetProperty(JsonRtcClockPin, out var c) && c.ValueKind == JsonValueKind.Number && c.TryGetInt32(out int cv))
+                    if (doc.RootElement.TryGetProperty(JsonRtcClockPin, out JsonElement c) && c.ValueKind == JsonValueKind.Number && c.TryGetInt32(out int cv))
                         clock = cv;
 
-                    if (doc.RootElement.TryGetProperty(JsonRtcResetPin, out var r) && r.ValueKind == JsonValueKind.Number && r.TryGetInt32(out int rv))
+                    if (doc.RootElement.TryGetProperty(JsonRtcResetPin, out JsonElement r) && r.ValueKind == JsonValueKind.Number && r.TryGetInt32(out int rv))
                         reset = rv;
 
                     if (data.HasValue && clock.HasValue && reset.HasValue)
@@ -817,11 +819,11 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(RouteConfigNextionGet, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                var model = new NextionConfigModel();
+                NextionConfigModel model = new NextionConfigModel();
 
                 if (doc.RootElement.ValueKind == JsonValueKind.Object)
                 {
-                    foreach (var prop in doc.RootElement.EnumerateObject())
+                    foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
                     {
                         string name = prop.Name.ToLowerInvariant();
 
@@ -922,9 +924,9 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(route, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean() &&
-                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                    doc.RootElement.TryGetProperty(JsonValueKey, out JsonElement v))
                 {
                     if (v.ValueKind == JsonValueKind.Number && v.TryGetInt32(out int val))
                         return val;
@@ -976,9 +978,9 @@ namespace PowerControlHubApp.Services
                 string json = await _client.GetStringAsync(url, ct);
                 using JsonDocument doc = JsonDocument.Parse(json);
 
-                if (doc.RootElement.TryGetProperty(ResultSuccess, out var success) &&
+                if (doc.RootElement.TryGetProperty(ResultSuccess, out JsonElement success) &&
                     success.GetBoolean() &&
-                    doc.RootElement.TryGetProperty(JsonValueKey, out var v))
+                    doc.RootElement.TryGetProperty(JsonValueKey, out JsonElement v))
                 {
                     return v.GetString();
                 }

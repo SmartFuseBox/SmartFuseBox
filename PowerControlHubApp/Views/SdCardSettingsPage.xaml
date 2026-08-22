@@ -2,13 +2,14 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.SdCardSettingsPage"
-             Title="SD Card Settings"
+             Title="{x:Static localization:AppResources.SdCardSettingsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="SD Card Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.SdCardSettingsTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -20,47 +21,47 @@
                         Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="SPI Pins"
+                        <Label Text="{x:Static localization:AppResources.SpiPins}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="SCK (Clock)"
+                        <Label Text="{x:Static localization:AppResources.SckClock}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding SpiSck}"
-                               Placeholder="e.g. 12"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin12}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="MOSI (Master Out)"
+                        <Label Text="{x:Static localization:AppResources.MosiMasterOut}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding SpiMosi}"
-                               Placeholder="e.g. 11"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin11}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="MISO (Master In)"
+                        <Label Text="{x:Static localization:AppResources.MisoMasterIn}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding SpiMiso}"
-                               Placeholder="e.g. 13"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin13}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Use 255 to disable any pin"
+                        <Label Text="{x:Static localization:AppResources.Use255DisableAnyPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="10"
                                FontAttributes="Italic" />
@@ -73,23 +74,23 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Chip Select"
+                        <Label Text="{x:Static localization:AppResources.ChipSelect}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="CS Pin"
+                        <Label Text="{x:Static localization:AppResources.CsPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding CsPin}"
-                               Placeholder="e.g. 10"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin10}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Use 255 to disable"
+                        <Label Text="{x:Static localization:AppResources.Use255Disable}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="10"
                                FontAttributes="Italic" />
@@ -102,23 +103,23 @@
                         StrokeShape="RoundRectangle 8" Padding="14"
                         Margin="0,8,0,0">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Init Speed"
+                        <Label Text="{x:Static localization:AppResources.InitSpeed}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="Speed (MHz)"
+                        <Label Text="{x:Static localization:AppResources.SpeedMhz}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding InitSpeed}"
-                               Placeholder="4"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderSpeedMhz}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Valid: 4, 8, 12, 16, 20, 24 MHz"
+                        <Label Text="{x:Static localization:AppResources.ValidSpeeds}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="10"
                                FontAttributes="Italic" />
@@ -126,7 +127,7 @@
                 </Border>
 
                 <!-- Save All button -->
-                <Button Text="Save All Settings"
+                <Button Text="{x:Static localization:AppResources.SaveAllSettings}"
                         Command="{Binding SaveAllCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"

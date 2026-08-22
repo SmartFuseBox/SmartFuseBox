@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -12,6 +13,7 @@ public class SystemViewModel : BaseViewModel
     private string _pinsInUseText = string.Empty;
     private bool _isPinsRefreshing;
     private int _pinsCount;
+    private string _selectedLanguage;
 
     // F16 Pin Restrictions (compile-time — fetched once, never changes)
     private string _hardPinsText = string.Empty;
@@ -93,7 +95,21 @@ public class SystemViewModel : BaseViewModel
         }
     }
 
-    // StatusMessage, HasStatus, and OnPropertyChanged are provided by BaseViewModel
+    public IReadOnlyList<string> LanguageOptions => LanguageService.LanguageOptions;
+
+    public string SelectedLanguage
+    {
+        get => _selectedLanguage;
+        set
+        {
+            if (_selectedLanguage == value)
+                return;
+
+            _selectedLanguage = value;
+            OnPropertyChanged();
+            LanguageService.ApplyOption(value);
+        }
+    }
 
     public bool HasStatusMessage => !string.IsNullOrEmpty(StatusMessage);
 
@@ -122,6 +138,7 @@ public class SystemViewModel : BaseViewModel
     public SystemViewModel(PowerHubService service, LogService log)
         : base(service, log)
     {
+        _selectedLanguage = LanguageService.CurrentOption;
         CheckForUpdateCommand = new Command(async () => await CheckForUpdateAsync());
         RefreshPinsCommand = new Command(async () => await RefreshPinsAsync());
         InstallFirmwareCommand = new Command(async () => await InstallFirmwareAsync(), () => CanInstallFirmware);
@@ -149,7 +166,7 @@ public class SystemViewModel : BaseViewModel
 
         try
         {
-            var result = await Service.GetSystemPinsAsync();
+            SystemPinsResponseModel result = await Service.GetSystemPinsAsync();
 
             if (result?.Success == true && result.Pins?.Count > 0)
             {
@@ -189,7 +206,7 @@ public class SystemViewModel : BaseViewModel
 
         try
         {
-            var result = await Service.GetSystemPinRestrictionsAsync();
+            SystemPinRestrictionsResponseModel result = await Service.GetSystemPinRestrictionsAsync();
 
             if (result?.Success == true)
             {
@@ -227,14 +244,14 @@ public class SystemViewModel : BaseViewModel
             if (!_pinRestrictionsLoaded)
                 await RefreshPinRestrictionsAsync();
 
-            var list = await Service.GetWarningsAsync();
+            List<string> list = await Service.GetWarningsAsync();
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Warnings.Clear();
 
                 if (list != null && list.Count > 0)
                 {
-                    foreach (var w in list) Warnings.Add(w);
+                    foreach (string w in list) Warnings.Add(w);
                     StatusMessage = $"Updated {DateTime.Now:HH:mm:ss}";
                 }
                 else
@@ -279,7 +296,7 @@ public class SystemViewModel : BaseViewModel
         _isCheckingOta = true;
         try
         {
-            var ota = await Service.GetOtaStatusAsync();
+            OtaStatusModel ota = await Service.GetOtaStatusAsync();
             _otaStatus = ota;
             NotifyOtaProperties();
         }
@@ -312,7 +329,7 @@ public class SystemViewModel : BaseViewModel
 
         try
         {
-            var ok = await Service.TriggerOtaInstallAsync();
+            bool ok = await Service.TriggerOtaInstallAsync();
 
             if (ok)
             {

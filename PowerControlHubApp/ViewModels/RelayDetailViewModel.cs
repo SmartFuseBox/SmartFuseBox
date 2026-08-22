@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -23,13 +24,13 @@ public sealed class RelayDetailViewModel : BaseViewModel
     private int _actionType;
     private int _linkedIndex = UnconfiguredPin;
 
-    public ObservableCollection<string> ColorOptions { get; } = new(ColorOptionNames);
+    public ObservableCollection<string> ColorOptions { get; } = new(new[] { ColorBlue, ColorGreen, ColorGrey, ColorOrange, ColorRed, ColorYellow, None });
 
-    public ObservableCollection<string> ActionOptions { get; } = new(ActionOptionNames);
+    public ObservableCollection<string> ActionOptions { get; } = new(new[] { ActionDefault, ActionHorn, ActionNightRelay });
 
     public ObservableCollection<string> LinkedRelayOptions { get; } = [];
 
-    public ObservableCollection<string> DefaultStateOptions { get; } = new(DefaultStateOptionNames);
+    public ObservableCollection<string> DefaultStateOptions { get; } = new(new[] { StateOff, StateOn });
 
     public ICommand SaveCommand { get; }
 
@@ -163,7 +164,7 @@ public sealed class RelayDetailViewModel : BaseViewModel
     // IsBusy, IsNotBusy, StatusMessage, HasStatus, and OnPropertyChanged are provided by BaseViewModel
 
     // Expose an error indicator using the inherited StatusMessage.
-    public bool IsError => HasStatus && !StatusMessage.StartsWith(CheckMark);
+    public bool IsError => HasStatus && !StatusMessage.StartsWith(IconCheckMark);
 
     public RelayDetailViewModel(PowerHubService service, LogService log, IDashboardProvider provider, RelayStore relayStore)
         : base(service, log)
@@ -207,7 +208,7 @@ public sealed class RelayDetailViewModel : BaseViewModel
             {
                 try
                 {
-                    var idx = await Service.GetDashboardDataAsync();
+                    IndexModel idx = await Service.GetDashboardDataAsync();
                     relays = RelayStore.FromModels(idx.Relays ?? []);
                 }
                 catch
@@ -258,7 +259,7 @@ public sealed class RelayDetailViewModel : BaseViewModel
     private void BuildLinkedRelayOptions(int selfIndex)
     {
         LinkedRelayOptions.Clear();
-        LinkedRelayOptions.Add(NoneString);
+        LinkedRelayOptions.Add(None);
 
         for (int i = 0; i < RelayCount; i++)
         {
@@ -304,7 +305,7 @@ public sealed class RelayDetailViewModel : BaseViewModel
             if (ok)
                 ok &= await Service.SaveSettingsAsync();
 
-            StatusMessage = ok ? SavedOk : SavedFailed;
+            StatusMessage = ok ? $"{IconCheckMark} {SavedOk}" : $"{IconWarning} {SavedFailed}";
 
             if (ok && _original != null)
             {

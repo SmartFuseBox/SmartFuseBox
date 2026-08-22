@@ -5,8 +5,9 @@
              xmlns:models="clr-namespace:PowerControlHubApp.Models"
              xmlns:converters="clr-namespace:PowerControlHubApp.Converters"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization" xmlns:internal="clr-namespace:PowerControlHubApp.Internal"
              x:Class="PowerControlHubApp.Views.RelayConfigPage"
-             Title="Relay Config"
+             Title="{x:Static localization:AppResources.RelayConfigPageTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <views:BasePowerControlHubContentPage.Resources>
@@ -45,10 +46,11 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
         <!-- ── Top bar ── -->
-        <views:TopBarView Grid.Row="0" Title="⚡ Relay Configuration"
-                          RightButtonText="↻"
-                          RightButtonCommand="{Binding LoadCommand}"
-                          RightButtonIsEnabled="{Binding IsNotBusy}" />
+        <views:TopBarView Grid.Row="0" 
+            Title="{x:Static internal:Constants.IconRelaySymbol} {x:Static localization:AppResources.RelayConfigTitle}"
+            RightButtonText="↻"
+            RightButtonCommand="{Binding LoadCommand}"
+            RightButtonIsEnabled="{Binding IsNotBusy}" />
 
         <!-- Not connected banner -->
         <views:NotConnectedBanner Grid.Row="1" />
@@ -93,18 +95,8 @@
                                 <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                     <Label Text="{Binding DisplayName}"
                                            Style="{StaticResource RelayNameLabel}" />
-                                    <Label Style="{StaticResource RelaySubLabel}">
-                                        <Label.Text>
-                                            <MultiBinding StringFormat="Pin {0}">
-                                                <Binding Path="Pin" />
-                                            </MultiBinding>
-                                        </Label.Text>
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding IsEnabled}" Value="False">
-                                                <Setter Property="Text" Value="Not configured" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
+                                    <Label Text="{Binding PinSummary}"
+                                           Style="{StaticResource RelaySubLabel}" />
                                 </VerticalStackLayout>
 
                                 <!-- Action type badge -->
@@ -130,14 +122,14 @@
                                            TextColor="{DynamicResource AppLabelMuted}">
                                         <Label.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="0">
-                                                <Setter Property="Text" Value="Default" />
+                                                <Setter Property="Text" Value="{x:Static localization:AppResources.ActionBadgeDefault}" />
                                             </DataTrigger>
                                             <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="1">
-                                                <Setter Property="Text" Value="🔊 Horn" />
+                                                <Setter Property="Text" Value="🔊 {x:Static localization:AppResources.ActionBadgeHorn}" />
                                                 <Setter Property="TextColor" Value="#cc6666" />
                                             </DataTrigger>
                                             <DataTrigger TargetType="Label" Binding="{Binding ActionType}" Value="2">
-                                                <Setter Property="Text" Value="🌙 Night" />
+                                                <Setter Property="Text" Value="🌙 {x:Static localization:AppResources.ActionBadgeNight}" />
                                                 <Setter Property="TextColor" Value="#6699cc" />
                                             </DataTrigger>
                                         </Label.Triggers>

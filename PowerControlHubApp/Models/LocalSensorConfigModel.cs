@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Models
 {
@@ -85,10 +86,10 @@ namespace PowerControlHubApp.Models
                     return SensorNotConfigured;
 
                 if (Pin0 < UnconfiguredPin && Pin1 < UnconfiguredPin)
-                    return $"Pin {Pin0}, {Pin1}";
+                    return string.Format(PinPairFormat, Pin0, Pin1);
 
                 if (Pin0 < UnconfiguredPin)
-                    return $"Pin {Pin0}";
+                    return string.Format(PinFormat, Pin0);
 
                 return TypeName;
             }

@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:PowerControlHubApp.Models"
+    xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
     x:Class="PowerControlHubApp.Views.Templates.GpsSensorTemplate">
 
     <ResourceDictionary.MergedDictionaries>
@@ -27,14 +28,14 @@
                         <Label Text="🚢" FontSize="20" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding GpsSpeed}"
                                Style="{StaticResource SensorPrimaryValue}" />
-                        <Label Text="Speed"
+                        <Label Text="{x:Static localization:AppResources.SpeedLabel}"
                                Style="{StaticResource SensorFieldLabel}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Column="1" Spacing="1" HorizontalOptions="Center">
                         <Label Text="🧭" FontSize="20" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding GpsCourse}"
                                Style="{StaticResource SensorPrimaryValue}" />
-                        <Label Text="Course"
+                        <Label Text="{x:Static localization:AppResources.CourseLabel}"
                                Style="{StaticResource SensorFieldLabel}" />
                     </VerticalStackLayout>
                 </Grid>
@@ -44,16 +45,16 @@
 
                 <!-- Secondary rows -->
                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="3" ColumnSpacing="8">
-                    <Label Grid.Row="0" Grid.Column="0" Text="Latitude"   Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="{x:Static localization:AppResources.LatitudeLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding GpsLatitude}" Style="{StaticResource SensorSecondaryValue}" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="Longitude"  Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="{x:Static localization:AppResources.LongitudeLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding GpsLongitude}" Style="{StaticResource SensorSecondaryValue}" />
 
-                    <Label Grid.Row="2" Grid.Column="0" Text="Altitude"   Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="2" Grid.Column="0" Text="{x:Static localization:AppResources.AltitudeLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding GpsAltitude}" Style="{StaticResource SensorSecondaryValue}" />
 
-                    <Label Grid.Row="3" Grid.Column="0" Text="Satellites" Style="{StaticResource SensorSecondaryLabel}" />
+                    <Label Grid.Row="3" Grid.Column="0" Text="{x:Static localization:AppResources.SatellitesLabel}" Style="{StaticResource SensorSecondaryLabel}" />
                     <Label Grid.Row="3" Grid.Column="1" Text="{Binding GpsSatellites}" Style="{StaticResource SensorSecondaryValue}" />
                 </Grid>
 

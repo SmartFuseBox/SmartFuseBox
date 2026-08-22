@@ -4,6 +4,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -183,7 +184,7 @@ public class ExternalSensorDetailViewModel : BaseViewModel
 
         try
         {
-            var list = await Service.GetExternalSensorsAsync();
+            List<ExternalSensorConfigModel> list = await Service.GetExternalSensorsAsync();
             _original = list?.FirstOrDefault(s => s.Index == index);
 
             if (_original != null)
@@ -228,7 +229,7 @@ public class ExternalSensorDetailViewModel : BaseViewModel
             if (ok)
                 ok &= await Service.SaveSettingsAsync();
 
-            StatusMessage = ok ? SavedOk : SavedFailed;
+            StatusMessage = ok ? $"{IconCheckMark} {SavedOk}" : $"{IconWarning} {SavedFailed}";
         }
         catch (Exception ex)
         {
@@ -246,10 +247,10 @@ public class ExternalSensorDetailViewModel : BaseViewModel
             return;
 
         bool confirmed = await Application.Current.Windows[0].Page.DisplayAlertAsync(
-            MsgRemoveSensor,
+            RemoveSensor,
             $"Remove sensor at index {_sensorIndex}?\n\nThis cannot be undone.",
-            MsgRemove,
-            MsgCancel);
+            Remove,
+            Cancel);
 
         if (!confirmed)
             return;
@@ -270,7 +271,7 @@ public class ExternalSensorDetailViewModel : BaseViewModel
             }
             else
             {
-                StatusMessage = ErrRemoveCommandFailed;
+                StatusMessage = $"{IconWarning}{ErrRemoveCommandFailed}";
             }
         }
         catch (Exception ex)

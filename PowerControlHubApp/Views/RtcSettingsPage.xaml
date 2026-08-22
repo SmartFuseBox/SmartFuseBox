@@ -2,13 +2,14 @@
 <views:BasePowerControlHubContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:PowerControlHubApp.Views"
+             xmlns:localization="clr-namespace:PowerControlHubApp.Resources.Localization"
              x:Class="PowerControlHubApp.Views.RtcSettingsPage"
-             Title="RTC Settings"
+             Title="{x:Static localization:AppResources.RtcSettingsTitle}"
              BackgroundColor="{DynamicResource AppPageBg}">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" BackgroundColor="{DynamicResource AppPageBg}">
 
-        <views:TopBarView Grid.Row="0" Title="RTC Settings" ShowBackButton="True" />
+        <views:TopBarView Grid.Row="0" Title="{x:Static localization:AppResources.RtcSettingsTitle}" ShowBackButton="True" />
 
         <views:NotConnectedBanner Grid.Row="1" />
 
@@ -20,47 +21,47 @@
                         Stroke="{DynamicResource AppHelpCardStroke}"
                         StrokeShape="RoundRectangle 8" Padding="14">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="RTC Pins"
+                        <Label Text="{x:Static localization:AppResources.RtcPins}"
                                TextColor="{DynamicResource AppLabelMuted}"
                                FontAttributes="Bold"
                                FontSize="13" />
 
-                        <Label Text="Data Pin"
+                        <Label Text="{x:Static localization:AppResources.DataPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11" />
                         <Entry Text="{Binding DataPin}"
-                               Placeholder="e.g. 21"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin21}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Clock Pin"
+                        <Label Text="{x:Static localization:AppResources.ClockPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding ClockPin}"
-                               Placeholder="e.g. 22"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin22}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Reset Pin"
+                        <Label Text="{x:Static localization:AppResources.ResetPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="11"
                                Margin="0,8,0,0" />
                         <Entry Text="{Binding ResetPin}"
-                               Placeholder="e.g. 23"
+                               Placeholder="{x:Static localization:AppResources.PlaceholderPin23}"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource AppEntryText}"
                                PlaceholderColor="{DynamicResource AppPlaceholderText}"
                                BackgroundColor="{DynamicResource AppEntryBg}"
                                FontSize="14" />
 
-                        <Label Text="Use 255 to disable any pin"
+                        <Label Text="{x:Static localization:AppResources.Use255DisableAnyPin}"
                                TextColor="{DynamicResource AppLabelSubtle}"
                                FontSize="10"
                                FontAttributes="Italic" />
@@ -68,7 +69,7 @@
                 </Border>
 
                 <!-- Save All button -->
-                <Button Text="Save All Settings"
+                <Button Text="{x:Static localization:AppResources.SaveAllSettings}"
                         Command="{Binding SaveAllCommand}"
                         BackgroundColor="{DynamicResource AppAccent}"
                         TextColor="White"

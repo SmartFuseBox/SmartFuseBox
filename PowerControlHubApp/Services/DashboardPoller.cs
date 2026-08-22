@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using PowerControlHubApp.Models.Json;
 using System.ComponentModel;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Services;
 

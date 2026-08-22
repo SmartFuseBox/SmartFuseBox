@@ -1,7 +1,7 @@
 using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
-using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -106,7 +106,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
 
         try
         {
-            var config = await Service.GetAuthConfigAsync();
+            AuthConfigModel config = await Service.GetAuthConfigAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -118,7 +118,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
                 }
 
                 IsConnected = true;
-                StatusMessage = $"{NetworkSecurityMsgRefreshed} {DateTime.Now:HH:mm:ss}";
+                StatusMessage = $"{Refreshed} {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
@@ -149,13 +149,13 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
 
         try
         {
-            var apiKeyOk = await Service.SetAuthApiKeyAsync(ApiKey);
+            bool apiKeyOk = await Service.SetAuthApiKeyAsync(ApiKey);
             apiKeyFailed = !apiKeyOk;
 
-            var hmacKeyOk = await Service.SetAuthHmacKeyAsync(HmacKey);
+            bool hmacKeyOk = await Service.SetAuthHmacKeyAsync(HmacKey);
             hmacKeyFailed = !hmacKeyOk;
 
-            var enabledOk = await Service.SetAuthEnabledAsync(IsEnabled);
+            bool enabledOk = await Service.SetAuthEnabledAsync(IsEnabled);
             enableFailed = !enabledOk;
 
             await Service.SaveSettingsAsync();
@@ -172,7 +172,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
                 }
                 else
                 {
-                    StatusMessage = NetworkSecurityMsgSaved;
+                    StatusMessage = NetworkSecuritySettingsSaved;
                 }
 
                 OnPropertyChanged(nameof(HasStatusMessage));
@@ -201,14 +201,14 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
 
         try
         {
-            var ok = await Service.GenerateAuthKeysAsync();
+            bool ok = await Service.GenerateAuthKeysAsync();
 
             if (ok)
             {
                 await RefreshAsync();
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    StatusMessage = NetworkSecurityMsgKeysGenerated;
+                    StatusMessage = NetworkSecurityKeysGenerated;
                     OnPropertyChanged(nameof(HasStatusMessage));
                 });
             }
@@ -216,7 +216,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    StatusMessage = NetworkSecurityMsgGenerateFailed;
+                    StatusMessage = NetworkSecurityGenerateFailed;
                     OnPropertyChanged(nameof(HasStatusMessage));
                 });
             }
@@ -225,7 +225,7 @@ public sealed class NetworkSecurityViewModel : BaseViewModel
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                StatusMessage = NetworkSecurityMsgGenerateFailed;
+                StatusMessage = NetworkSecurityGenerateFailed;
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }

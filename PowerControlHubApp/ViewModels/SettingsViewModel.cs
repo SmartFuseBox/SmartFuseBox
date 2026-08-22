@@ -2,6 +2,7 @@ using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -147,7 +148,7 @@ public class SettingsViewModel : BaseViewModel
 
         try
         {
-            var result = await Service.GetSystemPinsAsync();
+            SystemPinsResponseModel result = await Service.GetSystemPinsAsync();
 
             if (result?.Success == true && result.Pins?.Count > 0)
             {

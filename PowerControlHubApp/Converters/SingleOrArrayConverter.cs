@@ -11,7 +11,7 @@ namespace PowerControlHubApp.Converters
             if (reader.TokenType == JsonTokenType.StartArray)
                 return JsonSerializer.Deserialize<T[]>(ref reader, options)!;
 
-            var single = JsonSerializer.Deserialize<T>(ref reader, options);
+            T single = JsonSerializer.Deserialize<T>(ref reader, options);
             return [single!];
         }
 

@@ -2,6 +2,7 @@ using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -124,7 +125,7 @@ public sealed class MqttSettingsViewModel : BaseViewModel
         }
     }
 
-    public string MqttConnectionStateText => _mqttConnectionState ? MqttConnectedLabel : MqttDisconnectedLabel;
+    public string MqttConnectionStateText => _mqttConnectionState ? MqttConnected : MqttDisconnected;
 
     public string MqttDiscoveryPrefix
     {
@@ -170,15 +171,15 @@ public sealed class MqttSettingsViewModel : BaseViewModel
 
         try
         {
-            var enabled = await Service.GetMqttEnabledAsync();
-            var broker = await Service.GetMqttBrokerAsync();
-            var port = await Service.GetMqttPortAsync();
-            var username = await Service.GetMqttUsernameAsync();
-            var deviceId = await Service.GetMqttDeviceIdAsync();
-            var haDiscovery = await Service.GetMqttHADiscoveryAsync();
-            var keepAlive = await Service.GetMqttKeepAliveAsync();
-            var connectionState = await Service.GetMqttConnectionStateAsync();
-            var discoveryPrefix = await Service.GetMqttDiscoveryPrefixAsync();
+            bool? enabled = await Service.GetMqttEnabledAsync();
+            string broker = await Service.GetMqttBrokerAsync();
+            int? port = await Service.GetMqttPortAsync();
+            string username = await Service.GetMqttUsernameAsync();
+            string deviceId = await Service.GetMqttDeviceIdAsync();
+            bool? haDiscovery = await Service.GetMqttHADiscoveryAsync();
+            int? keepAlive = await Service.GetMqttKeepAliveAsync();
+            bool? connectionState = await Service.GetMqttConnectionStateAsync();
+            string discoveryPrefix = await Service.GetMqttDiscoveryPrefixAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -223,40 +224,40 @@ public sealed class MqttSettingsViewModel : BaseViewModel
 
         try
         {
-            var enabledOk = await Service.SetMqttEnabledAsync(MqttEnabled);
+            bool enabledOk = await Service.SetMqttEnabledAsync(MqttEnabled);
             anyFailed |= !enabledOk;
 
-            var brokerOk = await Service.SetMqttBrokerAsync(MqttBroker);
+            bool brokerOk = await Service.SetMqttBrokerAsync(MqttBroker);
             anyFailed |= !brokerOk;
 
             if (int.TryParse(MqttPort, out int port) && port >= PortMin && port <= PortMax)
             {
-                var portOk = await Service.SetMqttPortAsync(port);
+                bool portOk = await Service.SetMqttPortAsync(port);
                 anyFailed |= !portOk;
             }
 
-            var usernameOk = await Service.SetMqttUsernameAsync(MqttUsername);
+            bool usernameOk = await Service.SetMqttUsernameAsync(MqttUsername);
             anyFailed |= !usernameOk;
 
             if (!string.IsNullOrEmpty(MqttPassword))
             {
-                var passwordOk = await Service.SetMqttPasswordAsync(MqttPassword);
+                bool passwordOk = await Service.SetMqttPasswordAsync(MqttPassword);
                 anyFailed |= !passwordOk;
             }
 
-            var deviceIdOk = await Service.SetMqttDeviceIdAsync(MqttDeviceId);
+            bool deviceIdOk = await Service.SetMqttDeviceIdAsync(MqttDeviceId);
             anyFailed |= !deviceIdOk;
 
-            var haOk = await Service.SetMqttHADiscoveryAsync(MqttHADiscovery);
+            bool haOk = await Service.SetMqttHADiscoveryAsync(MqttHADiscovery);
             anyFailed |= !haOk;
 
             if (int.TryParse(MqttKeepAlive, out int keepAlive) && keepAlive > 0)
             {
-                var kaOk = await Service.SetMqttKeepAliveAsync(keepAlive);
+                bool kaOk = await Service.SetMqttKeepAliveAsync(keepAlive);
                 anyFailed |= !kaOk;
             }
 
-            var prefixOk = await Service.SetMqttDiscoveryPrefixAsync(MqttDiscoveryPrefix);
+            bool prefixOk = await Service.SetMqttDiscoveryPrefixAsync(MqttDiscoveryPrefix);
             anyFailed |= !prefixOk;
 
             await Service.SaveSettingsAsync();

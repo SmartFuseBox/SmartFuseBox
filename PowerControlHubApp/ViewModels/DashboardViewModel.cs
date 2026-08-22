@@ -3,6 +3,7 @@ using PowerControlHubApp.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
@@ -114,7 +115,7 @@ public class DashboardViewModel : BaseViewModel
         // here can never affect IsConnected, HasSensors, or the IsBusy flag.
         _ = Task.Run(async () =>
         {
-            var ota = await Service.GetOtaStatusAsync();
+            OtaStatusModel ota = await Service.GetOtaStatusAsync();
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 OtaSupported = ota != null;
@@ -161,7 +162,7 @@ public class DashboardViewModel : BaseViewModel
 
             // Give the device a moment then poll for updated status
             await Task.Delay(TimeSpan.FromSeconds(SecondsTwo));
-            var ota = await Service.GetOtaStatusAsync();
+            OtaStatusModel ota = await Service.GetOtaStatusAsync();
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 _otaStatus = ota;
@@ -188,7 +189,7 @@ public class DashboardViewModel : BaseViewModel
 
     private void UpdateRelays(IReadOnlyList<RelayModel> incoming)
     {
-        var vms = RelayStore.FromModels(incoming ?? []);
+        List<RelayViewModel> vms = RelayStore.FromModels(incoming ?? []);
         _relayStore.ReplaceAll(vms);
     }
 

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.Models
 {

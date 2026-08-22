@@ -2,10 +2,11 @@ using PowerControlHubApp.Models.Json;
 using PowerControlHubApp.Services;
 using System.Windows.Input;
 using static PowerControlHubApp.Internal.Constants;
+using static PowerControlHubApp.Resources.Localization.AppResources;
 
 namespace PowerControlHubApp.ViewModels;
 
-public sealed class SdCardSettingsViewModel : BaseViewModel
+public sealed partial class SdCardSettingsViewModel : BaseViewModel
 {
     private string _spiSck = string.Empty;
     private string _spiMosi = string.Empty;
@@ -115,21 +116,33 @@ public sealed class SdCardSettingsViewModel : BaseViewModel
 
         try
         {
-            var index = await Service.GetDashboardDataAsync();
+            IndexModel index = await Service.GetDashboardDataAsync();
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (index?.Config != null)
                 {
-                    SpiSck = index.Config.SpiPins?.Sck == SdCardPinDisabled ? string.Empty : index.Config.SpiPins?.Sck.ToString() ?? string.Empty;
-                    SpiMosi = index.Config.SpiPins?.Mosi == SdCardPinDisabled ? string.Empty : index.Config.SpiPins?.Mosi.ToString() ?? string.Empty;
-                    SpiMiso = index.Config.SpiPins?.Miso == SdCardPinDisabled ? string.Empty : index.Config.SpiPins?.Miso.ToString() ?? string.Empty;
-                    CsPin = index.Config.SdCardCsPin == SdCardPinDisabled ? string.Empty : index.Config.SdCardCsPin.ToString();
+                    SpiSck = index.Config.SpiPins?.Sck == SdCardPinDisabled ?
+                        string.Empty :
+                        index.Config.SpiPins?.Sck.ToString() ?? string.Empty;
+
+                    SpiMosi = index.Config.SpiPins?.Mosi == SdCardPinDisabled ?
+                        string.Empty
+                        : index.Config.SpiPins?.Mosi.ToString() ?? string.Empty;
+
+                    SpiMiso = index.Config.SpiPins?.Miso == SdCardPinDisabled ?
+                        string.Empty :
+                        index.Config.SpiPins?.Miso.ToString() ?? string.Empty;
+
+                    CsPin = index.Config.SdCardCsPin == SdCardPinDisabled ?
+                        string.Empty :
+                        index.Config.SdCardCsPin.ToString();
+
                     InitSpeed = index.Config.SdCardInitializeSpeed.ToString();
                 }
 
                 IsConnected = true;
-                StatusMessage = $"{SdCardMsgRefreshed} {DateTime.Now:HH:mm:ss}";
+                StatusMessage = $"{Refreshed} {DateTime.Now:HH:mm:ss}";
                 OnPropertyChanged(nameof(HasStatusMessage));
             });
         }
@@ -160,21 +173,23 @@ public sealed class SdCardSettingsViewModel : BaseViewModel
 
         try
         {
-            if (int.TryParse(SpiSck, out int sck) && int.TryParse(SpiMosi, out int mosi) && int.TryParse(SpiMiso, out int miso))
+            if (int.TryParse(SpiSck, out int sck) &&
+                int.TryParse(SpiMosi, out int mosi) &&
+                int.TryParse(SpiMiso, out int miso))
             {
-                var spiOk = await Service.SetSdCardSpiPinsAsync(sck, mosi, miso);
+                bool spiOk = await Service.SetSdCardSpiPinsAsync(sck, mosi, miso);
                 spiFailed = !spiOk;
             }
 
             if (int.TryParse(CsPin, out int cs))
             {
-                var csOk = await Service.SetSdCardCsPinAsync(cs);
+                bool csOk = await Service.SetSdCardCsPinAsync(cs);
                 csFailed = !csOk;
             }
 
             if (int.TryParse(InitSpeed, out int speed))
             {
-                var speedOk = await Service.SetSdCardInitSpeedAsync(speed);
+                bool speedOk = await Service.SetSdCardInitSpeedAsync(speed);
                 speedFailed = !speedOk;
             }
 
@@ -184,15 +199,15 @@ public sealed class SdCardSettingsViewModel : BaseViewModel
             {
                 if (spiFailed)
                 {
-                    StatusMessage = SdCardMsgSpiFailed;
+                    StatusMessage = $"{IconWarning} {SdCardSpiFailed}";
                 }
                 else if (!csFailed && !speedFailed)
                 {
-                    StatusMessage = SdCardMsgSaved;
+                    StatusMessage = SdCardSettingsSaved;
                 }
                 else
                 {
-                    StatusMessage = SdCardMsgPartiallySaved;
+                    StatusMessage = $"{IconWarning} {SdCardPartiallySaved}";
                 }
 
                 OnPropertyChanged(nameof(HasStatusMessage));
@@ -212,7 +227,8 @@ public sealed class SdCardSettingsViewModel : BaseViewModel
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822", Justification = "Called polymorphically from OnDisappearing")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822",
+        Justification = "Called polymorphically from OnDisappearing")]
     public void Cleanup()
     {
     }
